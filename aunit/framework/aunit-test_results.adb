@@ -8,7 +8,7 @@
 --                                                                          --
 --                            $Revision$
 --                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--           Copyright (C) 2000-2001 Ada Core Technologies, Inc.            --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -34,10 +34,9 @@ package body AUnit.Test_Results is
       R.Tests_Run := R.Tests_Run + Subtest_Count;
    end Start_Test;
 
-
    --  Record an assertion violation
    procedure Add_Success
-     (R : in out Result; Test_Name, Routine_name : String_Access) is
+     (R : in out Result; Test_Name, Routine_Name : String_Access) is
    begin
       Success_Lists.Extend
         (R.Successes_List,
@@ -46,7 +45,7 @@ package body AUnit.Test_Results is
 
    --  Record a test failure
    procedure Add_Failure
-     (R : in out Result; Test_Name, Routine_name : String_Access;
+     (R : in out Result; Test_Name, Routine_Name : String_Access;
       E : Exception_Occurrence) is
    begin
       Failure_Lists.Extend
@@ -56,7 +55,7 @@ package body AUnit.Test_Results is
 
    --  Record a test error
    procedure Add_Error
-     (R : in out Result; Test_Name, Routine_name : String_Access;
+     (R : in out Result; Test_Name, Routine_Name : String_Access;
       E : Exception_Occurrence) is
    begin
       Failure_Lists.Extend
@@ -99,7 +98,6 @@ package body AUnit.Test_Results is
    begin
       return Success_Count (R) = Test_Count (R);
    end Successful;
-
 
    --  List of successful tests
    function Successes (R : Result) return Success_Lists.List is
