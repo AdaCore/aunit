@@ -7,12 +7,13 @@
 	<META NAME="AUTHOR" CONTENT=" ">
 	<META NAME="CREATED" CONTENT="20000320;9474300">
 	<META NAME="CHANGEDBY" CONTENT="Ed Falis">
-	<META NAME="CHANGED" CONTENT="20001002;6214900">
+	<META NAME="CHANGED" CONTENT="20001129;15395100">
 </HEAD>
 <BODY>
 <H1><FONT COLOR="#33ff33">A</FONT><FONT COLOR="#cc0000">U</FONT>nit
 Cookbook</H1>
-<HR>
+<P STYLE="border-top: none; border-bottom: 1.10pt double #808080; border-left: none; border-right: none; padding-top: 0in; padding-bottom: 0.02in; padding-left: 0in; padding-right: 0in">
+<FONT SIZE=2 STYLE="font-size: 11pt">Version 1.01</FONT></P>
 <P><BR>This is a short guide for using the AUnit test framework.
 AUnit is an adaptation of the Java JUnit (Kent Beck, Eric Gamma) unit
 test framework for Ada code. This document is adapted from the JUnit
@@ -44,25 +45,27 @@ something, here is what you do:
 	</P>
 	<LI><P STYLE="margin-bottom: 0in">The new derived type must provide
 	implementations of <I>Register_Tests</I> and <I>Name.</I></P>
-	<LI><P STYLE="margin-bottom: 0in">Write each test routine (a
-	parameterless procedure) and register it with a line in routine
-	<I>Register_Tests</I>, of the form:</P>
+	<LI><P STYLE="margin-bottom: 0in">Write each test routine (see
+	below) and register it with a line in routine <I>Register_Tests</I>,
+	of the form:</P>
 	<P STYLE="margin-bottom: 0in"><BR><FONT SIZE=2><FONT FACE="courier, monospace">Register_Routine
 	(T, Test_Name'Access, &quot;Description of test routine&quot;);</FONT></FONT></P>
 	<LI><P>When you want to check a value,
 	use:<BR><BR><FONT SIZE=2><FONT FACE="courier, monospace">AUnit.Assertions.A</FONT></FONT><TT><FONT SIZE=2><FONT FACE="courier, monospace">ssert</FONT></FONT></TT><FONT SIZE=2><FONT FACE="courier, monospace">(Boolean_Expression,
 	String_Description);</FONT></FONT></P>
-	<LI><P>In a harness routine, create an instance of the derived test
-	case type, and either add it to a test suite (see below) or call its
-	run subroutine.</P>
+	<LI><P>Create a suite function to gather together test cases and
+	sub-suites.</P>
+	<LI><P>At any level at which you wish to run tests, create a harness
+	instantiating Aunit.Test_Runner with a suite function collecting
+	together test cases and sub-suites to execute.</P>
 	<LI><P>Be sure to initialize the source path for GNAT to include
-	/aunit-1.0/aunit and its subdirectories. In GLIDE, this can be done
+	/aunit-1.01/aunit and its subdirectories. In GLIDE, this can be done
 	using the &quot;Load Recursive Directory&quot; command in the
 	project editing window. For other compilation systems, make these
 	source file subdirectories known to them using their specific
 	conventions.</P>
 	<LI><P ALIGN=LEFT>Build the harness routine using gnatmake. <FONT SIZE=3><FONT FACE="Times New Roman, serif">The
-	Glide project file aunit-1.0/aunit/aunit.adp contains all the
+	Glide project file aunit-1.01/aunit/aunit.adp contains all the
 	necessary links and switches for building test cases. When testing a
 	new compiler, as opposed to incremental unit tests, the GNAT &quot;-f&quot;
 	switch should be set for gnatmake. One can then use GLIDE to build
@@ -70,14 +73,15 @@ something, here is what you do:
 	file, setting &quot;-f&quot; if needed, and building (^C-C) and
 	running (^C-R). For other compilation systems, use their standard
 	build commands, ensuring that the subdirectories under
-	aunit-1.0/aunit are known to the compilation system as containing
+	aunit-1.01/aunit are known to the compilation system as containing
 	sources.</FONT></FONT></P>
 </OL>
 <P>For example, to test that the sum of two Moneys with the same
 currency contains a value which is the sum of the values of the two
 Moneys, the test routine would look like: 
 </P>
-<PRE><FONT FACE="Courier"><FONT SIZE=2>procedure Test_Simple_Add is</FONT></FONT>
+<PRE><FONT FACE="Courier"><FONT SIZE=2>procedure Test_Simple_Add</FONT></FONT>
+<FONT FACE="Courier"><FONT SIZE=2>   (T : Aunit.Test_Cases.Test_Case'Class) is</FONT></FONT>
 <FONT FACE="Courier"><FONT SIZE=2>   X, Y: Some_Currency;</FONT></FONT>
 <FONT FACE="Courier"><FONT SIZE=2>begin</FONT></FONT>
 <FONT FACE="Courier"><FONT SIZE=2>   X := 12; Y := 14;</FONT></FONT>
@@ -140,7 +144,8 @@ package body, constructed by modifying pr_xxxx_xxx.adb is:</FONT></FONT></P>
 <FONT SIZE=2>package body <B>PR_xxxx_xxx</B> is</FONT>
 
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>   -- Simple test routine:</B></FONT></FONT>
-<FONT FACE="Courier, monospace"><FONT SIZE=2><B>   procedure Test_Simple_Add is</B></FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=2><B>   procedure Test_Simple_Add</B></FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=2><B><FONT FACE="Courier">      (T : Aunit.Test_Cases.Test_Case'Class)</FONT> is</B></FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>      X, Y: Some_Currency;</B></FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>   begin</B></FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>      X := 12; Y := 14;</B></FONT></FONT>
@@ -166,7 +171,7 @@ package body, constructed by modifying pr_xxxx_xxx.adb is:</FONT></FONT></P>
 
 <FONT SIZE=2>end <B>PR_xxxx_xxx</B>;</FONT></PRE><P>
 <FONT SIZE=3>The corresponding harness code, adapted from
-aunit-1.0/template/harness.adb is:</FONT></P>
+aunit-1.01/template/harness.adb is:</FONT></P>
 <PRE><FONT SIZE=2>with AUnit.Test_Suites; use AUnit.Test_Suites;</FONT>
 <FONT SIZE=2>with AUnit.Test_Runner;</FONT>
 
@@ -259,7 +264,8 @@ The body becomes:</P>
 <FONT SIZE=2><B>   end Set_Up;</B></FONT>
 
 <FONT FACE="Courier, monospace"><FONT SIZE=2>   -- Simple test routine:</FONT></FONT>
-<FONT FACE="Courier, monospace"><FONT SIZE=2>   procedure Test_Simple_Add is</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=2>   procedure Test_Simple_Add</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=2><FONT FACE="Courier">     (T : Aunit.Test_Cases.Test_Case'Class)</FONT> is</FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2>   begin</FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>       Assert </B></FONT></FONT>
 <FONT FACE="Courier, monospace"><FONT SIZE=2><B>        (FR_12 + FR_14 /= US_26, </B></FONT></FONT>
@@ -288,6 +294,16 @@ routines as you like. Calls to <FONT FACE="courier, monospace">Set_Up</FONT>
 and <FONT FACE="courier, monospace">Tear_Down</FONT><FONT FACE="times, serif">
 </FONT><FONT FACE="Times New Roman, serif">bracket the invocation of
 each test routine.</FONT></P>
+<P><FONT FACE="Times New Roman, serif">Note that as of AUnit 1.01 a
+parameter of type AUnit.Test_Cases.Test_Case'Class has been added to
+test routines. This parameter allows access to the current Test_Case
+instance, so that a test routine can access per-instance (rather than
+package body global) data. This can be useful when deriving one test
+case from another, which introduces the need to separate data of an
+instance of the parent type from that of derived types. This is
+different than the normal case of a set of tests where each Test_Case
+derived type almost certainly will have a singleton instance,
+allowing the safe use of package body global data.</FONT></P>
 <P>Once you have several test cases, organize them into a Suite. 
 </P>
 <H2>Suite</H2>
@@ -397,8 +413,18 @@ begin
 end Harness;</PRE><P STYLE="font-weight: medium">
 As can be seen, this is a very flexible way of composing test cases
 into execution runs.</P>
-<H2><BR><BR>
-</H2>
+<P STYLE="font-weight: medium">Note that the Aunit.Test_Runner.Run
+routine has a defaulted parameter to control whether timing
+information is reported.  Its speficiation is:</P>
+<PRE>procedure Run (Timed : Boolean := True);</PRE><P STYLE="font-weight: medium">
+<BR><BR>
+</P>
+<P STYLE="margin-bottom: 0in">By default the execution time for a
+harness is reported.  If you are running some number of harnesses
+from a scripting language, and comparing the result to an existing
+file, using <SPAN STYLE="font-style: normal"><FONT SIZE=2><FONT FACE="Courier, sans-serif">Timed
+=&gt; False</FONT></FONT></SPAN> ensures that the output will be
+identical across successful runs.</P>
 <H2>Reporting</H2>
 <P STYLE="font-weight: medium">Currently test results are reported
 using a simple console reporting routine:</P>

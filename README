@@ -1,8 +1,8 @@
-AUnit 1.0 README
-24 September 2000
+AUnit 1.01 README
+29 November 2000
 
-This is the first release of the Ada unit test framework AUnit, derived from 
-the JUnit framework for Java.  Read AUnit.html for usage.
+This is a minor update release of the Ada unit test framework AUnit, derived 
+from the JUnit framework for Java.  Read AUnit.html for usage.
 
 
 Installation:
@@ -33,10 +33,28 @@ test_harness [ -v | -V ]
 -v : Verbose mode.  Lists all tests executed.  When not specified, only failed
      and error tests are listed.
 
+Changes:
+1.01	1. Added Test_Case'Class parameter to test routines, allowing access to
+	Test_Case per-instance data.  This may be useful for derived Test_Case
+	instances, as an alternative to using global package body data.
+
+	2. Changed the profile of AUnit.Test_Runner to:
+		procedure AUnit.Test_Runner (Timed : Boolean := True);
+	This allows suppression of timing reporting so that the output
+	of running a harness can be identical across runs.  Useful for
+	scripted regression tests, where the output of a harness run is
+	compared against a reference file.
+
+	3. Implemented remaining memory management for the framework.  There
+	should be no memory leaks now (checked with gnatmem).
+
+	4. Corrected error in AUnit.Lists.Put_Right, where the list wasn't
+	being chained correctly.
+
+	5. Added Set_Up and Tear_Down routines to AUnit.Lists tests.
 
 To do:
 
-1. Memory management for Test_Cases and Test_Suites. Lists are done.
-2. GUI.
+	1. GUI integration.
 
 Maintainer: Ed Falis (falis@gnat.com)
