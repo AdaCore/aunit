@@ -10,7 +10,6 @@ project Aunit_Tests is
 
    package Builder is
       for Default_Switches ("ada") use ("-g", "-gnatQ");
-      for Executable ("harness.adb") use "harness";
    end Builder;
 
    package Linker is
