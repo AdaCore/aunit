@@ -6,9 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                            $Revision$
---                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--             Copyright (C) 2000 - 2003 Ada Core Technologies, Inc.        --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -51,10 +49,16 @@ package AUnit.Test_Cases is
    --  Set up performed before each test routine
    procedure Set_Up (Test : in out Test_Case);
 
+   --  Set up performed before each case (set of test routines)
+   procedure Set_Up_Case (Test : in out Test_Case);
+
    --  Tear down performed after each test routine
    procedure Tear_Down (Test : in out Test_Case);
 
-   --  Run one test case
+   --  Tear down performed after each case
+   procedure Tear_Down_Case (Test : in out Test_Case);
+
+    --  Run one test case
    procedure Run (Test : in out Test_Case; R : in out Result);
 
 private
