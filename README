@@ -1,5 +1,5 @@
-AUnit 1.01 README
-29 November 2000
+AUnit 1.02 README
+05 October 2003
 
 This is a minor update release of the Ada unit test framework AUnit, derived 
 from the JUnit framework for Java.  Read AUnit.html for usage.
@@ -7,19 +7,42 @@ from the JUnit framework for Java.  Read AUnit.html for usage.
 
 Installation:
 
-Unzip the archive into <install-dir>.  Build and run <install-dir>/aunit-1.0/test/harness.adb to verify that it works.
+Unzip the archive into <install-dir>.  Build and run
+ <install-dir>/aunit-1.02/test/harness.adb to verify that it works. To build, 
+connect to <install-dir>/aunit-1.02 and type:
+
+gnatmake -Paunit_tests
+
+To execute, type:
+
+./harness   -- or "harness" on Windows
+
+The output should be:
+
+   Total Tests Run:  24
+
+   Successful Tests: 24
+
+   Failed Tests: 0
+
+   Unexpected Errors: 0
+
+
+-------
 
 
 Directories contain the following:
 
-aunit/*    - The framework and a simple text mode reporter of results.
-template/* - Templates for unit tests, a test harness, and a GLIDE project
-             file.
-tests/*    - A set of unit tests for testing the framework itself (in progress)
+aunit      - Top-level: includes README etc, a GNAT project file for
+             AUnit, and a GNAT project file for the AUnit tests
+aunit/*    - The framework and a simple text mode reporter of results
+template/* - Templates for unit tests and a test harness, and for a GNAT 
+	     project file.
+tests/*    - A set of unit tests for testing the framework itself
 
 Currently AUnit is written to work with the open source GNAT Ada compilation
-system.  To that end, GLIDE project files have been provided.  For other 
-compilation systems, the sources in aunit-1.0/aunit/* must be made accessible
+system.  To that end, GNAT project files have been provided.  For other 
+compilation systems, the sources in aunit-1.02/aunit/* must be made accessible
 to the compilation system according to its conventions.
 
 
@@ -34,6 +57,8 @@ test_harness [ -v | -V ]
      and error tests are listed.
 
 Changes:
+1.02    1. Added GNAT project files (*.gpr).
+
 1.01	1. Added Test_Case'Class parameter to test routines, allowing access to
 	Test_Case per-instance data.  This may be useful for derived Test_Case
 	instances, as an alternative to using global package body data.
@@ -52,9 +77,5 @@ Changes:
 	being chained correctly.
 
 	5. Added Set_Up and Tear_Down routines to AUnit.Lists tests.
-
-To do:
-
-	1. GUI integration.
 
 Maintainer: Ed Falis (falis@gnat.com)
