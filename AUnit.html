@@ -15,7 +15,7 @@
 Cookbook</h1>
 <p
  style="border-style: none none double; border-color: -moz-use-text-color -moz-use-text-color rgb(128, 128, 128); border-width: medium medium 1.1pt; padding: 0in 0in 0.02in;">
-<font style="font-size: 11pt;" size="2">Version 1.03</font></p>
+<font style="font-size: 11pt;" size="2">Version 1.04</font></p>
 <p><br>
 This is a short guide for using the AUnit test framework.
 AUnit is an adaptation of the Java JUnit (Kent Beck, Erich Gamma) unit
@@ -39,7 +39,10 @@ something, here is what you do: </p>
   <li>
     <p style="margin-bottom: 0in;">Declare a package for a test case -
 a set of logically related test routines. A template for such a package
-is in /AUnit/Template/pr_xxxx_xxx.ad*.</p>
+is in /AUnit/Template/pr_xxxx_xxx.ad*.&nbsp; GPS provides an <span
+ style="font-style: italic;">Edit -&gt; Unit Testing </span>menu to
+generate template code.<br>
+    </p>
   </li>
   <li>
     <p style="margin-bottom: 0in;">Derive from <i><span style="">AUnit</span><b>.</b>Test_Cases.Test_Case</i>
@@ -60,8 +63,8 @@ Test_Name'Access, "Description of test routine");</font></font></p>
   <li>
     <p>When you want to check a value, use:<br>
     <br>
-    <font size="2"><font face="courier, monospace">AUnit.Assertions.A</font></font><tt><font
- size="2"><font face="courier, monospace">ssert</font></font></tt><font
+    <font size="2"><font face="courier, monospace">AUnit.Assertions.</font></font><font
+ size="2"><font face="courier, monospace">Assert</font></font><font
  size="2"><font face="courier, monospace">(Boolean_Expression,
 String_Description);</font></font></p>
   </li>
@@ -75,24 +78,21 @@ instantiating Aunit.Test_Runner with a suite function collecting
 together test cases and sub-suites to execute.</p>
   </li>
   <li>
-    <p>Be sure to initialize the source path for GNAT to include
-/aunit-1.01/aunit and its subdirectories. In GLIDE, this can be done
-using the "Load Recursive Directory" command in the project editing
-window. For other compilation systems, make these source file
-subdirectories known to them using their specific conventions.</p>
+    <p>AUnit includes a GNAT project file that should be included into
+your application project to access the framework.&nbsp; For other
+compilation systems, be sure to include the subdirectories of <span
+ style="font-style: italic;">aunit</span> in your list of source
+directories.<br>
+    </p>
   </li>
   <li>
     <p align="left">Build the harness routine using gnatmake. <font
- size="3"><font face="Times New Roman, serif">The Glide project file
-aunit-1.01/aunit/aunit.adp contains all the necessary links and
+ size="3"><font face="Times New Roman, serif">The GNAT project file
+    <span style="font-style: italic;">aunit-1.03/aunit_tests.gpr</span>
+contains all the necessary links and
 switches for building test cases. When testing a new compiler, as
 opposed to incremental unit tests, the GNAT "-f" switch should be set
-for gnatmake. One can then use GLIDE to build and run the tests, making
-sure that aunit.adp is the default project file, setting "-f" if
-needed, and building (^C-C) and running (^C-R). For other compilation
-systems, use their standard build commands, ensuring that the
-subdirectories under aunit-1.01/aunit are known to the compilation
-system as containing sources.</font></font></p>
+for gnatmake. One can then use GNAT to build and run the tests.</font></font></p>
   </li>
 </ol>
 <p>For example, to test that the sum of two Moneys with the same
@@ -204,7 +204,7 @@ package body, constructed by modifying pr_xxxx_xxx.adb is:</font></font></p>
 
 <font size="2">end <b>PR_xxxx_xxx</b>;</font></pre>
 <p><font size="3">The corresponding harness code, adapted from
-aunit-1.01/template/harness.adb is:</font></p>
+aunit-1.03/template/harness.adb is:</font></p>
 <pre><font size="2">with AUnit.Test_Suites; use AUnit.Test_Suites;</font>
 <font size="2">with AUnit.Test_Runner;</font>
 
@@ -246,18 +246,30 @@ section, starting from the templates pr_xxxx_xxx.ad*</p>
   </li>
   <li>
     <p style="margin-bottom: 0in;">Add fields for elements of the
-fixture into package body.</p>
+fixture into the package body.<br>
+    <br>
+    </p>
+  </li>
+  <li>Override <i><font face="courier, monospace">Set_Up_Case </font></i>
+to initialize the fixture for all test routines.<br>
   </li>
   <li>
     <p>Override <i><font face="courier, monospace">Set_Up</font></i>
-to initialize the variables </p>
+to initialize the variables before the execution of each routine.<br>
+    </p>
   </li>
   <li>
     <p>Override <font face="courier, monospace"><i>Tear_Down</i> </font>to
-release any permanent resources you allocated in <i>S<font
+release any&nbsp; resources you allocated in <i>S<font
  face="courier, monospace">et_Up</font></i><font
- face="courier, monospace"> </font> </p>
+ face="courier, monospace"> - to be executed after each test routine.<br>
+    </font></p>
   </li>
+  <li>Override <font face="courier, monospace"><i>Tear_Down_Case</i> </font>to
+release any permanent resources you allocated in <i>S<font
+ face="courier, monospace">et_Up_Case </font></i><font
+ face="courier, monospace">- executed after all test routines.<br>
+    </font></li>
 </ol>
 <p>For example, to write several test cases that want to work with
 different combinations of 12 French Francs, 14 French Francs, and 26
@@ -401,6 +413,12 @@ following to the console when executed:</p>
 <p>The switch "-v" may be used with any harness to cause the
 list of successful tests to be printed along with any failures or
 errors:</p>
-<pre>[efalis@dogen AUnit]$ ./harness -v<br>   Total Tests Run:  17<br><br>   Successful Tests: 17<br>      PR 7112-001: Record_Initialization<br>      PR 7210-005: Test_1<br>      PR 7210-005: Test_2<br>      PR 7210-005: Test_3<br>      PR 7210-005: Test_4<br>      PR 7210-005: Test_5<br>      PR 7210-005: Test_6<br>      PR 7210-005: Test_A<br>      PR 7210-005: Test_B<br>      PR 7503-008: Allocation_Test<br>      PR 7605-009: Modular_Bounds<br>      PR 8010-001b: Test calculation of constant with modular sub-expression<br>      PR 7522-012: Subtype not recognized in initialization<br>      PR 7617-011: Test renaming in instantiation I<br>      PR 7624-003: Use of multi-dimensional aggregate as generic actual parameter<br>      PR 7813-010: Test -gnatc for bogus semantic error<br>      PR 8010-009: Overload resolution with enumeration literals<br><br>   Failed Tests: 0<br><br>   Unexpected Errors: 0<br><br>Time:  0.001011000 seconds</pre>
+<pre>[efalis@dogen AUnit]$ ./harness -v<br>   Total Tests Run:  17<br><br>   Successful Tests: 17<br>      PR 7112-001: Record_Initialization<br>      PR 7210-005: Test_1<br>      PR 7210-005: Test_2<br>      PR 7210-005: Test_3<br>      PR 7210-005: Test_4<br>      PR 7210-005: Test_5<br>      PR 7210-005: Test_6<br>      PR 7210-005: Test_A<br>      PR 7210-005: Test_B<br>      PR 7503-008: Allocation_Test<br>      PR 7605-009: Modular_Bounds<br>      PR 8010-001b: Test calculation of constant with modular sub-expression<br>      PR 7522-012: Subtype not recognized in initialization<br>      PR 7617-011: Test renaming in instantiation I<br>      PR 7624-003: Use of multi-dimensional aggregate as generic actual parameter<br>      PR 7813-010: Test -gnatc for bogus semantic error<br>      PR 8010-009: Overload resolution with enumeration literals<br><br>   Failed Tests: 0<br><br>   Unexpected Errors: 0<br><br>Time:  0.001011000 seconds<br><br></pre>
+<h2>GPS Support</h2>
+Note that the GPS IDE has a menu <span style="font-weight: bold;"><span
+ style="font-style: italic;">Edit -&gt; Unit Testing</span></span> to
+generate the template code for test cases, test suites and harnesses.<br>
+<br>
+<pre><br></pre>
 </body>
 </html>
