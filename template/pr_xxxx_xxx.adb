@@ -7,8 +7,7 @@ with AUnit.Assertions; use AUnit.Assertions;
 package body PR_XXXX_XXX is
 
    --  Example test routine. Provide as many as are needed:
-   procedure Test1;
-
+   procedure Test1 (R : in out AUnit.Test_Cases.Test_Case'Class);
 
    procedure Set_Up (T : in out Test_Case) is
    begin
@@ -29,7 +28,7 @@ package body PR_XXXX_XXX is
 
 
    --  Example test routine. Provide as many as are needed:
-   procedure Test1 is
+   procedure Test1 (R : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       --  Do something:
       null;

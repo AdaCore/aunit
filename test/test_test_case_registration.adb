@@ -9,19 +9,19 @@ package body Test_Test_Case_Registration is
 
    --  Test Routines:
 
-   procedure Dummy_Test_Routine is
+   procedure Dummy_Test_Routine (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       null;
    end Dummy_Test_Routine;
 
-   procedure Test_Register_Routine is
-      T : aliased Empty_Test_Case.Test_Case;
-      Initial_Count : Natural := Routine_Count (T);
+   procedure Test_Register_Routine (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      E : aliased Empty_Test_Case.Test_Case;
+      Initial_Count : Natural := Routine_Count (E);
    begin
-      Register_Routine (T, Dummy_Test_Routine'Access, "Dummy");
+      Register_Routine (E, Dummy_Test_Routine'Access, "Dummy");
 
       Assert
-        (Routine_Count (T) = Initial_Count + 1,
+        (Routine_Count (E) = Initial_Count + 1,
          "Register failed to update routine count");
    end Test_Register_Routine;
 

@@ -15,7 +15,9 @@ package One_Test_Case is
 
 private
    --  Test_1 will be inherited in another test case:
-   procedure Test_1;
-   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
+   procedure Test_1 (T : in out AUnit.Test_Cases.Test_Case'Class);
+   type Test_Case is new AUnit.Test_Cases.Test_Case with record
+      Parent_Data : Integer := 0;
+   end record;
 
 end One_Test_Case;

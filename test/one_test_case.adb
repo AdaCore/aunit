@@ -6,7 +6,7 @@ package body One_Test_Case is
 
 
    --  Test Routines:
-   procedure Test_1 is
+   procedure Test_1 (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       null;
    end Test_1;

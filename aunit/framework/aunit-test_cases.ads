@@ -36,8 +36,10 @@ use Ada.Strings.Unbounded;
 package AUnit.Test_Cases is
    type Test_Case is abstract new Test with private;
 
-   --  All test routines are parameterless procedures:
-   type Test_Routine is access procedure;
+   --  All test routines include a reference to the Test_Case instance,
+   --  which can be useful for maintaining per-instance data in derivations
+   --  of Test_Case:
+   type Test_Routine is access procedure (Test : in out Test_Case'Class);
 
    --  Register test methods with test suite. Each test case has its
    --  own version of this routine.

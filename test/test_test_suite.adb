@@ -8,13 +8,13 @@ with AUnit.Test_Suites; use AUnit.Test_Suites;
 
 with Empty_Test_Case;
 with One_Test_Case;
-with Inherited_Test_Case;
+with One_Test_Case.Inherited_Test_Case;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
 
    --  Test Routines:
-   procedure Test_No_Test_Case is
+   procedure Test_No_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class) is
       S : Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
@@ -25,7 +25,7 @@ package body Test_Test_Suite is
    end Test_No_Test_Case;
 
 
-   procedure Test_No_Test_Routines is
+   procedure Test_No_Test_Routines (T : in out AUnit.Test_Cases.Test_Case'Class) is
       S :  Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
@@ -37,7 +37,7 @@ package body Test_Test_Suite is
    end Test_No_Test_Routines;
 
 
-   procedure Test_One_Test_Case is
+   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class) is
       S : Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
@@ -50,15 +50,15 @@ package body Test_Test_Suite is
       Assert (Successful (R), "Suite did not run successfully");
    end Test_One_Test_Case;
 
-   procedure Test_Inherited_Tests is
+   procedure Test_Inherited_Tests (T : in out AUnit.Test_Cases.Test_Case'Class) is
       S :  Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
-      Add_Test (S, new Inherited_Test_Case.Test_Case);
+      Add_Test (S, new One_Test_Case.Inherited_Test_Case.Test_Case);
       Run (S.all, R);
 
       Assert (Successful (R), "Suite did not run successfully");
-      Assert (Test_Count (R) = 2, "Wrong number of tests run");
+      Assert (Test_Count (R) = 4, "Wrong number of tests run");
    end Test_Inherited_Tests;
 
 

@@ -321,6 +321,7 @@ package body AUnit.Lists is
          L.Active := P;
       else
          Put_Right (P, L.Active.Right);
+         Put_Right (L.Active, P);
       end if;
       L.Count := L.Count + 1;
    end Put_Right;

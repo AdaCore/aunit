@@ -9,7 +9,7 @@ package body Test_Test_Case is
 
    --  Test Routines:
 
-   procedure Test_Register_Tests is
+   procedure Test_Register_Tests (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Simple : Simple_Test_Case.Test_Case;
       Old_Count : Positive := Routine_Count (Simple);
    begin
@@ -20,7 +20,7 @@ package body Test_Test_Case is
          "Routine not properly registered");
    end Test_Register_Tests;
 
-   procedure Test_Set_Up is
+   procedure Test_Set_Up (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Simple :  Simple_Test_Case.Test_Case;
       use Simple_Test_Case;
       Was_Reset : Boolean := not Is_Set_Up (Simple);
@@ -32,7 +32,7 @@ package body Test_Test_Case is
          "Not set up correctly");
    end Test_Set_Up;
 
-   procedure Test_Torn_Down is
+   procedure Test_Torn_Down (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Simple :  Simple_Test_Case.Test_Case;
       use Simple_Test_Case;
       Was_Reset : Boolean := not Is_Torn_Down (Simple);
@@ -44,24 +44,25 @@ package body Test_Test_Case is
          "Not torn down correctly");
    end Test_Torn_Down;
 
-   procedure Test_Run is
+   procedure Test_Run (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      use Simple_Test_Case;
       Simple :  Simple_Test_Case.Test_Case;
       R : Result;
-      use Simple_Test_Case;
+      Count : Natural := Routine_Count (Simple);
    begin
       Run (Simple, R);
 
       Assert
-        (Routine_Count (Simple) >= 3,
+        (Count  >= 3,
          "Not enough routines in simple test case");
 
       Assert
-        (Test_Count (R) = Routine_Count (Simple),
+        (Test_Count (R) = Count,
          "Not all requested routines were run");
 
       Assert
         (Success_Count (R) + Failure_Count (R) + Error_Count (R) =
-         Routine_Count (Simple),
+         Count,
          "Not all requested routines are recorded");
 
       Assert (Success_Count (R) = 1, "Wrong success count");

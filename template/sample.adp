@@ -1,4 +1,5 @@
-comp_opt=-gnatq 
+comp_opt=-gnatq -gnatE
+bind_opt=-p -f
 gnatmake_opt=-g -i -f
 run_cmd=cd ${build_dir} && ${main} 
 debug_cmd=gvd  ${main}

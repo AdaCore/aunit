@@ -18,18 +18,18 @@ package body Simple_Test_Case is
 
 
    --  Test Routines:
-   procedure Succeed is
+   procedure Succeed (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       null;
    end Succeed;
 
-   procedure Fail is
+   procedure Fail (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       null;
       Assert (False, "Failure test failed");
    end Fail;
 
-   procedure Error is
+   procedure Error (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       raise Constraint_Error;
    end Error;

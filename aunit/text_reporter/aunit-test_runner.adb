@@ -33,7 +33,7 @@ with AUnit.Test_Results.Text_Reporter;
 with Ada.Calendar; use Ada.Calendar;
 
 --  Runner of test suites using text reporter
-procedure AUnit.Test_Runner is
+procedure AUnit.Test_Runner (Timed : Boolean := True) is
    Result : AUnit.Test_Results.Result;
    Start_Time, End_Time : Time;
    Tests : Access_Test_Suite := Suite;
@@ -45,7 +45,10 @@ begin
    Run (Tests.all, Result);
    End_Time := Clock;
 
-   AUnit.Test_Results.Set_Elapsed (Result, End_Time - Start_Time);
+   if Timed then
+      AUnit.Test_Results.Set_Elapsed (Result, End_Time - Start_Time);
+   end if;
+
    AUnit.Test_Results.Text_Reporter.Report (Result);
 end AUnit.Test_Runner;
 

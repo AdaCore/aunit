@@ -9,34 +9,30 @@ package body Test_Lists is
    package Integer_Lists is new AUnit.Lists (Integer);
    use Integer_Lists;
 
+   L : List;
+
    procedure Set_Up (T : in out Test_Case) is
    begin
-      --  Do any necessary set ups.  If there are none,
-      --  omit from both spec and body, as a default
-      --  version is provided in Test_Cases.
-      null;
+      if not Before (L) then
+         Back (L);
+      end if;
    end Set_Up;
 
    procedure Tear_Down (T : in out Test_Case) is
    begin
-      --  Do any necessary cleanups, so the next test
-      --  has a clean environment.  If there is no
-      --  cleanup, omit spec and body, as default is
-      --  provided in Test_Cases.
-      null;
+      Wipe_Out (L);
    end Tear_Down;
 
 
+   -- Test Routines:
 
-   procedure Test_Creation is
-      L : List;
+   procedure Test_Creation (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Assert (Before (L), "Cursor not properly set on initialization");
       Assert (Empty (L), "Initial list not empty");
    end Test_Creation;
 
-   procedure Test_Back is
-      L : List;
+   procedure Test_Back (T : in out AUnit.Test_Cases.Test_Case'Class) is
       I : Natural;
    begin
       Extend (L, 1);
@@ -53,8 +49,7 @@ package body Test_Lists is
           Integer'Image (I - 1) & ", got " & Integer'Image (Index (L)));
    end Test_Back;
 
-   procedure Test_Finish is
-      L : List;
+   procedure Test_Finish (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Finish (L);
       Assert (Before (L), "Finish on empty list /= Before");
@@ -67,24 +62,27 @@ package body Test_Lists is
    end Test_Finish;
 
 
-   procedure Test_Forth is
-      L : List;
-      I : Natural;
+   procedure Test_Forth (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Extend (L, 1);
       Extend (L, 2);
-      I := Index (L);
       Forth (L);
       Assert
-        (Index (L) = I + 1,
+        (Index (L) = 1,
          "Forth failed to advance cursor: expected " &
-         Integer'Image (I + 1) &
+         Integer'Image (1) &
+         " got " &
+         Integer'Image (Index (L)));
+      Forth (L);
+      Assert
+        (Index (L) = 2,
+         "Forth failed to advance cursor: expected " &
+         Integer'Image (2) &
          " got " &
          Integer'Image (Index (L)));
    end Test_Forth;
 
-   procedure Test_Go_I_Th is
-      L : List;
+   procedure Test_Go_I_Th (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Extend (L, 1);
       Extend (L, 2);
@@ -101,8 +99,7 @@ package body Test_Lists is
       end loop;
    end Test_Go_I_Th;
 
-   procedure Test_Move is
-      L : List;
+   procedure Test_Move (T : in out AUnit.Test_Cases.Test_Case'Class) is
       I : Natural;
    begin
       Extend (L, 1);
@@ -148,8 +145,7 @@ package body Test_Lists is
         (After (L), "Move beyond last element failed to indicate After");
    end Test_Move;
 
-   procedure Test_Start is
-      L : List;
+   procedure Test_Start (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Start (L);
       Assert (After (L), "Start on empty list failed to indicate After");
@@ -162,8 +158,7 @@ package body Test_Lists is
         (Is_First (L), "Start on non-empty list failed to indicate Is_First");
    end Test_Start;
 
-   procedure Test_Put_Front is
-      L : List;
+   procedure Test_Put_Front (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Old_Count : Natural := 0;
    begin
       Put_Front (L, 1);
@@ -185,8 +180,7 @@ package body Test_Lists is
    end Test_Put_Front;
 
 
-   procedure Test_Put_Left is
-      L : List;
+   procedure Test_Put_Left (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -213,8 +207,7 @@ package body Test_Lists is
          "Put_Left failed to adjust index for multi-element list");
    end Test_Put_Left;
 
-   procedure Test_Put_Right is
-      L : List;
+   procedure Test_Put_Right (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -241,8 +234,7 @@ package body Test_Lists is
          "Put_Right failed to maintain index for multi-element list");
    end Test_Put_Right;
 
-   procedure Test_Replace is
-      L : List;
+   procedure Test_Replace (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Extend (L, 1);
       Start (L);
@@ -261,8 +253,7 @@ package body Test_Lists is
       Assert (Item (L) = 4, "Replace failed in middle of list");
    end Test_Replace;
 
-   procedure Test_Remove is
-      L : List;
+   procedure Test_Remove (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       Extend (L, 1);
       Extend (L, 2);
@@ -287,8 +278,7 @@ package body Test_Lists is
       Assert (After (L), "Removal of last element failed to indicate After");
    end Test_Remove;
 
-   procedure Test_Remove_Left is
-      L : List;
+   procedure Test_Remove_Left (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -320,8 +310,7 @@ package body Test_Lists is
          "Remove_Left failed to adjust Index when removing first element");
    end Test_Remove_Left;
 
-   procedure Test_Remove_Right is
-      L : List;
+   procedure Test_Remove_Right (T : in out AUnit.Test_Cases.Test_Case'Class) is
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -353,8 +342,7 @@ package body Test_Lists is
          "Remove_Right failed to maintain Index when removing last element");
    end Test_Remove_Right;
 
-   procedure Test_Wipe_Out is
-      L : List;
+   procedure Test_Wipe_Out (T : in out AUnit.Test_Cases.Test_Case'Class) is
    begin
       for I in 1 .. 10 loop
          Extend (L, I);
@@ -362,6 +350,11 @@ package body Test_Lists is
 
       Wipe_Out (L);
       Assert (Empty (L), "Wipe_Out failed to empty list");
+
+      Wipe_Out (L);
+   exception
+      when others =>
+         Assert (False, "Wipe_Out fails when called on empty list");
    end Test_Wipe_Out;
 
    --  Register test routines to call:

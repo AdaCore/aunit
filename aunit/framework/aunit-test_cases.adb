@@ -46,7 +46,7 @@ package body AUnit.Test_Cases is
       Set_Up (Test);
 
       begin
-         Subtest.Routine.all;
+         Subtest.Routine.all (Test);
          Add_Success (R, Name (Test), Subtest.Routine_Name);
       exception
          when E : Assertion_Error =>
@@ -68,7 +68,7 @@ package body AUnit.Test_Cases is
       Start (Test.Routines);
       while not Off (Test.Routines) loop
          Run_Routine (Test, Item (Test.Routines), R);
-         Forth (Test.Routines);
+         Remove (Test.Routines);
       end loop;
    end Run;
 

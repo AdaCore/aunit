@@ -26,13 +26,7 @@
 ------------------------------------------------------------------------------
 
 --  A collection of test cases and sub-suites.
-with Ada.Unchecked_Deallocation;
 package body AUnit.Test_Suites is
-
-   type Access_Test is access all Test'Class;
-
-   procedure Destroy is
-      new Ada.Unchecked_Deallocation (Test'Class, Access_Test);
 
    --  Add a test case or sub-suite to this one:
    procedure Add_Test (S : access Test_Suite; T : access Test'Class) is
@@ -53,7 +47,7 @@ package body AUnit.Test_Suites is
             Tests.Run (Dispatcher, R);
          end;
 
-         Forth (S.Tests);
+         Remove (S.Tests);
       end loop;
    end Run;
 
