@@ -59,6 +59,10 @@ test_harness [ -v | -V ]
 Changes:
 1.02    1. Added GNAT project files (*.gpr).
 
+	2. Added routines Set_Up_Case and Tear_Down_Case to AUnit.Test_Cases
+	to support fixture maintenance needed before and after the execution
+	of the full sequence of test routines.
+
 1.01	1. Added Test_Case'Class parameter to test routines, allowing access to
 	Test_Case per-instance data.  This may be useful for derived Test_Case
 	instances, as an alternative to using global package body data.
