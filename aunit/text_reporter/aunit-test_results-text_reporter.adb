@@ -8,7 +8,7 @@
 --                                                                          --
 --                            $Revision$
 --                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--           Copyright (C) 2000-2001 Ada Core Technologies, Inc.            --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -58,7 +58,8 @@ package body AUnit.Test_Results.Text_Reporter is
             "      " & Err_Rec.Routine_Name.all & ": ");
 
          if not Is_Assertion then
-            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all) & "** : ");
+            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all) 
+                         & "** : ");
             Put ("         ");
          end if;
 
@@ -119,7 +120,6 @@ package body AUnit.Test_Results.Text_Reporter is
       else
          Deallocate_Success_List (S);
       end if;
-
 
       New_Line;
       Put_Line ("   Failed Tests:" & Natural'Image (Failure_Count (R)));
