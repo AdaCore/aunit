@@ -57,6 +57,9 @@ test_harness [ -v | -V ]
      and error tests are listed.
 
 Changes:
+1.03    1. Handling of exceptions in Set_Up and Tear_Down implemented.
+        D603-009.
+
 1.02    1. Added GNAT project files (*.gpr).
 
 	2. Added routines Set_Up_Case and Tear_Down_Case to AUnit.Test_Cases
