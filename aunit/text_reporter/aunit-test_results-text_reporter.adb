@@ -33,6 +33,8 @@ with AUnit.Options; use AUnit.Options;
 --  Very simple reporter to console
 package body AUnit.Test_Results.Text_Reporter is
 
+   procedure Deallocate_Success_List (L : in out Success_Lists.List);
+
    procedure Destroy is new Ada.Unchecked_Deallocation (String, String_Access);
 
    --  Report the contents of an error or failure list
@@ -58,8 +60,8 @@ package body AUnit.Test_Results.Text_Reporter is
             "      " & Err_Rec.Routine_Name.all & ": ");
 
          if not Is_Assertion then
-            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all) 
-                         & "** : ");
+            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all)
+                      & "** : ");
             Put ("         ");
          end if;
 
