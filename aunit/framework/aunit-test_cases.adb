@@ -6,9 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
---                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--             Copyright (C) 2000 - 2003 Ada Core Technologies, Inc.        --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -66,20 +64,30 @@ package body AUnit.Test_Cases is
         (R, Routine_Lists.Count (Test.Routines));
 
       Start (Test.Routines);
+      Set_Up_Case (Test_Case'Class (Test));
       while not Off (Test.Routines) loop
          Run_Routine (Test, Item (Test.Routines), R);
          Remove (Test.Routines);
       end loop;
+      Tear_Down_Case (Test_Case'Class (Test));
+
    end Run;
 
    --  Default Set up routine:
    procedure Set_Up (Test : in out Test_Case) is
    begin null; end Set_Up;
 
+   --  Default Set up case routine:
+   procedure Set_Up_Case (Test : in out Test_Case) is
+   begin null; end Set_Up_Case;
+
    --  Default Tear down routine:
    procedure Tear_Down (Test : in out Test_Case) is
    begin null; end Tear_Down;
 
+   --  Default Tear down case routine:
+   procedure Tear_Down_Case (Test : in out Test_Case) is
+   begin null; end Tear_Down_Case;
 
    --  Register the test routines.
    procedure Initialize (Test : in out Test_Case) is
