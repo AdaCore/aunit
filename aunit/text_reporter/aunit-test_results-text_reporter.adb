@@ -52,16 +52,18 @@ package body AUnit.Test_Results.Text_Reporter is
       Start (L);
       while not Off (L) loop
          Err_Rec := Item (L);
-         Put
+         Put_Line
            ("      " & Err_Rec.Test_Name.all
-            & ": " & Err_Rec.Routine_Name.all & ": ");
+            & ": " &  ASCII.LF &
+            "      " & Err_Rec.Routine_Name.all & ": ");
 
          if not Is_Assertion then
-            Put_Line ("**" & Exception_Name (Err_Rec.E.all) & "** : ");
+            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all) & "** : ");
             Put ("         ");
          end if;
 
-         Put_Line (Exception_Message (Err_Rec.E.all));
+         Put_Line ("      " & Exception_Message (Err_Rec.E.all));
+         New_Line;
 
          Destroy (Err_Rec.Routine_Name);
          Destroy (Err_Rec.Test_Name);
