@@ -1,0 +1,29 @@
+with "aunit.gpr";
+
+project Aunit_Tests is
+
+   for Languages use ("Ada");
+   for Source_Dirs use ("./test");
+   for Object_Dir use "./test";
+   for Exec_Dir use "./";
+   for Main use ("harness.adb");
+
+   package Builder is
+      for Default_Switches ("ada") use ("-g", "-gnatQ");
+      for Executable ("harness.adb") use "harness";
+   end Builder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnatf", "-g");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E", "-static");
+   end Binder;
+
+end Aunit_Tests;
+

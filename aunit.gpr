@@ -1,0 +1,24 @@
+project Aunit is
+
+   for Languages use ("Ada");
+   for Source_Dirs use ("aunit/framework/", "aunit/text_reporter/");
+   for Object_Dir use "aunit";
+
+   package Builder is
+      for Default_Switches ("ada") use ("-g", "-gnatQ");
+   end Builder;
+
+   package Linker is
+      for Default_Switches ("ada") use ("-g");
+   end Linker;
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-gnatf", "-g");
+   end Compiler;
+
+   package Binder is
+      for Default_Switches ("ada") use ("-E", "-static");
+   end Binder;
+
+end Aunit;
+
