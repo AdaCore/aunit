@@ -6,7 +6,9 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---             Copyright (C) 2000 - 2003 Ada Core Technologies, Inc.        --
+--                            $Revision$
+--                                                                          --
+--            Copyright (C) 2000-2004 Ada Core Technologies, Inc.           --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -30,6 +32,12 @@ pragma Elaborate_All (AUnit.Test_Results);
 --  Test cases.
 package body AUnit.Test_Cases is
 
+   Set_Up_String : constant Ada.Strings.Unbounded.String_Access
+     := new String'("*Set_Up*");
+
+   Tear_Down_String : constant Ada.Strings.Unbounded.String_Access
+     := new String'("*Tear_Down*");
+
    --  Run one test routine:
    procedure Run_Routine
      (Test : in out Test_Case'Class;
@@ -41,7 +49,13 @@ package body AUnit.Test_Cases is
       Subtest : Routine_Spec; R : in out Result) is
 
    begin
-      Set_Up (Test);
+      begin
+         Set_Up (Test);
+      exception
+         when E : others =>
+            Add_Error (R, Name (Test), Set_Up_String, E);
+            return;
+      end;
 
       begin
          Subtest.Routine.all (Test);
@@ -53,7 +67,12 @@ package body AUnit.Test_Cases is
             Add_Error (R, Name (Test), Subtest.Routine_Name, E);
       end;
 
-      Tear_Down (Test);
+      begin
+         Tear_Down (Test);
+      exception
+         when E : others =>
+            Add_Error (R, Name (Test), Tear_Down_String, E);
+      end;
    end Run_Routine;
 
    --  Run all routines registered for this test case:
@@ -64,30 +83,20 @@ package body AUnit.Test_Cases is
         (R, Routine_Lists.Count (Test.Routines));
 
       Start (Test.Routines);
-      Set_Up_Case (Test_Case'Class (Test));
       while not Off (Test.Routines) loop
          Run_Routine (Test, Item (Test.Routines), R);
          Remove (Test.Routines);
       end loop;
-      Tear_Down_Case (Test_Case'Class (Test));
-
    end Run;
 
    --  Default Set up routine:
    procedure Set_Up (Test : in out Test_Case) is
    begin null; end Set_Up;
 
-   --  Default Set up case routine:
-   procedure Set_Up_Case (Test : in out Test_Case) is
-   begin null; end Set_Up_Case;
-
    --  Default Tear down routine:
    procedure Tear_Down (Test : in out Test_Case) is
    begin null; end Tear_Down;
 
-   --  Default Tear down case routine:
-   procedure Tear_Down_Case (Test : in out Test_Case) is
-   begin null; end Tear_Down_Case;
 
    --  Register the test routines.
    procedure Initialize (Test : in out Test_Case) is
