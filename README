@@ -1,0 +1,42 @@
+AUnit 1.0 README
+24 September 2000
+
+This is the first release of the Ada unit test framework AUnit, derived from 
+the JUnit framework for Java.  Read AUnit.html for usage.
+
+
+Installation:
+
+Unzip the archive into <install-dir>.  Build and run <install-dir>/aunit-1.0/test/harness.adb to verify that it works.
+
+
+Directories contain the following:
+
+aunit/*    - The framework and a simple text mode reporter of results.
+template/* - Templates for unit tests, a test harness, and a GLIDE project
+             file.
+tests/*    - A set of unit tests for testing the framework itself (in progress)
+
+Currently AUnit is written to work with the open source GNAT Ada compilation
+system.  To that end, GLIDE project files have been provided.  For other 
+compilation systems, the sources in aunit-1.0/aunit/* must be made accessible
+to the compilation system according to its conventions.
+
+
+Switches:
+
+Any test harness using AUnit.Test_Results.Text_Reporter can be invoked with
+the following command syntax:
+
+test_harness [ -v | -V ]
+
+-v : Verbose mode.  Lists all tests executed.  When not specified, only failed
+     and error tests are listed.
+
+
+To do:
+
+1. Memory management for Test_Cases and Test_Suites. Lists are done.
+2. GUI.
+
+Maintainer: Ed Falis (falis@gnat.com)

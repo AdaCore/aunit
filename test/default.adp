@@ -1,0 +1,15 @@
+comp_opt= -gnatf -gnato -gnatE
+bind_opt=-f -p
+gnatmake_opt=-g 
+run_cmd=${main} -v
+debug_cmd=gvd ${main}
+main=./harness
+main_unit=harness
+build_dir=./
+casing=~/.emacs_case_exceptions/
+src_dir=./
+src_dir=../aunit/framework/
+src_dir=../aunit/text_reporter/
+obj_dir=./
+obj_dir=../aunit/framework/
+obj_dir=../aunit/text_reporter/
