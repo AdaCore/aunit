@@ -1,5 +1,3 @@
-with AUnit.Test_Cases.Registration;
-use AUnit.Test_Cases.Registration;
 
 --  Simple test case
 package body Empty_Test_Case is
@@ -9,12 +7,14 @@ package body Empty_Test_Case is
 
    --  Register test routines to call:
    procedure Register_Tests (T : in out Test_Case) is
+      pragma Unreferenced (T);
    begin
       null;
    end Register_Tests;
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+      pragma Unreferenced (T);
    begin
       return  new String'("Empty Test Case");
    end Name;

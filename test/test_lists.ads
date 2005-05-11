@@ -14,7 +14,7 @@ package Test_Lists is
    --  Provide name identifying the test case:
    function Name (T : Test_Case) return String_Access;
 
-   -- Setup before each routine:
+   --  Setup before each routine:
    procedure Set_Up (T : in out Test_Case);
 
    --  Cleanup performed after each routine:

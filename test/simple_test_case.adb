@@ -18,12 +18,18 @@ package body Simple_Test_Case is
 
 
    --  Test Routines:
+   procedure Error (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Fail (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Succeed (T : in out AUnit.Test_Cases.Test_Case'Class);
+
    procedure Succeed (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
    begin
       null;
    end Succeed;
 
    procedure Fail (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
    begin
       null;
       Assert (False, "Failure test failed");
@@ -50,6 +56,7 @@ package body Simple_Test_Case is
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+      pragma Unreferenced (T);
    begin
       return  new String'("Dummy Test Case");
    end Name;

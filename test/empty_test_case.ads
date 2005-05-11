@@ -3,7 +3,7 @@ use Ada.Strings.Unbounded;
 
 with  AUnit.Test_Cases;
 
--- Test case with no routines.
+--  Test case with no routines.
 package Empty_Test_Case is
    type Test_Case is new AUnit.Test_Cases.Test_Case with private;
 

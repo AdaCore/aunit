@@ -8,10 +8,16 @@ with AUnit.Assertions; use AUnit.Assertions;
 package body Test_Test_Case is
 
    --  Test Routines:
+   procedure Test_Register_Tests (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Run (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Set_Up (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Torn_Down (T : in out AUnit.Test_Cases.Test_Case'Class);
 
-   procedure Test_Register_Tests (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   procedure Test_Register_Tests (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
       Simple : Simple_Test_Case.Test_Case;
-      Old_Count : Positive := Routine_Count (Simple);
+      Old_Count : constant Positive := Routine_Count (Simple);
    begin
       Simple_Test_Case.Register_Tests (Simple);
 
@@ -21,9 +27,10 @@ package body Test_Test_Case is
    end Test_Register_Tests;
 
    procedure Test_Set_Up (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
       Simple :  Simple_Test_Case.Test_Case;
       use Simple_Test_Case;
-      Was_Reset : Boolean := not Is_Set_Up (Simple);
+      Was_Reset : constant Boolean := not Is_Set_Up (Simple);
    begin
       Set_Up (Simple);
 
@@ -33,9 +40,10 @@ package body Test_Test_Case is
    end Test_Set_Up;
 
    procedure Test_Torn_Down (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Simple :  Simple_Test_Case.Test_Case;
       use Simple_Test_Case;
-      Was_Reset : Boolean := not Is_Torn_Down (Simple);
+      Was_Reset : constant Boolean := not Is_Torn_Down (Simple);
    begin
       Tear_Down (Simple);
 
@@ -45,10 +53,11 @@ package body Test_Test_Case is
    end Test_Torn_Down;
 
    procedure Test_Run (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       use Simple_Test_Case;
       Simple :  Simple_Test_Case.Test_Case;
       R : Result;
-      Count : Natural := Routine_Count (Simple);
+      Count : constant Natural := Routine_Count (Simple);
    begin
       Run (Simple, R);
 
@@ -92,6 +101,7 @@ package body Test_Test_Case is
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+   pragma Unreferenced (T);
    begin
       return  new String'("Test AUnit.Test_Cases");
    end Name;

@@ -7,6 +7,7 @@ package body One_Test_Case is
 
    --  Test Routines:
    procedure Test_1 (T : in out AUnit.Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
    begin
       null;
    end Test_1;
@@ -23,6 +24,7 @@ package body One_Test_Case is
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+      pragma Unreferenced (T);
    begin
       return  new String'("One Test Case");
    end Name;

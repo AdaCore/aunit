@@ -14,8 +14,16 @@ with One_Test_Case.Inherited_Test_Case;
 package body Test_Test_Suite is
 
    --  Test Routines:
+   procedure Test_Inherited_Tests
+     (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_No_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_No_Test_Routines
+     (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class);
+
    procedure Test_No_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      S : Access_Test_Suite := new Test_Suite;
+      pragma Unreferenced (T);
+      S : constant Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
       Run (S.all, R);
@@ -25,8 +33,11 @@ package body Test_Test_Suite is
    end Test_No_Test_Case;
 
 
-   procedure Test_No_Test_Routines (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      S :  Access_Test_Suite := new Test_Suite;
+   procedure Test_No_Test_Routines
+     (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      S : constant  Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
       Add_Test (S, new Empty_Test_Case.Test_Case);
@@ -37,8 +48,10 @@ package body Test_Test_Suite is
    end Test_No_Test_Routines;
 
 
-   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      S : Access_Test_Suite := new Test_Suite;
+   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      S : constant Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
       Add_Test (S, new One_Test_Case.Test_Case);
@@ -50,8 +63,10 @@ package body Test_Test_Suite is
       Assert (Successful (R), "Suite did not run successfully");
    end Test_One_Test_Case;
 
-   procedure Test_Inherited_Tests (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      S :  Access_Test_Suite := new Test_Suite;
+   procedure Test_Inherited_Tests (T : in out AUnit.Test_Cases.Test_Case'Class)
+   is
+      pragma Unreferenced (T);
+      S : constant  Access_Test_Suite := new Test_Suite;
       R : Result;
    begin
       Add_Test (S, new One_Test_Case.Inherited_Test_Case.Test_Case);
@@ -75,12 +90,13 @@ package body Test_Test_Suite is
         (T, Test_One_Test_Case'Access, "Test One Test Routine");
 
       Register_Routine
-        (T, Test_Inherited_tests'Access, "Test Inherited Test Case");
+        (T, Test_Inherited_Tests'Access, "Test Inherited Test Case");
 
    end Register_Tests;
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+      pragma Unreferenced (T);
    begin
       return  new String'("Test AUnit.Test_Suites");
    end Name;

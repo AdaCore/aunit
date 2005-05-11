@@ -12,6 +12,7 @@ package body Test_Lists is
    L : List;
 
    procedure Set_Up (T : in out Test_Case) is
+   pragma Unreferenced (T);
    begin
       if not Before (L) then
          Back (L);
@@ -19,20 +20,38 @@ package body Test_Lists is
    end Set_Up;
 
    procedure Tear_Down (T : in out Test_Case) is
+   pragma Unreferenced (T);
    begin
       Wipe_Out (L);
    end Tear_Down;
 
 
-   -- Test Routines:
+   --  Test Routines:
+   procedure Test_Back (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Creation (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Finish (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Forth (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Go_I_Th (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Move (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Put_Front (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Put_Left (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Put_Right (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Remove (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Remove_Left (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Remove_Right (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Replace (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Start (T : in out AUnit.Test_Cases.Test_Case'Class);
+   procedure Test_Wipe_Out (T : in out AUnit.Test_Cases.Test_Case'Class);
 
    procedure Test_Creation (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Assert (Before (L), "Cursor not properly set on initialization");
       Assert (Empty (L), "Initial list not empty");
    end Test_Creation;
 
    procedure Test_Back (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       I : Natural;
    begin
       Extend (L, 1);
@@ -50,6 +69,7 @@ package body Test_Lists is
    end Test_Back;
 
    procedure Test_Finish (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Finish (L);
       Assert (Before (L), "Finish on empty list /= Before");
@@ -63,6 +83,7 @@ package body Test_Lists is
 
 
    procedure Test_Forth (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Extend (L, 1);
       Extend (L, 2);
@@ -83,6 +104,7 @@ package body Test_Lists is
    end Test_Forth;
 
    procedure Test_Go_I_Th (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Extend (L, 1);
       Extend (L, 2);
@@ -100,6 +122,7 @@ package body Test_Lists is
    end Test_Go_I_Th;
 
    procedure Test_Move (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       I : Natural;
    begin
       Extend (L, 1);
@@ -146,6 +169,7 @@ package body Test_Lists is
    end Test_Move;
 
    procedure Test_Start (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Start (L);
       Assert (After (L), "Start on empty list failed to indicate After");
@@ -159,6 +183,7 @@ package body Test_Lists is
    end Test_Start;
 
    procedure Test_Put_Front (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Old_Count : Natural := 0;
    begin
       Put_Front (L, 1);
@@ -181,6 +206,7 @@ package body Test_Lists is
 
 
    procedure Test_Put_Left (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -208,6 +234,7 @@ package body Test_Lists is
    end Test_Put_Left;
 
    procedure Test_Put_Right (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -235,6 +262,7 @@ package body Test_Lists is
    end Test_Put_Right;
 
    procedure Test_Replace (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Extend (L, 1);
       Start (L);
@@ -254,6 +282,7 @@ package body Test_Lists is
    end Test_Replace;
 
    procedure Test_Remove (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       Extend (L, 1);
       Extend (L, 2);
@@ -279,6 +308,7 @@ package body Test_Lists is
    end Test_Remove;
 
    procedure Test_Remove_Left (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -292,10 +322,12 @@ package body Test_Lists is
       Remove_Left (L);
       Assert
         (Count (L) = Old_Count - 1,
-         "Remove_Left failed to adjust Count when removing before last element");
+         "Remove_Left failed to adjust Count when removing " &
+         "before last element");
       Assert
         (Index (L) = Old_Index - 1,
-         "Remove_Left failed to adjust Index when removing before last element");
+         "Remove_Left failed to adjust Index when removing " &
+         "before last element");
 
       Start (L);
       Forth (L);
@@ -311,6 +343,7 @@ package body Test_Lists is
    end Test_Remove_Left;
 
    procedure Test_Remove_Right (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
       Old_Count, Old_Index : Natural;
    begin
       Extend (L, 1);
@@ -324,10 +357,12 @@ package body Test_Lists is
       Remove_Right (L);
       Assert
         (Count (L) = Old_Count - 1,
-         "Remove_Right failed to adjust Count when removing after first element");
+         "Remove_Right failed to adjust Count when removing " &
+         "after first element");
       Assert
         (Index (L) = Old_Index,
-         "Remove_Right failed to maintain Index when removing after first element");
+         "Remove_Right failed to maintain Index when removing " &
+         "after first element");
 
       Finish (L);
       Back (L);
@@ -343,6 +378,7 @@ package body Test_Lists is
    end Test_Remove_Right;
 
    procedure Test_Wipe_Out (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   pragma Unreferenced (T);
    begin
       for I in 1 .. 10 loop
          Extend (L, I);
@@ -380,6 +416,7 @@ package body Test_Lists is
 
    --  Identifier of test case:
    function Name (T : Test_Case) return String_Access is
+   pragma Unreferenced (T);
    begin
       return  new String'("Test_Lists");
    end Name;

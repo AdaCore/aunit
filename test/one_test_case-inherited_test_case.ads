@@ -17,6 +17,4 @@ private
    type Test_Case is new One_Test_Case.Test_Case with record
       Child_Data : Integer := 1;
    end record;
-   
-
 end One_Test_Case.Inherited_Test_Case;
