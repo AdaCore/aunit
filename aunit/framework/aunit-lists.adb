@@ -6,9 +6,8 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
+--                      Copyright (c) 2000-2005 AdaCore                     --
 --                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,7 +20,7 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 with Ada.Unchecked_Deallocation;
@@ -263,7 +262,7 @@ package body AUnit.Lists is
 
    procedure Extend (L : in out List; E : Element) is
       --  Add E to end. Do not move cursor
-      P : Linkable_Access := new Linkable'(new Element'(E), null);
+      P : constant Linkable_Access := new Linkable'(new Element'(E), null);
    begin
       if Empty (L) then
          L.First_Element := P;
@@ -280,7 +279,7 @@ package body AUnit.Lists is
 
    procedure Put_Front (L : in out List; E : Element) is
       --  Add E to start.  Do not move cursor
-      P : Linkable_Access := new Linkable'(new Element'(E), null);
+      P : constant Linkable_Access := new Linkable'(new Element'(E), null);
    begin
       Put_Right (P, L.First_Element);
       L.First_Element := P;
@@ -313,7 +312,7 @@ package body AUnit.Lists is
 
    procedure Put_Right (L : in out List; E : Element) is
       --  Add E to right of cursor.  Do not move cursor
-      P : Linkable_Access := new Linkable'(new Element'(E), null);
+      P : constant Linkable_Access := new Linkable'(new Element'(E), null);
    begin
       if Before (L) then
          Put_Right (P, L.First_Element);

@@ -6,9 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
---                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--                      Copyright (C) 2000-2005 AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,7 +19,7 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 
@@ -31,23 +29,23 @@ package body AUnit.Test_Suites is
    --  Add a test case or sub-suite to this one:
    procedure Add_Test (S : access Test_Suite; T : access Test'Class) is
    begin
-      Extend (S.Tests, T.all);
+      Extend (S.Test_Set, T.all);
    end Add_Test;
 
    --  Run each test case in this suite.  Run sub-suite test cases
    --  recursively:
    procedure Run (S : in out Test_Suite; R : in out Result) is
    begin
-      Start (S.Tests);
+      Start (S.Test_Set);
 
-      while not Off (S.Tests) loop
+      while not Off (S.Test_Set) loop
          declare
-            Dispatcher : Test'Class := Item (S.Tests);
+            Dispatcher : Test'Class := Item (S.Test_Set);
          begin
             Tests.Run (Dispatcher, R);
          end;
 
-         Remove (S.Tests);
+         Remove (S.Test_Set);
       end loop;
    end Run;
 

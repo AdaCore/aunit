@@ -6,9 +6,8 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
 --                                                                          --
---            Copyright (C) 2000-2004 Ada Core Technologies, Inc.           --
+--                      Copyright (C) 2000-2005 AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,7 +20,7 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore(http://www.adacore.com).                   --
 --                                                                          --
 ------------------------------------------------------------------------------
 with AUnit.Test_Results; use AUnit.Test_Results;
@@ -94,18 +93,22 @@ package body AUnit.Test_Cases is
 
    --  Default Set up routine:
    procedure Set_Up (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin null; end Set_Up;
 
    --  Default Set up case routine:
    procedure Set_Up_Case (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin null; end Set_Up_Case;
 
    --  Default Tear down routine:
    procedure Tear_Down (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin null; end Tear_Down;
 
    --  Default Tear down case routine:
    procedure Tear_Down_Case (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin null; end Tear_Down_Case;
 
    --  Register the test routines.

@@ -6,9 +6,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
---                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--                      Copyright (C) 2000-2005 AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,7 +19,7 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 
@@ -34,21 +32,21 @@ with Ada.Calendar; use Ada.Calendar;
 
 --  Runner of test suites using text reporter
 procedure AUnit.Test_Runner (Timed : Boolean := True) is
-   Result : AUnit.Test_Results.Result;
+   Res : AUnit.Test_Results.Result;
    Start_Time, End_Time : Time;
-   Tests : Access_Test_Suite := Suite;
+   Test_Set : constant Access_Test_Suite := Suite;
 
 begin
 
    --  Run them and report results:
    Start_Time := Clock;
-   Run (Tests.all, Result);
+   Run (Test_Set.all, Res);
    End_Time := Clock;
 
    if Timed then
-      AUnit.Test_Results.Set_Elapsed (Result, End_Time - Start_Time);
+      AUnit.Test_Results.Set_Elapsed (Res, End_Time - Start_Time);
    end if;
 
-   AUnit.Test_Results.Text_Reporter.Report (Result);
+   AUnit.Test_Results.Text_Reporter.Report (Res);
 end AUnit.Test_Runner;
 

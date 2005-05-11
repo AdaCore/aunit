@@ -6,9 +6,8 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                            $Revision$
 --                                                                          --
---                Copyright (C) 2000 Ada Core Technologies, Inc.            --
+--                     Copyright (C) 2000-2005 AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,30 +20,29 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 with AUnit.Lists;
 
-with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Strings.Unbounded;
-use Ada.Strings.Unbounded;
+with Ada.Exceptions;        use Ada.Exceptions;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 --  Test reporting
 package AUnit.Test_Results is
 
-   type  Result is  private;
+   type Result is private;
 
    --  Information about a test failure or error
    type Test_Failure is record
-      Test_Name : String_Access;
+      Test_Name    : String_Access;
       Routine_Name : String_Access;
-      E : Exception_Occurrence_Access;
+      E            : Exception_Occurrence_Access;
    end record;
 
    --  Information about a test success
    type Test_Success is record
-      Test_Name : String_Access;
+      Test_Name    : String_Access;
       Routine_Name : String_Access;
    end record;
 
@@ -55,24 +53,24 @@ package AUnit.Test_Results is
    package Failure_Lists is new Lists (Test_Failure);
 
    --  Count a test run
-   procedure Start_Test
-     (R : in out Result; Subtest_Count : Natural);
+   procedure Start_Test (R : in out Result; Subtest_Count : Natural);
 
    --  Record an assertion violation
    procedure Add_Success
-     (R : in out Result; Test_Name, Routine_Name : String_Access);
+     (R                       : in out Result;
+      Test_Name, Routine_Name : String_Access);
 
    --  Record an assertion violation
    procedure Add_Failure
-     (R : in out Result;
+     (R                       : in out Result;
       Test_Name, Routine_Name : String_Access;
-      E : Exception_Occurrence);
+      E                       : Exception_Occurrence);
 
    --  Record an unexpected exception
    procedure Add_Error
-     (R : in out Result;
+     (R                       : in out Result;
       Test_Name, Routine_Name : String_Access;
-      E : Exception_Occurrence);
+      E                       : Exception_Occurrence);
 
    --  Set Elapsed time for reporter:
    procedure Set_Elapsed (R : in out Result; D : Duration);
@@ -106,15 +104,14 @@ package AUnit.Test_Results is
 
 private
 
-   type Result is  record
-      Tests_Run : Natural := 0;
-      Failures_List : Failure_Lists.List;
-      Errors_List : Failure_Lists.List;
+   type Result is record
+      Tests_Run      : Natural  := 0;
+      Failures_List  : Failure_Lists.List;
+      Errors_List    : Failure_Lists.List;
       Successes_List : Success_Lists.List;
-      Elapsed : Duration := 0.0;
+      Elapsed_Time   : Duration := 0.0;
    end record;
 
    pragma Inline (Test_Count, Failure_Count, Error_Count);
 
 end AUnit.Test_Results;
-

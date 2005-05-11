@@ -6,9 +6,8 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                            $Revision$
 --                                                                          --
---           Copyright (C) 2000-2001 Ada Core Technologies, Inc.            --
+--                    Copyright (C) 2000-2005 AdaCore                       --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -21,7 +20,7 @@
 -- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
 -- MA 02111-1307, USA.                                                      --
 --                                                                          --
--- GNAT is maintained by Ada Core Technologies Inc (http://www.gnat.com).   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 --  Record test results.
@@ -66,7 +65,7 @@ package body AUnit.Test_Results is
    --  Set Elapsed time for reporter:
    procedure Set_Elapsed (R : in out Result; D : Duration) is
    begin
-      R.Elapsed := D;
+      R.Elapsed_Time := D;
    end Set_Elapsed;
 
    --  Total tests run
@@ -120,7 +119,7 @@ package body AUnit.Test_Results is
    --  Elapsed time for test execution:
    function Elapsed (R : Result) return Duration is
    begin
-      return R.Elapsed;
+      return R.Elapsed_Time;
    end Elapsed;
 
 end AUnit.Test_Results;
