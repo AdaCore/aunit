@@ -57,16 +57,16 @@ implementations of <i>Register_Tests</i> and <i>Name.</i></p>
 and register it with a line in routine <i>Register_Tests</i>, of the
 form:</p>
     <p style="margin-bottom: 0in;"><br>
-    <font size="2"><font face="courier, monospace">Register_Routine (T,
-Test_Name'Access, "Description of test routine");</font></font></p>
+    <font style="font-family: monospace;">Register_Routine (T,
+Test_Name'Access, "Description of test routine");</font></p>
   </li>
   <li>
     <p>When you want to check a value, use:<br>
     <br>
-    <font size="2"><font face="courier, monospace">AUnit.Assertions.</font></font><font
- size="2"><font face="courier, monospace">Assert</font></font><font
- size="2"><font face="courier, monospace">(Boolean_Expression,
-String_Description);</font></font></p>
+    <font style="font-family: monospace;">AUnit.Assertions.</font><font
+ style="font-family: monospace;">Assert</font><font
+ style="font-family: monospace;">(Boolean_Expression,
+String_Description);</font></p>
   </li>
   <li>
     <p>Create a suite function to gather together test cases and
@@ -87,24 +87,25 @@ directories.<br>
   </li>
   <li>
     <p align="left">Build the harness routine using gnatmake. <font
- size="3"><font face="Times New Roman, serif">The GNAT project file
-    <span style="font-style: italic;">aunit-1.03/aunit_tests.gpr</span>
-contains all the necessary links and
+ size="3"><font face="Times New Roman, serif">The GNAT</font></font><font
+ size="3"> project file</font><font size="3"><font
+ face="Times New Roman, serif"> <span style="font-style: italic;">aunit-1.04/aunit_tests.gpr</span>
+    </font></font><font size="3">contains all the necessary links and
 switches for building test cases. When testing a new compiler, as
 opposed to incremental unit tests, the GNAT "-f" switch should be set
-for gnatmake. One can then use GNAT to build and run the tests.</font></font></p>
+for gnatmake. One can then use GNAT to build and run the tests.</font></p>
   </li>
 </ol>
 <p>For example, to test that the sum of two Moneys with the same
 currency contains a value which is the sum of the values of the two
 Moneys, the test routine would look like: </p>
-<pre><font face="Courier"><font size="2">procedure Test_Simple_Add</font></font>
-<font face="Courier"><font size="2">   (T : Aunit.Test_Cases.Test_Case'Class) is</font></font>
-<font face="Courier"><font size="2">   X, Y: Some_Currency;</font></font>
-<font face="Courier"><font size="2">begin</font></font>
-<font face="Courier"><font size="2">   X := 12; Y := 14;</font></font>
-<font face="Courier"><font size="2">   Assert (X + Y = 24, "Addition is incorrect");</font></font>
-<font face="Courier"><font size="2">end;</font></font></pre>
+<pre style="font-family: monospace;">procedure Test_Simple_Add
+   (T : Aunit.Test_Cases.Test_Case'Class) is
+   X, Y: Some_Currency;
+begin
+   X := 12; Y := 14;
+   Assert (X + Y = 26, "Addition is incorrect");
+end;</pre>
 <p style="margin-bottom: 0in;">The package spec (taken almost directly
 from pr_xxxx_xxx.ads) looks
 as follows. The only modification was to remove support for a test
@@ -112,120 +113,92 @@ fixture (next section), and to provide a name for the unit. Changes
 to "boilerplate code" are in bold:</p>
 <p style="margin-bottom: 0in;"><br>
 </p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">with
-Ada.Strings.Unbounded;</font></font></p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">use
-Ada.Strings.Unbounded;</font></font></p>
+<p style="margin-bottom: 0in; font-family: monospace;">with
+Ada.Strings.Unbounded;<br>
+use
+Ada.Strings.Unbounded;</p>
+<p style="margin-bottom: 0in; font-family: monospace;">with
+AUnit.Test_Cases;<br>
+use
+AUnit.Test_Cases;</p>
+<p style="margin-bottom: 0in; font-family: monospace;">package
+<b>PR_xxxx_xxx</b> is<br>
+&nbsp;&nbsp; type
+Test_Case is new AUnit.Test_Cases.Test_Case with
+null record;</p>
+<p style="margin-bottom: 0in; font-family: monospace;">&nbsp;&nbsp; --
+Register routines to be run:<br>
+&nbsp;&nbsp; procedure
+Register_Tests (T: in out Test_Case);</p>
+<p style="margin-bottom: 0in; font-family: monospace;">&nbsp;&nbsp; --
+Provide name identifying the test case:<br>
+&nbsp;&nbsp; function
+Name (T: Test_Case) return String_Access;<br>
+end
+<b>PR_xxxx_xxx</b>;</p>
 <p style="margin-bottom: 0in;"><br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">with
-AUnit.Test_Cases;</font></font></p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">use
-AUnit.Test_Cases;</font></font></p>
-<p style="margin-bottom: 0in;"><br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">package
-<b>PR_xxxx_xxx</b> is </font></font>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">type
-Test_Case is new AUnit.Test_Cases.Test_Case </font></font>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">with
-null record;</font></font></p>
-<p style="margin-bottom: 0in;"><br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">--
-Register routines to be run:</font></font></p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">procedure
-Register_Tests (T: in out Test_Case);</font></font></p>
-<p style="margin-bottom: 0in;"><br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">--
-Provide name identifying the test case:</font></font></p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">function
-Name (T: Test_Case) return String_Access;</font></font></p>
-<p style="margin-bottom: 0in;"><br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Courier, monospace"><font
- size="2">end
-<b>PR_xxxx_xxx</b>;</font></font></p>
-<p><br>
-<br>
-</p>
-<p style="margin-bottom: 0in;"><font face="Times New Roman, serif"><font
- size="3">The
+<font face="Times New Roman, serif"><font size="3">The
 package body, constructed by modifying pr_xxxx_xxx.adb is:</font></font></p>
 <p style="margin-bottom: 0in;"><br>
 </p>
-<pre><font size="2">with AUnit.Test_Cases.Registration;</font>
-<font size="2">use AUnit.Test_Cases.Registration;</font>
+<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;
+use AUnit.Test_Cases.Registration;
 
-<font size="2">with AUnit.Assertions; use AUnit.Assertions;</font>
+with AUnit.Assertions; use AUnit.Assertions;
 
-<font size="2">-- Template for test case body.</font>
-<font size="2">package body <b>PR_xxxx_xxx</b> is</font>
+-- Template for test case body.
+package body <b>PR_xxxx_xxx</b> is
 
-<font face="Courier, monospace"><font size="2"><b>   -- Simple test routine:</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>   procedure Test_Simple_Add</b></font></font>
-<font face="Courier, monospace"><font size="2"><b><font face="Courier">      (T : Aunit.Test_Cases.Test_Case'Class)</font> is</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>      X, Y: Some_Currency;</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>   begin</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>      X := 12; Y := 14;</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>      Assert </b></font></font>
-<font face="Courier, monospace"><font size="2"><b>         (X + Y = 26, "Addition is incorrect");</b></font></font>
-<font face="Courier, monospace"><font size="2"><b>   end;</b></font></font>
+<b>   -- Simple test routine:</b>
+<b>   procedure Test_Simple_Add</b>
+<b>      (T : Aunit.Test_Cases.Test_Case'Class) is</b>
+<b>      X, Y: Some_Currency;</b>
+<b>   begin</b>
+<b>      X := 12; Y := 14;</b>
+<b>      Assert </b>
+<b>         (X + Y = 26, "Addition is incorrect");</b>
+<b>   end;</b>
 
-<font size="2">   -- Register test routines to call:</font>
-<font size="2">   procedure Register_Tests (T: access Test_Case) is</font>
-<font size="2">   begin</font>
-<font size="2">      -- Repeat for each test routine:</font>
-<font size="2"> <b>     Register_Routine (T, Test_Simple_Add'Access, "Test Addition");</b></font>
-<font size="2">   end Register_Tests;</font>
+   -- Register test routines to call:
+   procedure Register_Tests (T: access Test_Case) is
+   begin
+      -- Repeat for each test routine:
+ <b>     Register_Routine (T, Test_Simple_Add'Access, "Test Addition");</b>
+   end Register_Tests;
 
 
 
-<font size="2">   -- Identifier of test case.  Just change the string</font>
-<font size="2">   -- result of the function.</font>
-<font size="2">   function Name (T: Test_Case) return String_Access is</font>
-<font size="2">   begin</font>
-<font size="2">      return new String'(<b>"Money Tests"</b>);</font>
-<font size="2">   end Name;</font>
+   -- Identifier of test case.  Just change the string
+   -- result of the function.
+   function Name (T: Test_Case) return String_Access is
+   begin
+      return new String'(<b>"Money Tests"</b>);
+   end Name;
 
-<font size="2">end <b>PR_xxxx_xxx</b>;</font></pre>
+end <b>PR_xxxx_xxx</b>;</pre>
 <p><font size="3">The corresponding harness code, adapted from
-aunit-1.03/template/harness.adb is:</font></p>
-<pre><font size="2">with AUnit.Test_Suites; use AUnit.Test_Suites;</font>
-<font size="2">with AUnit.Test_Runner;</font>
+aunit-1.04/template/harness.adb is:</font></p>
+<pre>with AUnit.Test_Suites; use AUnit.Test_Suites;
+with AUnit.Test_Runner;
 
-<font size="2">--  List of tests and suites to run:</font>
-<font size="2"><b>with PR_XXXX_XXX;</b></font>
+--  List of tests and suites to run:
+<b>with PR_XXXX_XXX;</b>
 
-<font size="2">procedure Harness is</font>
+procedure Harness is
 
-<font size="2"><b>   function Suite return Access_Test_Suite is</b></font>
-<font size="2"><b>      Result : Access_Test_Suite := new Test_Suite;</b></font>
-<font size="2"><b>   begin</b></font>
-<font size="2"><b>      --  You may add multiple tests or suites here:</b></font>
-<font size="2"><b>      Add_Test (Result, new PR_XXXX_XXX.Test_Case);</b></font>
-<font size="2"><b>      return Result;</b></font>
-<font size="2"><b>   end Suite;</b></font>
+<b>   function Suite return Access_Test_Suite is</b>
+<b>      Result : Access_Test_Suite := new Test_Suite;</b>
+<b>   begin</b>
+<b>      --  You may add multiple tests or suites here:</b>
+<b>      Add_Test (Result, new PR_XXXX_XXX.Test_Case);</b>
+<b>      return Result;</b>
+<b>   end Suite;</b>
 
-<font size="2">   procedure Run is new AUnit.Test_Runner (Suite);</font>
+   procedure Run is new AUnit.Test_Runner (Suite);
 
-<font size="2">begin</font>
-<font size="2">   Run;</font>
-<font size="2">end Harness;</font></pre>
+begin
+   Run;
+end Harness;</pre>
 <h2>Fixture</h2>
 <p>Tests need to run against the background of a known set of
 objects. This set of objects is called a test fixture. When you are
@@ -274,62 +247,18 @@ release any permanent resources you allocated in <i>S<font
 <p>For example, to write several test cases that want to work with
 different combinations of 12 French Francs, 14 French Francs, and 26
 US Dollars, first create a fixture. The package spec is now:</p>
-<pre>with Ada.Strings.Unbounded;<br>use Ada.Strings.Unbounded;<br><br>with AUnit.Test_Cases;<br>use AUnit.Test_Cases;<br>package PR_xxxx_xxx is<br>   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;<br><br>    -- Register routines to be run:<br>   procedure Register_Tests (T: in out Test_Case);<br><br>   -- Provide name identifying the test case:<br>   function Name (T: Test_Case) return String_Access;<br><br><br><b>   -- Preparation performed before each routine:</b>
+<pre style="font-family: monospace;">with Ada.Strings.Unbounded;<br>use Ada.Strings.Unbounded;<br><br>with AUnit.Test_Cases;<br>use AUnit.Test_Cases;<br>package PR_xxxx_xxx is<br>   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;<br><br>    -- Register routines to be run:<br>   procedure Register_Tests (T: in out Test_Case);<br><br>   -- Provide name identifying the test case:<br>   function Name (T: Test_Case) return String_Access;<br><br><br><b>   -- Preparation performed before each routine:</b>
 <b>   Procedure Set_Up (T: in out Test_Case);</b>
 
 end PR_xxxx_xxx;</pre>
 <p>The body becomes:</p>
-<pre><font size="2">with AUnit.Test_Cases.Registration;</font>
-<font size="2">use AUnit.Test_Cases.Registration;</font>
-
-<font size="2">with AUnit.Assertions; use AUnit.Assertions;</font>
-
-<font size="2"><b>with Currencies; use Currencies;</b></font>
-<font size="2">package body PR_xxxx_xxx is</font>
-<font size="2">   <b>-- Fixture elements:</b></font>
-<font size="2">  <b> FR_12, FR_14: French_Franc; </b></font>
-<font size="2"><b>   US_26: US_Dollar;</b></font>
-
-<font size="2">   <b>-- Preparation performed before each routine:</b></font>
-<font size="2"><b>   Procedure Set_Up (T: in out Test_Case) is</b></font>
-<font size="2"><b>   begin</b></font>
-<font size="2"><b>      FR_12 := 12; FR_14 := 14;</b></font>
-<font size="2"><b>      US_26 := 26;</b></font>
-<font size="2"><b>   end Set_Up;</b></font>
-
-<font face="Courier, monospace"><font size="2">   -- Simple test routine:</font></font>
-<font face="Courier, monospace"><font size="2">   procedure Test_Simple_Add</font></font>
-<font face="Courier, monospace"><font size="2"><font face="Courier">     (T : Aunit.Test_Cases.Test_Case'Class)</font> is</font></font>
-<font face="Courier, monospace"><font size="2">   begin</font></font>
-<font face="Courier, monospace"><font size="2"><b>       Assert </b></font></font>
-<font face="Courier, monospace"><font size="2"><b>        (FR_12 + FR_14 /= US_26, </b></font></font>
-<font face="Courier, monospace"><font size="2"><b>         "US and French currencies not diffentiated");</b></font></font>
-<font face="Courier, monospace"><font size="2"><b> </b>  end;</font></font>
-
-<font size="2">   -- Register test routines to call:</font>
-<font size="2">   procedure Register_Tests (T: in out Test_Case) is</font>
-<font size="2">   begin</font>
-<font size="2">      -- Repeat for each test routine:</font>
-<font size="2">      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");</font>
-<font size="2">   end Register_Tests;</font>
-
-
-
-<font size="2">   -- Identifier of test case.  Just change the string</font>
-<font size="2">   -- result of the function.</font>
-<font size="2">   function Name (T: Test_Case) return String_Access is</font>
-<font size="2">   begin</font>
-<font size="2">      return  new String'("Money Tests");</font>
-<font size="2">   end Name;</font>
-
-<font size="2">end PR_xxxx_xxx;</font></pre>
+<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;<br>use AUnit.Test_Cases.Registration;<br><br>with AUnit.Assertions; use AUnit.Assertions;<br><br><b>with Currencies; use Currencies;</b><br>package body PR_xxxx_xxx is<br>   <b>-- Fixture elements:</b><br>  <b> FR_12, FR_14: French_Franc; </b><br><b>   US_26: US_Dollar;</b><br><br>   <b>-- Preparation performed before each routine:</b><br><b>   Procedure Set_Up (T: in out Test_Case) is</b><br><b>   begin</b><br><b>      FR_12 := 12; FR_14 := 14;</b><br><b>      US_26 := 26;</b><br><b>   end Set_Up;</b><br><br>   -- Simple test routine:<br>   procedure Test_Simple_Add<br>     (T : Aunit.Test_Cases.Test_Case'Class) is<br>   begin<br><b>       Assert </b><br><b>        (FR_12 + FR_14 /= US_26, </b><br><b>         "US and French currencies not diffentiated");</b><br><b> </b>  end;<br><br>   -- Register test routines to call:<br>   procedure Register_Tests (T: in out Test_Case) is<br>   begin<br>      -- Repeat for each test routine:<br>      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");<br>   end Register_Tests;<br><br><br><br>   -- Identifier of test case.  Just change the string<br>   -- result of the function.<br>   function Name (T: Test_Case) return String_Access is<br>   begin<br>      return  new String'("Money Tests");<br>   end Name;<br><br>end PR_xxxx_xxx;</pre>
 <p>Once you have the fixture in place, you can write as many test
 routines as you like. Calls to <font face="courier, monospace">Set_Up</font>
-and <font face="courier, monospace">Tear_Down</font><font
- face="times, serif">
-</font><font face="Times New Roman, serif">bracket the invocation of
-each test routine.</font></p>
-<p><font face="Times New Roman, serif">Note that as of AUnit 1.01 a
+and <font face="courier, monospace">Tear_Down</font>
+bracket the invocation of
+each test routine.</p>
+<p>Note that as of AUnit 1.01 a
 parameter of type AUnit.Test_Cases.Test_Case'Class has been added to
 test routines. This parameter allows access to the current Test_Case
 instance, so that a test routine can access per-instance (rather than
@@ -338,7 +267,7 @@ case from another, which introduces the need to separate data of an
 instance of the parent type from that of derived types. This is
 different than the normal case of a set of tests where each Test_Case
 derived type almost certainly will have a singleton instance,
-allowing the safe use of package body global data.</font></p>
+allowing the safe use of package body global data.</p>
 <p>Once you have several test cases, organize them into a Suite. </p>
 <h2>Suite</h2>
 <p>How do you run several test cases at once? </p>
@@ -348,18 +277,18 @@ grow tired of that. Instead, AUnit provides an object, <font
  face="courier, monospace">Test_Suite</font>
 which runs any number of test cases together. </p>
 <p>For test routines that use the same fixture (i.e. those declared
-in the same package), the <font face="courier, monospace">Register_Routine
-</font><font face="Times New Roman, serif">procedure is used to
-collect them into the single test case.</font></p>
-<p><font face="Times New Roman, serif">A single Test_Case and its
-collection of routines can be executed directly in a harness like so:</font></p>
-<pre style="margin-bottom: 0.2in;"><font face="Times New Roman, serif">...</font>
-<font face="Times New Roman, serif">Test : PR_XXXX_XXX.Test_Case;</font>
-<font face="Times New Roman, serif">Result : Aunit.Test_Results.Result;</font>
-<font face="Times New Roman, serif">...</font>
-<font face="times, serif">run (Test, Result);</font></pre>
+in the same package), the <font face="courier, monospace">Register_Routine</font>
+procedure is used to
+collect them into the single test case.</p>
+<p>A single Test_Case and its
+collection of routines can be executed directly in a harness like so:</p>
+<pre style="margin-bottom: 0.2in; font-family: monospace;">...
+Test : PR_XXXX_XXX.Test_Case;
+Result : AUnit.Test_Results.Result;
+...
+Run (Test, Result);</pre>
 <p>To create a suite of two test cases and run them together, execute: </p>
-<pre>with AUnit.Test_Suites; use AUnit.Test_Suites;<br>with AUnit.Test_Runner;<br><br>--  List of tests and suites to run:<br>with Test_Case_1, Test_Case_2;<br><br>procedure Harness is<br><br><b>   function Suite return Access_Test_Suite is</b>
+<pre style="font-family: monospace;">with AUnit.Test_Suites; use AUnit.Test_Suites;<br>with AUnit.Test_Runner;<br><br>--  List of tests and suites to run:<br>with Test_Case_1, Test_Case_2;<br><br>procedure Harness is<br><br><b>   function Suite return Access_Test_Suite is</b>
 <b>      Result : Access_Test_Suite := new Test_Suite;</b>
 <b>   begin</b>
 <b>      --  You may add multiple tests or suites here:</b>
@@ -373,13 +302,14 @@ collection of routines can be executed directly in a harness like so:</font></p>
 begin
    Run;
 end Harness;</pre>
-<h2>Composition of Suites</h2>
-<p>Typically, one will want the flexibility to execute a complete set
+<h2 style="font-family: monospace;">Composition of Suites</h2>
+<p style="font-family: monospace;">Typically, one will want the
+flexibility to execute a complete set
 of tests, or some subset of them. In order to facilitate this, we can
 reorganize the harness so that the composition of test cases and
 suites is done in a separate library function, and each composition
 level can have its own harness:</p>
-<pre>-- Composition function:<br>with AUnit.Test_Suites; use Aunit.Test_Suites;<br><br>-- List of tests and suites to compose:<br>with Test_Case_1;<br>with Test_Case_2;<br>function This_Suite return Access_Test_Suite is<br>   Result : Access_Test_Suite := new Test_Suite;<br>begin<br>   Add_Test (Result, new Test_Case_1.Test_Case);<br>   Add_Test (Result, new Test_Case_2.Test_Case);<br>   return Result;<br>end Suite;<br><br><br>-- More general form of harness for a given level:<br>with AUnit.Test_Runner;<br><br>--  Composition function for this level:<br>with This_Suite;<br><br>procedure Harness is<br>   procedure Run is new AUnit.Test_Runner (This_Suite);<br>begin<br>   Run;<br>end Harness;</pre>
+<pre style="font-family: monospace;">-- Composition function:<br>with AUnit.Test_Suites; use Aunit.Test_Suites;<br><br>-- List of tests and suites to compose:<br>with Test_Case_1;<br>with Test_Case_2;<br>function This_Suite return Access_Test_Suite is<br>   Result : Access_Test_Suite := new Test_Suite;<br>begin<br>   Add_Test (Result, new Test_Case_1.Test_Case);<br>   Add_Test (Result, new Test_Case_2.Test_Case);<br>   return Result;<br>end Suite;<br><br><br>-- More general form of harness for a given level:<br>with AUnit.Test_Runner;<br><br>--  Composition function for this level:<br>with This_Suite;<br><br>procedure Harness is<br>   procedure Run is new AUnit.Test_Runner (This_Suite);<br>begin<br>   Run;<br>end Harness;</pre>
 <p>At a higher level, we may wish to combine two suites of units tests
 that are composed with functions <font size="2"><font
  face="Courier, monospace">This_Suite</font></font>
@@ -393,10 +323,8 @@ into execution runs.</p>
 routine has a defaulted parameter to control whether timing
 information is reported. Its speficiation is:</p>
 <pre>procedure Run (Timed : Boolean := True);</pre>
-<p style=""><br>
-<br>
-</p>
-<p style="margin-bottom: 0in;">By default the execution time for a
+<p style="margin-bottom: 0in;"><br>
+By default the execution time for a
 harness is reported. If you are running some number of harnesses
 from a scripting language, and comparing the result to an existing
 file, using <span style="font-style: normal;"><font size="2"><font
