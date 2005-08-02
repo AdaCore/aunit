@@ -70,7 +70,12 @@ String_Description);</font></p>
   </li>
   <li>
     <p>Create a suite function to gather together test cases and
-sub-suites.</p>
+sub-suites.&nbsp; Alternatively, you can call the <span
+ style="font-style: italic;">Run</span> routine of a single test case
+directly, and then call <span style="font-style: italic;">Test_Results.Test_Reporter.Report
+    </span>on its <span style="font-style: italic;">Result</span>
+parameter.&nbsp; This eliminates step 7.<br>
+    </p>
   </li>
   <li>
     <p>At any level at which you wish to run tests, create a harness
@@ -99,13 +104,7 @@ for gnatmake. One can then use GNAT to build and run the tests.</font></p>
 <p>For example, to test that the sum of two Moneys with the same
 currency contains a value which is the sum of the values of the two
 Moneys, the test routine would look like: </p>
-<pre style="font-family: monospace;">procedure Test_Simple_Add
-   (T : Aunit.Test_Cases.Test_Case'Class) is
-   X, Y: Some_Currency;
-begin
-   X := 12; Y := 14;
-   Assert (X + Y = 26, "Addition is incorrect");
-end;</pre>
+<pre style="font-family: monospace;">procedure Test_Simple_Add<br>   (T : Aunit.Test_Cases.Test_Case'Class) is<br>   X, Y: Some_Currency;<br>begin<br>   X := 12; Y := 14;<br>   Assert (X + Y = 26, "Addition is incorrect");<br>end;</pre>
 <p style="margin-bottom: 0in;">The package spec (taken almost directly
 from pr_xxxx_xxx.ads) looks
 as follows. The only modification was to remove support for a test
@@ -141,15 +140,7 @@ end
 package body, constructed by modifying pr_xxxx_xxx.adb is:</font></font></p>
 <p style="margin-bottom: 0in;"><br>
 </p>
-<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;
-use AUnit.Test_Cases.Registration;
-
-with AUnit.Assertions; use AUnit.Assertions;
-
--- Template for test case body.
-package body <b>PR_xxxx_xxx</b> is
-
-<b>   -- Simple test routine:</b>
+<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;<br>use AUnit.Test_Cases.Registration;<br><br>with AUnit.Assertions; use AUnit.Assertions;<br><br>-- Template for test case body.<br>package body <b>PR_xxxx_xxx</b> is<br><br><b>   -- Simple test routine:</b>
 <b>   procedure Test_Simple_Add</b>
 <b>      (T : Aunit.Test_Cases.Test_Case'Class) is</b>
 <b>      X, Y: Some_Currency;</b>
@@ -172,33 +163,11 @@ package body <b>PR_xxxx_xxx</b> is
    -- result of the function.
    function Name (T: Test_Case) return String_Access is
    begin
-      return new String'(<b>"Money Tests"</b>);
-   end Name;
-
-end <b>PR_xxxx_xxx</b>;</pre>
+      return new String'(<b>"Money Tests"</b>);<br>   end Name;<br><br>end <b>PR_xxxx_xxx</b>;</pre>
 <p><font size="3">The corresponding harness code, adapted from
 aunit-1.04/template/harness.adb is:</font></p>
-<pre>with AUnit.Test_Suites; use AUnit.Test_Suites;
-with AUnit.Test_Runner;
-
---  List of tests and suites to run:
-<b>with PR_XXXX_XXX;</b>
-
-procedure Harness is
-
-<b>   function Suite return Access_Test_Suite is</b>
-<b>      Result : Access_Test_Suite := new Test_Suite;</b>
-<b>   begin</b>
-<b>      --  You may add multiple tests or suites here:</b>
-<b>      Add_Test (Result, new PR_XXXX_XXX.Test_Case);</b>
-<b>      return Result;</b>
-<b>   end Suite;</b>
-
-   procedure Run is new AUnit.Test_Runner (Suite);
-
-begin
-   Run;
-end Harness;</pre>
+<pre>with AUnit.Test_Cases; use AUnit.Test_Cases;<br>with AUnit.Test_Results.Test_Reporter; <br>use AUnit.Test_Results.Test_Reporter;<br><br>--  Test case to run:<br>with PR_XXXX_XXX;<br><br>procedure Harness is<br>   Test : PR_XXXX_XXX.Test_Case;<br>   Result : AUnit.Test_Results.Result;<br>begin<br>   Run (Test, Result);
+   Report (Result);<br>end Harness;</pre>
 <h2>Fixture</h2>
 <p>Tests need to run against the background of a known set of
 objects. This set of objects is called a test fixture. When you are
@@ -245,14 +214,14 @@ release any permanent resources you allocated in <i>S<font
     </font></li>
 </ol>
 <p>For example, to write several test cases that want to work with
-different combinations of 12 French Francs, 14 French Francs, and 26
+different combinations of 12 Euros, 14 Euros, and 26
 US Dollars, first create a fixture. The package spec is now:</p>
 <pre style="font-family: monospace;">with Ada.Strings.Unbounded;<br>use Ada.Strings.Unbounded;<br><br>with AUnit.Test_Cases;<br>use AUnit.Test_Cases;<br>package PR_xxxx_xxx is<br>   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;<br><br>    -- Register routines to be run:<br>   procedure Register_Tests (T: in out Test_Case);<br><br>   -- Provide name identifying the test case:<br>   function Name (T: Test_Case) return String_Access;<br><br><br><b>   -- Preparation performed before each routine:</b>
 <b>   Procedure Set_Up (T: in out Test_Case);</b>
 
 end PR_xxxx_xxx;</pre>
 <p>The body becomes:</p>
-<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;<br>use AUnit.Test_Cases.Registration;<br><br>with AUnit.Assertions; use AUnit.Assertions;<br><br><b>with Currencies; use Currencies;</b><br>package body PR_xxxx_xxx is<br>   <b>-- Fixture elements:</b><br>  <b> FR_12, FR_14: French_Franc; </b><br><b>   US_26: US_Dollar;</b><br><br>   <b>-- Preparation performed before each routine:</b><br><b>   Procedure Set_Up (T: in out Test_Case) is</b><br><b>   begin</b><br><b>      FR_12 := 12; FR_14 := 14;</b><br><b>      US_26 := 26;</b><br><b>   end Set_Up;</b><br><br>   -- Simple test routine:<br>   procedure Test_Simple_Add<br>     (T : Aunit.Test_Cases.Test_Case'Class) is<br>   begin<br><b>       Assert </b><br><b>        (FR_12 + FR_14 /= US_26, </b><br><b>         "US and French currencies not diffentiated");</b><br><b> </b>  end;<br><br>   -- Register test routines to call:<br>   procedure Register_Tests (T: in out Test_Case) is<br>   begin<br>      -- Repeat for each test routine:<br>      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");<br>   end Register_Tests;<br><br><br><br>   -- Identifier of test case.  Just change the string<br>   -- result of the function.<br>   function Name (T: Test_Case) return String_Access is<br>   begin<br>      return  new String'("Money Tests");<br>   end Name;<br><br>end PR_xxxx_xxx;</pre>
+<pre style="font-family: monospace;">with AUnit.Test_Cases.Registration;<br>use AUnit.Test_Cases.Registration;<br><br>with AUnit.Assertions; use AUnit.Assertions;<br><br><b>with Currencies; use Currencies;</b><br>package body PR_xxxx_xxx is<br>   <b>-- Fixture elements:</b><br>  <b> EU_12, EU_14: Euro; </b><br><b>   US_26: US_Dollar;</b><br><br>   <b>-- Preparation performed before each routine:</b><br><b>   Procedure Set_Up (T: in out Test_Case) is</b><br><b>   begin</b><br><b>      EU_12 := 12; EU_14 := 14;</b><br><b>      US_26 := 26;</b><br><b>   end Set_Up;</b><br><br>   -- Simple test routine:<br>   procedure Test_Simple_Add<br>     (T : Aunit.Test_Cases.Test_Case'Class) is<br>   begin<br><b>       Assert </b><br><b>        (EU_12 + EU_14 /= US_26, </b><br><b>         "US and EU currencies not differentiated");</b><br><b> </b>  end;<br><br>   -- Register test routines to call:<br>   procedure Register_Tests (T: in out Test_Case) is<br>   begin<br>      -- Repeat for each test routine:<br>      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");<br>   end Register_Tests;<br><br><br><br>   -- Identifier of test case.  Just change the string<br>   -- result of the function.<br>   function Name (T: Test_Case) return String_Access is<br>   begin<br>      return  new String'("Money Tests");<br>   end Name;<br><br>end PR_xxxx_xxx;</pre>
 <p>Once you have the fixture in place, you can write as many test
 routines as you like. Calls to <font face="courier, monospace">Set_Up</font>
 and <font face="courier, monospace">Tear_Down</font>
@@ -262,12 +231,10 @@ each test routine.</p>
 parameter of type AUnit.Test_Cases.Test_Case'Class has been added to
 test routines. This parameter allows access to the current Test_Case
 instance, so that a test routine can access per-instance (rather than
-package body global) data. This can be useful when deriving one test
-case from another, which introduces the need to separate data of an
-instance of the parent type from that of derived types. This is
-different than the normal case of a set of tests where each Test_Case
-derived type almost certainly will have a singleton instance,
-allowing the safe use of package body global data.</p>
+package body global) data. This can be useful when part of the data to
+be used depends on a particular test case instance, while another part
+is global data of the test fixture.<br>
+</p>
 <p>Once you have several test cases, organize them into a Suite. </p>
 <h2>Suite</h2>
 <p>How do you run several test cases at once? </p>
@@ -282,11 +249,7 @@ procedure is used to
 collect them into the single test case.</p>
 <p>A single Test_Case and its
 collection of routines can be executed directly in a harness like so:</p>
-<pre style="margin-bottom: 0.2in; font-family: monospace;">...
-Test : PR_XXXX_XXX.Test_Case;
-Result : AUnit.Test_Results.Result;
-...
-Run (Test, Result);</pre>
+<pre style="margin-bottom: 0.2in; font-family: monospace;">...<br>Test : PR_XXXX_XXX.Test_Case;<br>Result : AUnit.Test_Results.Result;<br>...<br>Run (Test, Result);<br>Report (Result);<br></pre>
 <p>To create a suite of two test cases and run them together, execute: </p>
 <pre style="font-family: monospace;">with AUnit.Test_Suites; use AUnit.Test_Suites;<br>with AUnit.Test_Runner;<br><br>--  List of tests and suites to run:<br>with Test_Case_1, Test_Case_2;<br><br>procedure Harness is<br><br><b>   function Suite return Access_Test_Suite is</b>
 <b>      Result : Access_Test_Suite := new Test_Suite;</b>
