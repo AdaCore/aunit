@@ -1,8 +1,13 @@
-project Aunit is
+
+with "aunit.gpr";
+
+project Aunit_Tests is
 
    for Languages use ("Ada");
-   for Source_Dirs use ("aunit/framework/", "aunit/text_reporter/");
-   for Object_Dir use "aunit";
+   for Source_Dirs use ("./test");
+   for Object_Dir use "./test";
+   for Exec_Dir use "./";
+   for Main use ("harness.adb");
 
    package Builder is
       for Default_Switches ("ada") use ("-g", "-gnatQ");
@@ -20,5 +25,4 @@ project Aunit is
       for Default_Switches ("ada") use ("-E", "-static");
    end Binder;
 
-end Aunit;
-
+end Aunit_Tests;
