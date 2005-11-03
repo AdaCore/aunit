@@ -17,6 +17,7 @@ all:
 
 clean:
 	gnatclean -Paunit
+	gnatclean -Paunit_tests
 
 install_clean:
 	$(RM) -fr $(I_INC)
