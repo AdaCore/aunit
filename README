@@ -1,21 +1,33 @@
+
 AUnit 1.04 README
-12 May 2005
+3 November 2005
 
 This is a minor update release of the Ada unit test framework AUnit, derived 
 from the JUnit framework for Java.  Read AUnit.html for usage.
 
 
 Installation:
+-------------
 
-Unzip the archive into <install-dir>.  Build and run
- <install-dir>/aunit-1.03/test/harness.adb to verify that it works. To build, 
-connect to <install-dir>/aunit-1.03 and type:
+Unzip the archive into <build-dir>.
 
-gnatmake -Paunit_tests
+* To build AUnit:
 
-To execute, type:
+   $ cd <build-dir>
+   $ make
 
-./harness   -- or "harness" on Windows
+* To install AUnit:
+
+   $ make INSTALL=<gnat-root>
+
+   Where <gnat-root> is for example /opt/gnatpro/5.03a1
+
+   At this point AUnit will be automatically available. It is just required to
+   with the "aunit" project into the application project.
+
+* To test AUnit:
+
+   $ make test
 
 The output should be:
 
@@ -28,10 +40,8 @@ The output should be:
    Unexpected Errors: 0
 
 
--------
-
-
 Directories contain the following:
+----------------------------------
 
 aunit      - Top-level: includes README etc, a GNAT project file for
              AUnit, and a GNAT project file for the AUnit tests
