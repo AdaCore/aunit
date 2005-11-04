@@ -1,8 +1,13 @@
+
 project Aunit is
 
    for Languages use ("Ada");
    for Source_Dirs use ("aunit/framework/", "aunit/text_reporter/");
-   for Object_Dir use "aunit";
+   for Object_Dir use "aunit/obj";
+
+   for Library_Dir use "aunit/lib";
+   for Library_Name use "aunit";
+   for Library_Kind use "static";
 
    package Builder is
       for Default_Switches ("ada") use ("-g", "-gnatQ");
@@ -21,4 +26,3 @@ project Aunit is
    end Binder;
 
 end Aunit;
-
