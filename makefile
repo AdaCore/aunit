@@ -13,11 +13,15 @@ I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
 all:
+	$(MKDIR) aunit/obj
+	$(MKDIR) aunit/lib
 	gnatmake -Paunit
 
 clean:
 	gnatclean -Paunit
 	gnatclean -Paunit_tests
+	$(RMDIR) aunit/obj
+	$(RMDIR) aunit/lib
 
 install_clean:
 	$(RM) -fr $(I_INC)
@@ -36,18 +40,19 @@ install_dirs: install_clean
 
 install: install_dirs
 	$(CP) aunit/framework/*.ad* aunit/text_reporter/*.ad* $(I_INC)
-	$(CP) aunit/*.ali aunit/*.o $(I_LIB)
-	$(CP) -r template/* $(I_TPL)
+	$(CP) aunit/lib/* $(I_LIB)
+	$(CP) template/*.ad* template/*.gpr $(I_TPL)
 	$(CP) AUnit.html $(I_DOC)
 	$(CP) support/aunit.gpr $(I_GPR)
-	$(CP) support/aunit_index.xml $(I_PLG)
+	$(CP) support/aunit.xml $(I_PLG)
 
 force:
 
 test: force
 	gnatmake -Paunit_tests
-	harness
+	./harness
 
+RMDIR	= rmdir
 MKDIR	= mkdir -p
 RM	= rm
 CP	= cp -p
