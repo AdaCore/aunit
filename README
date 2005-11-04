@@ -70,6 +70,8 @@ Changes:
 1.04	1. Cleaned up sources to conform to GNAT style conventions and to
         eliminate warnings.
 
+	2. Adjusted build scripts to install into <gnat-root>/lib/gnat
+
 1.03    1. Handling of exceptions in Set_Up and Tear_Down implemented.
         D603-009.
 
