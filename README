@@ -100,4 +100,4 @@ Changes:
 
 	5. Added Set_Up and Tear_Down routines to AUnit.Lists tests.
 
-Maintainer: Ed Falis (falis@gnat.com)
+Maintainer: Ed Falis (falis@adacore.com)
