@@ -18,7 +18,7 @@ Unzip the archive into <build-dir>.
 
 * To install AUnit:
 
-   $ make INSTALL=<gnat-root>
+   $ make INSTALL=<gnat-root> install
 
    Where <gnat-root> is for example /opt/gnatpro/5.03a1
 
