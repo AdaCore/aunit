@@ -26,9 +26,14 @@
 --  Test routine registration
 package body AUnit.Test_Cases.Registration is
 
+   pragma Ada_05;
+
    --  Register a test routine.
    procedure Register_Routine
-     (Test : in out Test_Case'Class; Routine : Test_Routine; Name : String) is
+     (Test    : in out Test_Case'Class;
+      Routine : access procedure (Test : in out Test_Case'Class);
+      Name    : String)
+   is
    begin
       Extend
         (Test.Routines,

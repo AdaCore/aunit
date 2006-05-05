@@ -27,9 +27,13 @@
 --  Registration interface for test cases.
 package AUnit.Test_Cases.Registration is
 
+   pragma Ada_05;
+
    --  Add test routine to the test case:
    procedure Register_Routine
-     (Test : in out Test_Case'Class; Routine : Test_Routine; Name : String);
+     (Test    : in out Test_Case'Class;
+      Routine : access procedure (Test : in out Test_Case'Class);
+      Name    : String);
 
    --  Count of registered routines in test case:
    function Routine_Count (Test : Test_Case'Class) return Natural;
