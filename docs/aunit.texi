@@ -174,7 +174,7 @@ instantiating @code{Aunit.Test_Runner} with a suite function collecting
 together test cases and sub-suites to execute.
 
 @item AUnit includes a GNAT project file that should be included into
-your application project to access the framework.&nbsp; For other
+your application project to access the framework. For other
 compilation systems, be sure to include the subdirectories of
 @i{aunit} in your list of source directories.
 
