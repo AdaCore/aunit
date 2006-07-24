@@ -43,7 +43,7 @@ install: install_dirs
 	$(CP) aunit/framework/*.ad* aunit/text_reporter/*.ad* $(I_INC)
 	$(CP) aunit/lib/* $(I_LIB)
 	$(CP) template/*.ad* template/*.gpr $(I_TPL)
-	$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
+	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
 	$(CP) support/aunit.gpr $(I_GPR)
 	$(CP) support/aunit.xml $(I_PLG)
 
