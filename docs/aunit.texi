@@ -81,7 +81,7 @@ unmodified in any copy.
 
 @page
 
-<p>Copyright @copyright{} 2000-2005, AdaCore
+<p>Copyright @copyright{} 2000-2006, AdaCore
 
 <p>This document may be copied, in whole or in part, in any form or by any
 means, as is or with alterations, provided that (1) alterations are clearly
@@ -100,11 +100,15 @@ unmodified in any copy.
 
 @menu
 * Introduction::
+* Overview::
 * Simple Test Case::
 * Fixture::
 * Suite::
 * Composition of Suites::
+* Support for OOP::
+* Support for Generics::
 * Reporting::
+* Migrating Tests from AUnit 1 to AUnit 2::
 * GPS Support::
 @end menu
 @end ifinfo
@@ -117,23 +121,40 @@ unmodified in any copy.
 @noindent
 This is a short guide for using the AUnit test framework.
 AUnit is an adaptation of the Java JUnit (Kent Beck, Erich Gamma) unit
-test framework for Ada code. This document is adapted from the JUnit
-Cookbook document contained in the JUnit release package.
+test framework for Ada code. AUnit 2 differs somewhat from the original
+AUnit 1 in that it is compatible with restricted run-time libraries provided
+with GNAT Pro for high integrity applications. It also provides better
+support for testing of OOP applications by allowing overriding and
+inheritance of test routines. AUnit 1 only supported inheritance.
+
+AUnit allows a great deal of flexibility as to the structure of test cases,
+suites and harnesses.  The templates and examples given in this document
+illustrate how to use AUnit while staying within the constraints of the
+GNAT Pro restricted and Zero Foot Print (ZFP) run-time libraries. Therefore,
+they avoid the use of dynamic allocation and some other features that would
+be outside of the profiles corresponding to these libraries.  Tests targeted
+to the full Ada run-time library need not comply with these constraints.
+
+This document is adapted from the JUnit Cookbook document contained in the
+JUnit release package.
+
+Special thanks to Francois Brun of Thales Avionics for his ideas about
+support for OOP testing.
 
 @c ======================================================================
 
-@node Simple Test Case
-@chapter Simple Test Case
+@node Overview
+@chapter Overview
 
 How do you write testing code?
 
 The simplest way is as an expression in a debugger. You can change
 debug expressions without recompiling, and you can wait to decide
 what to write until you have seen the running objects. You can also
-write test expressions as statements which print to the standard
+write test expressions as statements that print to the standard
 output stream. Both styles of tests are limited because they require
 human judgment to analyze their results. Also, they don't compose
-nicely- you can only execute one debug expression at a time and a
+nicely - you can only execute one debug expression at a time and a
 program with too many print statements causes the dreaded "Scroll
 Blindness".
 
@@ -143,136 +164,214 @@ something, here is what you do:
 
 @enumerate
 
-@item Declare a package for a test case - a set of logically related
-test routines. A template for such a package is in
-@code{/AUnit/Template/pr_xxxx_xxx.ad*}. GPS provides an
-@b{Edit -> Unit Testing} menu to generate template code.
+@item Instantiate @code{AUnit.Framework} to parameterize 
+@code{AUnit}.  Since restricted run-time profiles do not support
+dynamic memory management without customization, tables of information 
+used for reporting test results and for manipulating tests must be statically
+sized. In this document, we will call this instantiation @code{@b{Framework}}
+in both code samples and text. When referring to this user-instantiated
+package, it will appear in boldface, as will all other user-written code.
 
-@item Derive from @code{AUnit.Test_Cases.Test_Case} in the new
-package.
+@item Declare a package for a test case - a set of logically related
+test routines.
+
+@item Derive a test case type from @code{@b{Framework}.Test_Cases.Test_Case} in
+the package.
 
 @item The new derived type must provide implementations of
 @code{Register_Tests} and @code{Name}.
 
-@item Write each test routine (see below) and register it with a line
-in routine @i{Register_Tests}, of the form:
-
+@item Write each test routine (see below) and register it with a statement
+in routine @code{Register_Tests}, of the form:
 @AEXP{Register_Routine (T, Test_Name'Access, "Description of test routine");}
+@code{Register_Routine} is exported by an instantiation of 
+@code{@b{Framework}.Test_Cases.Registration} whose actual
+parameter is a derivation of @code{@b{Framework}.Test_Cases.Test_Case}.
 
 @item When you want to check a value, use:
+@AEXP{@b{Framework}.Test_Cases.Assertions.Assert (@b{Test}'Access, @b{Boolean_Expression}, @b{String_Description});}
+or:
+@AEXP{if not @b{Framework}.Test_Cases.Assertions.Assert (@b{Test}'Access, @b{Boolean_Expression}, @b{String_Description}) then
+   return;
+end if;}
 
-@AEXP{AUnit.Assertions.Assert (Boolean_Expression, String_Description);}
+Note that in AUnit 2 the procedural form of @code{Assert} will have different
+behavior depending on whether the underlying Ada run-time library supports
+exception handling. If exception handling is supported, a failed assertion
+will cause the execution of the calling test routine to be abandoned. 
+If exception handling is not supported, a failed assertion will not do this:
+the calling test routine will continue executing.  This behavior is determined
+by the @i{aunit.gpr} project file, which selects the behavior based on the
+value of the @code{Runtime} scenario variable.  The first behavior is
+identical to that of AUnit 1 for backward compatibility.  The functional
+form of @code{Assert} always continues on a failed assertion, and provides you
+with a choice of behaviors.  This form allows writing test routines that are
+fully portable across run-time profiles.
 
-@item Create a suite function to gather together test cases and
-sub-suites. Alternatively, you can call the @code{Run} routine of a
-single test case directly, and then call
-@code{Test_Results.Test_Reporter.Report} on its @code{Result} parameter.
-This eliminates step 7.
+@item Create a suite function inside a package to gather together test cases
+and sub-suites. Test cases and suites must be statically allocated if using
+the ZFP profile without custom dynamic memory management, or the ``cert''
+run-time profile.
 
-@item At any level at which you wish to run tests, create a harness
-instantiating @code{Aunit.Test_Runner} with a suite function collecting
-together test cases and sub-suites to execute.
+@item At any level at which you wish to run tests, create a harness by
+instantiating package @code{@b{Framework}.Harness} with the top-level suite
+function to be executed. This instantiation exports the routine @code{Run}
+that executes all of the tests in the suite.  Note that
+@code{@b{Framework}.Harness} must be instantiated at the library level. This
+prevents reporting data structures from being allocated on stack. If you
+do not instantiate the package at the library level, compilation will fail.
 
-@item AUnit includes a GNAT project file that should be included into
-your application project to access the framework. For other
-compilation systems, be sure to include the subdirectories of
-@i{aunit} in your list of source directories.
-
-@item Build the harness routine using gnatmake. The GNAT
-project file @i{aunit-@value{VERSION}/aunit_tests.gpr} contains all
-the necessary links and switches for building test cases. When testing
-a new compiler, as opposed to incremental unit tests, the GNAT "-f"
-switch should be set for gnatmake. One can then use GNAT to build and
-run the tests.
+@item Build the code that calls the harness @code{Run} routine using gnatmake.
+The GNAT project file @i{aunit.gpr} contains all necessary switches, and
+should be imported into your root project file.
 
 @end enumerate
 
 @noindent
-For example, to test that the sum of two Moneys with the same
+The first step when using AUnit is to instantiate the framework in order
+to size various elements used for manipulating tests and reporting the results
+of a run.  Unlike AUnit 1, AUnit 2 does not use any dynamic allocation so
+that it can be used with GNAT run-time libraries such as ZFP and cert that
+either do not support the use of allocators by default, or place restrictions
+on where they can be used. The following code fragment
+is a typical instantiation. User-specific text is in boldface.
+
+@AEXP{with AUnit.Framework;
+package @b{Framework} is new AUnit.Framework
+  (Max_Tests_Per_Harness    => @b{50},
+   Max_Errors_Per_Harness   => @b{5},
+   Max_Failures_Per_Harness => @b{20},
+   Max_Failure_Message_Size => @b{150},
+   Max_Routines_Per_Test    => @b{50},
+   Test_Name_Size           => @b{30},
+   Routine_Name_Size        => @b{50});}
+
+@noindent
+The term ``run'' in this discussion means the execution of a call to the
+@code{Run} routine exported by an instantiation of
+@code{@b{Framework}.Harness}.
+
+The formal parameters of @code{AUnit.Framework} are:
+@itemize
+@item
+@i{Max_Tests_Per_Harness}: the maximum number of test routines that can be
+reported in a given run.  This includes all test routines of all test cases
+rooted in the top-level test suite for the run.
+
+@item
+@i{Max_Errors_Per_Harness}: the maximum number of unhandled exceptions
+that can be reported in test routines for a given run.
+
+@item
+@i{Max_Failures_Per_Harness}: the maximum number of failed assertions that
+can be reported in the run.
+
+@item
+@i{Max_Failure_Message_Size}: the maximum length of a message describing an
+assertion failure.
+
+@item
+@i{Max_Routines_Per_Test}: the maximum number of routines that can be part
+of any test case.
+
+@item
+@i{Test_Name_Size}: the largest size of any test case name.
+
+@item
+@i{Routine_Name_Size}: the largest size of any test routine description.
+
+@end itemize
+
+@c ======================================================================
+
+@node Simple Test Case
+@chapter Simple Test Case
+
+To test that the sum of two Moneys with the same
 currency contains a value which is the sum of the values of the two
 Moneys, the test routine would look like:
 
-@AEXP{procedure Test_Simple_Add
-   (T : Aunit.Test_Cases.Test_Case'Class) is
+@AEXP{procedure Test_Simple_Add (T : in out Money_Test) is
     X, Y: Some_Currency;
 begin
    X := 12; Y := 14;
-   Assert (X + Y = 26, "Addition is incorrect");
+   Assert (T'Access, X + Y = 26, "Addition is incorrect");
 end Test_Simple_Add;}
 
 @noindent
-The package spec (taken almost directly from @file{pr_xxxx_xxx.ads}) looks
-as follows. The only modification was to remove support for a test
-fixture (next section), and to provide a name for the unit. Changes
-to "boilerplate code" are in bold:
+The package spec looks as follows. The only modification was to remove
+support for a test fixture (next section), and to provide a name for the
+unit. Changes to "boilerplate code" are in bold (remember that
+@code{@b{Framework}} here is the name of your instantiation of
+@code{AUnit.Framework}).
 
-@AEXP{with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with AUnit.Test_Cases; use AUnit.Test_Cases;
+@AEXP{with @b{Framework}; use @b{Framework};
 
-package @b{PR_xxxx_xxx} is
+package @b{Money_Tests} is
+   use Test_Results;
 
-   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
+   type @b{Money_Test} is new @b{Framework}.Test_Cases.Test_Case with @b{null record};
 
-   procedure Register_Tests (T: in out Test_Case);
+   procedure Register_Tests (@b{T}: in out @b{Money_Test});
    -- Register routines to be run
 
-   function Name (T: Test_Case) return String_Access;
-   -- Provide name identifying the test case:
+   function Name (@b{T}: @b{Money_Test}) return Test_String;
+   -- Provide name identifying the test case
 
-end @b{PR_xxxx_xxx};}
+   -- Test Routines:
+   procedure @b{Test_Simple_Add} (@b{T} : in out @b{Money_Test});
+end @b{Money_Tests};}
 
-The package body, constructed by modifying @file{pr_xxxx_xxx.adb} is:
+The package body is:
 
-@AEXP{with AUnit.Test_Cases.Registration; use AUnit.Test_Cases.Registration;
-with AUnit.Assertions; use AUnit.Assertions;
+@AEXP{
+with AUnit.Tests.Test_Cases.Registration;
 
--- Template for test case body.
+package body @b{Money_Tests} is
 
-package body @b{PR_xxxx_xxx} is
+   use Assertions;
 
-   -- Simple test routine
-
-   procedure Test_Simple_Add
-      (T    : Aunit.Test_Cases.Test_Case'Class) is
-       X, Y : Some_Currency;
+   procedure @b{Test_Simple_Add} (@b{T} : in out @b{Money_Test}) is
+       @b{X, Y : Some_Currency;}
    begin
-      X := 12; Y := 14;
-      Assert (X + Y = 26, "Addition is incorrect");
-   end;
+      @b{X := 12; Y := 14;}
+      @b{Assert (T'Access, X + Y = 26, "Addition is incorrect");}
+   end @b{Test_Simple_Add};
 
    -- Register test routines to call
+   procedure Register_Tests (@b{T}: in out @b{Money_Test}) is
 
-   procedure Register_Tests (T: access Test_Case) is
+      package @b{Registration} is new @b{Framework}.Test_Cases.Registration (@b{Money_Test});
+      use @b{Registration};
+
    begin
       -- Repeat for each test routine:
-      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");
+      Register_Routine (@b{T}, @b{Test_Simple_Add}'Access, @b{"Test Addition"});
    end Register_Tests;
 
-   -- Identifier of test case.  Just change the string
-   -- result of the function.
+   -- Identifier of test case
 
-   function Name (T: Test_Case) return String_Access is
+   function Name (@b{T}: @b{Money_Test}) return Test_String is
    begin
-      return new String'("Money Tests");   
+      return Format (@b{"Money Tests"});   
    end Name;
 
-end @b{PR_xxxx_xxx};}
+end @b{Money_Tests};}
 
 @noindent
-The corresponding harness code, adapted from
-@file{aunit-@value{VERSION}/template/harness.adb} is:
+The corresponding harness code, which imports user suite package
+@code{@b{Money_Suite}} (see below) is:
+@AEXP{with @b{Money_Suite};
+with @b{Framework};
+package @b{Money_Harness} is new @b{Framework}.Harness (@b{Money_Suite.Suite});
 
-@AEXP{with AUnit.Test_Cases; use AUnit.Test_Cases;
-with AUnit.Test_Results.Test_Reporter; use AUnit.Test_Results.Test_Reporter;
---  Test case to run:
-with @b{PR_XXXX_XXX};
-procedure Harness is
-   Test : PR_XXXX_XXX.Test_Case;
-   Result : AUnit.Test_Results.Result;
+with @b{Money_Harness};
+--  If targeting the ZFP run-time library, uncomment:
+--  with Last_Chance_Handler, Dummy_SS_Get;
+procedure @b{My_Tests} is
 begin
-   Run (Test, Result);
-   Report (Result);
-end Harness;}
+   @b{Money_Harness.Run};
+end @b{My_Tests};}
 
 @c ======================================================================
 
@@ -280,37 +379,35 @@ end Harness;}
 @chapter Fixture
 
 @noindent
-Tests need to run against the background of a known set of
-objects. This set of objects is called a test fixture. When you are
+Tests need to run against the background of a set of known entities.
+This set is called a test fixture. When you are
 writing tests you will often find that you spend more time writing
-the code to set up the fixture than you do in actually testing
-values.
+code to set up the fixture than you do in actually testing values.
 
-To some extent, you can make writing the fixture code easier by
-paying careful attention to the constructors you write. However, a
-much bigger savings comes from sharing fixture code. Often, you will
-be able to use the same fixture for several different tests. Each
-case will send slightly different messages or parameters to the
+You can make writing fixture code easier by sharing it.
+Often you will be able to use the same fixture for several different
+tests. Each case will send slightly different messages or parameters to the
 fixture and will check for different results.
 
 When you have a common fixture, here is what you do:
 
 @enumerate
-@item Create a package as in the previous section, starting from the
-templates @file{pr_xxxx_xxx.ad*}.
+@item Create a package as in the previous section.
 
-@item Add fields for elements of the fixture into the package body.
+@item Declare variables or components for elements of the fixture either
+as part of the test case type or in the package body.
 
-@item Override @code{Set_Up_Case} to initialize the fixture for all test routines.
+@item Override @code{Set_Up_Case} to initialize the fixture for all test
+routines.
 
-@item Override @code{Set_Up} to initialize the variables before the
-execution of each routine.
+@item Override @code{Set_Up} to initialize the variables or components before
+the execution of each routine.
 
 @item Override @code{Tear_Down} to release any resources you allocated in
 @code{Set_Up} - to be executed after each test routine.
 
 @item Override @code{Tear_Down_Case} to release any permanent resources
-you allocated in @code{Set_Up_Case} - executed after all test routines.
+you allocated in @code{Set_Up_Case} - to be executed after all test routines.
 @end enumerate
 
 @noindent
@@ -318,84 +415,90 @@ For example, to write several test cases that want to work with
 different combinations of 12 Euros, 14 Euros, and 26 US Dollars, first
 create a fixture. The package spec is now:
 
-@AEXP{with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with AUnit.Test_Cases; use AUnit.Test_Cases;
+@AEXP{with @b{Framework}; use @b{Framework};
 
-package @b{PR_xxxx_xxx} is
-   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
+package @b{Money_Tests} is
+   use Test_Results;
 
-   procedure Register_Tests (T: in out Test_Case);
+   type @b{Money_Test} is new @b{Framework}.Test_Cases.Test_Case with @b{null record};
+
+   procedure Register_Tests (@b{T}: in out @b{Money_Test});
    -- Register routines to be run
 
-   function Name (T: Test_Case) return String_Access;
+   function Name (@b{T} : @b{Money_Test}) return Test_String;
    -- Provide name identifying the test case
 
-   Procedure Set_Up (T: in out Test_Case);
-   -- Preparation performed before each routine
+   procedure Set_Up (@b{T} : in out @b{Money_Test});
+   --  Set up performed before each test routine
 
-end @b{PR_xxxx_xxx};}
+   -- Test Routines:
+   procedure @b{Test_Simple_Add} (@b{T} : in out @b{Money_Test});
+end @b{Money_Tests};}
 
 The body becomes:
 
-@AEXP{with AUnit.Test_Cases.Registration; use AUnit.Test_Cases.Registration;
-with AUnit.Assertions; use AUnit.Assertions;
-with Currencies; use Currencies;
+@AEXP{with AUnit.Tests.Test_Cases.Registration;
 
-package body @b{PR_xxxx_xxx} is
+package body @b{Money_Tests} is
+
+   use Assertions;
 
    -- Fixture elements
 
-   EU_12, EU_14 : Euro;
-   US_26        : US_Dollar;
+   @b{EU_12, EU_14 : Euro;
+   US_26        : US_Dollar;}
 
    -- Preparation performed before each routine
 
-   Procedure Set_Up (T: in out Test_Case) is
+   procedure Set_Up (@b{T}: in out @b{Money_Test}) is
    begin
-      EU_12 := 12; EU_14 := 14;
-      US_26 := 26;
+      @b{EU_12 := 12; EU_14 := 14;
+      US_26 := 26;}
    end Set_Up;
 
-   -- Simple test routine
-
-   procedure Test_Simple_Add
-     (T : Aunit.Test_Cases.Test_Case'Class) is
+   procedure @b{Test_Simple_Add} (@b{T} : in out @b{Money_Test}) is
+       @b{X, Y : Some_Currency;}
    begin
-       Assert
-         (EU_12 + EU_14 /= US_26,
-          "US and EU currencies not differentiated");
-   end Test_Simple_Add;
+       @b{Assert
+         (T'Access,
+          EU_12 + EU_14 /= US_26,
+          "US and EU currencies not differentiated");}
+   end @b{Test_Simple_Add};
 
    -- Register test routines to call
+   procedure Register_Tests (@b{T}: in out @b{Money_Test}) is
 
-   procedure Register_Tests (T: in out Test_Case) is
+      package @b{Registration} is new @b{Framework}.Test_Cases.Registration (@b{Money_Test});
+      use @b{Registration};
+
    begin
       -- Repeat for each test routine:
-      Register_Routine (T, Test_Simple_Add'Access, "Test Addition");
+      Register_Routine (@b{T}, @b{Test_Simple_Add}'Access, @b{"Test Addition"});
    end Register_Tests;
 
-   -- Identifier of test case.  Just change the string
-   -- result of the function.
-
-   function Name (T: Test_Case) return String_Access is
+   -- Identifier of test case
+   function Name (@b{T}: @b{Money_Test}) return Test_String is
    begin
-      return new String'("Money Tests");
+      return Format (@b{"Money Tests"});   
    end Name;
 
-end @b{PR_xxxx_xxx};}
+end @b{Money_Tests};}
 
 @noindent
 Once you have the fixture in place, you can write as many test
 routines as you like. Calls to @code{Set_Up} and @code{Tear_Down}
 bracket the invocation of each test routine.
 
-Note that as of AUnit 1.01 a parameter of type
-@code{AUnit.Test_Cases.Test_Case'Class} has been added to 
-test routines. This parameter allows access to the current @code{Test_Case}
-instance, so that a test routine can access per-instance (rather than
+Note that in AUnit each test routine has a formal parameter of the specific
+test case type. This parameter allows access to the current
+test case instance, so that a test routine can access per-instance (rather than
 package body global) data. This can be useful when part of the data to
 be used depends on a particular test case instance, while another part
-is global data of the test fixture.
+is global data of the test fixture. In AUnit 1, this parameter
+was class-wide; replacing this with a specific type allows overriding
+of test routines when units under test employ OOP techniques and you 
+want your test case hierarchy to reflect that of the application (see the
+section on Support for OOP).
 
 Once you have several test cases, organize them into a Suite.
 
@@ -408,49 +511,58 @@ How do you run several test cases at once?
 
 As soon as you have two tests, you'll want to run them together.
 You could run the tests one at a time yourself, but you would quickly
-grow tired of that. Instead, AUnit provides an object, @code{Test_Suite}
-which runs any number of test cases together.
+grow tired of that. Instead, AUnit provides an object, @code{Test_Suite},
+that runs any number of test cases together.
 
 For test routines that use the same fixture (i.e. those declared
 in the same package), the @code{Register_Routine} procedure is used to
 collect them into the single test case.
 
-A single @code{Test_Case} and its
-collection of routines can be executed directly in a harness like so:
+@noindent
+To create a suite of two test cases and run them together, first create
+a test suite (again, @code{@b{Framework}} designates the user instantiation of
+@code{AUnit.Framework}):
 
-@AEXP{...
-Test   : PR_XXXX_XXX.Test_Case;
-Result : AUnit.Test_Results.Result;
-...
-Run (Test, Result);
-Report (Result);}
+@AEXP{with @b{Framework}; use @b{Framework};
+package @b{My_Suite} is
+   function @b{Suite} return Test_Suites.Test_Suite_Access;
+end @b{My_Suite};
+
+--  Import tests and sub-suites to run
+with @b{Test_Case_1, Test_Case_2};
+
+package body @b{My_Suite} is
+   use Test_Suites;
+
+   -- Statically allocate test suite:
+   @b{Result} : aliased Test_Suite;
+
+   --  Statically allocate test cases:
+   @b{Test_1 : aliased Test_Case_1.Test_Case;}
+   @b{Test_2 : aliased Test_Case_2.Test_Case;}
+
+   function @b{Suite} return Test_Suite_Access is
+   begin
+      Add_Test (@b{Result'Access, Test_Case_1'Access});
+      Add_Test (@b{Result'Access, Test_Case_2'Access});
+      return @b{Result'Access};
+   end @b{Suite};
+end @b{My_Suite};}
 
 @noindent
-To create a suite of two test cases and run them together, execute:
+The harness and test procedure are:
+@AEXP{with @b{My_Suite};
+with @b{Framework};
+package @b{My_Harness} is new @b{Framework}.Harness (@b{My_Suite.Suite});
 
-@AEXP{with AUnit.Test_Suites; use AUnit.Test_Suites;
-with AUnit.Test_Runner;
-
---  List of tests and suites to run
-
-with Test_Case_1, Test_Case_2;
-
-procedure Harness is
-
-   function Suite return Access_Test_Suite is
-      Result : Access_Test_Suite := new Test_Suite;
-   begin
-      --  You may add multiple tests or suites here:
-      Add_Test (Result, new Test_Case_1.Test_Case);
-      Add_Test (Result, new Test_Case_2.Test_Case);
-      return Result;
-   end Suite;
-
-   procedure Run is new AUnit.Test_Runner (Suite);
-
+with @b{My_Harness};
+--  If targeting the ZFP run-time library, uncomment:
+--  with Last_Chance_Handler, Dummy_SS_Get;
+procedure @b{My_Tests} is
 begin
-   Run;
-end Harness;}
+   @b{My_Harness.Run};
+end @b{My_Tests};}
+
 
 @c ======================================================================
 
@@ -460,81 +572,274 @@ end Harness;}
 @noindent
 Typically, one will want the flexibility to execute a complete set
 of tests, or some subset of them. In order to facilitate this, we can
-reorganize the harness so that the composition of test cases and
-suites is done in a separate library function, and each composition
-level can have its own harness:
+compose both suites and test cases, and provide a harness for any given
+suite:
 
-@AEXP{-- Composition function:
-with AUnit.Test_Suites; use Aunit.Test_Suites;
+@AEXP{-- Composition package:
+with @b{Framework}; use @b{Framework};
+package @b{Composite_Suite} is
+   function @b{Suite} return Test_Suites.Test_Suite_Access;
+end @b{Composite_Suite};
 
--- List of tests and suites to compose:
-with Test_Case_1;
-with Test_Case_2;
+--  Import tests and suites to run
+with @b{This_Suite, That_Suite};
 
-function This_Suite return Access_Test_Suite is
-   Result : Access_Test_Suite := new Test_Suite;
+package body @b{Composite_Suite} is
+   use Test_Suites;
+
+   -- Statically allocate test suite. Note that the suites to compose
+   -- have already been allocated in their own packages.
+   @b{Result} : aliased Test_Suite;
+
+   function @b{Suite} return Test_Suite_Access is
+   begin
+      Add_Test (@b{Result'Access, This_Suite.Suite'Access});
+      Add_Test (@b{Result'Access, That_Suite.Suite'Access});
+      return @b{Result'Access};
+   end @b{Suite};
+end @b{Composite_Suite};}
+
+@noindent
+The harness remains the same:
+@AEXP{with @b{Composite_Suite};
+with @b{Framework};
+package @b{Composite_Harness} is new @b{Framework}.Harness (@b{Composite_Suite.Suite});
+
+with @b{Composite_Harness};
+--  If targeting the ZFP run-time library, uncomment:
+--  with Last_Chance_Handler, Dummy_SS_Get;
+procedure @b{Composite_Tests} is
 begin
-   Add_Test (Result, new Test_Case_1.Test_Case);
-   Add_Test (Result, new Test_Case_2.Test_Case);
-   return Result;
-end Suite;
+   @b{Composite_Harness.Run};
+end @b{Composite_Tests};}
 
--- More general form of harness for a given level:
-with AUnit.Test_Runner;
---  Composition function for this level:
-with This_Suite;
-procedure Harness is
-   procedure Run is new AUnit.Test_Runner (This_Suite);
-begin
-   Run;
-end Harness;}
-
-At a higher level, we may wish to combine two suites of units tests
-that are composed with functions @code{This_Suite} and @code{That_Suite}.
-
-The corresponding composition function and harness would be:
-
-@AEXP{-- Composition function:
-with AUnit.Test_Suites; use Aunit.Test_Suites;
-
--- List of tests and suites to compose:
-with Suite_1;
-with Suite_2;
-
-function Composition_Suite return Access_Test_Suite is
-   Result : Access_Test_Suite := new Test_Suite;
-begin
-   Add_Test (Result, Suite_1);
-   Add_Test (Result, Suite_2);
-   return Result;
-end Composition_Suite;
-
--- More general form of harness for a given level:
-with AUnit.Test_Runner;
---  Composition function for this level:
-with Composition_Suite;
-procedure Harness is
-   procedure Run is new AUnit.Test_Runner (Composition_Suite);
-begin
-   Run;
-end Harness;}
 
 
 @noindent
 As can be seen, this is a very flexible way of composing test cases
-into execution runs.
+into execution runs: any combination of test cases and sub-suites can
+be collected into a suite.
 
-Note that the @code{Aunit.Test_Runner.Run} routine has a defaulted
-parameter to control whether timing information is reported. Its
-speficiation is:
+@c ======================================================================
 
-@AEXP{procedure Run (Timed : Boolean := True);}
+@node Support for OOP
+@chapter Support for OOP
 
-By default the execution time for a
-harness is reported. If you are running some number of harnesses
-from a scripting language, and comparing the result to an existing
-file, using @code{Timed} -> @code{False} ensures that the output will be
-identical across successful runs.
+When testing a hierarchy of tagged types, one will often want to run tests
+for parent types against their derivations without rewriting those tests.
+The most straightforward way to accomplish this is to derive the test cases
+for the derived types from those for the parent type.
+
+Suppose we have a parent type defined in a package:
+@AEXP{package Root is
+   type Parent is tagged private;
+
+   procedure P1 (P : in out Parent);
+   procedure P2 (P : in out Parent);
+private
+   type Parent is tagged null record;
+end Root;}
+
+@noindent
+and a corresponding test case:
+@AEXP{with @b{Framework};
+package @b{Parent_Tests} is
+   use Test_Results;
+
+   type @b{Parent_Test} is new @b{Framework}.Test_Cases.Test_Case @b{with private};
+
+   function Name (@b{P} : @b{Parent_Test}) return Test_String;
+   procedure Register_Tests (@b{P} : in out @b{Parent_Test});
+
+   --  Test routines. If derived types are declared in child packages,
+   --  these can be in the private part.
+   procedure @b{Test_P1} (@b{P} : in out @b{Parent_Test});
+   procedure @b{Test_P2} (@b{P} : in out @b{Parent_Test});
+
+private
+   type @b{Parent_Test} is new @b{Framework}.Test_Cases.Test_Case @b{with null record};
+end @b{Parent_Tests};}
+
+@noindent
+The body of the test case will follow the usual pattern, declaring one or
+more objects of type @code{@b{Parent}}, and executing statements in the
+test routines against them.  However, in order to support dispatching to
+overriding routines of derived test cases, we need to introduce class-wide
+wrapper routines for each primitive test routine of the parent type that
+we anticipate may be overridden. Instead of registering the parent's
+overridable primitive operations directly using @code{Register_Routine},
+we register the wrapper using @code{Register_Wrapper}. This latter routine
+is exported by the instantiation of @code{@b{Framework}.Test_Cases.Registration}:
+@AEXP{with AUnit.Tests.Test_Cases.Registration;
+@b{with Root; use Root;}
+package body @b{Parent_Tests} is
+   use Assertions;
+
+   @b{Fixture : Parent;}
+   --  This could also be a field of Parent_Test
+
+   --  Declare class-wide wrapper routines for any test routines that will be
+   --  overridden:
+   procedure @b{Test_P1_Wrapper} (@b{P} : in out @b{Parent_Test}'Class);
+   procedure @b{Test_P2_Wrapper} (@b{P} : in out @b{Parent_Test}'Class);
+
+   function Name (@b{C} : @b{Parent_Test}) return Test_String is ...;
+
+   --  Register Wrappers:
+   procedure Register_Tests (@b{P} : in out @b{Parent_Test}) is
+
+      package Registration is new @b{Framework}.Test_Cases.Registration (@b{Parent_Test});
+      use Registration;
+
+   begin
+      Register_Wrapper (@b{P}, @b{Test_P1_Wrapper}'Access, @b{"Test P1"});
+      Register_Wrapper (@b{P}, @b{Test_P2_Wrapper}'Access, @b{"Test P2"});
+   end Register_Tests;
+
+   --  Test routines:
+   procedure @b{Test_P1} (@b{P} : in out @b{Parent_Test}) is ...;
+   procedure @b{Test_P2} (@b{C} : in out @b{Parent_Test}) is ...;
+
+   --  Wrapper routines. These dispatch to the corresponding primitive
+   --  test routines of the specific types.
+   procedure @b{Test_P1_Wrapper} (@b{P} : in out @b{Parent_Test}'Class) is
+   begin
+      @b{Test_P1} (@b{P});
+   end @b{Test_P1_Wrapper};
+
+   procedure @b{Test_P2_Wrapper} (@b{P} : in out @b{Parent_Test}'Class) is
+   begin
+      @b{Test_P2} (@b{P});
+   end @b{Test_P2_Wrapper};
+
+end @b{Parent_Tests};}
+
+Now consider a derivation of type @code{Parent}:
+@AEXP{with Root;
+package Branch is
+   type Child is new Root.Parent with private;
+
+   procedure P2 (C : in out Child);
+   procedure P3 (C : in out Child);
+private
+   type Child is new Root.Parent with null record;
+end Branch;}
+
+@noindent
+Note that @code{Child} retains the parent implementation of @code{P1},
+overrides @code{P2} and adds @code{P3}. Its test case looks like the following,
+assuming that we will override @code{Test_P2} when we override @code{P2} (not
+necessary, but certainly possible):
+
+@AEXP{with @b{Parent_Tests}; use @b{Parent_Tests};
+with @b{Framework}; use @b{Framework};
+package @b{Child_Tests} is
+   use Test_Results;
+
+   type @b{Child_Test} is new @b{Parent_Test} @b{with private};
+
+   function Name (@b{C} : @b{Child_Test}) return Test_String;
+   procedure Register_Tests (@b{C} : in out @b{Child_Test});
+
+   --  Test routines:
+   procedure @b{Test_P2} (@b{C} : in out @b{Child_Test});
+   procedure @b{Test_P3} (@b{C} : in out @b{Child_Test});
+private
+   type @b{Child_Test} is new @b{Parent_Test} @b{with null record};
+end @b{Child_Tests};
+
+with AUnit.Tests.Test_Cases.Registration;
+@b{with Branch; use Branch;}
+package body @b{Child_Tests} is
+   use Assertions;
+
+   @b{Fixture : Child;}
+   --  This could also be a field of Child_Test
+
+   --  Declare wrapper for Test_P3:
+   procedure @b{Test_P3_Wrapper} (@b{C} : in out @b{Child_Test}'Class);
+
+   function Name (@b{C} : @b{Child_Test}) return Test_String is ...;
+
+   procedure Register_Tests (@b{C} : in out @b{Child_Test}) is
+
+      package @b{Registration} is new @b{Framework}.Test_Cases.Registration (@b{Child_Test});
+      use @b{Registration};
+
+   begin
+      -- Register parent tests for P1 and P2:
+      @b{Parent_Tests}.Register_Tests (@b{Parent_Test} (@b{C}));
+
+      -- Repeat for each new test routine (Test_P3 in this case):
+      @b{Register_Wrapper} (@b{C}, @b{Test_P3_Wrapper}'Access, @b{"Test P3"});
+   end Register_Tests;
+
+   --  Test routines:
+   procedure @b{Test_P2} (@b{C} : in out @b{Child_Test}) is ...;
+   procedure @b{Test_P3} (@b{C} : in out @b{Child_Test}) is ...;
+
+   --  Wrapper for new routine:
+   procedure @b{Test_P3_Wrapper} (@b{C} : in out @b{Child_Test}'Class) is
+   begin
+      @b{Test_P3} (@b{C});
+   end @b{Test_P3_Wrapper};
+
+end @b{Child_Tests};}
+
+@noindent
+Note that inherited and overridden tests do not need to be explicitly
+re-registered in derived test cases - one just calls the parent version of
+@code{Register_Tests}. If the application tagged type hierarchy is organized
+into parent and child units, one could also organize the test cases into a
+hierarchy that reflects that of the units under test.
+
+@c ======================================================================
+
+@node Support for Generics
+@chapter Support for Generics
+
+When testing generic units, one would like to apply the same generic tests
+to all instantiations in an application.  A simple approach is to make the
+generic unit under test a formal parameter to a generic test case.
+
+For instance, suppose the generic unit to test is a package (though it could
+be a subprogram, and the same principle would apply):
+@AEXP{generic
+   -- Formal parameter list
+package Template is
+   -- Declarations
+end Template;}
+
+@noindent
+The corresponding test case would be:
+@AEXP{with @b{Framework}; use @b{Framework};
+with @b{Template};
+generic
+   with package @b{Instance} is new Template (<>);
+package @b{Template_Tests} is
+   use Test_Results;
+
+   type @b{Template_Test} is new Test_Cases.Test_Case with private;
+
+   function Name (@b{T} : @b{Template_Test}) return Test_String;
+   procedure Register_Tests (@b{T} : in out @b{Template_Test});
+   
+   --  Declare test routines
+
+private
+
+   type @b{Template_Test} is new Test_Cases.Test_Case with @b{...};
+
+end @b{Template_Tests};}
+
+The body will follow the usual patterns with the fixture being based on the
+formal package @code{Instance}.
+
+Instances of @code{Template} will have associated instances of
+@code{Template_Tests}. The instances under test can be instantiated as is
+convenient, at the library level or within a helper package.  Likewise for
+the test case instances. The instantiated test case objects are added to a
+suite in the usual manner.
 
 @c ======================================================================
 
@@ -542,53 +847,199 @@ identical across successful runs.
 @chapter Reporting
 
 Currently test results are reported using a simple console reporting
-routine:
+routine that is invoked when the @code{Run} routine of an instantiation of
+@code{@b{Framework}.Harness} is called.
 
-@AEXP{Test_Results.Text_Reporter.Report (Result);}
+Here is an example where the test program calls three different @code{Run}
+routines (because they need to be invoked in the contexts of distinct
+tasks):
 
-A sample run on a set of problem reports submitted to ACT prints the
-following to the console when executed:
+@AEXP{--------------------
 
-@AEXP{[efalis@@dogen AUnit]$ ./harness
-   Total Tests Run:  10
-   Failed Tests: 1
-      PR 7503-008.Allocation_Test:: Bad discriminant check
+   Total Tests Run: 7
+
+   Successful Tests: 7
+      Apex_Blackboards_Init         : creation routines
+      Apex_Buffers_Init             : creation routines
+      Apex_Events_Init              : creation routines
+      Apex_Processes_Init           : creation routines
+      Apex_Queuing_Ports_Init       : creation routines
+      Apex_Sampling_Ports_Init      : creation routines
+      Apex_Semaphores_Init          : creation routines
+
+   Failed Assertions: 0
+
+--------------------
+
+   Total Tests Run: 4
+
+   Successful Tests: 4
+      Apex_Partition                : Partition status
+      Apex_Processes                : General routines for ARINC processes
+      Apex_Processes                : Routines that manipulate process priority
+      Apex_Processes                : Routines that stop and resume processes
+
+   Failed Assertions: 0
+
+--------------------
+
+   Total Tests Run: 46
+
+   Successful Tests: 44
+      Apex_Semaphores               : Routines that handle semaphores
+      Apex_Buffers                  : Routines that handle buffers
+      Apex_Blackboards              : Blackboard information exchange
+      Apex_Queuing_Ports            : Routines using queuing ports
+      Apex_Sampling_Ports           : Routines using sampling ports
+      Exception handling            : Local exception handling in APEX process
+      Exception handling            : Synch signal handling in APEX process
+      Exception handling            : Integer overflow handling in APEX process
+      HW FP error detection         : Divide by zero - constrained float
+      HW FP error detection         : Divide by zero - unconstrained float
+      HW FP error detection         : Constrained floating point overflow
+      HW FP error detection         : Unconstrained floating point overflow
+      HW FP error detection         : Divide by zero - C4A012B
+      HW FP error detection         : Divide by zero - C4A013A
+      HW FP error detection         : Overflows on addition and subtraction - C45322A
+      HW FP error detection         : Overflows on multiplication and division - C45523A
+      HW FP error detection         : Overflows on exponentiation - C45622A
+      Stack Overflow                : Overflow on large objects
+      Stack Overflow                : Basic overflow handling in APEX process
+      Stack Overflow                : Cascaded overflow in exception handler
+      Stack Overflow                : Overflow due to large string allocation
+      Generic_Elementary_Functions  : CXG2001: accuracy of Standard.Float
+      Generic_Elementary_Functions  : CXG2003: accuracy of sqrt
+      Generic_Elementary_Functions  : CXG2004: accuracy of sin and cos
+      Generic_Elementary_Functions  : CXG2005: accuracy of FP add and multiply
+      Generic_Elementary_Functions  : CXG2010: accuracy of exp
+      Generic_Elementary_Functions  : CXG2011: accuracy of log
+      Generic_Elementary_Functions  : CXG2012: accuracy of **
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan/cot: float exact
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: float +/- pi
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: float fractional
+      Generic_Elementary_Functions  : CXG2013: accuracy of cot: float
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan/cot: float exception
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan/cot: long exact
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: long +/- pi
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: long fractional
+      Generic_Elementary_Functions  : CXG2013: accuracy of cot: long
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan/cot: long exception
+      Generic_Elementary_Functions  : CXG2015: accuracy of arcsin and arccos
+      Generic_Elementary_Functions  : CXG2016: accuracy of arctan
+      Generic_Elementary_Functions  : CXG2022: accuracy of binary fix pt mul/div
+      Generic_Elementary_Functions  : CXG2023: accuracy of decimal fix pt mul/div
+      Generic_Elementary_Functions  : CXG2024: accuracy of mixed bin/dec fix pt mul/div
+      Apex_Timing                   : routines handling delays
+
+   Failed Assertions: 2
+
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: float sampled
+            Tan_Test
+ Actual    : -6.96356E+02
+ Expected  : -6.96370E+02
+ Delta     :  1.40991E-02
+ Max Error :  8.01652E-04
+
+      Generic_Elementary_Functions  : CXG2013: accuracy of tan: long sampled
+            Tan_Test
+ Actual    :  6.36625980697355E+04
+ Expected  :  6.36625980695562E+04
+ Delta     :  1.79301423486322E-07
+ Max Error :  1.36508677850804E-10
+
    Unexpected Errors: 0}
+   
+@c ======================================================================
 
-The switch "-v" may be used with any harness to cause the list of
-successful tests to be printed along with any failures or errors:
-
-@AEXP{[efalis@@dogen AUnit]$ ./harness -v
-   Total Tests Run:  17
-   Successful Tests: 17
-      PR 7112-001: Record_Initialization
-      PR 7210-005: Test_1
-      PR 7210-005: Test_2
-      PR 7210-005: Test_3
-      PR 7210-005: Test_4
-      PR 7210-005: Test_5
-      PR 7210-005: Test_6
-      PR 7210-005: Test_A
-      PR 7210-005: Test_B
-      PR 7503-008: Allocation_Test
-      PR 7605-009: Modular_Bounds
-      PR 8010-001b: Test calculation of constant with modular sub-expression
-      PR 7522-012: Subtype not recognized in initialization
-      PR 7617-011: Test renaming in instantiation I
-      PR 7624-003: Use of multi-dimensional aggregate as generic actual parameter
-      PR 7813-010: Test -gnatc for bogus semantic error
-      PR 8010-009: Overload resolution with enumeration literals
-   Failed Tests: 0
-   Unexpected Errors: 0
-Time:  0.001011000 seconds}
-
+@node Migrating Tests from AUnit 1 to AUnit 2
+@chapter Migrating Tests from AUnit 1 to AUnit 2
 
 @c ======================================================================
+
+In adapting AUnit to be usable in a restricted Ada run-time library context,
+we were faced with a number of issues (e.g. no controlled types, no dynamic
+allocation, no exception handlers, no unconstrained function results) that
+inevitably broke backward compatibility between AUnit 1 and AUnit 2. We
+have tried to minimize these incompatibilities, but nonetheless converting
+test cases, suites and harnesses designed to work with AUnit 1 requires some
+effort.  The following steps describe the conversion.
+
+@enumerate
+@item Instantiate @code{AUnit.Framework} as @code{@b{Framework}} or some other
+arbitrary name.
+
+@item Declare all tests and suites statically.  This generally means declaring
+a suite initialization function in a package instead of as a library function,
+declaring the result and component tests as aliased objects in the package body
+(removing the local declaration of the result and the dynamic allocations of
+the test cases).  This is a ZFP constraint rather than one of AUnit
+itself. If the run-time library provides unrestricted support for allocators,
+this step can be omitted.
+
+@item Change each instantiation of @code{AUnit.Test_Runner.Run} to a library
+level instantiation of @code{@b{Framework}.Harness}. Add a context clause for the
+instantiation to the original harness procedure.
+
+@item If @code{Run} was called with parameter @code{Timed}, remove the
+parameter - it's not supported in AUnit 2.
+
+@item Remove all references to @code{Ada.Strings.Unbounded}.
+
+@item Remove all context clauses for children of @code{AUnit}.  Replace with
+a ``with'' clause for @code{@b{Framework}}. If use clauses were present for the
+child units of @code{AUnit}, they will need to be moved inside the client
+units, and possibly changed to reflect that they are now packages nested in
+@code{@b{Framework}}.
+
+@item Change the profile of all overrides of @code{AUnit.Test_Cases.Name} to
+have result type @code{@b{Framework}.Test_Results.Test_String} instead of
+@code{String_Access}.
+
+@item In test case @code{Name} routines, remove dynamic allocation of the name
+string and replace with call to @code{@b{Framework}.Test_Results.Format} with a
+string argument. @code{Format} will truncate or pad the string to the expected
+size as specified when @code{AUnit.Framework} was instantiated.
+
+@item Change all occurrences of @code{AUnit.Test_Suites.Access_Test_Suite} to
+@code{@b{Framework}.Test_Suites.Test_Suite_Access}.
+
+@item In the implementation of @code{@b{Framework}.Test_Cases.Register} for each
+specific @code{Test_Case} type, instantiate
+@code{@b{Framework}.Test_Cases.Registration} with the specific 
+@code{Test_Case} derivation. Add a context clause for
+@code{AUnit.Tests.Test_Cases.Registration} to all test case package
+bodies.
+
+@item Change the type of the first parameter of each test routine from
+@code{AUnit.Test_Cases.Test_Case'Class} to the specific @code{Test_Case} type.
+
+@item If a test routine can be overridden, provide a class-wide wrapper routine
+for it as described in the section on support for OOP.  Use 
+@code{Register_Wrapper} to register this wrapper routine instead of registering
+the primitive test routine using @code{Register_Routine}.
+
+@item Add a first  actual parameter to all calls to
+@code{@b{Framework}.Assertions.Assert}. This parameter is 'Access of the formal
+parameter to the enclosing test routine.
+
+@item Arrange (if using ZFP without exception handling support) to return from
+a test routine when an assertion fails if you want that behavior.
+A functional form of @code{@b{Framework}.Assertions.Assert} has been added to
+facilitate this.  If using an Ada run-time library that supports exception
+handling, the procedural form of Assert will abandon execution of the test
+routine as is done in AUnit 1.
+
+@end enumerate
 
 @node GPS Support
 @chapter GPS Support
 
 @noindent
+*** NYI ***
+
+[We'll need to decide how we want to handle this section as the current
+GPS template generation is for the old version of AUnit]
+
 Note that the GPS IDE has a menu @b{Edit -> Unit Testing} to
 generate the template code for test cases, test suites and harnesses.
 

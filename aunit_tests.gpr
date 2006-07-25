@@ -1,28 +1,74 @@
+with "aunit";
 
-with "aunit.gpr";
+project AUnit_Tests is
 
-project Aunit_Tests is
+        for Languages use ("Ada");
+        for Main use ("aunit_harness.adb");
+        for Source_Dirs use ("test");
+        for Exec_Dir use "./";
 
-   for Languages use ("Ada");
-   for Source_Dirs use ("./test");
-   for Object_Dir use "./test";
-   for Exec_Dir use "./";
-   for Main use ("harness.adb");
 
-   package Builder is
-      for Default_Switches ("ada") use ("-g", "-gnatQ");
-   end Builder;
+        type Cpu_Type is ("PPC", "SIMNT");
+        Cpu : Cpu_Type := external ("CPU", "PPC");
 
-   package Linker is
-      for Default_Switches ("ada") use ("-g");
-   end Linker;
+        type Runtime_Type is ("zfp", "cert", "full", "kernel");
+        Runtime : Runtime_Type := external ("Runtime", "cert");
 
-   package Compiler is
-      for Default_Switches ("ada") use ("-gnatf", "-g");
-   end Compiler;
+        case Runtime is
+                when "zfp" | "cert" =>
+                        for Object_Dir use "obj_cert";
+                when "full" | "kernel" =>
+                        for Object_Dir use "obj_full";
+        end case;
 
-   package Binder is
-      for Default_Switches ("ada") use ("-E", "-static");
-   end Binder;
+        package Ide is
+                for Compiler_Command ("ada") use "powerpc-wrs-vxworksae-gnatmake";
+                for Debugger_Command use "powerpc-wrs-vxworksae_wtx4-gdb";
+                for Communication_Protocol use "wtx";
+                for Gnatlist use "powerpc-wrs-vxworksae-gnatls --RTS=" & Runtime;
+                for Program_Host use "750gx@naropa";
+        end Ide;
 
-end Aunit_Tests;
+        package Binder is
+                for Default_Switches ("ada") use ("-E", "-static");
+        end Binder;
+
+        package Compiler is
+
+                case Cpu is
+
+                        when "SIMNT" =>
+                                for Default_Switches ("ada") use ("-gnatf", "-g", "-gnato");
+
+                        when "PPC" =>
+
+                        case Runtime is
+
+                                when "zfp" =>
+                                        for Default_Switches ("ada") use ("-gnatf", "-g", "-gnato");
+
+                                when others =>
+                                        for Default_Switches ("ada") use ("-gnatf", "-g", "-gnato",
+					        "-fstack-check", "-gnatwa");
+			end case;
+                end case;
+        end Compiler;
+
+        package Linker is
+                for Default_Switches ("ada") use ("-g");
+        end Linker;
+
+        package Builder is
+                case Runtime is
+
+			when "zfp" =>
+				for Default_Switches ("ada") use ("-a", "-x", "-g", "-gnatQ",
+					"--RTS=" & Runtime);
+
+			when others =>
+				for Default_Switches ("ada") use ("-g", "-gnatQ", "--RTS=" & Runtime);
+                end case;
+        end Builder;
+
+end AUnit_Tests;
+

@@ -1,28 +1,42 @@
+with "containers", "environment";
 
-project Aunit is
+project AUnit is
 
-   for Languages use ("Ada");
-   for Source_Dirs use ("aunit/framework/", "aunit/text_reporter/");
-   for Object_Dir use "aunit/obj";
+   Runtime : Environment.Runtime_Type := Environment.Runtime;
 
-   for Library_Dir use "aunit/lib";
-   for Library_Name use "aunit";
-   for Library_Kind use "static";
+   case Runtime is
 
-   package Builder is
-      for Default_Switches ("ada") use ("-g", "-gnatQ");
-   end Builder;
+      when "zfp" =>
+         for Source_Dirs use ("aunit/framework/",
+                              "aunit/text_reporter/",
+                              "aunit/zfp_support/");
+         for Object_Dir use "obj_cert";
 
-   package Linker is
-      for Default_Switches ("ada") use ("-g");
-   end Linker;
+      when "cert" =>
+         for Source_Dirs use ("aunit/framework/",
+			      "aunit/text_reporter/",
+                              "aunit/cert_support/");
+         for Object_Dir use "obj_cert";
+
+      when others =>
+         for Source_Dirs use ("aunit/framework/",
+			      "aunit/text_reporter/",
+                              "aunit/cert_support/");
+         for Object_dir use "obj_full";
+
+   end case;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatf", "-g");
+      case Runtime is
+         when "zfp" =>
+            for Default_Switches ("ada") use
+               ("-O1", "-gnatf", "-gnato", "-gnatg");
+         when others =>
+            for Default_Switches ("ada") use
+                          ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check",
+                          "-gnatwa", "-gnatg");
+      end case;
    end Compiler;
 
-   package Binder is
-      for Default_Switches ("ada") use ("-E", "-static");
-   end Binder;
+end AUnit;
 
-end Aunit;

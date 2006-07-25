@@ -1,10 +1,20 @@
-with AUnit.Test_Cases.Registration;
-use AUnit.Test_Cases.Registration;
-
-with AUnit.Assertions; use AUnit.Assertions;
+with AUnit.Tests.Test_Cases.Registration;
 
 --  Simple test case
 package body Simple_Test_Case is
+   use Assertions;
+
+   procedure Double_Failure_Wrapper (T : in out Test_Case'Class);
+
+   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   use Registration;
+
+   function Routine_Count (T : Test_Case'Class)
+                           return Ada_Containers.Count_Type
+   is
+   begin
+      return Registration.Routine_Count (T);
+   end Routine_Count;
 
    procedure Set_Up (T : in out Test_Case) is
    begin
@@ -16,29 +26,32 @@ package body Simple_Test_Case is
       T.Is_Torn_Down := True;
    end Tear_Down;
 
-
-   --  Test Routines:
-   procedure Error (T : in out AUnit.Test_Cases.Test_Case'Class);
-   procedure Fail (T : in out AUnit.Test_Cases.Test_Case'Class);
-   procedure Succeed (T : in out AUnit.Test_Cases.Test_Case'Class);
-
-   procedure Succeed (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   procedure Succeed (T : in out Test_Case) is
       pragma Unreferenced (T);
    begin
       null;
    end Succeed;
 
-   procedure Fail (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      pragma Unreferenced (T);
+   procedure Fail (T : in out Test_Case) is
    begin
       null;
-      Assert (False, "Failure test failed");
+      Assert (T'Access, False, "Failure test failed");
    end Fail;
 
-   procedure Error (T : in out AUnit.Test_Cases.Test_Case'Class) is
+   procedure Double_Failure_Wrapper (T : in out Test_Case'Class) is
    begin
-      raise Constraint_Error;
-   end Error;
+      Double_Failure (T);
+   end Double_Failure_Wrapper;
+
+   procedure Double_Failure (T : in out Test_Case) is
+      pragma Warnings (Off);
+      Dummy : Boolean;
+      pragma Warnings (On);
+   begin
+      --  Fail two assertions. Will be checked in Test_Test_Case.Test_Run
+      Dummy := Assert (T'Access, False, "first failure");
+      Assert (T'Access, False, "second failure");
+   end Double_Failure;
 
    --  Register test routines to call:
    procedure Register_Tests (T : in out Test_Case) is
@@ -50,15 +63,17 @@ package body Simple_Test_Case is
       Register_Routine
         (T, Fail'Access, "Failure Test");
 
-      Register_Routine
-        (T, Error'Access, "Error Test");
+      Register_Wrapper
+        (T,
+         Double_Failure_Wrapper'Access,
+         "Multiple assertion failures");
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return String_Access is
+   function Name (T : Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return  new String'("Dummy Test Case");
+      return Format ("Dummy Test Case");
    end Name;
 
    --  Set up?
@@ -72,6 +87,5 @@ package body Simple_Test_Case is
    begin
       return T.Is_Torn_Down;
    end Is_Torn_Down;
-
 
 end Simple_Test_Case;

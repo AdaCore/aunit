@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                   A U N I T . T E S T _ R E S U L T S                    --
+--                    A U N I T . T E S T _ R E S U L T S                   --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -17,109 +17,261 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
 --  Record test results.
 package body AUnit.Test_Results is
 
-   --  Increment count by number of test routines in a case
-   procedure Start_Test
-     (R : in out Result; Subtest_Count : Natural) is
+   -----------------------
+   -- Local Subprograms --
+   -----------------------
+
+   procedure Swap (Left, Right : in out Error_Lists.List);
+   procedure Swap (Left, Right : in out Failure_Lists.List);
+   procedure Swap (Left, Right : in out Success_Lists.List);
+   procedure Transfer (Target : in out Error_Lists.List;
+                       Source : in out Error_Lists.List);
+   procedure Transfer (Target : in out Failure_Lists.List;
+                       Source : in out Failure_Lists.List);
+   procedure Transfer (Target : in out Success_Lists.List;
+                       Source : in out Success_Lists.List);
+
+   ---------------
+   -- Add_Error --
+   ---------------
+
+   procedure Add_Error
+     (R : in out Result;
+      Test_Name      : Test_String;
+      Routine_Name   : Routine_String;
+      Message        : Message_String) is
+
+      Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
+      use Error_Lists;
+
+   begin
+      Append (R.Errors_List, Val);
+   end Add_Error;
+
+   -----------------
+   -- Add_Failure --
+   -----------------
+
+   procedure Add_Failure
+     (R : in out Result;
+      Test_Name      : Test_String;
+      Routine_Name   : Routine_String;
+      Message        : Message_String) is
+
+      Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
+      use Failure_Lists;
+
+   begin
+      Append (R.Failures_List, Val);
+   end Add_Failure;
+
+   -----------------
+   -- Add_Success --
+   -----------------
+
+   procedure Add_Success
+     (R                       : in out Result;
+      Test_Name               : Test_String;
+      Routine_Name            : Routine_String) is
+
+      Val : constant Test_Success := (Test_Name, Routine_Name);
+      use Success_Lists;
+
+   begin
+      Append (R.Successes_List, Val);
+   end Add_Success;
+
+   -----------------
+   -- Error_Count --
+   -----------------
+
+   function Error_Count (R : Result) return Errors_Range is
+   begin
+      return Error_Lists.Length (R.Errors_List);
+   end Error_Count;
+
+   ------------
+   -- Errors --
+   ------------
+
+   procedure Errors
+     (R : in out Result;
+      E : in out Error_Lists.List)
+   is
+   begin
+      Swap (E, R.Errors_List);
+   end Errors;
+
+   -------------------
+   -- Failure_Count --
+   -------------------
+
+   function Failure_Count (R : Result) return Failures_Range is
+   begin
+      return Failure_Lists.Length (R.Failures_List);
+   end Failure_Count;
+
+   --------------
+   -- Failures --
+   --------------
+
+   procedure Failures
+     (R : in out Result;
+      F : in out Failure_Lists.List)
+   is
+   begin
+      Swap (F, R.Failures_List);
+   end Failures;
+
+   ------------
+   -- Format --
+   ------------
+
+   function Format (Name : String) return Test_String is
+
+      Length : constant Natural := Name'Length;
+      Result : Test_String := (others => ' ');
+
+   begin
+      if Length > Result'Length then
+         Result := Name (Name'First .. Name'First + Result'Length - 1);
+      else
+         Result (Result'First .. Result'First + Length - 1) := Name;
+      end if;
+
+      return Result;
+   end Format;
+
+   ----------------
+   -- Start_Test --
+   ----------------
+
+   procedure Start_Test (R : in out Result; Subtest_Count : Count_Type) is
    begin
       R.Tests_Run := R.Tests_Run + Subtest_Count;
    end Start_Test;
 
-   --  Record an assertion violation
-   procedure Add_Success
-     (R : in out Result; Test_Name, Routine_Name : String_Access) is
-   begin
-      Success_Lists.Extend
-        (R.Successes_List,
-         Test_Success'(Test_Name, Routine_Name));
-   end Add_Success;
+   -------------------
+   -- Success_Count --
+   -------------------
 
-   --  Record a test failure
-   procedure Add_Failure
-     (R : in out Result; Test_Name, Routine_Name : String_Access;
-      E : Exception_Occurrence) is
+   function Success_Count (R : Result)  return Successes_Range is
    begin
-      Failure_Lists.Extend
-        (R.Failures_List,
-         Test_Failure'(Test_Name, Routine_Name, Save_Occurrence (E)));
-   end Add_Failure;
-
-   --  Record a test error
-   procedure Add_Error
-     (R : in out Result; Test_Name, Routine_Name : String_Access;
-      E : Exception_Occurrence) is
-   begin
-      Failure_Lists.Extend
-        (R.Errors_List,
-         Test_Failure'(Test_Name, Routine_Name, Save_Occurrence (E)));
-   end Add_Error;
-
-   --  Set Elapsed time for reporter:
-   procedure Set_Elapsed (R : in out Result; D : Duration) is
-   begin
-      R.Elapsed_Time := D;
-   end Set_Elapsed;
-
-   --  Total tests run
-   function Test_Count (R : Result) return Natural is
-   begin
-      return R.Tests_Run;
-   end Test_Count;
-
-   --  Number of successes
-   function Success_Count (R : Result)  return Natural is
-   begin
-      return Success_Lists.Count (R.Successes_List);
+      return Success_Lists.Length (R.Successes_List);
    end Success_Count;
 
-   --  Number of failures
-   function Failure_Count (R : Result) return Natural is
-   begin
-      return Failure_Lists.Count (R.Failures_List);
-   end Failure_Count;
+   ---------------
+   -- Successes --
+   ---------------
 
-   --  Number of errors
-   function Error_Count (R : Result) return Natural is
+   procedure Successes (R : in out Result; S : in out Success_Lists.List) is
    begin
-      return Failure_Lists.Count (R.Errors_List);
-   end Error_Count;
+      Swap (S, R.Successes_List);
+   end Successes;
 
-   --  All tests successful?
+   ----------------
+   -- Successful --
+   ----------------
+
    function Successful (R : Result) return Boolean is
    begin
       return Success_Count (R) = Test_Count (R);
    end Successful;
 
-   --  List of successful tests
-   function Successes (R : Result) return Success_Lists.List is
-   begin
-      return R.Successes_List;
-   end Successes;
+   ----------
+   -- Swap --
+   ----------
 
-   --  List of failed tests
-   function Failures (R : Result) return Failure_Lists.List is
-   begin
-      return R.Failures_List;
-   end Failures;
+   procedure Swap (Left, Right : in out Error_Lists.List) is
 
-   --  List of error tests
-   function Errors (R : Result) return Failure_Lists.List is
-   begin
-      return R.Errors_List;
-   end Errors;
+      use Error_Lists;
+      Temp : List (Count_Type (Errors_Range'Last));
 
-   --  Elapsed time for test execution:
-   function Elapsed (R : Result) return Duration is
    begin
-      return R.Elapsed_Time;
-   end Elapsed;
+      Transfer (Temp, Left);
+      Transfer (Left, Right);
+      Transfer (Right, Temp);
+   end Swap;
+
+   procedure Swap (Left, Right : in out Failure_Lists.List) is
+
+      use Failure_Lists;
+      Temp : List (Count_Type (Failures_Range'Last));
+
+   begin
+      Transfer (Temp, Left);
+      Transfer (Left, Right);
+      Transfer (Right, Temp);
+   end Swap;
+
+   procedure Swap (Left, Right : in out Success_Lists.List) is
+
+      use Success_Lists;
+      Temp : List (Count_Type (Successes_Range'Last));
+
+   begin
+      Transfer (Temp, Left);
+      Transfer (Left, Right);
+      Transfer (Right, Temp);
+   end Swap;
+
+   ----------------
+   -- Test_Count --
+   ----------------
+
+   function Test_Count (R : Result) return Ada_Containers.Count_Type is
+   begin
+      return Ada_Containers.Count_Type (R.Tests_Run);
+   end Test_Count;
+
+   --------------
+   -- Transfer --
+   --------------
+
+   procedure Transfer
+     (Target : in out Error_Lists.List;
+      Source : in out Error_Lists.List)
+   is
+      use Error_Lists;
+
+   begin
+      Clear (Target);
+      Assign (Target, Source);
+      Clear (Source);
+   end Transfer;
+
+   procedure Transfer
+     (Target : in out Failure_Lists.List;
+      Source : in out Failure_Lists.List)
+   is
+      use Failure_Lists;
+
+   begin
+      Clear (Target);
+      Assign (Target, Source);
+      Clear (Source);
+   end Transfer;
+
+   procedure Transfer
+     (Target : in out Success_Lists.List;
+      Source : in out Success_Lists.List)
+   is
+      use Success_Lists;
+
+   begin
+      Clear (Target);
+      Assign (Target, Source);
+      Clear (Source);
+   end Transfer;
 
 end AUnit.Test_Results;

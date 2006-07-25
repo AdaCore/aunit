@@ -1,0 +1,30 @@
+with "environment";
+project Containers is
+   for Languages use ("Ada");
+   for Source_Dirs use ("containers");
+
+   Runtime : Environment.Runtime_Type := Environment.Runtime;
+
+   case Runtime is
+
+      when "zfp" | "cert" =>
+         for Object_Dir use "obj_cert";
+
+      when others =>
+         for Object_dir use "obj_full";
+
+   end case;
+
+   package Compiler is
+      case Runtime is
+         when "zfp" =>
+            for Default_Switches ("ada") use
+               ("-O1", "-gnatf", "-gnato");
+         when others =>
+            for Default_Switches ("ada") use
+               ("-gnatg", "-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check");
+      end case;
+   end Compiler;
+
+end Containers;
+

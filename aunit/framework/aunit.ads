@@ -2,11 +2,11 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                               A U N I T                                  --
+--                                A U N I T                                 --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,12 +16,45 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+--  This is a new version of AUnit suitable for use with the GNAT Level A
+--  run-time library for VxWorks 653 or with the ZFP run-time library.
+--
+--  Differences from AUnit 1.05:
+--  1. Requires instantiation of AUnit.Framework to size various
+--     preallocated data. Baseline ZFP does not support dynamic memory
+--     allocation.
+--  2. For execution on the VxWorks 653 cert partition operating system, any
+--     dynamic allocation of suites or test cases must occur before setting the
+--     partition into Normal mode.
+--  3. The templates for test cases and suites are somewhat different than in
+--     AUnit 1.05
+--  4. Elapsed time for harness execution is not reported.
+--  5. All harnesses are run in AUnit "verbose" mode. Command line
+--     arguments to harnesses are not supported (VxWorks limitation).
+--  6. Full support for derived test cases is implemented
+--
+--  ZFP-specific restrictions:
+--  1. Does not list unexpected exceptions: terminates instead. This is
+--     because baseline ZFP does not support exception propagation.
+--  2. All test cases and suites must be statically allocated, unless the
+--     run-time library implements __gnat_malloc
+--  3. A last chance handler must be provided in case of unexpected exceptions.
+--  4. GNAT.IO (g-io.ad?) must be compiled. The gnatmake -a switch should be
+--     used for this purpose.
+--  5. Application or tests must export symbol __gnat_get_secondary_stack. This
+--     is not actually used unless the application or unit tests require the
+--     secondary stack, in which case it must be fully implemented.
+--  6. Failed assertions do not abandon execution of the calling test routine.
+--     A functional form of the Assert subprogram allows the calling routine
+--     to determine whether to continue.
+
 package AUnit is
-   pragma Pure (AUnit);
+   pragma Pure;
 end AUnit;

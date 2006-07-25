@@ -1,17 +1,22 @@
-with Ada.Strings.Unbounded;
-use Ada.Strings.Unbounded;
-
-with AUnit.Test_Cases;
-use AUnit.Test_Cases;
+with Framework; use Framework;
 
 --  Unit tests for AUnit.Test_Suites.
 package Test_Test_Suite is
-   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
+   use Test_Results;
+
+   type Test_Case is new Framework.Test_Cases.Test_Case with null record;
 
    --  Register routines to be run:
    procedure Register_Tests (T : in out Test_Case);
 
    --  Provide name identifying the test case:
-   function Name (T : Test_Case) return String_Access;
+   function Name (T : Test_Case) return Test_String;
+
+private
+   --  Test Routines:
+   procedure Test_Inherited_Tests (T : in out Test_Case);
+   procedure Test_No_Test_Case (T : in out Test_Case);
+   procedure Test_No_Test_Routines (T : in out Test_Case);
+   procedure Test_One_Test_Case (T : in out Test_Case);
 
 end Test_Test_Suite;

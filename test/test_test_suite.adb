@@ -1,83 +1,62 @@
-with AUnit.Test_Cases.Registration;
-use AUnit.Test_Cases.Registration;
-
-with AUnit.Test_Results; use AUnit.Test_Results;
-with AUnit.Assertions; use AUnit.Assertions;
-
-with AUnit.Test_Suites; use AUnit.Test_Suites;
-
 with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
+with Ada_Containers; use Ada_Containers;
+with AUnit.Tests.Test_Cases.Registration;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
+   use Assertions, Test_Suites, Test_Cases;
 
-   --  Test Routines:
-   procedure Test_Inherited_Tests
-     (T : in out AUnit.Test_Cases.Test_Case'Class);
-   procedure Test_No_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class);
-   procedure Test_No_Test_Routines
-     (T : in out AUnit.Test_Cases.Test_Case'Class);
-   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class);
+   S : aliased Test_Suite;
+   R : aliased Result;
+   O : aliased One_Test_Case.Test_Case;
+   E : aliased Empty_Test_Case.Test_Case;
+   I : aliased One_Test_Case.Inherited_Test_Case.Test_Case;
 
-   procedure Test_No_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class) is
-      pragma Unreferenced (T);
-      S : constant Access_Test_Suite := new Test_Suite;
-      R : Result;
+   procedure Test_No_Test_Case (T : in out Test_Case) is
    begin
-      Run (S.all, R);
+      Run (S'Access, R'Access);
 
-      Assert (Successful (R), "Suite did not run successfully");
-      Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
+      Assert (T'Access, Successful (R), "Suite did not run successfully");
+      Assert (T'Access, Test_Count (R) = 0, "Wrong number of tests recorded");
    end Test_No_Test_Case;
 
-
-   procedure Test_No_Test_Routines
-     (T : in out AUnit.Test_Cases.Test_Case'Class)
-   is
-      pragma Unreferenced (T);
-      S : constant  Access_Test_Suite := new Test_Suite;
-      R : Result;
+   procedure Test_No_Test_Routines (T : in out Test_Case) is
    begin
-      Add_Test (S, new Empty_Test_Case.Test_Case);
-      Run (S.all, R);
+      Add_Test (S'Access, E'Access);
+      Run (S'Access, R'Access);
 
-      Assert (Successful (R), "Suite did not run successfully");
-      Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
+      Assert (T'Access, Successful (R), "Suite did not run successfully");
+      Assert (T'Access, Test_Count (R) = 0, "Wrong number of tests recorded");
    end Test_No_Test_Routines;
 
-
-   procedure Test_One_Test_Case (T : in out AUnit.Test_Cases.Test_Case'Class)
-   is
-      pragma Unreferenced (T);
-      S : constant Access_Test_Suite := new Test_Suite;
-      R : Result;
+   procedure Test_One_Test_Case (T : in out Test_Case) is
    begin
-      Add_Test (S, new One_Test_Case.Test_Case);
-      Run (S.all, R);
+      Add_Test (S'Access, O'Access);
+      Run (S'Access, R'Access);
 
-      Assert (Test_Count (R) = 1, "Wrong number of tests run");
-      Assert (Failure_Count (R) = 0, "Wrong number of failures");
-      Assert (Error_Count (R) = 0, "Wrong number of unexpected errors");
-      Assert (Successful (R), "Suite did not run successfully");
+      Assert (T'Access, Test_Count (R) = 1, "Wrong number of tests run");
+      Assert (T'Access, Failure_Count (R) = 0, "Wrong number of failures");
+      Assert (T'Access, Successful (R), "Suite did not run successfully");
    end Test_One_Test_Case;
 
-   procedure Test_Inherited_Tests (T : in out AUnit.Test_Cases.Test_Case'Class)
-   is
-      pragma Unreferenced (T);
-      S : constant  Access_Test_Suite := new Test_Suite;
-      R : Result;
+   procedure Test_Inherited_Tests (T : in out Test_Case) is
+      Old_Count : constant Count_Type := Test_Count (R);
    begin
-      Add_Test (S, new One_Test_Case.Inherited_Test_Case.Test_Case);
-      Run (S.all, R);
+      Add_Test (S'Access, I'Access);
+      Run (S'Access, R'Access);
 
-      Assert (Successful (R), "Suite did not run successfully");
-      Assert (Test_Count (R) = 4, "Wrong number of tests run");
+      Assert (T'Access, Successful (R), "Suite did not run successfully");
+      Assert (T'Access,
+              Test_Count (R) = Old_Count + 4,
+              "Wrong number of tests run");
    end Test_Inherited_Tests;
 
-
    --  Register test routines to call:
+   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   use Registration;
+
    procedure Register_Tests (T : in out Test_Case) is
    begin
       Register_Routine
@@ -95,10 +74,10 @@ package body Test_Test_Suite is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return String_Access is
+   function Name (T : Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return  new String'("Test AUnit.Test_Suites");
+      return  Format ("Test AUnit.Test_Suites");
    end Name;
 
 end Test_Test_Suite;

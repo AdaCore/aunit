@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---         A U N I T . T E S T _ C A S E S . R E G I S T R A T I O N        --
+--          A U N I T . T E S T _ C A S E S . R E G I S T R A T I O N       --
 --                                                                          --
---                                 B o d y                                  --
+--                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -17,33 +17,35 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore  (http://www.adacore.com).                 --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
---  Test routine registration
-package body AUnit.Test_Cases.Registration is
+
+--  Registration interface for test cases.
+generic
+   type Specific_Case is new Test_Case with private;
+package AUnit.Tests.Test_Cases.Registration is
 
    pragma Ada_05;
 
-   --  Register a test routine.
+   use Ada_Containers;
+
    procedure Register_Routine
-     (Test    : in out Test_Case'Class;
-      Routine : access procedure (Test : in out Test_Case'Class);
-      Name    : String)
-   is
-   begin
-      Extend
-        (Test.Routines,
-         Routine_Spec'(Routine, new String'(Name)));
-   end Register_Routine;
+     (Test    : in out Specific_Case;
+      Routine : access procedure (Test : in out Specific_Case);
+      Name    : String);
+   --  Add test routine to test case
 
-   --  Count of registered routines in test case:
-   function Routine_Count (Test : Test_Case'Class) return Natural is
-   begin
-      return Count (Test.Routines);
-   end Routine_Count;
+   procedure Register_Wrapper
+     (Test    : in out Specific_Case'Class;
+      Routine : access procedure (Test : in out Specific_Case'Class);
+      Name    : String);
+   --  Add wrapper for overridable test routine
 
-end AUnit.Test_Cases.Registration;
+   function Routine_Count (Test : Test_Case'Class) return Count_Type;
+   --  Count of registered routines in test case
+
+end AUnit.Tests.Test_Cases.Registration;

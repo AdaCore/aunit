@@ -2,11 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . T E S T _ S U I T E S                    --
+--                     A U N I T . T E S T _ R U N N E R                    --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                                                                          --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,37 +17,35 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  A collection of test cases and sub-suites.
-package body AUnit.Test_Suites is
+with AUnit.Test_Results.Text_Reporter;
 
-   --  Add a test case or sub-suite to this one:
-   procedure Add_Test (S : access Test_Suite; T : access Test'Class) is
-   begin
-      Extend (S.Test_Set, T.all);
-   end Add_Test;
+--  Framework using text reporter
+package body AUnit.Framework is
 
-   --  Run each test case in this suite.  Run sub-suite test cases
-   --  recursively:
-   procedure Run (S : in out Test_Suite; R : in out Result) is
-   begin
-      Start (S.Test_Set);
+   package Reporter is new Test_Results.Text_Reporter;
 
-      while not Off (S.Test_Set) loop
-         declare
-            Dispatcher : Test'Class := Item (S.Test_Set);
-         begin
-            Tests.Run (Dispatcher, R);
-         end;
+   package body Harness is
 
-         Remove (S.Test_Set);
-      end loop;
-   end Run;
+      Results : aliased Test_Results.Result;
+      --  Test results for one harness run
 
-end AUnit.Test_Suites;
+      ---------
+      -- Run --
+      ---------
+
+      procedure Run is
+      begin
+         Test_Suites.Run (Suite, Results'Access);
+         Reporter.Report (Results);
+      end Run;
+
+   end Harness;
+
+end AUnit.Framework;

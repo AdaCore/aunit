@@ -1,12 +1,13 @@
+------------------------------------------------------------------------------
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
 --                      A U N I T . A S S E R T I O N S                     --
 --                                                                          --
---                                 B o d y                                  --
+--                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,19 +17,30 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-with Ada.Exceptions; use Ada.Exceptions;
-package body AUnit.Assertions is
-   procedure Assert (Condition : Boolean; Message : String) is
-   begin
-      if not Condition then
-         Raise_Exception (Assertion_Error'Identity, Message);
-      end if;
-   end Assert;
 
-end AUnit.Assertions;
+generic
+package AUnit.Tests.Test_Cases.Assertions is
+   procedure Assert
+     (T         : access Test_Case'Class;
+      Condition : Boolean;
+      Message   : String);
+   --  Test "Condition" and record "Message" if false.
+   --  If the Ada run-time library supports exception handling, a failed
+   --  condition passed to this routine causes the calling routine to be
+   --  abandoned. Otherwise, a failed assertion returns and continues the
+   --  caller.
+
+   function Assert
+     (T         : access Test_Case'Class;
+      Condition : Boolean;
+      Message   : String) return Boolean;
+   --  Functional version to allow calling routine to decide whether to
+   --  continue or abandon execution
+
+end AUnit.Tests.Test_Cases.Assertions;

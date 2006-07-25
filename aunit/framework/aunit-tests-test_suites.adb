@@ -2,11 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                        A U N I T . O P T I O N S                         --
+--                     A U N I T . T E S T _ S U I T E S                    --
 --                                                                          --
---                                 S p e c                                  --
+--                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                                                                          --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,14 +17,36 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-package AUnit.Options is
 
-   --  Verbose mode?
-   function Verbose return Boolean;
-end AUnit.Options;
+--  A collection of test cases
+package body AUnit.Tests.Test_Suites is
+
+   --------------
+   -- Add_Test --
+   --------------
+
+   procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class) is
+   begin
+      Append (S.Tests, Test_Access'(T.all'Unchecked_Access));
+   end Add_Test;
+
+   ---------
+   -- Run --
+   ---------
+
+   procedure Run (S : access Test_Suite; R : Result_Access) is
+      C : Cursor := First (S.Tests);
+   begin
+      while Has_Element (C) loop
+         Run (Element (C), R);
+         Next (C);
+      end loop;
+   end Run;
+
+end AUnit.Tests.Test_Suites;

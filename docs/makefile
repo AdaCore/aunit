@@ -1,8 +1,4 @@
-
-# $Id$
-
 .SILENT:
-
 
 MAKEINFO	= $(shell which makeinfo 2> /dev/null)
 DVIPS		= $(shell which dvips 2> /dev/null)
@@ -43,7 +39,7 @@ ifneq (${PDFTEX},)
 	${TEXI2DVI} -p --expand --clean --quiet $<
 else
 	@echo "-----------------------------------------------"
-	@echo "pdftex not fond, cannot build PDF documentation"
+	@echo "pdftex not found, cannot build PDF documentation"
 	@echo "-----------------------------------------------"
 endif
 else

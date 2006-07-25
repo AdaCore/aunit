@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                     Copyright (C) 2000-2006, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,24 +16,34 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
 -- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
-with Ada.Finalization; use Ada.Finalization;
 
-with AUnit.Test_Results; use AUnit.Test_Results;
+with AUnit.Test_Results;
 
---  Base Test or Test Suite.
+--  Base Test Case or Test Suite
+--
+--  This base type allows composition of both test cases and sub-suites into a
+--  test suite (Composite pattern)
+
+generic
+   with package Results is new AUnit.Test_Results (<>);
 package AUnit.Tests is
 
-   type Test is abstract new Controlled with private;
+   use Results;
 
+   type Test is abstract tagged limited private;
+   type Test_Access is access all Test'Class;
+
+   procedure Run (T : access Test; R : Result_Access) is abstract;
    --  Run a test case or suite
-   procedure Run (T : in out Test; R : in out Result) is abstract;
 
 private
-   type Test is abstract new Controlled with null record;
+
+   type Test is abstract tagged limited null record;
+
 end AUnit.Tests;

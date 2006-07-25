@@ -6,7 +6,8 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---                     Copyright (C) 2000-2005, AdaCore                     --
+--                                                                          --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -16,124 +17,179 @@
 -- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License --
 -- for  more details.  You should have  received  a copy of the GNU General --
 -- Public License  distributed with GNAT;  see file COPYING.  If not, write --
--- to  the Free Software Foundation,  59 Temple Place - Suite 330,  Boston, --
--- MA 02111-1307, USA.                                                      --
+-- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
+-- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
+-- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Exceptions; use Ada.Exceptions;
-with Ada.Unchecked_Deallocation;
 
-with AUnit.Options; use AUnit.Options;
+with GNAT.IO; use GNAT.IO;
 
 --  Very simple reporter to console
 package body AUnit.Test_Results.Text_Reporter is
 
-   procedure Deallocate_Success_List (L : in out Success_Lists.List);
+   procedure Dump_Error_List (L : in Error_Lists.List);
+   --  List failed assertions
 
-   procedure Destroy is new Ada.Unchecked_Deallocation (String, String_Access);
+   procedure Dump_Failure_List (L : in Failure_Lists.List);
+   --  List failed assertions
 
-   --  Report the contents of an error or failure list
-   procedure Dump_Failure_List
-     (L : in out Failure_Lists.List; Is_Assertion : Boolean := True);
+   procedure Dump_Success_List (L : in Success_Lists.List);
+   --  List successful test routines
 
-   --  List successful tests
-   procedure Dump_Success_List
-     (L : in out Success_Lists.List; Is_Assertion : Boolean := True);
+   function Last_Index (S : String) return Natural;
+   --  Index of last non-space character
 
-      --  Report the contents of an error or failure list
-   procedure Dump_Failure_List
-     (L : in out Failure_Lists.List; Is_Assertion : Boolean := True) is
-      Err_Rec : Test_Failure;
-      use Failure_Lists;
+   procedure Report_Error (Error : Test_Failure);
+   --  Report a single assertion failure or unexpected exception
+
+   ----------------------
+   --  Dump_Error_List --
+   ----------------------
+
+   procedure Dump_Error_List (L : Error_Lists.List) is
+
+      use Error_Lists;
+
+      C : Cursor := First (L);
+
    begin
-      Start (L);
-      while not Off (L) loop
-         Err_Rec := Item (L);
-         Put_Line
-           ("      " & Err_Rec.Test_Name.all
-            & ": " &  ASCII.LF &
-            "      " & Err_Rec.Routine_Name.all & ": ");
 
-         if not Is_Assertion then
-            Put_Line ("      " & "**" & Exception_Name (Err_Rec.E.all)
-                      & "** : ");
-            Put ("         ");
-         end if;
+      --  Note: can't use Iterate because it violates restriction
+      --  No_Implicit_Dynamic_Code
 
-         Put_Line ("      " & Exception_Message (Err_Rec.E.all));
-         New_Line;
+      while Has_Element (C) loop
+         Report_Error (Element (C));
+         Next (C);
+      end loop;
+   end Dump_Error_List;
 
-         Destroy (Err_Rec.Routine_Name);
-         Destroy (Err_Rec.Test_Name);
-         Remove (L);
+   ------------------------
+   --  Dump_Failure_List --
+   ------------------------
+
+   procedure Dump_Failure_List (L : Failure_Lists.List) is
+
+      use Failure_Lists;
+
+      C : Cursor := First (L);
+
+   begin
+
+      --  Note: can't use Iterate because it violates restriction
+      --  No_Implicit_Dynamic_Code
+
+      while Has_Element (C) loop
+         Report_Error (Element (C));
+         Next (C);
       end loop;
    end Dump_Failure_List;
 
-   --  List successful tests
-   procedure Dump_Success_List
-     (L : in out Success_Lists.List; Is_Assertion : Boolean := True) is
-      pragma Unreferenced (Is_Assertion);
-      Rec : Test_Success;
-      use Success_Lists;
-   begin
-      Start (L);
-      while not Off (L) loop
-         Rec := Item (L);
-         Put_Line
-           ("      " & Rec.Test_Name.all
-            & ": " & Rec.Routine_Name.all);
+   -----------------------
+   -- Dump_Success_List --
+   -----------------------
 
-         Destroy (Rec.Routine_Name);
-         Destroy (Rec.Test_Name);
-         Remove (L);
+   procedure Dump_Success_List (L : in Success_Lists.List) is
+
+      use Success_Lists;
+
+      procedure Report_Success (Success : Test_Success);
+
+      procedure Report_Success (Success : Test_Success) is
+      begin
+         Put ("      ");
+         Put (Success.Test_Name);
+         Put (": ");
+         Put_Line (Success.Routine_Name
+           (Success.Routine_Name'First ..
+                Last_Index (Success.Routine_Name)));
+      end Report_Success;
+
+      C : Cursor := First (L);
+
+   begin
+      while Has_Element (C) loop
+         Report_Success (Element (C));
+         Next (C);
       end loop;
    end Dump_Success_List;
 
-   procedure Deallocate_Success_List (L : in out Success_Lists.List) is
-      Rec : Test_Success;
-      use Success_Lists;
+   ----------------
+   -- Last_Index --
+   ----------------
+
+   function Last_Index (S : String) return Natural is
+      Result : Natural := S'Last;
    begin
-      Start (L);
-      while not Off (L) loop
-         Rec := Item (L);
-         Destroy (Rec.Routine_Name);
-         Destroy (Rec.Test_Name);
-         Remove (L);
+      while S (Result) = ' ' loop
+         Result := Result - 1;
       end loop;
-   end Deallocate_Success_List;
 
-   --  Report on a test run
-   procedure Report (R : Result) is
-      S : Success_Lists.List := Successes (R);
-      F : Failure_Lists.List := Failures (R);
-      E : Failure_Lists.List := Errors (R);
+      return Result;
+   end Last_Index;
+
+   ------------
+   -- Report --
+   ------------
+
+   procedure Report (R : in out Result) is
+      E : Error_Lists.List (Count_Type (Errors_Range'Last));
+      F : Failure_Lists.List (Count_Type (Failures_Range'Last));
+      S : Success_Lists.List (Count_Type (Successes_Range'Last));
    begin
-      Put_Line ("   Total Tests Run: " & Natural'Image (Test_Count (R)));
+      Put_Line ("--------------------");
+      New_Line;
+
+      Put ("   Total Tests Run: ");
+      Put (Integer (Test_Count (R)));
+      New_Line; New_Line;
+
+      Put ("   Successful Tests: ");
+      Put (Integer (Success_Count (R)));
+      New_Line;
+
+      Successes (R, S);
+      Dump_Success_List (S);
 
       New_Line;
-      Put_Line ("   Successful Tests:" & Natural'Image (Success_Count (R)));
-
-      if Verbose then
-         Dump_Success_List (S);
-      else
-         Deallocate_Success_List (S);
-      end if;
-
+      Put ("   Failed Assertions: ");
+      Put (Integer (Failure_Count (R)));
       New_Line;
-      Put_Line ("   Failed Tests:" & Natural'Image (Failure_Count (R)));
+
+      Failures (R, F);
       Dump_Failure_List (F);
+      New_Line;
 
       New_Line;
-      Put_Line ("   Unexpected Errors:" & Natural'Image (Error_Count (R)));
-      Dump_Failure_List (E, False);
+      Put ("   Unexpected Errors: ");
+      Put (Integer (Error_Count (R)));
+      New_Line;
 
-      if Elapsed  (R) > 0.0 then
-         New_Line;
-         Put_Line ("Time: " & Duration'Image (Elapsed (R)) & " seconds");
-      end if;
+      Errors (R, E);
+      Dump_Error_List (E);
+      New_Line;
+
    end Report;
+
+   ------------------
+   -- Report_Error --
+   ------------------
+
+   procedure Report_Error (Error : Test_Failure) is
+   begin
+      New_Line;
+      Put ("      ");
+      Put (Error.Test_Name);
+      Put (": ");
+      Put_Line (Error.Routine_Name
+        (Error.Routine_Name'First ..
+             Last_Index (Error.Routine_Name)));
+      Put ("      ");
+      Put ("      ");
+      Put_Line (Error.Message
+        (Error.Message'First ..
+             Last_Index (Error.Message)));
+   end Report_Error;
 
 end AUnit.Test_Results.Text_Reporter;
