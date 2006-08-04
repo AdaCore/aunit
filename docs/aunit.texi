@@ -109,6 +109,7 @@ unmodified in any copy.
 * Support for Generics::
 * Reporting::
 * Migrating Tests from AUnit 1 to AUnit 2::
+* Using AUnit with Restricted Run-Time Libraries::
 * GPS Support::
 @end menu
 @end ifinfo
@@ -1029,6 +1030,52 @@ facilitate this.  If using an Ada run-time library that supports exception
 handling, the procedural form of Assert will abandon execution of the test
 routine as is done in AUnit 1.
 
+@end enumerate
+
+@node Using AUnit with Restricted Run-Time Libraries
+@chapter Using AUnit with Restricted Run-Time Libraries
+
+@noindent
+AUnit 2 is a reimplementation of the original AUnit so that it can be used in
+environments with restricted Ada run-time libraries, such as ZFP and the cert
+run-time profile on Wind River Systems PSC ARINC-653.  The patterns given in
+this document for writing tests, suites and harnesses are not the only
+patterns that can be used with AUnit, but they are compatible with the
+restricted run-time libraries provided with GNAT Pro.
+
+In general, dynamic allocation and deallocation must be used carefully in test
+code.  For the cert profile on PSC ARINC-653, all dynamic allocation must be
+done prior to setting the application partition into ``normal'' mode.
+Deallocation is prohibited in this profile. For the default ZFP profile,
+dynamic memory management is not implemented, and should not be used unless
+you have provided implementations as described in the GNAT Pro High Integrity
+User Guide.
+
+Additional restrictions relevant to the default ZFP profile include:
+@enumerate
+@item
+Normally AUnit will list any unexpected exceptions that occur during test
+execution. However, since the default ZFP profile does not support exception
+propagation, control is instead passed to the user last chance handler. As
+in all ZFP profiles, such a last chance handler is required.
+
+@item
+AUnit requires @code{GNAT.IO} provided in @file{g-io.ad?} in the full or cert
+profile run-time library sources (or as implemented by the user). Since this
+is a run-time library unit it must be compiled with the gnatmake ``-a''
+switch.
+
+@item
+The application under test or the tests themselves  must export symbol 
+@code{__gnat_get_secondary_stack}. This is not actually used unless the
+application or unit tests require the secondary stack, in which case it must
+be fully implemented.
+
+@item
+Failed assertions do not abandon execution of the calling test routine in
+ZFP profiles that do not support exception propagation. A functional form of
+the @code{Assert} subprogram allows the calling routine to determine whether
+to continue or abandon its further execution.
 @end enumerate
 
 @node GPS Support
