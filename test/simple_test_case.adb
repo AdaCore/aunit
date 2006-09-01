@@ -44,9 +44,8 @@ package body Simple_Test_Case is
    end Double_Failure_Wrapper;
 
    procedure Double_Failure (T : in out Test_Case) is
-      pragma Warnings (Off);
       Dummy : Boolean;
-      pragma Warnings (On);
+      pragma Unreferenced (Dummy);
    begin
       --  Fail two assertions. Will be checked in Test_Test_Case.Test_Run
       Dummy := Assert (T'Access, False, "first failure");
