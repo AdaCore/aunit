@@ -88,9 +88,8 @@ package body Test_Test_Case is
    end Test_Multiple_Failures_Wrapper;
 
    procedure Test_Multiple_Failures (T : in out Test_Case) is
-      pragma Warnings (Off);
       Dummy : Boolean;
-      pragma Warnings (On);
+      pragma Unreferenced (Dummy);
    begin
       Dummy := Assert (T'Access, False, "expected failure 1");
       Assert (T'Access, False, "expected failure 2");
