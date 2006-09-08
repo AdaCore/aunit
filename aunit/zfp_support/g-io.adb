@@ -113,7 +113,7 @@ package body GNAT.IO is
          end if;
       end loop;
 
-      X := -Sign * X;
+      X := (-Sign) * X;
    end Get;
 
    procedure Get (C : out Character) is
