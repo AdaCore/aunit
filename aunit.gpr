@@ -1,42 +1,24 @@
-with "containers", "environment";
+with "containers";
+with "environment";
 
 project AUnit is
 
-   Runtime : Environment.Runtime_Type := Environment.Runtime;
-
-   case Runtime is
-
+   case Environment.Runtime is
       when "zfp" =>
-         for Source_Dirs use ("aunit/framework/",
-                              "aunit/text_reporter/",
-                              "aunit/zfp_support/");
-         for Object_Dir use "obj_cert";
-
-      when "cert" =>
-         for Source_Dirs use ("aunit/framework/",
-			      "aunit/text_reporter/",
-                              "aunit/cert_support/");
-         for Object_Dir use "obj_cert";
-
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/zfp",
+                              "aunit/zfp_support");
       when others =>
-         for Source_Dirs use ("aunit/framework/",
-			      "aunit/text_reporter/",
-                              "aunit/cert_support/");
-         for Object_dir use "obj_full";
-
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/native");
    end case;
 
-   package Compiler is
-      case Runtime is
-         when "zfp" =>
-            for Default_Switches ("ada") use
-               ("-O1", "-gnatf", "-gnato", "-gnatg");
-         when others =>
-            for Default_Switches ("ada") use
-                          ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check",
-                          "-gnatwa", "-gnatg");
-      end case;
-   end Compiler;
+   for Object_Dir use "obj";
+
+   package Compiler renames Environment.Compiler;
+   package Builder renames Environment.Builder;
+   package IDE renames Environment.IDE;
 
 end AUnit;
-
