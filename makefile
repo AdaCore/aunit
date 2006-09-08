@@ -54,7 +54,7 @@ force:
 
 test: force
 	gnatmake -Paunit_tests
-	./harness
+	./aunit_harness
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
