@@ -1,4 +1,4 @@
-with Framework; use Framework;
+with AUnit; use AUnit;
 --  Unit tests for AUnit.Test_Cases.
 package Test_Test_Case is
    use Test_Results;

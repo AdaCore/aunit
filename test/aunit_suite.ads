@@ -1,4 +1,4 @@
-with Framework; use Framework;
+with AUnit; use AUnit;
 package AUnit_Suite is
-   function Suite return Test_Suites.Test_Suite_Access;
+   function Suite return Test_Suites.Access_Test_Suite;
 end AUnit_Suite;

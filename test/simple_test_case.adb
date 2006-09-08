@@ -1,4 +1,4 @@
-with AUnit.Tests.Test_Cases.Registration;
+with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Simple test case
 package body Simple_Test_Case is
@@ -6,7 +6,7 @@ package body Simple_Test_Case is
 
    procedure Double_Failure_Wrapper (T : in out Test_Case'Class);
 
-   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
    use Registration;
 
    function Routine_Count (T : Test_Case'Class)
@@ -33,9 +33,9 @@ package body Simple_Test_Case is
    end Succeed;
 
    procedure Fail (T : in out Test_Case) is
+      pragma Unreferenced (T);
    begin
-      null;
-      Assert (T'Access, False, "Failure test failed");
+      Assert (False, "Failure test failed");
    end Fail;
 
    procedure Double_Failure_Wrapper (T : in out Test_Case'Class) is
@@ -45,11 +45,11 @@ package body Simple_Test_Case is
 
    procedure Double_Failure (T : in out Test_Case) is
       Dummy : Boolean;
-      pragma Unreferenced (Dummy);
+      pragma Unreferenced (T, Dummy);
    begin
       --  Fail two assertions. Will be checked in Test_Test_Case.Test_Run
-      Dummy := Assert (T'Access, False, "first failure");
-      Assert (T'Access, False, "second failure");
+      Dummy := Assert (False, "first failure");
+      Assert (False, "second failure");
    end Double_Failure;
 
    --  Register test routines to call:

@@ -1,4 +1,4 @@
-with AUnit.Tests.Test_Cases.Registration;
+with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Test case that inherits a routine
 package body One_Test_Case.Inherited_Test_Case is
@@ -16,14 +16,13 @@ package body One_Test_Case.Inherited_Test_Case is
    procedure Test_Data_Access (T : in out Test_Case) is
    begin
       Assert
-        (T'Access,
-         T.Parent_Data = 0 and
+        (T.Parent_Data = 0 and
          T.Child_Data = 1,
          "Parent and Child data not correctly accessed");
    end Test_Data_Access;
 
    --  Register test routines to call.  Total test routines = 4:
-   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
    use Registration;
 
    procedure Register_Tests (T : in out Test_Case) is

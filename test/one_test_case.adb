@@ -1,4 +1,4 @@
-with AUnit.Tests.Test_Cases.Registration;
+with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Test case with one routine
 package body One_Test_Case is
@@ -13,7 +13,7 @@ package body One_Test_Case is
    end Test_1;
 
    --  Register test routines to call:
-   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
    use Registration;
 
    procedure Register_Tests (T : in out Test_Case) is

@@ -1,10 +1,10 @@
-with AUnit.Tests.Test_Cases.Registration;
+with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Simple test case
 package body Empty_Test_Case is
    pragma Ada_05;
 
-   package Registration is new Framework.Test_Cases.Registration (Test_Case);
+   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
    use Registration;
 
    function Routine_Count (T : Test_Case'Class) return Count_Type is

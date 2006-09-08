@@ -1,4 +1,4 @@
-with  Framework; use Framework;
+with AUnit; use AUnit;
 with Ada_Containers; use Ada_Containers;
 
 --  Test case with no routines.
@@ -6,7 +6,7 @@ package Empty_Test_Case is
    pragma Ada_05;
    use Test_Results;
 
-   type Test_Case is new Framework.Test_Cases.Test_Case with private;
+   type Test_Case is new AUnit.Test_Cases.Test_Case with private;
 
    --  Register routines to be run:
    procedure Register_Tests (T : in out Test_Case);
@@ -23,6 +23,6 @@ package Empty_Test_Case is
 
 private
 
-   type Test_Case is new Framework.Test_Cases.Test_Case with null record;
+   type Test_Case is new AUnit.Test_Cases.Test_Case with null record;
 
 end Empty_Test_Case;

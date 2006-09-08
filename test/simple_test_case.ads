@@ -1,11 +1,11 @@
-with Framework; use Framework;
+with AUnit; use AUnit;
 with Ada_Containers; use Ada_Containers;
 
 --  Simple test case.
 package Simple_Test_Case is
    use Test_Results;
 
-   type Test_Case is new Framework.Test_Cases.Test_Case with private;
+   type Test_Case is new AUnit.Test_Cases.Test_Case with private;
 
    --  Register routines to be run:
    procedure Register_Tests (T : in out Test_Case);
@@ -35,7 +35,7 @@ package Simple_Test_Case is
       return Ada_Containers.Count_Type;
 
 private
-   type Test_Case is new Framework.Test_Cases.Test_Case with record
+   type Test_Case is new AUnit.Test_Cases.Test_Case with record
       Is_Set_Up,
       Is_Torn_Down : Boolean := False;
    end record;

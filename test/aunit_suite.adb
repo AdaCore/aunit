@@ -12,7 +12,7 @@ package body AUnit_Suite is
    Test_Case_Registration : aliased Test_Test_Case_Registration.Test_Case;
    Test_Suite : aliased Test_Test_Suite.Test_Case;
 
-   function Suite return Test_Suite_Access is
+   function Suite return Access_Test_Suite is
    begin
       Add_Test (Result'Access, Test_Case'Access);
       Add_Test (Result'Access, Test_Case_Registration'Access);
