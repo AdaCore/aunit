@@ -1,23 +1,19 @@
 project Environment is
 
-   type Runtime_Type is
-      ("full", "zfp", "cert", "kernel");
+   type Runtime_Type is ("full", "zfp", "cert", "kernel");
    Runtime : Runtime_Type := external ("Runtime", "full");
    for Source_Dirs use ();
    for Source_Files use ();
 
    package Builder is
-
       case Runtime is
-
-         when "kernel" =>
-            for Default_Switches ("ada") use ("-g", "-gnatQ", "--RTS=" & Runtime);
-
-         when "cert" =>
-            for Default_Switches ("ada") use ("-g", "-gnatQ", "--RTS=" & Runtime);
+         when "kernel" | "cert" =>
+            for Default_Switches ("ada") use
+              ("-g", "-gnatQ", "--RTS=" & Runtime);
 
          when "zfp" =>
-            for Default_Switches ("ada") use ("-a", "-x", "-g", "-gnatQ", "--RTS=" & Runtime);
+            for Default_Switches ("ada") use
+              ("-a", "-x", "-g", "-gnatQ", "--RTS=" & Runtime);
 
          when "full" =>
             for Default_Switches ("ada") use ("-g", "-gnatQ");
@@ -25,38 +21,27 @@ project Environment is
    end Builder;
 
    package Compiler is
-
       case Runtime is
-
-         when "kernel" =>
-            for Default_Switches ("ada") use ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check", "-gnatwa", "-gnatg");
-
-         when "cert" =>
-            for Default_Switches ("ada") use ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check", "-gnatwa", "-gnatg");
+         when "kernel" | "cert" =>
+            for Default_Switches ("ada") use
+              ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check",
+               "-gnatwa", "-gnatg");
 
          when "zfp" =>
-            for Default_Switches ("ada") use ("-O1", "-gnatf", "-gnato", "-gnatg");
+            for Default_Switches ("ada") use
+              ("-O1", "-gnatf", "-gnato", "-gnatg");
 
          when "full" =>
-            for Default_Switches ("ada") use ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check", "-gnatwa", "-gnatg");
-            for Switches ("test_restricted_lists.adb") use ("-O1", "-gnato", "-fstack-check", "-gnata", "-gnatg");
+            for Default_Switches ("ada") use
+              ("-gnata", "-O1", "-gnatf", "-gnato", "-fstack-check",
+               "-gnatwa", "-gnatg");
+            for Switches ("test_restricted_lists.adb") use
+              ("-O1", "-gnato", "-fstack-check", "-gnata", "-gnatg");
       end case;
    end Compiler;
 
    package Ide is
       for Vcs_Kind use "cvs";
-
-      case Runtime is
-
-         when "kernel" =>
-
-         when "cert" =>
-
-         when "zfp" =>
-
-         when "full" =>
-
-      end case;
    end Ide;
 
 end Environment;
