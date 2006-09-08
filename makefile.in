@@ -1,6 +1,3 @@
-
-# $Id$
-
 INSTALL	= /opt
 
 # Install directories
