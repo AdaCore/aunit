@@ -23,7 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Restrictions (No_Implicit_Dynamic_Code);
 with AUnit_Framework.Test_Results;
 
 --  Base Test Case or Test Suite

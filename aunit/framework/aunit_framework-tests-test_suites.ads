@@ -24,7 +24,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Restrictions (No_Implicit_Dynamic_Code);
 with AUnit_Framework.Tests.Test_Cases;
 
 with Ada_Containers;
