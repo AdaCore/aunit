@@ -1,0 +1,20 @@
+project Zfp_Support is
+   --  Support lib for ZFP with a native platform
+
+   for Languages use ("c", "ada");
+   for Source_Dirs use (".", "native");
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+   for Library_Name use "zfp_support";
+   for Library_Kind use "static";
+
+   package Builder is
+      for Default_Switches ("ada") use ("--RTS=zfp");
+   end Builder;
+
+   package Ide is
+      for Vcs_Kind use "CVS";
+   end Ide;
+
+end Zfp_Support;
+
