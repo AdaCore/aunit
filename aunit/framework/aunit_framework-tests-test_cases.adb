@@ -29,6 +29,8 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    The_Current_Test_Case : access Test_Case'Class := null;
 
+   package body Registration is separate;
+
    -----------------------
    -- Local Subprograms --
    -----------------------
