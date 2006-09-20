@@ -68,10 +68,7 @@ package AUnit_Framework.Framework is
 
    generic
       with function Suite return Test_Suites.Access_Test_Suite;
-   package Harness is
-      procedure Run (Timed : Boolean := False);
-      --  ??? add timed parameter
-   end Harness;
-   --  Instantiate Harness at library level to minimize stack requirement
+   procedure Test_Runner (Timed : Boolean := True);
+   --  Instantiate Test_Runner at library level to minimize stack requirement
 
 end AUnit_Framework.Framework;
