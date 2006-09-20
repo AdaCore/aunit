@@ -5,5 +5,5 @@ with Harness;
 
 procedure AUnit_Harness is
 begin
-   Harness.Run;
+   Harness;
 end AUnit_Harness;

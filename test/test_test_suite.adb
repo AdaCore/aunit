@@ -2,7 +2,6 @@ with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
 with Ada_Containers; use Ada_Containers;
-with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
@@ -10,11 +9,11 @@ package body Test_Test_Suite is
 
    S : aliased Test_Suite;
    R : aliased Result;
-   O : aliased One_Test_Case.Test_Case;
-   E : aliased Empty_Test_Case.Test_Case;
-   I : aliased One_Test_Case.Inherited_Test_Case.Test_Case;
+   O : aliased One_Test_Case.The_Test_Case;
+   E : aliased Empty_Test_Case.The_Test_Case;
+   I : aliased One_Test_Case.Inherited_Test_Case.The_Test_Case;
 
-   procedure Test_No_Test_Case (T : in out Test_Case) is
+   procedure Test_No_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       Run (S'Access, R'Access);
@@ -23,7 +22,7 @@ package body Test_Test_Suite is
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
    end Test_No_Test_Case;
 
-   procedure Test_No_Test_Routines (T : in out Test_Case) is
+   procedure Test_No_Test_Routines (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       Add_Test (S'Access, E'Access);
@@ -33,7 +32,7 @@ package body Test_Test_Suite is
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
    end Test_No_Test_Routines;
 
-   procedure Test_One_Test_Case (T : in out Test_Case) is
+   procedure Test_One_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       Add_Test (S'Access, O'Access);
@@ -44,7 +43,7 @@ package body Test_Test_Suite is
       Assert (Successful (R), "Suite did not run successfully");
    end Test_One_Test_Case;
 
-   procedure Test_Inherited_Tests (T : in out Test_Case) is
+   procedure Test_Inherited_Tests (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       Old_Count : constant Count_Type := Test_Count (R);
    begin
@@ -57,10 +56,9 @@ package body Test_Test_Suite is
    end Test_Inherited_Tests;
 
    --  Register test routines to call:
-   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
-   use Registration;
+   use AUnit.Test_Cases.Registration;
 
-   procedure Register_Tests (T : in out Test_Case) is
+   procedure Register_Tests (T : in out The_Test_Case) is
    begin
       Register_Routine
         (T, Test_No_Test_Case'Access, "Test No Test Case");
@@ -77,7 +75,7 @@ package body Test_Test_Suite is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_String is
+   function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
       return  Format ("Test AUnit.Test_Suites");

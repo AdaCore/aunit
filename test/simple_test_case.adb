@@ -1,49 +1,39 @@
-with AUnit_Framework.Tests.Test_Cases.Registration;
-
 --  Simple test case
 package body Simple_Test_Case is
    use Assertions;
 
-   procedure Double_Failure_Wrapper (T : in out Test_Case'Class);
+   procedure Double_Failure_Wrapper (T : in out The_Test_Case'Class);
 
-   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
-   use Registration;
+   use AUnit.Test_Cases.Registration;
 
-   function Routine_Count (T : Test_Case'Class)
-                           return Ada_Containers.Count_Type
-   is
-   begin
-      return Registration.Routine_Count (T);
-   end Routine_Count;
-
-   procedure Set_Up (T : in out Test_Case) is
+   procedure Set_Up (T : in out The_Test_Case) is
    begin
       T.Is_Set_Up := True;
    end Set_Up;
 
-   procedure Tear_Down (T : in out Test_Case) is
+   procedure Tear_Down (T : in out The_Test_Case) is
    begin
       T.Is_Torn_Down := True;
    end Tear_Down;
 
-   procedure Succeed (T : in out Test_Case) is
+   procedure Succeed (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       null;
    end Succeed;
 
-   procedure Fail (T : in out Test_Case) is
+   procedure Fail (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       Assert (False, "Failure test failed");
    end Fail;
 
-   procedure Double_Failure_Wrapper (T : in out Test_Case'Class) is
+   procedure Double_Failure_Wrapper (T : in out The_Test_Case'Class) is
    begin
       Double_Failure (T);
    end Double_Failure_Wrapper;
 
-   procedure Double_Failure (T : in out Test_Case) is
+   procedure Double_Failure (T : in out The_Test_Case) is
       Dummy : Boolean;
       pragma Unreferenced (T, Dummy);
    begin
@@ -53,7 +43,9 @@ package body Simple_Test_Case is
    end Double_Failure;
 
    --  Register test routines to call:
-   procedure Register_Tests (T : in out Test_Case) is
+   procedure Register_Tests (T : in out The_Test_Case) is
+      procedure Register_Wrapper is
+        new AUnit.Test_Cases.Registration.Register_Wrapper (The_Test_Case);
    begin
 
       Register_Routine
@@ -69,20 +61,20 @@ package body Simple_Test_Case is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_String is
+   function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
       return Format ("Dummy Test Case");
    end Name;
 
    --  Set up?
-   function Is_Set_Up (T : Test_Case) return Boolean is
+   function Is_Set_Up (T : The_Test_Case) return Boolean is
    begin
       return T.Is_Set_Up;
    end Is_Set_Up;
 
    --  Torn down?
-   function Is_Torn_Down (T : Test_Case) return Boolean is
+   function Is_Torn_Down (T : The_Test_Case) return Boolean is
    begin
       return T.Is_Torn_Down;
    end Is_Torn_Down;

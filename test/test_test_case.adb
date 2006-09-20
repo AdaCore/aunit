@@ -1,29 +1,30 @@
 with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
-with AUnit_Framework.Tests.Test_Cases.Registration;
 
 --  Unit tests for AUnit.Test_Cases.
 package body Test_Test_Case is
    use Assertions;
 
-   Simple :  aliased Simple_Test_Case.Test_Case;
+   Simple :  aliased Simple_Test_Case.The_Test_Case;
    R : aliased Result;
 
-   procedure Test_Register_Tests (T : in out Test_Case)
+   procedure Test_Register_Tests (T : in out Test_Cases.Test_Case'Class)
    is
       pragma Unreferenced (T);
       use Simple_Test_Case;
-      Old_Count : constant Count_Type := Routine_Count (Simple);
+      Old_Count : constant Count_Type :=
+                   AUnit.Test_Cases.Registration.Routine_Count (Simple);
       Routines_In_Simple : constant := 3;
    begin
       Simple_Test_Case.Register_Tests (Simple);
 
       Assert
-        (Routine_Count (Simple) = Old_Count + Routines_In_Simple,
+        (AUnit.Test_Cases.Registration.Routine_Count (Simple) =
+           Old_Count + Routines_In_Simple,
          "Routine not properly registered");
    end Test_Register_Tests;
 
-   procedure Test_Set_Up (T : in out Test_Case) is
+   procedure Test_Set_Up (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       use Simple_Test_Case;
       Was_Reset : constant Boolean := not Is_Set_Up (Simple);
@@ -35,7 +36,7 @@ package body Test_Test_Case is
          "Not set up correctly");
    end Test_Set_Up;
 
-   procedure Test_Torn_Down (T : in out Test_Case) is
+   procedure Test_Torn_Down (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       use Simple_Test_Case;
       Was_Reset : constant Boolean := not Is_Torn_Down (Simple);
@@ -47,10 +48,11 @@ package body Test_Test_Case is
          "Not torn down correctly");
    end Test_Torn_Down;
 
-   procedure Test_Run (T : in out Test_Case) is
+   procedure Test_Run (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       use Simple_Test_Case;
-      Count  : constant Count_Type := Routine_Count (Simple);
+      Count  : constant Count_Type :=
+                 AUnit.Test_Cases.Registration.Routine_Count (Simple);
       Old_Count : constant Count_Type := Test_Count (R);
 
    begin
@@ -76,16 +78,17 @@ package body Test_Test_Case is
       Assert (Failure_Count (R) = 3, "Wrong failure count");
    end Test_Run;
 
-   procedure Test_Multiple_Failures_Wrapper (T : in out Test_Case'Class);
+   procedure Test_Multiple_Failures_Wrapper (T : in out The_Test_Case'Class);
 
-   procedure Test_Multiple_Failures_Wrapper (T : in out Test_Case'Class) is
+   procedure Test_Multiple_Failures_Wrapper (T : in out The_Test_Case'Class)
+   is
    begin
       Test_Multiple_Failures (T);
       raise Constraint_Error;
 
    end Test_Multiple_Failures_Wrapper;
 
-   procedure Test_Multiple_Failures (T : in out Test_Case) is
+   procedure Test_Multiple_Failures (T : in out The_Test_Case) is
       Dummy : Boolean;
       pragma Unreferenced (T, Dummy);
    begin
@@ -94,16 +97,17 @@ package body Test_Test_Case is
    end Test_Multiple_Failures;
 
    --  Exclude when run-time library does not support exception handling
-   procedure Test_Exceptions (T : in out Test_Case) is
+   procedure Test_Exceptions (T : in out Test_Cases.Test_Case'Class) is
    begin
       raise Constraint_Error;
    end Test_Exceptions;
 
    --  Register test routines to call:
-   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
-   use Registration;
+   use AUnit.Test_Cases.Registration;
 
-   procedure Register_Tests (T : in out Test_Case) is
+   procedure Register_Tests (T : in out The_Test_Case) is
+      procedure Register_Wrapper is
+        new AUnit.Test_Cases.Registration.Register_Wrapper (The_Test_Case);
    begin
       Register_Routine
         (T, Test_Register_Tests'Access, "Test Routine Registration");
@@ -130,7 +134,7 @@ package body Test_Test_Case is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_String is
+   function Name (T : The_Test_Case) return Test_String is
    pragma Unreferenced (T);
    begin
       return  Format ("Test AUnit.Test_Cases");

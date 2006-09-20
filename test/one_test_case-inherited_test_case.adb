@@ -1,11 +1,9 @@
-with AUnit_Framework.Tests.Test_Cases.Registration;
-
 --  Test case that inherits a routine
 package body One_Test_Case.Inherited_Test_Case is
 
    use Assertions;
 
-   procedure Test_2 (T : in out Test_Case) is
+   procedure Test_2 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       null;
@@ -13,22 +11,21 @@ package body One_Test_Case.Inherited_Test_Case is
 
    --  Check ability to access parent and child instance-specific data.
    --  Derived test_case must be declared in a child unit:
-   procedure Test_Data_Access (T : in out Test_Case) is
+   procedure Test_Data_Access (T : in out Test_Cases.Test_Case'Class) is
    begin
       Assert
-        (T.Parent_Data = 0 and
-         T.Child_Data = 1,
+        (The_Test_Case (T).Parent_Data = 0 and
+         The_Test_Case (T).Child_Data = 1,
          "Parent and Child data not correctly accessed");
    end Test_Data_Access;
 
    --  Register test routines to call.  Total test routines = 4:
-   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
-   use Registration;
+   use AUnit.Test_Cases.Registration;
 
-   procedure Register_Tests (T : in out Test_Case) is
+   procedure Register_Tests (T : in out The_Test_Case) is
    begin
       --  Register parent routines:
-      Register_Tests (One_Test_Case.Test_Case (T));
+      Register_Tests (One_Test_Case.The_Test_Case (T));
 
       --  Register tests of derived Test_Case type:
       Register_Routine
@@ -39,7 +36,7 @@ package body One_Test_Case.Inherited_Test_Case is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_String is
+   function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
       return  Format ("Inherited Test Case");

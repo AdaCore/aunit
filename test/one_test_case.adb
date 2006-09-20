@@ -1,28 +1,25 @@
-with AUnit_Framework.Tests.Test_Cases.Registration;
-
 --  Test case with one routine
 package body One_Test_Case is
 
    use Assertions;
 
    --  Test Routines:
-   procedure Test_1 (T : in out Test_Case) is
+   procedure Test_1 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
    begin
       null;
    end Test_1;
 
    --  Register test routines to call:
-   package Registration is new AUnit.Test_Cases.Registration (Test_Case);
-   use Registration;
+   use AUnit.Test_Cases.Registration;
 
-   procedure Register_Tests (T : in out Test_Case) is
+   procedure Register_Tests (T : in out The_Test_Case) is
    begin
       Register_Routine (T, Test_1'Access, "Test Routine 1");
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_String is
+   function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
       return Format ("One Test Case");

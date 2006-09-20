@@ -8,9 +8,9 @@ package body AUnit_Suite is
 
    Result : aliased Test_Suite;
 
-   Test_Case : aliased Test_Test_Case.Test_Case;
-   Test_Case_Registration : aliased Test_Test_Case_Registration.Test_Case;
-   Test_Suite : aliased Test_Test_Suite.Test_Case;
+   Test_Case : aliased Test_Test_Case.The_Test_Case;
+   Test_Case_Registration : aliased Test_Test_Case_Registration.The_Test_Case;
+   Test_Suite : aliased Test_Test_Suite.The_Test_Case;
 
    function Suite return Access_Test_Suite is
    begin
