@@ -25,28 +25,29 @@
 ------------------------------------------------------------------------------
 
 with AUnit_Framework.Test_Results.Text_Reporter;
+with AUnit_Framework.Time_Measure;
 
 --  Framework using text reporter
 package body AUnit_Framework.Framework is
 
    package Reporter is new Test_Results.Text_Reporter;
 
-   package body Harness is
+   Results : aliased Test_Results.Result;
+   --  Test results for one harness run
 
-      Results : aliased Test_Results.Result;
-      --  Test results for one harness run
-
-      ---------
-      -- Run --
-      ---------
-
-      procedure Run (Timed : Boolean := False) is
-         pragma Unreferenced (Timed);
-      begin
-         Test_Suites.Run (Suite, Results'Access);
-         Reporter.Report (Results);
-      end Run;
-
-   end Harness;
+   procedure Test_Runner (Timed : Boolean := True) is
+      Time : Time_Measure.Time;
+   begin
+      Test_Results.Clear (Results);
+      if Timed then
+         Time_Measure.Start_Measure (Time);
+      end if;
+      Test_Suites.Run (Suite, Results'Access);
+      if Timed then
+         Time_Measure.Stop_Measure (Time);
+         Test_Results.Set_Elapsed (Results, Time);
+      end if;
+      Reporter.Report (Results);
+   end Test_Runner;
 
 end AUnit_Framework.Framework;
