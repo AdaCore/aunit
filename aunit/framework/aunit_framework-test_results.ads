@@ -27,6 +27,8 @@
 with Ada_Containers;
 with Ada_Containers_Restricted_Doubly_Linked_Lists;
 
+with AUnit_Framework.Time_Measure;
+
 --  Test reporting.
 --
 --  Generic formals size the reporting data structures, which have to be
@@ -108,6 +110,10 @@ package AUnit_Framework.Test_Results is
       Routine_Name            : Routine_String);
    --  Record a test routine success
 
+   procedure Set_Elapsed (R : in out Result;
+                          T : Time_Measure.Time);
+   --  Set Elapsed time for reporter:
+
    function Error_Count (R : Result) return Errors_Range;
    --  Number of routines with unexpected exceptions
 
@@ -121,6 +127,9 @@ package AUnit_Framework.Test_Results is
    procedure Failures (R : in out Result;
                        F : in out Failure_Lists.List);
    --  List of failed routines
+
+   function Elapsed (R : Result) return Time_Measure.Time;
+   --  Elapsed time for test execution:
 
    function Format (Name : String) return Test_String;
    --  Format a string to use as a test name
@@ -141,6 +150,9 @@ package AUnit_Framework.Test_Results is
    function Test_Count (R : Result) return Ada_Containers.Count_Type;
    --  Number of routines run
 
+   procedure Clear (R : in out Result);
+   --  Clear the results
+
 private
 
    type Result is limited record
@@ -148,6 +160,7 @@ private
       Errors_List    : Error_Lists.List (Errors_Range'Last);
       Failures_List  : Failure_Lists.List (Failures_Range'Last);
       Successes_List : Success_Lists.List (Successes_Range'Last);
+      Elapsed_Time   : Time_Measure.Time := Time_Measure.Null_Time;
    end record;
 
    pragma Inline (Error_Count, Failure_Count, Success_Count, Test_Count);

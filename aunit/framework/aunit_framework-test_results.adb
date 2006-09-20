@@ -92,6 +92,16 @@ package body AUnit_Framework.Test_Results is
    end Add_Success;
 
    -----------------
+   -- Set_Elapsed --
+   -----------------
+
+   procedure Set_Elapsed (R : in out Result;
+                          T : Time_Measure.Time) is
+   begin
+      R.Elapsed_Time := T;
+   end Set_Elapsed;
+
+   -----------------
    -- Error_Count --
    -----------------
 
@@ -132,6 +142,15 @@ package body AUnit_Framework.Test_Results is
    begin
       Swap (F, R.Failures_List);
    end Failures;
+
+   -------------
+   -- Elapsed --
+   -------------
+
+   function Elapsed (R : Result) return Time_Measure.Time is
+   begin
+      return R.Elapsed_Time;
+   end Elapsed;
 
    ------------
    -- Format --
@@ -273,5 +292,14 @@ package body AUnit_Framework.Test_Results is
       Assign (Target, Source);
       Clear (Source);
    end Transfer;
+
+   procedure Clear (R : in out Result) is
+   begin
+      R.Tests_Run    := 0;
+      R.Elapsed_Time := Time_Measure.Null_Time;
+      R.Errors_List.Clear;
+      R.Failures_List.Clear;
+      R.Successes_List.Clear;
+   end Clear;
 
 end AUnit_Framework.Test_Results;
