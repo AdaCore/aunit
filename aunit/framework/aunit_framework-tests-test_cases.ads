@@ -80,6 +80,28 @@ package AUnit_Framework.Tests.Test_Cases is
    function Current_Test_Case return access Test_Case'Class;
    --  The running test case
 
+   package Registration is
+      use Ada_Containers;
+
+      procedure Register_Routine
+        (Test    : in out Test_Case'Class;
+         Routine : Test_Routine;
+         Name    : String);
+      --  Add test routine to test case
+
+      generic
+         type Specific_Test_Case is new Test_Case with private;
+      procedure Register_Wrapper
+        (Test    : in out Specific_Test_Case'Class;
+         Routine : access procedure
+           (Test : in out Specific_Test_Case'Class);
+         Name    : String);
+      --  Add test routine for a specific test case
+
+      function Routine_Count (Test : Test_Case'Class) return Count_Type;
+         --  Count of registered routines in test case
+   end Registration;
+
 private
 
    type Routine_Access is access all Routine_Spec;
