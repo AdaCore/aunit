@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 with GNAT.IO; use GNAT.IO;
+with AUnit_Framework.Time_Measure; use AUnit_Framework.Time_Measure;
 
 --  Very simple reporter to console
 package body AUnit_Framework.Test_Results.Text_Reporter is
@@ -170,6 +171,10 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       Dump_Error_List (E);
       New_Line;
 
+      if Elapsed  (R) /= Time_Measure.Null_Time then
+         New_Line;
+         Put_Line ("Time: " & Print (Elapsed (R)) & " seconds");
+      end if;
    end Report;
 
    ------------------
