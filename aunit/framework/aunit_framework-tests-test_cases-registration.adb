@@ -27,39 +27,20 @@
 --  Test routine registration
 with Ada.Unchecked_Conversion;
 with System;
-package body AUnit_Framework.Tests.Test_Cases.Registration is
+
+separate (AUnit_Framework.Tests.Test_Cases)
+package body Registration is
 
    pragma Ada_05;
-
-   -----------------------
-   -- Local Subprograms --
-   -----------------------
-
-   procedure Register_Routine
-     (Test    : in out Specific_Case'Class;
-      Routine : System.Address;
-      Name    : String);
-   --  Common processing
 
    ----------------------
    -- Register_Routine --
    ----------------------
 
    procedure Register_Routine
-     (Test    : in out Specific_Case;
-      Routine : access procedure (Test : in out Specific_Case);
+     (Test    : in out Test_Case'Class;
+      Routine : Test_Routine;
       Name    : String) is
-   begin
-      Register_Routine (Test, Routine.all'Address, Name);
-   end Register_Routine;
-
-   procedure Register_Routine
-     (Test    : in out Specific_Case'Class;
-      Routine : System.Address;
-      Name    : String) is
-
-      function Conv is
-        new Ada.Unchecked_Conversion (System.Address, Test_Routine);
 
       Formatted_Name : Routine_String := (others => ' ');
       Length : constant Natural := Name'Length;
@@ -75,7 +56,7 @@ package body AUnit_Framework.Tests.Test_Cases.Registration is
            (Formatted_Name'First .. Formatted_Name'First + Length - 1) := Name;
       end if;
 
-      Val  := (Conv (Routine), Formatted_Name);
+      Val  := (Routine, Formatted_Name);
       Add_Routine (Test, Val);
    end Register_Routine;
 
@@ -84,11 +65,17 @@ package body AUnit_Framework.Tests.Test_Cases.Registration is
    ----------------------
 
    procedure Register_Wrapper
-     (Test    : in out Specific_Case'Class;
-      Routine : access procedure (Test : in out Specific_Case'Class);
+     (Test    : in out Specific_Test_Case'Class;
+      Routine : access procedure (Test : in out Specific_Test_Case'Class);
       Name    : String) is
+
+      function Conv is
+        new Ada.Unchecked_Conversion (System.Address, Test_Routine);
+
    begin
-      Register_Routine (Test, Routine.all'Address, Name);
+      Register_Routine (Test_Case'Class (Test),
+                        Conv (Routine.all'Address),
+                        Name);
    end Register_Wrapper;
 
    -------------------
@@ -100,4 +87,4 @@ package body AUnit_Framework.Tests.Test_Cases.Registration is
       return Routine_Lists.Length (Test.Routines);
    end Routine_Count;
 
-end AUnit_Framework.Tests.Test_Cases.Registration;
+end Registration;
