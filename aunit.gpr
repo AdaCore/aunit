@@ -1,14 +1,20 @@
 with "containers";
-with "environment";
+with "aunit_env";
+with "aunit/zfp_support/zfp_support";
 
 project AUnit is
 
-   case Environment.Runtime is
+   case AUnit_Env.Runtime is
       when "zfp" =>
          for Source_Dirs use ("aunit/framework",
                               "aunit/text_reporter",
                               "aunit/framework/zfp",
-                              "aunit/zfp_support");
+                              "aunit/framework/cert");
+      when "cert" =>
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/cert",
+                              "aunit/framework/native");
       when others =>
          for Source_Dirs use ("aunit/framework",
                               "aunit/text_reporter",
@@ -17,8 +23,8 @@ project AUnit is
 
    for Object_Dir use "obj";
 
-   package Compiler renames Environment.Compiler;
-   package Builder renames Environment.Builder;
-   package IDE renames Environment.IDE;
+   package Builder renames AUnit_Env.Builder; 
+   package Compiler renames AUnit_Env.Compiler;
+   package IDE renames AUnit_Env.IDE;
 
 end AUnit;
