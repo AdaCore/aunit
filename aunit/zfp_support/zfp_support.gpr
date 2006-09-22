@@ -1,20 +1,26 @@
+with "../../aunit_env";
+
 project Zfp_Support is
    --  Support lib for ZFP with a native platform
 
-   for Languages use ("c", "ada");
-   for Source_Dirs use (".", "native");
-   for Object_Dir use "obj";
-   for Library_Dir use "lib";
-   for Library_Name use "zfp_support";
-   for Library_Kind use "static";
+   case AUnit_Env.Runtime is
+      when "zfp" =>
+         for Languages use ("c", "ada");
+         for Source_Dirs use (".", "native");
+         for Object_Dir use "obj";
+         for Library_Dir use "lib";
+         for Library_Name use "zfp_support";
+         for Library_Kind use "static";
+      
+      when others =>
+         --  Empty project in case of other run-times
+         for Source_Dirs use ();
+         for Source_Files use ();
 
-   package Builder is
-      for Default_Switches ("ada") use ("--RTS=zfp");
-   end Builder;
+   end case;
 
-   package Ide is
-      for Vcs_Kind use "CVS";
-   end Ide;
+   package Builder renames AUnit_Env.Builder;
+   package IDE renames AUnit_Env.IDE;
 
 end Zfp_Support;
 
