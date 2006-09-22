@@ -24,7 +24,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada_Containers;
+with Ada_Containers; use Ada_Containers;
 with Ada_Containers_Restricted_Doubly_Linked_Lists;
 
 --  Test case: a collection of test routines
@@ -81,7 +81,6 @@ package AUnit_Framework.Tests.Test_Cases is
    --  The running test case
 
    package Registration is
-      use Ada_Containers;
 
       procedure Register_Routine
         (Test    : in out Test_Case'Class;
@@ -119,8 +118,6 @@ private
    package Message_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Message_String);
    --  Container for failed assertion messages per routine
-
-   use Ada_Containers;
 
    type Test_Case is abstract new Test with record
       Name     : Test_String;
