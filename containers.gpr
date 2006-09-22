@@ -1,4 +1,4 @@
-with "environment";
+with "aunit_env";
 
 project Containers is
 
@@ -6,7 +6,7 @@ project Containers is
    for Source_Dirs use ("containers");
    for Object_Dir use "obj";
 
-   package Compiler renames Environment.Compiler;
+   package Compiler renames AUnit_Env.Compiler;
 
 end Containers;
 

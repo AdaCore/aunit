@@ -1,5 +1,5 @@
 with "aunit";
-with "environment";
+with "aunit_env";
 
 project AUnit_Tests is
 
@@ -10,13 +10,13 @@ project AUnit_Tests is
 
         for Object_Dir use "obj";
 
+        package Builder renames AUnit_Env.Builder;
+        package Compiler renames AUnit_Env.Compiler;
+        package IDE renames AUnit_Env.IDE;
+
         package Binder is
                 for Default_Switches ("ada") use ("-E", "-static");
         end Binder;
-
-        package Builder renames Environment.Builder;
-        package Compiler renames Environment.Compiler;
-        package IDE renames Environment.IDE;
 
         package Linker is
            for Default_Switches ("ada") use ("-g");
