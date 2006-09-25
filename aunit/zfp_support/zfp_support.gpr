@@ -6,7 +6,12 @@ project Zfp_Support is
    case AUnit_Env.Runtime is
       when "zfp" =>
          for Languages use ("c", "ada");
-         for Source_Dirs use (".", "native");
+         case AUnit_Env.Target is
+            when "native" =>
+               for Source_Dirs use (".", "native");
+            when "VXAEPPC" | "VXAESIMNT" =>
+               for Source_Dirs use (".", "vxworksae");
+         end case;
          for Object_Dir use "obj";
          for Library_Dir use "lib";
          for Library_Name use "zfp_support";
