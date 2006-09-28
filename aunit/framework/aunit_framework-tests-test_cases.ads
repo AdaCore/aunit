@@ -88,18 +88,25 @@ package AUnit_Framework.Tests.Test_Cases is
          Name    : String);
       --  Add test routine to test case
 
-      generic
-         type Specific_Test_Case is new Test_Case with private;
-      procedure Register_Wrapper
-        (Test    : in out Specific_Test_Case'Class;
-         Routine : access procedure
-           (Test : in out Specific_Test_Case'Class);
-         Name    : String);
-      --  Add test routine for a specific test case
-
       function Routine_Count (Test : Test_Case'Class) return Count_Type;
          --  Count of registered routines in test case
+
    end Registration;
+
+   generic
+      type Specific_Test_Case is new Test_Case with private;
+   package Specific_Test_Case_Registration is
+         --  Specific Test Case registration
+
+      type Specific_Test_Routine is access procedure
+        (Test : in out Specific_Test_Case'Class);
+
+      procedure Register_Wrapper
+        (Test    : in out Specific_Test_Case'Class;
+         Routine : Specific_Test_Routine;
+         Name    : String);
+      --  Add test routine for a specific test case
+   end Specific_Test_Case_Registration;
 
 private
 

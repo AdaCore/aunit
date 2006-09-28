@@ -25,44 +25,28 @@
 ------------------------------------------------------------------------------
 
 --  Test routine registration
+with Ada.Unchecked_Conversion;
 
 separate (AUnit_Framework.Tests.Test_Cases)
-package body Registration is
+package body Specific_Test_Case_Registration is
 
    ----------------------
-   -- Register_Routine --
+   -- Register_Wrapper --
    ----------------------
 
-   procedure Register_Routine
-     (Test    : in out Test_Case'Class;
-      Routine : Test_Routine;
+   procedure Register_Wrapper
+     (Test    : in out Specific_Test_Case'Class;
+      Routine : Specific_Test_Routine;
       Name    : String) is
 
-      Formatted_Name : Routine_String := (others => ' ');
-      Length : constant Natural := Name'Length;
-      Val : Routine_Spec;
-      use Routine_Lists;
+      function Conv is
+        new Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
 
    begin
-      if Length > Formatted_Name'Length then
-         Formatted_Name := Name
-           (Name'First .. Name'First + Formatted_Name'Length - 1);
-      else
-         Formatted_Name
-           (Formatted_Name'First .. Formatted_Name'First + Length - 1) := Name;
-      end if;
+      Registration.Register_Routine
+        (Test_Case'Class (Test),
+         Conv (Routine),
+         Name);
+   end Register_Wrapper;
 
-      Val  := (Routine, Formatted_Name);
-      Add_Routine (Test, Val);
-   end Register_Routine;
-
-   -------------------
-   -- Routine_Count --
-   -------------------
-
-   function Routine_Count (Test : Test_Case'Class) return Count_Type is
-   begin
-      return Routine_Lists.Length (Test.Routines);
-   end Routine_Count;
-
-end Registration;
+end Specific_Test_Case_Registration;
