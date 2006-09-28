@@ -106,8 +106,9 @@ package body Test_Test_Case is
    use AUnit.Test_Cases.Registration;
 
    procedure Register_Tests (T : in out The_Test_Case) is
-      procedure Register_Wrapper is
-        new AUnit.Test_Cases.Registration.Register_Wrapper (The_Test_Case);
+      package Register_Specific is
+        new AUnit.Test_Cases.Specific_Test_Case_Registration (The_Test_Case);
+      use Register_Specific;
    begin
       Register_Routine
         (T, Test_Register_Tests'Access, "Test Routine Registration");
