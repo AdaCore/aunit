@@ -5,7 +5,7 @@ with Ada_Containers; use Ada_Containers;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
-   use Assertions, Test_Suites, Test_Cases;
+   use Assertions, Test_Suites;
 
    S : aliased Test_Suite;
    R : aliased Result;
