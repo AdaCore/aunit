@@ -1,0 +1,108 @@
+How to port your tests from AUnit 1.5 to AUnit 2:
+------------------------------------------------
+
+Assuming that you are using the same run-time, here are the things that needs
+to be taken care of when porting your tests from AUnit 1.5 framework to AUnit 2
+
+* Providing a AUnit package:
+With AUnit now supporting constrained run-times, all AUnit internal types are
+now constrained. Technically, this means that the all AUnit Framework is now a
+generic package whose instantiation will provide the constraints. In order to
+port your tests from the previous AUnit framework, you will need first to
+instantiate the AUnit_Framework.Framework package. You can do it in a AUnit
+package: this will allow you to minimize the work that needs to be done on your
+tests.
+
+Example of instantiation:
+
+with AUnit_Framework.Framework;
+package AUnit is new AUnit_Framework.Framework
+  (Max_Tests_Per_Harness      => 50,
+   Max_Errors_Per_Harness     => 10,
+   Max_Failures_Per_Harness   => 30,
+   Max_Failure_Message_Size   => 150,
+   Max_Routines_Per_Test      => 50,
+   Test_Name_Size             => 30,
+   Routine_Name_Size          => 50);
+
+* Modifying the with and use clauses:
+All previous AUnit.xxx packages are now embedded in AUnit_Framework.Framework.
+As a result, you don't need (and can't) 'with' them directly in your code. For
+example, "with AUnit.Test_Suites; use AUnit.Test_Suites;" will now be an error.
+You should replace this with "with AUnit; use AUnit.Test_Suites;"
+
+* API modifications:
+The Test_Suite package has been modified to accept constrained types. The
+result is that the 'Name' function of the Test_Case object was returning an
+Ada.Strings.Unbounded.String_Access and now returns a Test_Results.Test_String
+type.
+
+Following is an example on how to change its implementation:
+
+function Name (T : List_Test_Case) return Ada.Strings.Unbounded.String_Access
+is
+begin
+   return new String'("My test case");
+end Name;
+
+Should be modified with AUnit 2:
+
+function Name (T : My_Test_Case) return AUnit.Test_Results.Test_String is
+begin
+   return Aunit.Test_Results.Format ("My test case");
+end Name;
+
+Automatisation:
+--------------
+
+Note that some of the changes described above can be automated by scripts.
+
+For example, changing the with clauses and modifying the Name function can be
+performed by the following sed script, that can be changed according to the way
+the tests are coded:
+----------------------------------
+from_aunit1_to_aunit2.sed
+----------------------------------
+#!/usr/bin/sed
+: first_with_clause
+s/with \(\([,][ ]*\)\?AUnit[^,;]*\)*/with AUnit/
+t following_with_clauses
+n
+b first_with_clause
+
+: following_with_clauses
+n
+s/with \(\([,][ ]*\)\?AUnit[^,;]*\)*; *//
+t following_with_clauses
+s/function Name/&/
+t function_Name_match
+b following_with_clauses
+
+: function_Name_match
+s/return .*String_Access/return AUnit.Test_Results.Test_String/
+t spec_matched
+n
+b function_Name_match
+
+: spec_matched
+s/;/&/
+T body_matched
+b end
+
+: body_matched
+s/ *end/&/
+t end
+s/new String[']/Aunit.Test_Results.Format /
+t end
+n
+b body_matched
+
+:end
+----------------------------------
+
+The script can be used by the following command to modify all files
+placed in src dir and copy the result in ../AUnit2_tests_repository/src:
+
+for f in `src/*.ad[bs]`; do
+  sed -f from_aunit1_to_aunit2.sed $f > ../AUnit2_tests_repository/$f;
+done
