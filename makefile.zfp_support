@@ -3,7 +3,7 @@ INSTALL	= /usr/gnat
 TARGET = native
 # TARGET can take the following values: native VXAEPPC VXAESIMNT
 
-TOOL_PREFIX := $(shell \
+TOOL_PREFIX = $(shell \
   if [ "$(TARGET)" == "native" ]; then \
     echo ""; \
   elif [ "$(TARGET)" == "VXAEPPC" ]; then \
@@ -12,13 +12,13 @@ TOOL_PREFIX := $(shell \
     echo "i586-wrs-vxworksae-"; \
   fi)
 
-GPRMAKE   := $(TOOL_PREFIX)gprmake
-GNATMAKE  := $(TOOL_PREFIX)gnatmake
-GNATCLEAN := $(TOOL_PREFIX)gnatclean
-RMDIR	  := rmdir
-MKDIR	  := mkdir -p
-RM	  := rm
-CP	  := cp -p
+GPRMAKE   = $(TOOL_PREFIX)gprmake
+GNATMAKE  = $(TOOL_PREFIX)gnatmake
+GNATCLEAN = $(TOOL_PREFIX)gnatclean
+RMDIR	  = rmdir
+MKDIR	  = mkdir -p
+RM	  = rm
+CP	  = cp -p
 
 I_INC  = $(INSTALL)/include/zfp_support
 I_LIB  = $(INSTALL)/lib/zfp_support
