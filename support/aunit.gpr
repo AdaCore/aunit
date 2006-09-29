@@ -1,0 +1,21 @@
+project AUnit is
+
+   type Runtime_Type is
+      ("full", "zfp", "cert", "kernel");
+   Runtime : Runtime_Type := external ("Runtime", "<RUNTIME>");
+
+   case Runtime is
+      when "full" =>
+         for Source_Dirs use ("../../include/aunit");
+         for Library_Dir use "../../lib/aunit";
+         for Library_Name use "aunit";
+      when others =>
+         for Source_Dirs use ("../../include/aunit-" & Runtime);
+         for Library_Dir use "../../lib/aunit-" & Runtime;
+         for Library_Name use "aunit-" & Runtime;
+   end case;
+   
+   for Library_Kind use "static";
+   for Externally_Built use "true";
+
+end AUnit;
