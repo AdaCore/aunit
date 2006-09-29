@@ -1,27 +1,27 @@
-INSTALL	:= /usr/gnat
+INSTALL	= /usr/gnat
 
 # Runtimes used to install
 # can take the values : full zfp cert kernel
-RUNTIME := full
-GPRMAKE := gprmake
-GNATMAKE := gnatmake
-GNATCLEAN := gnatclean
+RUNTIME   = full
+GPRMAKE   = gprmake
+GNATMAKE  = gnatmake
+GNATCLEAN = gnatclean
 
 # Install directories
 
-SUFFIX := $(shell \
+SUFFIX = $(shell \
   if [ "$(RUNTIME)" == "full" ]; then \
     echo ""; \
   else \
     echo -$(RUNTIME); \
   fi)
 
-I_INC   := $(INSTALL)/include/aunit$(SUFFIX)
-I_LIB   := $(INSTALL)/lib/aunit$(SUFFIX)
-I_GPR   := $(INSTALL)/lib/gnat
-I_TPL   := $(INSTALL)/share/examples/aunit
-I_DOC   := $(INSTALL)/share/doc/aunit
-I_PLG   := $(INSTALL)/share/gps/plug-ins
+I_INC   = $(INSTALL)/include/aunit$(SUFFIX)
+I_LIB   = $(INSTALL)/lib/aunit$(SUFFIX)
+I_GPR   = $(INSTALL)/lib/gnat
+I_TPL   = $(INSTALL)/share/examples/aunit
+I_DOC   = $(INSTALL)/share/doc/aunit
+I_PLG   = $(INSTALL)/share/gps/plug-ins
 
 INCLUDE_PATHS := $(shell \
   if [ "$(RUNTIME)" == "full" ]; then \
