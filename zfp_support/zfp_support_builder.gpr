@@ -1,0 +1,31 @@
+with "../aunit_env";
+
+project Zfp_Support_Builder is
+   --  Support lib for ZFP with a native platform
+
+   case AUnit_Env.Runtime is
+      when "zfp" =>
+         for Languages use ("c", "ada");
+         case AUnit_Env.Target is
+            when "native" =>
+               for Source_Dirs use ("src", "src/native");
+            when "VXAEPPC" | "VXAESIMNT" =>
+               for Source_Dirs use ("src", "src/vxworksae");
+         end case;
+         for Object_Dir use "obj";
+         for Library_Dir use "lib";
+         for Library_Name use "zfp_support";
+         for Library_Kind use "static";
+
+      when others =>
+         --  Empty project in case of other run-times
+         for Source_Dirs use ();
+         for Source_Files use ();
+
+   end case;
+
+   package Builder renames AUnit_Env.Builder;
+   package IDE renames AUnit_Env.IDE;
+
+end Zfp_Support_Builder;
+
