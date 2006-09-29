@@ -1,0 +1,16 @@
+project Zfp_Support is
+   --  Support lib for ZFP with a native platform
+
+   for Languages use ("c", "ada");
+   for Source_Dirs use ("../../include/zfp_support");
+   for Library_Dir use "../../lib/zfp_support";
+   for Library_Name use "zfp_support";
+   for Library_Kind use "static";
+   for Externally_Built use "true";
+
+   package Linker is
+      for Linker_Options use ("-lgnat", "-lzfp_support");
+   end Linker;
+
+end Zfp_Support;
+
