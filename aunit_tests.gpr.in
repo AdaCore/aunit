@@ -1,0 +1,26 @@
+with "aunit";
+with "aunit_env";
+<zfp_support>
+
+project AUnit_Tests is
+
+        for Languages use ("Ada");
+        for Main use ("aunit_harness.adb");
+        for Source_Dirs use ("test");
+        for Exec_Dir use "./";
+
+        for Object_Dir use "obj";
+
+        package Builder renames AUnit_Env.Builder;
+        package Compiler renames AUnit_Env.Compiler;
+        package IDE renames AUnit_Env.IDE;
+
+        package Binder is
+                for Default_Switches ("ada") use ("-E", "-static");
+        end Binder;
+
+        package Linker is
+           for Default_Switches ("ada") use ("-g");
+        end Linker;
+
+end AUnit_Tests;

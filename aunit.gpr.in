@@ -1,0 +1,43 @@
+with "aunit_env";
+<zfp_support>
+
+project AUnit is
+
+   case AUnit_Env.Runtime is
+      when "zfp" =>
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/zfp",
+                              "aunit/framework/cert",
+                              "aunit/containers");
+      when "cert" =>
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/cert",
+                              "aunit/framework/native",
+                              "aunit/containers");
+      when others =>
+         for Source_Dirs use ("aunit/framework",
+                              "aunit/text_reporter",
+                              "aunit/framework/native",
+                              "aunit/containers");
+   end case;
+
+   case AUnit_Env.Runtime is
+      when "full" =>
+         for Object_Dir use "aunit/obj";
+         for Library_Dir use "aunit/lib";
+         for Library_Name use "aunit";
+      when others =>
+         for Object_Dir use "aunit/obj-" & AUnit_Env.Runtime;
+         for Library_Dir use "aunit/lib-" & AUnit_Env.Runtime;
+         for Library_Name use "aunit-" & AUnit_Env.Runtime;
+   end case;
+
+   package Builder renames AUnit_Env.Builder;
+   package Compiler renames AUnit_Env.Compiler;
+   package IDE renames AUnit_Env.IDE;
+
+   for Library_Kind use "static";
+
+end AUnit;
