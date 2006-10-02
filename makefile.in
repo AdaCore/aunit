@@ -78,7 +78,7 @@ test: aunit_tests.gpr
 	$(GNATMAKE) -Paunit_tests
 	./aunit_harness
 
-zfp: setup
+zfp:
 	$(MKDIR) aunit/obj
 	$(MKDIR) aunit/lib
 	echo "with \"zfp_support\"; \
@@ -86,7 +86,7 @@ zfp: setup
 	cat aunit.gpr | sed -e 's/AUnit/AUnit_zfp/' >> aunit_zfp.gpr
 	${MAKE} SUPPORT_EXCEPTION=no SUPPORT_CALENDAR=no build_zfp
 
-build_zfp:
+build_zfp: setup
 	$(GNATMAKE) -Paunit_zfp
 
 RMDIR	= rmdir
