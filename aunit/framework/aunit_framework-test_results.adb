@@ -297,9 +297,9 @@ package body AUnit_Framework.Test_Results is
    begin
       R.Tests_Run    := 0;
       R.Elapsed_Time := Time_Measure.Null_Time;
-      R.Errors_List.Clear;
-      R.Failures_List.Clear;
-      R.Successes_List.Clear;
+      Error_Lists.Clear (R.Errors_List);
+      Failure_Lists.Clear (R.Failures_List);
+      Success_Lists.Clear (R.Successes_List);
    end Clear;
 
 end AUnit_Framework.Test_Results;
