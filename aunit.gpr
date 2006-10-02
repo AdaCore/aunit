@@ -1,0 +1,20 @@
+project AUnit is
+
+   for Source_Dirs use ("aunit/include");
+   for Object_Dir use "aunit/obj";
+   for Library_Dir use "aunit/lib";
+   for Library_Name use "aunit";
+
+   package Builder is
+      for Default_Switches ("ada") use
+        ("-g", "-gnatQ");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use
+        ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+   end Compiler;
+
+   for Library_Kind use "static";
+
+end AUnit;
