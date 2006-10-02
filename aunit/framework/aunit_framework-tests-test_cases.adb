@@ -27,7 +27,7 @@
 --  Test cases
 package body AUnit_Framework.Tests.Test_Cases is
 
-   The_Current_Test_Case : access Test_Case'Class := null;
+   The_Current_Test_Case : Test_Case_Access := null;
 
    package body Registration is separate;
    package body Specific_Test_Case_Registration is separate;
@@ -52,7 +52,7 @@ package body AUnit_Framework.Tests.Test_Cases is
    -- Current_Test_Case --
    -----------------------
 
-   function Current_Test_Case return access Test_Case'Class is
+   function Current_Test_Case return Test_Case_Access is
    begin
       return The_Current_Test_Case;
    end Current_Test_Case;
@@ -119,7 +119,7 @@ package body AUnit_Framework.Tests.Test_Cases is
       C := First (Test.Routines);
 
       while Has_Element (C) loop
-         The_Current_Test_Case := Test;
+         The_Current_Test_Case := Test_Case_Access (Test);
          Run_Routine (Test, Element (C), R);
          Next (C);
       end loop;

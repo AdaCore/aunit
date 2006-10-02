@@ -77,7 +77,7 @@ package AUnit_Framework.Tests.Test_Cases is
    procedure Tear_Down_Case (Test : in out Test_Case);
    --  Tear down performed after each test case
 
-   function Current_Test_Case return access Test_Case'Class;
+   function Current_Test_Case return Test_Case_Access;
    --  The running test case
 
    package Registration is
