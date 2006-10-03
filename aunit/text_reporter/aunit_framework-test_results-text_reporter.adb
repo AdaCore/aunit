@@ -190,12 +190,21 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
             Exp := Exp - 1;
          end loop;
 
-         Val := Integer (T);
+         --  Integer (T - 0.5) is equivalent to Float'Floor, but works
+         --  with durations !
+         Val := Integer (T - 0.5);
          T := (T - Duration (Val)) * 1000.0;
-         Dec := Integer (T);
+         Dec := Integer (T - 0.5);
          Put ("Time: ");
          Put (Val);
          Put (",");
+
+         if Dec < 10 then
+            Put ("00");
+         elsif Dec < 100 then
+            Put ("0");
+         end if;
+
          Put (Dec);
 
          if Exp /= 0 then
