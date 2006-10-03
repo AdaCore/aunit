@@ -73,7 +73,7 @@ install: install_dirs
 doc:
 	${MAKE} -C docs
 
-test: aunit_tests.gpr
+test:
 	-$(MKDIR) obj
 	$(GNATMAKE) -Paunit_tests
 	./aunit_harness
@@ -84,10 +84,24 @@ zfp:
 	echo "with \"zfp_support\"; \
 " > aunit_zfp.gpr
 	cat aunit.gpr | sed -e 's/AUnit/AUnit_zfp/' >> aunit_zfp.gpr
-	${MAKE} SUPPORT_EXCEPTION=no SUPPORT_CALENDAR=no build_zfp
+	${MAKE} SUPPORT_EXCEPTION=no \
+		SUPPORT_CALENDAR=no \
+		GNATMAKE="$(GNATMAKE) --RTS=zfp" \
+		build_zfp
 
 build_zfp: setup
-	$(GNATMAKE) --RTS=zfp -Paunit_zfp
+	$(GNATMAKE) -Paunit_zfp
+
+install_zfp: install_dirs install
+	echo "with \"zfp_support\"; \
+" > $(I_GPR)/aunit.gpr
+	cat support/aunit.gpr >> $(I_GPR)/aunit.gpr
+
+test_zfp:
+	sed -e 's/with "aunit"/with "aunit_zfp"/' -e 's/AUnit_Tests/AUnit_Tests_ZFP/' aunit_tests.gpr > aunit_tests_zfp.gpr
+	-$(MKDIR) obj
+	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp -cargs -gnateDNO_EXCEPTION
+	./aunit_harness
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
