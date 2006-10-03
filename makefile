@@ -87,7 +87,7 @@ zfp:
 	${MAKE} SUPPORT_EXCEPTION=no SUPPORT_CALENDAR=no build_zfp
 
 build_zfp: setup
-	$(GNATMAKE) -Paunit_zfp
+	$(GNATMAKE) --RTS=zfp -Paunit_zfp
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
