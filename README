@@ -2,7 +2,7 @@
 AUnit 2.01 README
 3 October 2006
 
-This is a major update release of the Ada unit test framework AUnit, derived 
+This is a major update release of the Ada unit test framework AUnit, derived
 from the JUnit framework for Java.  Read AUnit.html for usage.
 
 
@@ -26,6 +26,16 @@ Extract the archive into <build-dir>.
 
    $ make test
 
+* ZFP support library:
+
+   AUnit for a ZFP GNAT run-time requires a support library implementing a
+   last chance handler, and providing Gnat.IO package. To build and install
+   this support library:
+
+   $ cd <build-dir>
+   $ make -f makefile.zfp_support
+   $ make -f makefile.zfp_support INSTALL=<gnat-root> install
+
 * To build and install AUnit for a ZFP GNAT run-time:
 
    $ cd <build-dir>
@@ -37,7 +47,7 @@ Extract the archive into <build-dir>.
    $ make test-zfp
 
 Currently AUnit is written to work with the open source GNAT Ada compilation
-system.  To that end, GNAT project files have been provided.  For other 
+system.  To that end, GNAT project files have been provided.  For other
 compilation systems, the sources in aunit/* must be made accessible
 to the compilation system according to its conventions.
 
