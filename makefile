@@ -73,7 +73,9 @@ install: install_dirs
 doc:
 	${MAKE} -C docs
 
-test:
+force:
+
+test: force
 	-$(MKDIR) obj
 	$(GNATMAKE) -Paunit_tests
 	./aunit_harness
@@ -98,9 +100,8 @@ install_zfp: install_dirs install
 	cat support/aunit.gpr >> $(I_GPR)/aunit.gpr
 
 test_zfp:
-	sed -e 's/with "aunit"/with "aunit_zfp"/' -e 's/AUnit_Tests/AUnit_Tests_ZFP/' aunit_tests.gpr > aunit_tests_zfp.gpr
 	-$(MKDIR) obj
-	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp -cargs -gnateDNO_EXCEPTION
+	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp -cargs
 	./aunit_harness
 
 RMDIR	= rmdir
