@@ -1,8 +1,8 @@
 
-AUnit 1.04 README
-3 November 2005
+AUnit 2.01 README
+3 October 2006
 
-This is a minor update release of the Ada unit test framework AUnit, derived 
+This is a major update release of the Ada unit test framework AUnit, derived 
 from the JUnit framework for Java.  Read AUnit.html for usage.
 
 
@@ -11,16 +11,13 @@ Installation:
 
 Unzip the archive into <build-dir>.
 
-* To build AUnit:
+* To build and install AUnit for a full Ada run-time:
 
    $ cd <build-dir>
    $ make
-
-* To install AUnit:
-
    $ make INSTALL=<gnat-root> install
 
-   Where <gnat-root> is for example /opt/gnatpro/5.03a1
+   Where <gnat-root> is for example /opt/gnatpro/5.04a1
 
    At this point AUnit will be automatically available. It is just required to
    with the "aunit" project into the application project.
@@ -29,75 +26,20 @@ Unzip the archive into <build-dir>.
 
    $ make test
 
-The output should be:
+* To build and install AUnit for a ZFP GNAT run-time:
 
-   Total Tests Run:  24
+   $ cd <build-dir>
+   $ make zfp
+   $ make INSTALL=<gnat-root> install-zfp
 
-   Successful Tests: 24
+* To test AUnit in ZFP mode:
 
-   Failed Tests: 0
-
-   Unexpected Errors: 0
-
-
-Directories contain the following:
-----------------------------------
-
-aunit      - Top-level: includes README etc, a GNAT project file for
-             AUnit, and a GNAT project file for the AUnit tests
-aunit/*    - The framework and a simple text mode reporter of results
-template/* - Templates for unit tests and a test harness, and for a GNAT 
-	     project file.
-tests/*    - A set of unit tests for testing the framework itself
+   $ make test-zfp
 
 Currently AUnit is written to work with the open source GNAT Ada compilation
 system.  To that end, GNAT project files have been provided.  For other 
-compilation systems, the sources in aunit-1.03/aunit/* must be made accessible
+compilation systems, the sources in aunit/* must be made accessible
 to the compilation system according to its conventions.
 
-
-Switches:
-
-Any test harness using AUnit.Test_Results.Text_Reporter can be invoked with
-the following command syntax:
-
-test_harness [ -v | -V ]
-
--v : Verbose mode.  Lists all tests executed.  When not specified, only failed
-     and error tests are listed.
-
-Changes:
-1.04	1. Cleaned up sources to conform to GNAT style conventions and to
-        eliminate warnings.
-
-	2. Adjusted build scripts to install into <gnat-root>/lib/gnat
-
-1.03    1. Handling of exceptions in Set_Up and Tear_Down implemented.
-        D603-009.
-
-1.02    1. Added GNAT project files (*.gpr).
-
-	2. Added routines Set_Up_Case and Tear_Down_Case to AUnit.Test_Cases
-	to support fixture maintenance needed before and after the execution
-	of the full sequence of test routines.
-
-1.01	1. Added Test_Case'Class parameter to test routines, allowing access to
-	Test_Case per-instance data.  This may be useful for derived Test_Case
-	instances, as an alternative to using global package body data.
-
-	2. Changed the profile of AUnit.Test_Runner to:
-		procedure AUnit.Test_Runner (Timed : Boolean := True);
-	This allows suppression of timing reporting so that the output
-	of running a harness can be identical across runs.  Useful for
-	scripted regression tests, where the output of a harness run is
-	compared against a reference file.
-
-	3. Implemented remaining memory management for the framework.  There
-	should be no memory leaks now (checked with gnatmem).
-
-	4. Corrected error in AUnit.Lists.Put_Right, where the list wasn't
-	being chained correctly.
-
-	5. Added Set_Up and Tear_Down routines to AUnit.Lists tests.
 
 Maintainer: Ed Falis (falis@adacore.com)
