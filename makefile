@@ -89,17 +89,17 @@ zfp:
 	${MAKE} SUPPORT_EXCEPTION=no \
 		SUPPORT_CALENDAR=no \
 		GNATMAKE="$(GNATMAKE) --RTS=zfp" \
-		build_zfp
+		build-zfp
 
-build_zfp: setup
+build-zfp: setup
 	$(GNATMAKE) -Paunit_zfp
 
-install_zfp: install_dirs install
+install-zfp: install_dirs install
 	echo "with \"zfp_support\"; \
 " > $(I_GPR)/aunit.gpr
 	cat support/aunit.gpr >> $(I_GPR)/aunit.gpr
 
-test_zfp:
+test-zfp:
 	-$(MKDIR) obj
 	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp
 	./aunit_harness
