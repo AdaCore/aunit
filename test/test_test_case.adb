@@ -84,7 +84,6 @@ package body Test_Test_Case is
    is
    begin
       Test_Multiple_Failures (T);
-      raise Constraint_Error;
 
    end Test_Multiple_Failures_Wrapper;
 
@@ -94,6 +93,8 @@ package body Test_Test_Case is
    begin
       Dummy := Assert (False, "expected failure 1");
       Assert (False, "expected failure 2");
+      Assert (False,
+              "* UNEXPECTED FAILURE * except in 'no exception' run-time case");
    end Test_Multiple_Failures;
 
    --  Exclude when run-time library does not support exception handling
@@ -122,16 +123,16 @@ package body Test_Test_Case is
       Register_Routine
         (T, Test_Run'Access, "Test Run");
 
-      --  Exclude when run-time library does not support exception handling
       Register_Wrapper
         (T,
          Test_Multiple_Failures_Wrapper'Access,
          "Test for two failed assertions");
 
       --  Exclude when run-time library does not support exception handling
+      #if not NO_EXCEPTION'Defined
       Register_Routine
         (T, Test_Exceptions'Access, "Test Exceptions - * Error Expected *");
-
+      #end if;
    end Register_Tests;
 
    --  Identifier of test case:
