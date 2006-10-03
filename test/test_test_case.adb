@@ -98,10 +98,8 @@ package body Test_Test_Case is
    end Test_Multiple_Failures;
 
    --  Exclude when run-time library does not support exception handling
-   procedure Test_Exceptions (T : in out Test_Cases.Test_Case'Class) is
-   begin
-      raise Constraint_Error;
-   end Test_Exceptions;
+   procedure Test_Exceptions (T : in out Test_Cases.Test_Case'Class)
+   is separate;
 
    --  Register test routines to call:
    use AUnit.Test_Cases.Registration;
@@ -129,10 +127,8 @@ package body Test_Test_Case is
          "Test for two failed assertions");
 
       --  Exclude when run-time library does not support exception handling
-      #if not NO_EXCEPTION'Defined
       Register_Routine
         (T, Test_Exceptions'Access, "Test Exceptions - * Error Expected *");
-      #end if;
    end Register_Tests;
 
    --  Identifier of test case:
