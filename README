@@ -9,7 +9,7 @@ from the JUnit framework for Java.  Read AUnit.html for usage.
 Installation:
 -------------
 
-Unzip the archive into <build-dir>.
+Extract the archive into <build-dir>.
 
 * To build and install AUnit for a full Ada run-time:
 
