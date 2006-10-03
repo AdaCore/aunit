@@ -1,9 +1,9 @@
 
 AUnit 2.01 README
-3 October 2006
+October 3, 2006
 
 This is a major update release of the Ada unit test framework AUnit, derived
-from the JUnit framework for Java.  Read AUnit.html for usage.
+from the JUnit framework for Java.  Read docs/aunit.html for usage.
 
 
 Installation:
