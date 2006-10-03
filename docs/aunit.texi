@@ -166,9 +166,9 @@ something, here is what you do:
 
 @enumerate
 
-@item Instantiate @code{AUnit_Framework.Framework} to parameterize 
+@item Instantiate @code{AUnit_Framework.Framework} to parameterize
 the test framework.  Since restricted run-time profiles do not support
-dynamic memory management without customization, tables of information 
+dynamic memory management without customization, tables of information
 used for reporting test results and for manipulating tests must be statically
 sized. In this document, we will call this instantiation @code{@b{AUnit}}
 in both code samples and text. When referring to this user-instantiated
@@ -198,11 +198,11 @@ end if;}
 Note that in AUnit 2 the procedural form of @code{Assert} will have different
 behavior depending on whether the underlying Ada run-time library supports
 exception handling. If exception handling is supported, a failed assertion
-will cause the execution of the calling test routine to be abandoned. 
+will cause the execution of the calling test routine to be abandoned.
 If exception handling is not supported, a failed assertion will not do this:
-the calling test routine will continue executing.  This behavior is determined
-by the @i{aunit_env.gpr} project file, which selects the behavior based on the
-value of the @code{Runtime} scenario variable.  The first behavior is
+the calling test routine will continue executing.  This behavior is selected
+by the @code{SUPPORT_EXCEPTION} variable in the @i{makefile} file, during
+AUnit compilation. The first behavior is
 identical to that of AUnit 1 for backward compatibility.  The functional
 form of @code{Assert} always continues on a failed assertion, and provides you
 with a choice of behaviors.  This form allows writing test routines that are
@@ -335,7 +335,7 @@ The package body is:
        @b{X, Y : Some_Currency;}
    begin
       @b{X := 12; Y := 14;}
-      @b{Assert (T'Access, X + Y = 26, "Addition is incorrect");}
+      @b{Assert (X + Y = 26, "Addition is incorrect");}
    end @b{Test_Simple_Add};
 
    -- Register test routines to call
@@ -352,7 +352,7 @@ The package body is:
 
    function Name (@b{T}: @b{Money_Test}) return Test_String is
    begin
-      return Format (@b{"Money Tests"});   
+      return Format (@b{"Money Tests"});
    end Name;
 
 end @b{Money_Tests};}
@@ -474,7 +474,7 @@ The body becomes:
    -- Identifier of test case
    function Name (@b{T}: @b{Money_Test}) return Test_String is
    begin
-      return Format (@b{"Money Tests"});   
+      return Format (@b{"Money Tests"});
    end Name;
 
 end @b{Money_Tests};}
@@ -653,7 +653,7 @@ wrapper routines for each primitive test routine of the parent type that
 we anticipate may be overridden. Instead of registering the parent's
 overridable primitive operations directly using @code{Register_Routine},
 we register the wrapper using @code{Register_Wrapper}. This latter routine
-is exported by instantiating 
+is exported by instantiating
 @code{@b{AUnit}.Test_Cases.Specific_Test_Case_Registration} with the actual
 parameter being the parent test case type.
 
@@ -751,7 +751,7 @@ package body @b{Child_Tests} is
 
    procedure Register_Tests (@b{C} : in out @b{Child_Test}) is
 
-      package @b{Register_Specific} is 
+      package @b{Register_Specific} is
          new Test_Cases.Specific_Test_Case_Registration (@b{Child_Test});
       use @b{Register_Specific};
 
@@ -812,7 +812,7 @@ package @b{Template_Tests} is
 
    function Name (@b{T} : @b{Template_Test}) return Test_String;
    procedure Register_Tests (@b{T} : in out @b{Template_Test});
-   
+
    --  Declare test routines
 
 private
@@ -937,7 +937,7 @@ tasks):
  Max Error :  1.36508677850804E-10
 
    Unexpected Errors: 0}
-   
+
 @c ======================================================================
 
 @node Migrating Tests from AUnit 1 to AUnit 2
@@ -1089,7 +1089,9 @@ is a run-time library unit it must be compiled with the gnatmake ``-a''
 switch.
 
 @item
-The application under test or the tests themselves  must export symbol 
+The AUnit framework has been modified so that no call the the secondary
+stack is performed. However, if the unit under test, or the tests themselves
+require use of the secondary stack, then the test suite must export symbol
 @code{__gnat_get_secondary_stack}. This is not actually used unless the
 application or unit tests require the secondary stack, in which case it must
 be fully implemented.
@@ -1098,7 +1100,14 @@ be fully implemented.
 Failed assertions do not abandon execution of the calling test routine in
 ZFP profiles that do not support exception propagation. A functional form of
 the @code{Assert} subprogram allows the calling routine to determine whether
-to continue or abandon its further execution.
+to continue or abandon its further execution. This behavior is selected during
+compilation when the @i{makefile}'s @code{SUPPORT_EXCEPTION} variable is set
+to @code{no}.
+
+@item
+The timed parameter of the Harness @code{Run} routine has no effect when used
+with the ZFP profile. This behavior is selected during compilation when the
+@i{makefile}'s @code{SUPPORT_CALENDAR} variable is set to @code{no}.
 @end enumerate
 
 @node Installation and Use
