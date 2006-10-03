@@ -16,7 +16,7 @@ project AUnit_Tests is
 
    package Compiler is
       for Default_Switches ("ada") use
-        ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+        ("-O1", "-gnatf", "-gnato", "-gnatwae");
    end Compiler;
 
    package Binder is
