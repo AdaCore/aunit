@@ -44,14 +44,14 @@ package body AUnit_Framework.Time_Measure is
       T.Stop := Ada.Calendar.Clock;
    end Stop_Measure;
 
-   -----------
-   -- Print --
-   -----------
+   -----------------
+   -- Get_Measure --
+   -----------------
 
-   function Print (T : in Time) return String is
+   function Get_Measure (T : in Time) return Duration is
       use type Ada.Calendar.Time;
    begin
-      return Duration'Image (T.Stop - T.Start);
-   end Print;
+      return T.Stop - T.Start;
+   end Get_Measure;
 
 end AUnit_Framework.Time_Measure;

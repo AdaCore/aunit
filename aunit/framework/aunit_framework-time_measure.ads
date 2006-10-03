@@ -42,7 +42,7 @@ package AUnit_Framework.Time_Measure is
    procedure Stop_Measure (T : in out Time);
    --  Stop the measure
 
-   function Print (T : in Time) return String;
-   --  Print the measure
+   function Get_Measure (T : in Time) return Duration;
+   --  Get the measure
 
 end AUnit_Framework.Time_Measure;

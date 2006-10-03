@@ -138,6 +138,10 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       E : Error_Lists.List (Count_Type (Errors_Range'Last));
       F : Failure_Lists.List (Count_Type (Failures_Range'Last));
       S : Success_Lists.List (Count_Type (Successes_Range'Last));
+      T : Duration;
+      Exp : Integer;
+      Dec : Integer;
+      Val : Integer;
    begin
       Put_Line ("--------------------");
       New_Line;
@@ -173,7 +177,33 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
 
       if Elapsed  (R) /= Time_Measure.Null_Time then
          New_Line;
-         Put_Line ("Time: " & Print (Elapsed (R)) & " seconds");
+         T := Get_Measure (Elapsed (R));
+         Exp := 0;
+
+         while T >= 10.0 loop
+            T := T / 10.0;
+            Exp := Exp + 1;
+         end loop;
+
+         while T < 1.0 loop
+            T := T * 10.0;
+            Exp := Exp - 1;
+         end loop;
+
+         Val := Integer (T);
+         T := (T - Duration (Val)) * 1000.0;
+         Dec := Integer (T);
+         Put ("Time: ");
+         Put (Val);
+         Put (",");
+         Put (Dec);
+
+         if Exp /= 0 then
+            Put ("E");
+            Put (Exp);
+         end if;
+
+         Put_Line (" seconds");
       end if;
    end Report;
 

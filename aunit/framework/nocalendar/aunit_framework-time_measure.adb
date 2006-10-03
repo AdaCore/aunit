@@ -46,14 +46,14 @@ package body AUnit_Framework.Time_Measure is
       null;
    end Stop_Measure;
 
-   -----------
-   -- Print --
-   -----------
+   -----------------
+   -- Get_Measure --
+   -----------------
 
-   function Print (T : in Time) return String is
+   function Get_Measure (T : in Time) return Duration is
       pragma Unreferenced (T);
    begin
-      return "";
-   end Print;
+      return 0.0;
+   end Get_Measure;
 
 end AUnit_Framework.Time_Measure;
