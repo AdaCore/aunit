@@ -101,7 +101,7 @@ install_zfp: install_dirs install
 
 test_zfp:
 	-$(MKDIR) obj
-	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp -cargs
+	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp
 	./aunit_harness
 
 RMDIR	= rmdir
