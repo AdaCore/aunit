@@ -1,12 +1,25 @@
 INSTALL	= /usr/gnat
-
-GNATMAKE  = gnatmake
-GNATCLEAN = gnatclean
+RUNTIME = 
+TOOL_PREFIX =
 
 # tell wether the runtime supports the exceptions
 SUPPORT_EXCEPTION = yes
 # tell wether the runtime supports Ada.Calendar
 SUPPORT_CALENDAR = yes
+
+ifeq ($(TOOL_PREFIX),)
+   GNATMAKE  = gnatmake
+   GNATCLEAN = gnatclean
+else
+   GNATMAKE  = $(TOOL_PREFIX)-gnatmake
+   GNATCLEAN = $(TOOL_PREFIX)-gnatclean
+endif
+
+ifeq ($(RUNTIME),)
+   ADA_FLAGS =
+else
+   ADA_FLAGS = --RTS=$(RUNTIME)
+endif
 
 # Install directories
 
@@ -20,7 +33,7 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 all: setup
 	$(MKDIR) aunit/obj
 	$(MKDIR) aunit/lib
-	$(GNATMAKE) -Paunit
+	$(GNATMAKE) $(ADA_FLAGS) -Paunit
 
 setup:
 	$(MKDIR) aunit/include
@@ -77,7 +90,7 @@ force:
 
 test: force
 	-$(MKDIR) obj
-	$(GNATMAKE) -Paunit_tests
+	$(GNATMAKE) $(ADA_FLAGS) -Paunit_tests
 	./aunit_harness
 
 zfp:
