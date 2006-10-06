@@ -1,7 +1,6 @@
 INSTALL	= /usr/gnat
 RUNTIME = 
 TOOL_PREFIX =
-
 # tell wether the runtime supports the exceptions
 SUPPORT_EXCEPTION = yes
 # tell wether the runtime supports Ada.Calendar
@@ -52,13 +51,16 @@ setup:
 clean:
 	-$(GNATCLEAN) -Paunit
 	-$(GNATCLEAN) -Paunit_tests
+	-$(GNATCLEAN) -Paunit_tests_zfp
+	-$(GNATCLEAN) -Pzfp_support/zfp_support
 	-$(RM) aunit/include/*
 	-$(RMDIR) aunit/include
 	-$(RMDIR) aunit/obj
 	-$(RMDIR) aunit/lib
 	-$(RMDIR) obj
+	-$(RMDIR) zfp_support/obj
+	-$(RMDIR) zfp_support/lib
 	-${MAKE} -C docs clean
-	-$(RM) aunit_zfp.gpr
 
 install_clean:
 	$(RM) -fr $(I_INC)
@@ -94,25 +96,17 @@ test: force
 	./aunit_harness
 
 zfp:
-	$(MKDIR) aunit/obj
-	$(MKDIR) aunit/lib
-	echo "with \"zfp_support\"; \
-" > aunit_zfp.gpr
-	cat aunit.gpr | sed -e 's/AUnit/AUnit_zfp/' >> aunit_zfp.gpr
 	${MAKE} SUPPORT_EXCEPTION=no \
 		SUPPORT_CALENDAR=no \
-		GNATMAKE="$(GNATMAKE) --RTS=zfp" \
-		build-zfp
+		IO_SUPPORT=none \
+		RUNTIME=zfp \
+		all
 
-build-zfp: setup
-	$(GNATMAKE) -Paunit_zfp
-
-install-zfp: install_dirs install
-	echo "with \"zfp_support\"; \
-" > $(I_GPR)/aunit.gpr
-	cat support/aunit.gpr >> $(I_GPR)/aunit.gpr
+install-zfp: install
 
 test-zfp:
+	-$(MKDIR) zfp_support/obj
+	-$(MKDIR) zfp_support/lib
 	-$(MKDIR) obj
 	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp
 	./aunit_harness

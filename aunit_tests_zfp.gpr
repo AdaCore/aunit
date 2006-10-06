@@ -1,4 +1,5 @@
-with "aunit_zfp";
+with "aunit";
+with "zfp_support/zfp_support";
 
 project Aunit_Tests_ZFP is
 

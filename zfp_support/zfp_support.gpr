@@ -1,12 +1,31 @@
 project Zfp_Support is
    --  Support lib for ZFP with a native platform
 
+   type Target_Type is ("native", "vxworks");
+   Target : Target_Type := External ("TARGET", "native");
+
    for Languages use ("c", "ada");
-   for Source_Dirs use ("../../include/zfp_support");
-   for Library_Dir use "../../lib/zfp_support";
+   case Target is
+      when "native" =>
+         for Source_Dirs use ("src", "src/native");
+      when "vxworks" =>
+         for Source_Dirs use ("src", "src/vxworksae");
+   end case;
+   
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
    for Library_Name use "zfp_support";
    for Library_Kind use "static";
-   for Externally_Built use "true";
+
+   package Builder is
+      for Default_Switches ("ada") use
+        ("-g", "-gnatQ", "--RTS=zfp");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use
+        ("-O1", "-gnatf", "-gnato");
+   end Compiler;
 
    package Linker is
       for Linker_Options use ("-lgnat", "-lzfp_support");
