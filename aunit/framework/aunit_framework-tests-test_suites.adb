@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 --  A collection of test cases
+with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Tests.Test_Suites is
 
    --------------
@@ -33,7 +34,30 @@ package body AUnit_Framework.Tests.Test_Suites is
 
    procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class) is
    begin
-      Append (S.Tests, Test_Access'(T.all'Unchecked_Access));
+      if Length (S.Tests) =  Count_Type (Max_Test_Cases_Per_Suite) then
+         if T.all in Test_Case'Class then
+            declare
+               Error_String       : constant String :=
+                                      " overflows Max_Tests_Per_Suite:";
+               Message            :
+                  String
+                    (1 ..
+                       Name (Test_Case'Class (T.all))'Length
+                     + Error_String'Length);
+            begin
+               Message (1 .. Name (Test_Case'Class (T.all))'Length) :=
+                 Name (Test_Case'Class (T.all));
+               Message
+                 (Name (Test_Case'Class (T.all))'Length + 1 .. Message'Last)
+                  := Error_String;
+               Put_Line (Message);
+            end;
+         else
+            Put_Line ("Max_Tests_Per_Suite overflowed when adding sub-suite");
+         end if;
+      else
+         Append (S.Tests, Test_Access'(T.all'Unchecked_Access));
+      end if;
    end Add_Test;
 
    ---------

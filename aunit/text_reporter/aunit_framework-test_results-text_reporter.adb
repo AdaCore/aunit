@@ -101,7 +101,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       begin
          Put ("      ");
          Put (String (Success.Test_Name));
-         Put (": ");
+         Put (" : ");
          Put_Line (Success.Routine_Name
            (Success.Routine_Name'First ..
                 Last_Index (Success.Routine_Name)));
@@ -225,7 +225,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       New_Line;
       Put ("      ");
       Put (String (Error.Test_Name));
-      Put (": ");
+      Put (" : ");
       Put_Line (Error.Routine_Name
         (Error.Routine_Name'First ..
              Last_Index (Error.Routine_Name)));

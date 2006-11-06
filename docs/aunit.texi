@@ -241,13 +241,13 @@ is a typical instantiation. User-specific text is in boldface.
 
 @AEXP{with AUnit_Framework.Framework;
 package @b{AUnit} is new AUnit_Framework.Framework
-  (Max_Tests_Per_Harness    => @b{50},
-   Max_Errors_Per_Harness   => @b{5},
-   Max_Failures_Per_Harness => @b{20},
-   Max_Failure_Message_Size => @b{150},
-   Max_Routines_Per_Test    => @b{50},
-   Test_Name_Size           => @b{30},
-   Routine_Name_Size        => @b{50});}
+  (Max_Exceptions_Per_Harness   => @b{5},
+   Max_Failures_Per_Harness     => @b{20},
+   Max_Failure_Message_Size     => @b{150},
+   Max_Routines_Per_Test_Case   => @b{50},
+   Max_Test_Cases_Per_Suite     => @b{50},
+   Max_Test_Name_Size           => @b{30},
+   Max_Routine_Description_Size => @b{50});}
 
 @noindent
 The term ``run'' in this discussion means the execution of a call to the
@@ -257,12 +257,8 @@ The term ``run'' in this discussion means the execution of a call to the
 The formal parameters of @code{AUnit_Framework.Framework} are:
 @itemize
 @item
-@i{Max_Tests_Per_Harness}: the maximum number of test routines that can be
-reported in a given run.  This includes all test routines of all test cases
-rooted in the top-level test suite for the run.
-
 @item
-@i{Max_Errors_Per_Harness}: the maximum number of unhandled exceptions
+@i{Max_Exceptions_Per_Harness}: the maximum number of unhandled exceptions
 that can be reported in test routines for a given run.
 
 @item
@@ -271,17 +267,22 @@ can be reported in the run.
 
 @item
 @i{Max_Failure_Message_Size}: the maximum length of a message describing an
-assertion failure.
+assertion failure or unhandled exception.
 
 @item
-@i{Max_Routines_Per_Test}: the maximum number of routines that can be part
+@i{Max_Routines_Per_Test_Case}: the maximum number of routines that can be part
 of any test case.
 
 @item
-@i{Test_Name_Size}: the largest size of any test case name.
+@i{Max_Test_Cases_Per_Suite}: the maximum number of test cases or subsuites
+that can be put into a suite.
 
 @item
-@i{Routine_Name_Size}: the largest size of any test routine description.
+@i{Max_Test_Name_Size}: the largest size of any test case name.
+
+@item
+@i{Max_Routine_Description_Size}: the largest size of any test routine
+description.
 
 @end itemize
 

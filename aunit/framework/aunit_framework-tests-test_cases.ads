@@ -29,7 +29,7 @@ with Ada_Containers_Restricted_Doubly_Linked_Lists;
 
 --  Test case: a collection of test routines
 generic
-   Max_Routines_Per_Test : Natural;
+   Max_Routines_Per_Test_Case : Natural;
    Max_Failures_Per_Harness : Natural;
    Max_Failure_Message_Size : Natural;
 package AUnit_Framework.Tests.Test_Cases is
@@ -113,7 +113,7 @@ private
    type Routine_Access is access all Routine_Spec;
    --  Test routine description
 
-   subtype Routine_Range is Natural range 1 .. Max_Routines_Per_Test;
+   subtype Routine_Range is Natural range 1 .. Max_Routines_Per_Test_Case;
 
    package Routine_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Routine_Spec);
@@ -129,7 +129,7 @@ private
    type Test_Case is abstract new Test with record
       Name     : Test_String;
       Routines : aliased Routine_Lists.List
-        (Count_Type (Max_Routines_Per_Test));
+        (Count_Type (Max_Routines_Per_Test_Case));
       Failures : aliased Message_Lists.List
         (Count_Type (Max_Failures_Per_Harness));
    end record;

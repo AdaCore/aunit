@@ -32,6 +32,7 @@ with Ada_Containers_Restricted_Doubly_Linked_Lists;
 --  A collection of test cases.
 generic
    with package Tests is new AUnit_Framework.Tests.Test_Cases (<>);
+   Max_Test_Cases_Per_Suite : Natural;
 package AUnit_Framework.Tests.Test_Suites is
 
    use Results, Tests;
@@ -50,7 +51,7 @@ private
    use Ada_Containers;
 
    subtype Test_Range is Count_Type range
-     Count_Type'(1) .. Count_Type (Max_Tests_Per_Harness);
+     Count_Type'(1) .. Count_Type (Max_Test_Cases_Per_Suite);
 
    package Test_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Test_Access);
@@ -58,7 +59,7 @@ private
    --  Containers for test cases and sub-suites
 
    type Test_Suite is new Test with record
-      Tests : aliased Test_Lists.List (Count_Type (Max_Tests_Per_Harness));
+      Tests : aliased Test_Lists.List (Count_Type (Max_Test_Cases_Per_Suite));
    end record;
 
 end AUnit_Framework.Tests.Test_Suites;

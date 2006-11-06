@@ -37,34 +37,42 @@ with AUnit_Framework.Tests.Test_Suites;
 --  provide a way to trade off between the number of messages, their size and
 --  the consequent memory requirements.
 generic
-   Max_Tests_Per_Harness : Positive;   --  Max test cases per harness
-   Max_Errors_Per_Harness : Natural;   --  Max unhandled exceptions per harness
-   Max_Failures_Per_Harness : Natural; --  Max assertion failures per harness
-   Max_Failure_Message_Size : Natural; --  Max size of a routine failure
-                                       --  message
-   Max_Routines_Per_Test : Natural;    --  Max routines per test case
-   Test_Name_Size : Natural;           --  Max size of a test case name
-   Routine_Name_Size : Natural;        --  Max size of a test routine
-                                       --  description
+   Max_Exceptions_Per_Harness : Natural;   --  Max unhandled exceptions per
+                                          --  harness
+   Max_Failures_Per_Harness : Natural;     --  Max assertion failures per
+                                          --  harness
+   Max_Failure_Message_Size : Natural;     --  Max size of a routine failure
+                                          --  message
+   Max_Routines_Per_Test_Case : Natural;   --  Max routines per test case
+   Max_Test_Cases_Per_Suite : Natural;     --  Max test cases per suite
+
+   Max_Test_Name_Size : Natural;           --  Max size of a test case name
+   Max_Routine_Description_Size : Natural; --  Max size of a test routine
+                                          --  description
 package AUnit_Framework.Framework is
+
+   Max_Routines_Per_Harness : constant Natural :=
+      Max_Routines_Per_Test_Case * Max_Test_Cases_Per_Suite;
+
    package Test_Results is
      new AUnit_Framework.Test_Results
-       (Max_Tests_Per_Harness,
-        Max_Errors_Per_Harness,
+       (Max_Routines_Per_Harness,
+        Max_Exceptions_Per_Harness,
         Max_Failures_Per_Harness,
         Max_Failure_Message_Size,
-        Test_Name_Size,
-        Routine_Name_Size);
+        Max_Test_Name_Size,
+        Max_Routine_Description_Size);
 
    package Tests is new AUnit_Framework.Tests (Test_Results);
    package Test_Cases is
      new Tests.Test_Cases
-       (Max_Routines_Per_Test,
+       (Max_Routines_Per_Test_Case,
         Max_Failures_Per_Harness,
         Max_Failure_Message_Size);
    package Assertions is new Test_Cases.Assertions;
 
-   package Test_Suites is new Tests.Test_Suites (Test_Cases);
+   package Test_Suites is
+     new Tests.Test_Suites (Test_Cases, Max_Test_Cases_Per_Suite);
 
    generic
       with function Suite return Test_Suites.Access_Test_Suite;

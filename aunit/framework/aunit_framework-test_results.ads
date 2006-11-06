@@ -36,12 +36,13 @@ with AUnit_Framework.Time_Measure;
 --  default). Since failure messages can be rather large, this allows tradeoffs
 --  between verbosity and memory requirements.
 generic
-   Max_Tests_Per_Harness : Positive;   --  Max test cases per harness
-   Max_Errors_Per_Harness : Natural;   --  Max unhandled exceptions per harness
-   Max_Failures_Per_Harness : Natural; --  Max failed routines per harness
-   Max_Failure_Message_Size : Natural; --  Max size of failure message
-   Test_Name_Size : Natural;           --  Max test case name size
-   Routine_Name_Size : Natural;        --  Max routine description size
+   Max_Routines_Per_Harness : Positive;   --  Max test cases per harness
+   Max_Exceptions_Per_Harness : Natural;  --  Max unhandled exceptions per
+                                          --  harness
+   Max_Failures_Per_Harness : Natural;    --  Max failed routines per harness
+   Max_Failure_Message_Size : Natural;    --  Max size of failure message
+   Max_Test_Name_Size : Natural;          --  Max test case name size
+   Max_Routine_Name_Size : Natural;       --  Max routine description size
 package AUnit_Framework.Test_Results is
 
    type Result is limited private;
@@ -49,8 +50,8 @@ package AUnit_Framework.Test_Results is
    --  Record result. A result object is associated with the execution of a
    --  top-level test suite.
 
-   subtype Test_String is String (1 .. Test_Name_Size);
-   subtype Routine_String is String (1 .. Routine_Name_Size);
+   subtype Test_String is String (1 .. Max_Test_Name_Size);
+   subtype Routine_String is String (1 .. Max_Routine_Name_Size);
    subtype Message_String is String (1 .. Max_Failure_Message_Size);
    --  Strings used for reporting results
 
@@ -72,14 +73,14 @@ package AUnit_Framework.Test_Results is
    use Ada_Containers;
 
    subtype Successes_Range is Count_Type
-      range 0 .. Count_Type (Max_Tests_Per_Harness);
+      range 0 .. Count_Type (Max_Routines_Per_Harness);
    package Success_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists
        (Test_Success);
    --  Containers for successes
 
    subtype Errors_Range is Count_Type
-      range 0 .. Count_Type (Max_Errors_Per_Harness);
+      range 0 .. Count_Type (Max_Exceptions_Per_Harness);
    package Error_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Test_Failure);
    --  Containers for unexpected exceptions

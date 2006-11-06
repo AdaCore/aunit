@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 --  Record test results.
+with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Test_Results is
 
    -----------------------
@@ -55,7 +56,23 @@ package body AUnit_Framework.Test_Results is
       use Error_Lists;
 
    begin
-      Append (R.Errors_List, Val);
+      if Length (R.Errors_List) =  Count_Type (Max_Exceptions_Per_Harness) then
+         declare
+            Error_String       : constant String :=
+                                   " overflows Max_Errors_Per_Harness:";
+            Error_Message      :
+               String (1 .. Test_Name'Length + Error_String'Length);
+         begin
+            Error_Message (1 .. Test_Name'Length) := Test_Name;
+            Error_Message (Test_Name'Length + 1 .. Error_Message'Last)
+              := Error_String;
+            Put_Line (Error_Message);
+            Put (Routine_Name); Put (": ");
+            Put_Line (Message);
+         end;
+      else
+         Append (R.Errors_List, Val);
+      end if;
    end Add_Error;
 
    -----------------
@@ -72,7 +89,23 @@ package body AUnit_Framework.Test_Results is
       use Failure_Lists;
 
    begin
-      Append (R.Failures_List, Val);
+      if Length (R.Failures_List) =  Count_Type (Max_Failures_Per_Harness) then
+         declare
+            Error_String       : constant String :=
+                                   " overflows Max_Failures_Per_Harness:";
+            Error_Message      :
+               String (1 .. Test_Name'Length + Error_String'Length);
+         begin
+            Error_Message (1 .. Test_Name'Length) := Test_Name;
+            Error_Message (Test_Name'Length + 1 .. Error_Message'Last)
+              := Error_String;
+            Put_Line (Error_Message);
+            Put (Routine_Name); Put (": ");
+            Put_Line (Message);
+         end;
+      else
+         Append (R.Failures_List, Val);
+      end if;
    end Add_Failure;
 
    -----------------
@@ -88,7 +121,21 @@ package body AUnit_Framework.Test_Results is
       use Success_Lists;
 
    begin
-      Append (R.Successes_List, Val);
+      if Length (R.Successes_List) = Count_Type (Max_Routines_Per_Harness) then
+         declare
+            Error_String : constant String :=
+               " overflows Max_Routines_Per_Harness (successful):";
+            Message      :
+              String (1 .. Test_Name'Length + Error_String'Length);
+         begin
+            Message (1 .. Test_Name'Length) := Test_Name;
+            Message (Test_Name'Length + 1 .. Message'Last) := Error_String;
+            Put_Line (Message);
+            Put_Line (Routine_Name);
+         end;
+      else
+         Append (R.Successes_List, Val);
+      end if;
    end Add_Success;
 
    -----------------
@@ -163,7 +210,9 @@ package body AUnit_Framework.Test_Results is
 
    begin
       if Length > Result'Length then
-         Result := Name (Name'First .. Name'First + Result'Length - 1);
+         Result (1 .. Result'Last - 3) :=
+           Name (Name'First .. Name'First + Result'Length - 4);
+         Result (Result'Last - 2 .. Result'Last) := "...";
       else
          Result (Result'First .. Result'First + Length - 1) := Name;
       end if;

@@ -45,8 +45,10 @@ package body Registration is
 
    begin
       if Length > Formatted_Name'Length then
-         Formatted_Name := Name
-           (Name'First .. Name'First + Formatted_Name'Length - 1);
+         Formatted_Name (Formatted_Name'First .. Formatted_Name'Last - 3)
+           := Name (Name'First .. Name'First + Formatted_Name'Length - 4);
+         Formatted_Name (Formatted_Name'Last - 2 .. Formatted_Name'Last) :=
+           "...";
       else
          Formatted_Name
            (Formatted_Name'First .. Formatted_Name'First + Length - 1) := Name;

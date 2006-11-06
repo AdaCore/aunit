@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 --  Test cases
+with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Tests.Test_Cases is
 
    The_Current_Test_Case : Test_Case_Access := null;
@@ -63,7 +64,20 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    procedure Add_Routine (T : in out Test_Case'Class; Val : Routine_Spec) is
    begin
-      Routine_Lists.Append (T.Routines, Val);
+      if Routine_Lists.Length (T.Routines) =
+        Count_Type (Max_Routines_Per_Test_Case) then
+         declare
+            Error_String : constant String :=
+               " has more routines than Max_Routines_Per_Test_Case";
+            Message      : String (1 .. Name (T)'Length + Error_String'Length);
+         begin
+            Message (1 .. Name (T)'Length) := Name (T);
+            Message (Name (T)'Length + 1 .. Message'Last) := Error_String;
+            Put_Line (Message);
+         end;
+      else
+         Routine_Lists.Append (T.Routines, Val);
+      end if;
    end Add_Routine;
 
    --------------------
@@ -75,8 +89,9 @@ package body AUnit_Framework.Tests.Test_Cases is
    begin
 
       if S'Length >= Message'Length then
-         Message :=
-           S (S'First .. S'First + Message'Length - 1);
+         Message (Message'First .. Message'Last - 3) :=
+           S (S'First .. S'First + Message'Length - 3);
+         Message (Message'Last - 2 .. Message'Last) := "...";
       else
          Message (1 .. S'Length) := S;
       end if;
@@ -102,7 +117,22 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    procedure Register_Failure (T : access Test_Case'Class; S : String) is
    begin
-      Message_Lists.Append (T.Failures, Format_Message (S));
+      if Message_Lists.Length (T.Failures) =
+        Count_Type (Max_Failures_Per_Harness) then
+         declare
+            Error_String : constant String :=
+               " routine failure overflows Max_Failures_Per_Harness:";
+            Message      :
+               String (1 .. Name (T.all)'Length + Error_String'Length);
+         begin
+            Message (1 .. Name (T.all)'Length) := Name (T.all);
+            Message (Name (T.all)'Length + 1 .. Message'Last) := Error_String;
+            Put_Line (Message);
+            Put_Line (S);
+         end;
+      else
+         Message_Lists.Append (T.Failures, Format_Message (S));
+      end if;
    end Register_Failure;
 
    ---------
