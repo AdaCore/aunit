@@ -278,11 +278,13 @@ of any test case.
 that can be put into a suite.
 
 @item
-@i{Max_Test_Name_Size}: the largest size of any test case name.
+@i{Max_Test_Name_Size}: the largest size of any test case name. If exceeded,
+the string is truncated and ``...'' is appended.
 
 @item
 @i{Max_Routine_Description_Size}: the largest size of any test routine
-description.
+description. If exceeded, the string is truncated and ``...'' is appended.
+
 
 @end itemize
 
