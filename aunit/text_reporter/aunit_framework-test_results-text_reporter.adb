@@ -197,7 +197,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
          Dec := Integer (T - 0.5);
          Put ("Time: ");
          Put (Val);
-         Put (",");
+         Put (".");
 
          if Dec < 10 then
             Put ("00");
