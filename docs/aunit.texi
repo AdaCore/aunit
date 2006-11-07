@@ -259,23 +259,31 @@ The formal parameters of @code{AUnit_Framework.Framework} are:
 @item
 @item
 @i{Max_Exceptions_Per_Harness}: the maximum number of unhandled exceptions
-that can be reported in test routines for a given run.
+that can be reported in test routines for a given run. If this value is
+exceeded, a warning is displayed and the exception is reported immediately
+rather than as part of the summary reporting.
 
 @item
 @i{Max_Failures_Per_Harness}: the maximum number of failed assertions that
-can be reported in the run.
+can be reported in the run.. If this value is exceeded, a warning is displayed
+and the exception is reported immediately rather than as part of the summary
+reporting.
 
 @item
 @i{Max_Failure_Message_Size}: the maximum length of a message describing an
-assertion failure or unhandled exception.
+assertion failure or unhandled exception. If this limit is exceeded, the
+message describing the failed assertion is truncated, and the string ``...''
+is appended to it.
 
 @item
 @i{Max_Routines_Per_Test_Case}: the maximum number of routines that can be part
-of any test case.
+of any test case. If this limit is exceeded, a warning is displayed and the
+routine in question is not added to the test case for execution.
 
 @item
 @i{Max_Test_Cases_Per_Suite}: the maximum number of test cases or subsuites
-that can be put into a suite.
+that can be put into a suite. If this limit is exceeded, a warning is displayed
+and the test case is not added to the suite for execution.
 
 @item
 @i{Max_Test_Name_Size}: the largest size of any test case name. If exceeded,
