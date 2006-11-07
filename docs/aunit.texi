@@ -257,7 +257,6 @@ The term ``run'' in this discussion means the execution of a call to the
 The formal parameters of @code{AUnit_Framework.Framework} are:
 @itemize
 @item
-@item
 @i{Max_Exceptions_Per_Harness}: the maximum number of unhandled exceptions
 that can be reported in test routines for a given run. If this value is
 exceeded, a warning is displayed and the exception is reported immediately
