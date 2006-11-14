@@ -60,7 +60,6 @@ IF '!GNATROOT!' == '' (
     GOTO SELECT_COMPILER
   )
 )
-
 SET GNATMAKE=
 SET GNATROOT=
 
@@ -94,6 +93,10 @@ IF %ERRORLEVEL% == 0 (
 )
 CD !OLD_PWD!
 :COMPILER_END
+
+REM We do not need GNATROOT.TXT anymore.
+DEL GNATROOT.TXT
+
 
 ECHO Using !GNATMAKE! to compile AUnit
 
@@ -203,13 +206,14 @@ ECHO *** BUILDING THE AUNIT LIBRARY ***
 ECHO **********************************
 ECHO.
 
-REM The two following mkdir are a workaround for missing gnatmake -p
+REM The following mkdirs are a workaround for missing gnatmake -p
 REM switch in versions prior to GNAT Pro 6.0.0
-MKDIR "%INSTALL%\lib\aunit
-MKDIR "%INSTALL%\include\aunit
+MKDIR "%INSTALL%"\lib\aunit 2> NUL
+MKDIR "%INSTALL%"\include\aunit 2> NUL
+MKDIR aunit\obj 2> NUL
 
-ECHO %GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
-%GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
+ECHO %GNATMAKE% %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
+%GNATMAKE% %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
 
 :INSTALL
 ECHO.
