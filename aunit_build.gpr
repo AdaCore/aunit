@@ -1,0 +1,55 @@
+project AUnit_Build is
+
+   type Yes_No_Type is ("yes", "no");
+   Exception_Support : Yes_No_Type := external ("SUPPORT_EXCEPTION", "yes");
+   Calendar_Support : Yes_No_Type := external ("SUPPORT_CALENDAR", "yes");
+
+   Install_Dir := external ("INSTALL_DIR", "./aunit");
+
+   for Source_Dirs use ("aunit/framework",
+                        "aunit/containers",
+                        "aunit/text_reporter");
+
+   case Exception_Support is
+      when "yes" =>
+         for Source_Dirs use project'Source_Dirs & "aunit/framework/exception";
+      when "no" =>
+         for Source_Dirs use project'Source_Dirs & "aunit/framework/noexception";
+   end case;
+
+   case Calendar_Support is
+      when "yes" =>
+         for Source_Dirs use project'Source_Dirs & "aunit/framework/calendar";
+      when "no" =>
+         for Source_Dirs use project'Source_Dirs & "aunit/framework/nocalendar";
+   end case;
+
+   for Object_Dir use "aunit/obj";
+   for Library_Dir use Install_Dir & "/lib/aunit";
+   for Library_Src_Dir use Install_Dir & "/include/aunit";
+   for Library_Name use "aunit";
+   for Library_Kind use "static";
+   for Library_Interface use
+     ("AUnit_Framework",
+      "AUnit_Framework.Framework",
+      "AUnit_Framework.Tests",
+      "AUnit_Framework.Tests.Test_Cases",
+      "AUnit_Framework.Tests.Test_Cases.Assertions",
+      "AUnit_Framework.Tests.Test_Suites",
+      "AUnit_Framework.Test_Results",
+      "AUnit_Framework.Test_Results.Text_Reporter",
+      "AUnit_Framework.Time_Measure",
+      "Ada_Containers",
+      "Ada_Containers_Restricted_Doubly_Linked_Lists");
+
+   package Builder is
+      for Default_Switches ("ada") use
+        ("-g", "-gnatQ");
+   end Builder;
+
+   package Compiler is
+      for Default_Switches ("ada") use
+        ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+   end Compiler;
+
+end AUnit_Build;

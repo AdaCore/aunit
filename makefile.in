@@ -1,10 +1,18 @@
 INSTALL	= /usr/gnat
-RUNTIME = 
+RUNTIME =
 TOOL_PREFIX =
 # tell wether the runtime supports the exceptions
 SUPPORT_EXCEPTION = yes
 # tell wether the runtime supports Ada.Calendar
 SUPPORT_CALENDAR = yes
+
+TEST_PROJECT = aunit_tests
+
+ifeq ($(RUNTIME),zfp)
+   SUPPORT_EXCEPTION = no
+   SUPPORT_CALENDAR = no
+   TEST_PROJECT = aunit_tests_zfp
+endif
 
 ifeq ($(TOOL_PREFIX),)
    GNATMAKE  = gnatmake
@@ -29,86 +37,61 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
-all: setup
-	$(MKDIR) aunit/obj
-	$(MKDIR) aunit/lib
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit
+GPR_FLAGS_INSTALL = -XINSTALL_DIR=$(INSTALL)
 
-setup:
-	$(MKDIR) aunit/include
-	$(CP) aunit/framework/*.ad[bs] aunit/include/
-	$(CP) aunit/text_reporter/*.ad[bs] aunit/include/
-	$(CP) aunit/containers/*.ad[bs] aunit/include/
-	@if [ "$(SUPPORT_EXCEPTION)" != "yes" ]; then \
-	  echo "* no support for exception *"; \
-	  $(CP) aunit/framework/noexception/*.ad[bs] aunit/include/; \
-	fi
-	@if [ "$(SUPPORT_CALENDAR)" != "yes" ]; then \
-	  echo "* no support for calendar *"; \
-	  $(CP) aunit/framework/nocalendar/*.ad[bs] aunit/include/; \
-	fi
+ifneq ($(SUPPORT_EXCEPTION),yes)
+   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=no
+else
+   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=yes
+endif
+
+ifneq ($(SUPPORT_CALENDAR),yes)
+   GPR_FLAGS_CALENDAR = -XSUPPORT_CALENDAR=no
+else
+   GPR_FLAGS_CALENDAR := -XSUPPORT_CALENDAR=yes
+endif
+
+GPR_FLAGS = $(GPR_FLAGS_INSTALL) $(GPR_FLAGS_EXCEPTION) $(GPR_FLAGS_CALENDAR)
+
+all:
+	$(MKDIR) $(I_INC)
+	$(MKDIR) $(I_LIB)
+	$(MKDIR) $(I_GPR)
+	$(MKDIR) aunit/obj
+	$(GNATMAKE) $(ADA_FLAGS) -Paunit_build $(GPR_FLAGS)
+	$(CP) support/aunit.gpr $(I_GPR)
 
 clean:
-	-$(GNATCLEAN) -Paunit
-	-$(GNATCLEAN) -Paunit_tests
-	-$(GNATCLEAN) -Paunit_tests_zfp
-	-$(GNATCLEAN) -Pzfp_support/zfp_support
-	-$(RM) aunit/include/*
-	-$(RMDIR) aunit/include
+	-$(GNATCLEAN) -f -r -Paunit_build $(GPR_FLAGS)
+	-$(GNATCLEAN) -f -r -P$(TEST_PROJECT) $(GPR_FLAGS)
+	$(RM) -fr $(I_INC)
+	$(RM) -fr $(I_LIB)
+	$(RM) -f $(I_GPR)/aunit.gpr
 	-$(RMDIR) aunit/obj
-	-$(RMDIR) aunit/lib
 	-$(RMDIR) obj
-	-$(RMDIR) zfp_support/obj
-	-$(RMDIR) zfp_support/lib
 	-${MAKE} -C docs clean
 
 install_clean:
-	$(RM) -fr $(I_INC)
-	$(RM) -fr $(I_LIB)
-	$(RM) -fr $(INSTALL)/share/examples/aunit
 	$(RM) -fr $(I_DOC)
-	$(RM) -f $(I_GPR)/aunit.gpr
+	$(RM) -fr $(I_TPL)
+	$(RM) -f $(I_PLG)/aunit.xml
 
-install_dirs: install_clean
-	$(MKDIR) $(I_INC)
-	$(MKDIR) $(I_LIB)
+install: install_clean all
 	$(MKDIR) $(I_DOC)
-	$(MKDIR) $(I_GPR)
 	$(MKDIR) $(I_TPL)
 	$(MKDIR) $(I_PLG)
-
-install: install_dirs
-	$(CP) aunit/include/* $(I_INC)
-	$(CP) aunit/lib/* $(I_LIB)
-	$(CP) support/aunit.gpr $(I_GPR)
-	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
 	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
+	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
 	-$(CP) support/aunit.xml $(I_PLG)
 
 doc:
 	${MAKE} -C docs
 
-force:
-
-test: force
+test: all
 	-$(MKDIR) obj
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit_tests
-	./aunit_harness
-
-zfp:
-	${MAKE} SUPPORT_EXCEPTION=no \
-		SUPPORT_CALENDAR=no \
-		IO_SUPPORT=none \
-		RUNTIME=zfp \
-		all
-
-install-zfp: install
-
-test-zfp:
 	-$(MKDIR) zfp_support/obj
 	-$(MKDIR) zfp_support/lib
-	-$(MKDIR) obj
-	$(GNATMAKE) --RTS=zfp -Paunit_tests_zfp
+	GPR_PROJECT_PATH=$(INSTALL)/lib/gnat $(GNATMAKE) $(ADA_FLAGS) -P$(TEST_PROJECT) $(GPR_FLAGS)
 	./aunit_harness
 
 RMDIR	= rmdir
