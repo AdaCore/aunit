@@ -30,8 +30,6 @@ endif
 
 # Install directories
 
-I_INC   = $(INSTALL)/include/aunit
-I_LIB   = $(INSTALL)/lib/aunit
 I_GPR   = $(INSTALL)/lib/gnat
 I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
@@ -54,18 +52,13 @@ endif
 GPR_FLAGS = $(GPR_FLAGS_INSTALL) $(GPR_FLAGS_EXCEPTION) $(GPR_FLAGS_CALENDAR)
 
 all:
-	$(MKDIR) $(I_INC)
-	$(MKDIR) $(I_LIB)
-	$(MKDIR) $(I_GPR)
-	$(MKDIR) aunit/obj
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit_build $(GPR_FLAGS)
+	-$(MKDIR) $(I_GPR)
+	$(GNATMAKE) $(ADA_FLAGS) -Paunit_build -p $(GPR_FLAGS)
 	$(CP) support/aunit.gpr $(I_GPR)
 
 clean:
 	-$(GNATCLEAN) -f -r -Paunit_build $(GPR_FLAGS)
 	-$(GNATCLEAN) -f -r -P$(TEST_PROJECT) $(GPR_FLAGS)
-	$(RM) -fr $(I_INC)
-	$(RM) -fr $(I_LIB)
 	$(RM) -f $(I_GPR)/aunit.gpr
 	-$(RMDIR) aunit/obj
 	-$(RMDIR) obj

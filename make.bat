@@ -168,8 +168,6 @@ IF x%RUNTIME% EQU x (
 )
 
 :SETUP
-SET I_INC=%INSTALL%\include\aunit
-SET I_LIB=%INSTALL%\lib\aunit
 SET I_GPR=%INSTALL%\lib\gnat
 SET I_TPL=%INSTALL%\share\examples\aunit
 SET I_DOC=%INSTALL%\share\doc\aunit
@@ -205,11 +203,8 @@ ECHO *** BUILDING THE AUNIT LIBRARY ***
 ECHO **********************************
 ECHO.
 
-MKDIR aunit\obj 2> NUL
-MKDIR %I_INC% 2> NUL
-MKDIR %I_LIB% 2> NUL
-ECHO %GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
-%GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
+ECHO %GNATMAKE% %ADA_FLAGS% -Paunit_build -p %GPR_FLAGS%
+%GNATMAKE% %ADA_FLAGS% -Paunit_build -p %GPR_FLAGS%
 
 :INSTALL
 ECHO.
