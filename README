@@ -14,7 +14,6 @@ Extract the archive into <build-dir>.
 * To build and install AUnit for a full Ada run-time:
 
    $ cd <build-dir>
-   $ make
    $ make INSTALL=<gnat-root> install
 
    Where <gnat-root> is for example /opt/gnatpro/5.04a1
@@ -22,29 +21,51 @@ Extract the archive into <build-dir>.
    At this point AUnit will be automatically available. It is just required to
    with the "aunit" project into the application project.
 
+* Specific installation:
+
+   The AUnit makefile supports some specific options, activated using
+   environment variables. The following options are defined:
+
+   INSTALL: defines the AUnit base installation directory, should always be
+    set.
+
+   TOOL_PREFIX: defines the gnat tools prefix to use. For example, to compile
+    AUnit for powerpc VxWorks, TOOLS_PREFIX should be set to
+    powerpc-wrs-vxworks. If not set, the native compiler will be used.
+
+   RTS: defines the run-time used to compile AUnit. When set to zfp, this
+    automatically defines SUPPORT_CALENDAR and SUPPORT_EXCEPTION (see below).
+
+   SUPPORT_CALENDAR: takes the values yes (default) or no. If the compiler or
+    the run-time used do not provide Ada.Calendar, then you should set this
+    variable to 'no'.
+
+   SUPPORT_EXCEPTION: takes the values yes (default) or no. If the compiler or
+    the run-time used do not provide exceptions support, then you should set
+    this variable to 'no'.
+
+   Example:
+
+   To install AUnit to /opt/gnatpro/5.04a1, for a cross ppc vxworksae compiler,
+   using a zfp run-time, you need to type
+   $ cd <build-dir>
+   $ make INSTALL=/opt/gnatpro/5.04a1 RTS=zfp \
+       TOOL_PREFIX=powerpc-wrs-vxworksae install
+
 * To test AUnit:
 
-   $ make test
+   The AUnit test suite is in the test subdirectory. In order to build and
+   run the AUnit test suite, first install the AUnit library, then:
+   $ cd test
+   $ make
 
-* ZFP support library:
+   The test suite's makefile support the following variables:
+   * RTS
+   * TOOL_PREFIX
 
-   AUnit for a ZFP GNAT run-time requires a support library implementing a
-   last chance handler, and providing Gnat.IO package. To build and install
-   this support library:
 
-   $ cd <build-dir>
-   $ make -f makefile.zfp_support
-   $ make -f makefile.zfp_support INSTALL=<gnat-root> install
-
-* To build and install AUnit for a ZFP GNAT run-time:
-
-   $ cd <build-dir>
-   $ make zfp
-   $ make INSTALL=<gnat-root> install-zfp
-
-* To test AUnit in ZFP mode:
-
-   $ make test-zfp
+Other compilers:
+----------------
 
 Currently AUnit is written to work with the open source GNAT Ada compilation
 system.  To that end, GNAT project files have been provided.  For other
