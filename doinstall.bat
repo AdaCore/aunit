@@ -4,7 +4,7 @@ REM === Test defered variable evaluation
 SET I=
 SET I=!I!
 IF NOT '%I%' == '' (
-  CMD /V/C .\MAKE.BAT
+  CMD /V/C .\DOINSTALL.BAT
   GOTO END
 )
 
@@ -203,8 +203,13 @@ ECHO *** BUILDING THE AUNIT LIBRARY ***
 ECHO **********************************
 ECHO.
 
-ECHO %GNATMAKE% %ADA_FLAGS% -Paunit_build -p %GPR_FLAGS%
-%GNATMAKE% %ADA_FLAGS% -Paunit_build -p %GPR_FLAGS%
+REM The two following mkdir are a workaround for missing gnatmake -p
+REM switch in versions prior to GNAT Pro 6.0.0
+MKDIR "%INSTALL%\lib\aunit
+MKDIR "%INSTALL%\include\aunit
+
+ECHO %GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
+%GNATMAKE% %ADA_FLAGS% -Paunit_build %GPR_FLAGS%
 
 :INSTALL
 ECHO.

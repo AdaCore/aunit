@@ -53,7 +53,11 @@ GPR_FLAGS = $(GPR_FLAGS_INSTALL) $(GPR_FLAGS_EXCEPTION) $(GPR_FLAGS_CALENDAR)
 
 all:
 	-$(MKDIR) $(I_GPR)
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit_build -p $(GPR_FLAGS)
+	# The two following mkdir are a workaround for missing gnatmake -p
+	# switch in versions prior to GNAT Pro 6.0.0
+	-$(MKDIR) $(INSTALL)/lib/aunit
+	-$(MKDIR) $(INSTALL)/include/aunit
+	$(GNATMAKE) $(ADA_FLAGS) -Paunit_build $(GPR_FLAGS)
 	$(CP) support/aunit.gpr $(I_GPR)
 
 clean:
