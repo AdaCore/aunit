@@ -175,14 +175,14 @@ SET I_GPR=%INSTALL%\lib\gnat
 SET I_TPL=%INSTALL%\share\examples\aunit
 SET I_DOC=%INSTALL%\share\doc\aunit
 SET I_PLG=%INSTALL%\share\gps\plug-ins
+SET I_INC=%INSTALL%\include\aunit
+SET I_LIB=%INSTALL%\lib\aunit
 
 ECHO.
-ECHO ******************************
-ECHO *** SETTING UP THE SOURCES ***
-ECHO ******************************
+ECHO **********************************
+ECHO *** BUILDING THE AUNIT LIBRARY ***
+ECHO **********************************
 ECHO.
-
-SET GPR_FLAGS_INSTALL=-XINSTALL_DIR="%INSTALL%"
 
 IF NOT %SUPPORT_EXCEPTION% EQU yes (
   ECHO * no support for exceptions *
@@ -198,18 +198,11 @@ IF NOT %SUPPORT_CALENDAR% EQU yes (
   ECHO AUnit set-up with Ada.Calendar support
   SET GPR_FLAGS_CALENDAR=-XSUPPORT_CALENDAR=yes
 )
-SET GPR_FLAGS=!GPR_FLAGS_INSTALL! !GPR_FLAGS_EXCEPTION! !GPR_FLAGS_CALENDAR!
-
-ECHO.
-ECHO **********************************
-ECHO *** BUILDING THE AUNIT LIBRARY ***
-ECHO **********************************
-ECHO.
+SET GPR_FLAGS=!GPR_FLAGS_EXCEPTION! !GPR_FLAGS_CALENDAR!
 
 REM The following mkdirs are a workaround for missing gnatmake -p
 REM switch in versions prior to GNAT Pro 6.0.0
-MKDIR "%INSTALL%"\lib\aunit 2> NUL
-MKDIR "%INSTALL%"\include\aunit 2> NUL
+MKDIR aunit\lib 2> NUL
 MKDIR aunit\obj 2> NUL
 
 ECHO %GNATMAKE% %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
@@ -225,21 +218,47 @@ MKDIR "%I_DOC%" 2> NUL
 MKDIR "%I_GPR%" 2> NUL
 MKDIR "%I_TPL%" 2> NUL
 MKDIR "%I_PLG%" 2> NUL
+MKDIR "%I_LIB%" 2> NUL
+MKDIR "%I_INC%" 2> NUL
 
+ECHO.
 ECHO uninstalling previous AUnit library in %INSTALL% if needed
 DEL /Q "%I_GPR%\aunit.gpr"
 DEL /Q "%I_TPL%\*.ad*"
 DEL /Q "%I_DOC%\*.*"
+DEL /Q/F "%I_INC%\*.*"
+DEL /Q/F "%I_LIB%\*.*"
 
-ECHO copying aunit.gpr in %I_GPR%
-COPY support\aunit.gpr "%I_GPR%" > NUL 2> NUL
+ECHO.
 ECHO copying examples in %I_TPL%
-COPY template\*.ads "%I_TPL%" > NUL 2> NUL
-COPY template\*.adb "%I_TPL%" > NUL 2> NUL
-COPY template\*.gpr "%I_TPL%" > NUL 2> NUL
+COPY template\*.* "%I_TPL%" > NUL
+ECHO.
 ECHO copying documentation in %I_DOC%
-COPY docs\*.html docs\*.info docs\*.pdf docs\*.txt "%I_DOC%" > NUL 2> NUL
+COPY docs\*.html "%I_DOC%" > NUL 2> NUL
+COPY docs\*.pdf "%I_DOC%" > NUL 2> NUL
+COPY docs\*.txt "%I_DOC%" > NUL 2> NUL
+ECHO.
 ECHO copying GPS plug-in in %I_PLG%
-COPY support\aunit.xml "%I_PLG%" > NUL 2> NUL
+COPY support\aunit.xml "%I_PLG%" > NUL
+
+ECHO.
+ECHO copying aunit.gpr in %I_GPR%
+COPY support\aunit.gpr "%I_GPR%" > NUL
+
+ECHO.
+ECHO copying AUnit source files in %I_INC%
+GNAT LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
+SET PREV=
+FOR /F %%A IN ('TYPE files.txt') DO (
+  IF !PREV! NEQ %%A (
+    COPY "%%A" "%I_INC%" > NUL
+  )
+  SET PREV=%%A
+)
+DEL files.txt
+
+ECHO.
+ECHO copying AUnit lib files in %I_LIB%
+COPY aunit\lib\*.* "%I_LIB%" > NUL
 
 :END
