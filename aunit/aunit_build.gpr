@@ -4,8 +4,6 @@ project AUnit_Build is
    Exception_Support : Yes_No_Type := external ("SUPPORT_EXCEPTION", "yes");
    Calendar_Support : Yes_No_Type := external ("SUPPORT_CALENDAR", "yes");
 
-   Install_Dir := external ("INSTALL_DIR", ".");
-
    for Source_Dirs use ("framework",
                         "containers",
                         "text_reporter");
@@ -25,22 +23,9 @@ project AUnit_Build is
    end case;
 
    for Object_Dir use "obj";
-   for Library_Dir use Install_Dir & "/lib/aunit";
-   for Library_Src_Dir use Install_Dir & "/include/aunit";
+   for Library_Dir use "lib";
    for Library_Name use "aunit";
    for Library_Kind use "static";
-   for Library_Interface use
-     ("AUnit_Framework",
-      "AUnit_Framework.Framework",
-      "AUnit_Framework.Tests",
-      "AUnit_Framework.Tests.Test_Cases",
-      "AUnit_Framework.Tests.Test_Cases.Assertions",
-      "AUnit_Framework.Tests.Test_Suites",
-      "AUnit_Framework.Test_Results",
-      "AUnit_Framework.Test_Results.Text_Reporter",
-      "AUnit_Framework.Time_Measure",
-      "Ada_Containers",
-      "Ada_Containers_Restricted_Doubly_Linked_Lists");
 
    package Builder is
       for Default_Switches ("ada") use
