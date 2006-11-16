@@ -1,6 +1,6 @@
 
-AUnit 1.04 README
-3 November 2005
+AUnit 1.06 README
+16 November 2006
 
 This is a minor update release of the Ada unit test framework AUnit, derived 
 from the JUnit framework for Java.  Read AUnit.html for usage.
@@ -9,25 +9,13 @@ from the JUnit framework for Java.  Read AUnit.html for usage.
 Installation:
 -------------
 
-Unzip the archive into <build-dir>.
-
-* To build AUnit:
-
-   $ cd <build-dir>
-   $ make
-
-* To install AUnit:
-
-   $ make INSTALL=<gnat-root> install
-
-   Where <gnat-root> is for example /opt/gnatpro/5.03a1
-
-   At this point AUnit will be automatically available. It is just required to
-   with the "aunit" project into the application project.
+Unzip or untar the archive into <install-dir>
 
 * To test AUnit:
+   $ cd <install-dir>/aunit-1.06
+   $ [<prefix>-]gnatmake -P aunit_tests
 
-   $ make test
+   <execute the module harness on your target>
 
 The output should be:
 
@@ -49,10 +37,11 @@ aunit/*    - The framework and a simple text mode reporter of results
 template/* - Templates for unit tests and a test harness, and for a GNAT 
 	     project file.
 tests/*    - A set of unit tests for testing the framework itself
+docs       - The AUnit Cookbook in various formats
 
 Currently AUnit is written to work with the open source GNAT Ada compilation
 system.  To that end, GNAT project files have been provided.  For other 
-compilation systems, the sources in aunit-1.03/aunit/* must be made accessible
+compilation systems, the sources in aunit-1.06/aunit/* must be made accessible
 to the compilation system according to its conventions.
 
 
@@ -67,6 +56,10 @@ test_harness [ -v | -V ]
      and error tests are listed.
 
 Changes:
+1.06    Repackaged 1.05 to include prebuilt documentation
+
+1.05    Added Set_Up_Case and Tear_Down_Case to Test_Case
+
 1.04	1. Cleaned up sources to conform to GNAT style conventions and to
         eliminate warnings.
 
