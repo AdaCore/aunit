@@ -135,9 +135,6 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    ------------
 
    procedure Report (R : in out Result) is
-      E : Error_Lists.List (Count_Type (Errors_Range'Last));
-      F : Failure_Lists.List (Count_Type (Failures_Range'Last));
-      S : Success_Lists.List (Count_Type (Successes_Range'Last));
       T : Duration;
       Exp : Integer;
       Dec : Integer;
@@ -150,30 +147,42 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       Put (Integer (Test_Count (R)));
       New_Line; New_Line;
 
-      Put ("   Successful Tests: ");
-      Put (Integer (Success_Count (R)));
-      New_Line;
+      declare
+         S : Success_Lists.List (Success_Count (R));
+      begin
+         Put ("   Successful Tests: ");
+         Put (Integer (Success_Count (R)));
+         New_Line;
 
-      Successes (R, S);
-      Dump_Success_List (S);
+         Successes (R, S);
+         Dump_Success_List (S);
+      end;
 
-      New_Line;
-      Put ("   Failed Assertions: ");
-      Put (Integer (Failure_Count (R)));
-      New_Line;
+      declare
+         F : Failure_Lists.List (Failure_Count (R));
+      begin
+         New_Line;
+         Put ("   Failed Assertions: ");
+         Put (Integer (Failure_Count (R)));
+         New_Line;
 
-      Failures (R, F);
-      Dump_Failure_List (F);
-      New_Line;
+         Failures (R, F);
+         Dump_Failure_List (F);
+         New_Line;
+      end;
 
-      New_Line;
-      Put ("   Unexpected Errors: ");
-      Put (Integer (Error_Count (R)));
-      New_Line;
+      declare
+         E : Error_Lists.List (Error_Count (R));
+      begin
+         New_Line;
+         Put ("   Unexpected Errors: ");
+         Put (Integer (Error_Count (R)));
+         New_Line;
 
-      Errors (R, E);
-      Dump_Error_List (E);
-      New_Line;
+         Errors (R, E);
+         Dump_Error_List (E);
+         New_Line;
+      end;
 
       if Elapsed  (R) /= Time_Measure.Null_Time then
          New_Line;
