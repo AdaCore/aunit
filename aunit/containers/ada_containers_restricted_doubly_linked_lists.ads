@@ -226,12 +226,9 @@ private
 
    Empty_List : constant List := (0, others => <>);
 
-   type List_Access is access all List;
-   for List_Access'Storage_Size use 0;
-
    type Cursor is
       record
-         Container : List_Access;
+         Container : access List;
          Node      : Count_Type := 0;
       end record;
 
