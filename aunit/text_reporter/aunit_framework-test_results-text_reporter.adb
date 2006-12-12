@@ -123,7 +123,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    function Last_Index (S : String) return Natural is
       Result : Natural := S'Last;
    begin
-      while S (Result) = ' ' loop
+      while Result >= S'First and then S (Result) = ' ' loop
          Result := Result - 1;
       end loop;
 
