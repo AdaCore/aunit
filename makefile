@@ -81,7 +81,7 @@ install: install_clean all
 	-$(CP) support/aunit.xml $(I_PLG)
 	$(CP) support/aunit.gpr $(I_GPR)
 	$(CP) aunit/lib/* $(I_LIB)
-	@IFS=$$'\012'; for f in `gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//'`; do \
+	gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//' -e 's/\\/\\\\/g' | while read f; do \
 	  if [ '$$f' != '' ]; then \
 	    echo $(CP) "$$f" "$(I_INC)"; \
 	    $(CP) "$$f" "$(I_INC)"; \
