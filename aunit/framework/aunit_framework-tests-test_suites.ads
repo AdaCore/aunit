@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                    A U N I T . T E S T _ S U I T E S                     --
+--     A U N I T _ F R A M E W O R K . T E S T S . T E S T _ S U I T E S    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -43,7 +43,9 @@ package AUnit_Framework.Tests.Test_Suites is
    procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class);
    --  Add a test case or suite to this suite
 
-   procedure Run (S : access Test_Suite; R : Result_Access);
+   procedure Run (Suite      : access Test_Suite;
+                  R          : Result_Access;
+                  Outcome    : out Status);
    --  Run all tests collected into this suite
 
 private

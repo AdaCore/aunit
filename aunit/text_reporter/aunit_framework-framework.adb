@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . T E S T _ R U N N E R                    --
+--            A U N I T _ F R A M E W O R K . F R A M E W O R K             --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2006, AdaCore                   --
+--                       Copyright (C) 2006, AdaCore                        --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -35,19 +35,38 @@ package body AUnit_Framework.Framework is
    Results : aliased Test_Results.Result;
    --  Test results for one harness run
 
-   procedure Test_Runner (Timed : Boolean := True) is
+   procedure Run (Suite   : Test_Suites.Access_Test_Suite;
+                  Timed   : Boolean;
+                  Outcome : out Status);
+
+   procedure Run (Suite   : Test_Suites.Access_Test_Suite;
+                  Timed   : Boolean;
+                  Outcome : out Status) is
       Time : Time_Measure.Time;
    begin
       Test_Results.Clear (Results);
       if Timed then
          Time_Measure.Start_Measure (Time);
       end if;
-      Test_Suites.Run (Suite, Results'Access);
+      Test_Suites.Run (Suite, Results'Access, Outcome);
       if Timed then
          Time_Measure.Stop_Measure (Time);
          Test_Results.Set_Elapsed (Results, Time);
       end if;
       Reporter.Report (Results);
+   end Run;
+
+   procedure Test_Runner (Timed : Boolean := True) is
+      Outcome : Status;
+   begin
+      Run (Suite, Timed, Outcome);
    end Test_Runner;
+
+   function Test_Runner_With_Status (Timed : Boolean := True) return Status is
+      Result : Status;
+   begin
+      Run (Suite, Timed, Result);
+      return Result;
+   end Test_Runner_With_Status;
 
 end AUnit_Framework.Framework;

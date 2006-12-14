@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . T E S T _ C A S E S                      --
+--     A U N I T _ F R A M E W O R K . T E S T S . T E S T _ C A S E S      --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -25,7 +25,6 @@
 ------------------------------------------------------------------------------
 
 --  Test cases
-with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Tests.Test_Cases is
 
    The_Current_Test_Case : Test_Case_Access := null;
@@ -46,7 +45,8 @@ package body AUnit_Framework.Tests.Test_Cases is
    procedure Run_Routine
      (Test    : access Test_Case'Class;
       Subtest : Routine_Spec;
-      R       : access Result);
+      R       : access Result;
+      Outcome : out Status);
    --  Run one test routine
 
    -----------------------
@@ -67,13 +67,11 @@ package body AUnit_Framework.Tests.Test_Cases is
       if Routine_Lists.Length (T.Routines) =
         Count_Type (Max_Routines_Per_Test_Case) then
          declare
-            Error_String : constant String :=
+            Error_Message : constant String :=
                " has more routines than Max_Routines_Per_Test_Case";
-            Message      : String (1 .. Name (T)'Length + Error_String'Length);
          begin
-            Message (1 .. Name (T)'Length) := Name (T);
-            Message (Name (T)'Length + 1 .. Message'Last) := Error_String;
-            Put_Line (Message);
+            Put (Name (T));
+            Put_Line (Error_Message);
          end;
       else
          Routine_Lists.Append (T.Routines, Val);
@@ -84,21 +82,8 @@ package body AUnit_Framework.Tests.Test_Cases is
    -- Format_Message --
    --------------------
 
-   function Format_Message (S : String) return Message_String is
-      Message : Message_String := (others => ' ');
-   begin
-
-      if S'Length >= Message'Length then
-         Message (Message'First .. Message'Last - 3) :=
-           S (S'First .. S'First + Message'Length - 3);
-         Message (Message'Last - 2 .. Message'Last) := "...";
-      else
-         Message (1 .. S'Length) := S;
-      end if;
-
-      return Message;
-
-   end Format_Message;
+   function Format_Message (S : String) return Message_String
+                            renames New_String;
 
    ----------------
    -- Initialize --
@@ -117,21 +102,18 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    procedure Register_Failure (T : access Test_Case'Class; S : String) is
    begin
-      if Message_Lists.Length (T.Failures) =
+      if Failure_Lists.Length (T.Failures) =
         Count_Type (Max_Failures_Per_Harness) then
          declare
-            Error_String : constant String :=
+            Error_Message : constant String :=
                " routine failure overflows Max_Failures_Per_Harness:";
-            Message      :
-               String (1 .. Name (T.all)'Length + Error_String'Length);
          begin
-            Message (1 .. Name (T.all)'Length) := Name (T.all);
-            Message (Name (T.all)'Length + 1 .. Message'Last) := Error_String;
-            Put_Line (Message);
+            Put (Name (T.all));
+            Put_Line (Error_Message);
             Put_Line (S);
          end;
       else
-         Message_Lists.Append (T.Failures, Format_Message (S));
+         Failure_Lists.Append (T.Failures, Format_Message (S));
       end if;
    end Register_Failure;
 
@@ -139,8 +121,11 @@ package body AUnit_Framework.Tests.Test_Cases is
    -- Run --
    ---------
 
-   procedure Run (Test : access Test_Case; R : Result_Access) is
+   procedure Run (Test : access Test_Case;
+                  R    : Result_Access;
+                  Outcome : out Status) is
       use Routine_Lists;
+      Result : Status;
       C : Cursor;
    begin
       Initialize (Test);
@@ -150,7 +135,10 @@ package body AUnit_Framework.Tests.Test_Cases is
 
       while Has_Element (C) loop
          The_Current_Test_Case := Test_Case_Access (Test);
-         Run_Routine (Test, Element (C), R);
+         Run_Routine (Test, Element (C), R, Result);
+         if Result = Failure then
+            Outcome := Failure;
+         end if;
          Next (C);
       end loop;
 
@@ -164,13 +152,14 @@ package body AUnit_Framework.Tests.Test_Cases is
    procedure Run_Routine
      (Test    : access Test_Case'Class;
       Subtest : Routine_Spec;
-      R       : access Result) is separate;
+      R       : access Result;
+      Outcome : out Status) is separate;
 
    --------------
    -- Set_Name --
    --------------
 
-   procedure Set_Name (Test : in out Test_Case'Class; Name : Test_String) is
+   procedure Set_Name (Test : in out Test_Case'Class; Name : Message_String) is
    begin
       Test.Name := Name;
    end Set_Name;

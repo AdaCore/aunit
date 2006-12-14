@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                      A U N I T . T E S T _ C A S E S                     --
+--     A U N I T _ F R A M E W O R K . T E S T S . T E S T _ C A S E S      --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -31,7 +31,6 @@ with Ada_Containers_Restricted_Doubly_Linked_Lists;
 generic
    Max_Routines_Per_Test_Case : Natural;
    Max_Failures_Per_Harness : Natural;
-   Max_Failure_Message_Size : Natural;
 package AUnit_Framework.Tests.Test_Cases is
 
    type Test_Case is abstract new Test with private;
@@ -45,12 +44,12 @@ package AUnit_Framework.Tests.Test_Cases is
 
    type Routine_Spec is record
       Routine      : Test_Routine;
-      Routine_Name : Routine_String;
+      Routine_Name : Message_String;
    end record;
 
    procedure Add_Routine (T : in out Test_Case'Class; Val : Routine_Spec);
 
-   function Name (Test : Test_Case) return Test_String is abstract;
+   function Name (Test : Test_Case) return Message_String is abstract;
    --  Test case name
 
    procedure Register_Failure (T : access Test_Case'Class; S : String);
@@ -59,10 +58,12 @@ package AUnit_Framework.Tests.Test_Cases is
    procedure Register_Tests (Test : in out Test_Case) is abstract;
    --  Register test methods with test suite
 
-   procedure Run (Test : access Test_Case; R : Result_Access);
+   procedure Run (Test : access Test_Case;
+                  R       : Result_Access;
+                  Outcome : out Status);
    --  Run test case
 
-   procedure Set_Name (Test : in out Test_Case'Class; Name : Test_String);
+   procedure Set_Name (Test : in out Test_Case'Class; Name : Message_String);
    --  Set name of test
 
    procedure Set_Up (Test : in out Test_Case);
@@ -119,18 +120,15 @@ private
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Routine_Spec);
    --  Container for test routines
 
-   subtype Message_String is String (1 .. Max_Failure_Message_Size);
-   --  Failure message
-
-   package Message_Lists is
+   package Failure_Lists is
      new Ada_Containers_Restricted_Doubly_Linked_Lists (Message_String);
    --  Container for failed assertion messages per routine
 
    type Test_Case is abstract new Test with record
-      Name     : Test_String;
+      Name     : Message_String;
       Routines : aliased Routine_Lists.List
         (Count_Type (Max_Routines_Per_Test_Case));
-      Failures : aliased Message_Lists.List
+      Failures : aliased Failure_Lists.List
         (Count_Type (Max_Failures_Per_Harness));
    end record;
 

@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                   A U N I T . T E S T _ R E S U L T S                    --
+--          A U N I T _ F R A M E W O R K . T E S T _ R E S U L T S         --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -27,7 +27,7 @@
 with Ada_Containers;
 with Ada_Containers_Restricted_Doubly_Linked_Lists;
 
-with AUnit_Framework.Time_Measure;
+with AUnit_Framework.Time_Measure, AUnit_Framework.Message_Strings;
 
 --  Test reporting.
 --
@@ -40,24 +40,19 @@ generic
    Max_Exceptions_Per_Harness : Natural;  --  Max unhandled exceptions per
                                           --  harness
    Max_Failures_Per_Harness : Natural;    --  Max failed routines per harness
-   Max_Failure_Message_Size : Natural;    --  Max size of failure message
-   Max_Test_Name_Size : Natural;          --  Max test case name size
-   Max_Routine_Name_Size : Natural;       --  Max routine description size
+   with package Message_Strings is new AUnit_Framework.Message_Strings (<>);
 package AUnit_Framework.Test_Results is
+
+   use Message_Strings;
 
    type Result is limited private;
    type Result_Access is access all Result;
    --  Record result. A result object is associated with the execution of a
    --  top-level test suite.
 
-   subtype Test_String is String (1 .. Max_Test_Name_Size);
-   subtype Routine_String is String (1 .. Max_Routine_Name_Size);
-   subtype Message_String is String (1 .. Max_Failure_Message_Size);
-   --  Strings used for reporting results
-
    type Test_Failure is record
-      Test_Name    : Test_String;
-      Routine_Name : Routine_String;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
       Message      : Message_String;
    end record;
    --  Description of a test routine failures and unexpected exceptions
@@ -65,8 +60,8 @@ package AUnit_Framework.Test_Results is
    --  available in the run-time library
 
    type Test_Success is record
-      Test_Name    : Test_String;
-      Routine_Name : Routine_String;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
    end record;
    --  Decription of a test routine success
 
@@ -93,22 +88,22 @@ package AUnit_Framework.Test_Results is
 
    procedure Add_Error
      (R                       : in out Result;
-      Test_Name               : Test_String;
-      Routine_Name            : Routine_String;
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String;
       Message                 : Message_String);
    --  Record an unexpected exception
 
    procedure Add_Failure
      (R                       : in out Result;
-      Test_Name               : Test_String;
-      Routine_Name            : Routine_String;
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String;
       Message                 : Message_String);
    --  Record a test routine failure
 
    procedure Add_Success
      (R                       : in out Result;
-      Test_Name               : Test_String;
-      Routine_Name            : Routine_String);
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String);
    --  Record a test routine success
 
    procedure Set_Elapsed (R : in out Result;
@@ -132,8 +127,8 @@ package AUnit_Framework.Test_Results is
    function Elapsed (R : Result) return Time_Measure.Time;
    --  Elapsed time for test execution:
 
-   function Format (Name : String) return Test_String;
-   --  Format a string to use as a test name
+   function Format (Name : String) return Message_String;
+   --  Convert test name to Message_String
 
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
    --  Set count for a test run

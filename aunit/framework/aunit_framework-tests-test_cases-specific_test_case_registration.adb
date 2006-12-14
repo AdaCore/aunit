@@ -2,12 +2,13 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---          A U N I T. T E S T _ C A S E S . R E G I S T R A T I O N        --
+--      A U N I T _ F R A M E W O R K . T E S T S . T E S T _ C A S E S .   --
+--       S P E C I F I C _ T E S T _ C A S E _ R E G I S T R A T I O N      --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2006, AdaCore                   --
+--                       Copyright (C) 2006, AdaCore                        --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --

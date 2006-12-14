@@ -2,9 +2,10 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                      A U N I T _ F R A M E W O R K                       --
+--        A U N I T _ F R A M E W O R K . M E S S A G E _ S T R I N G S     --
 --                                                                          --
 --                                 S p e c                                  --
+--                                                                          --
 --                                                                          --
 --                       Copyright (C) 2006, AdaCore                        --
 --                                                                          --
@@ -23,9 +24,26 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  AUnit 2
+generic
+   Message_String_Pool_Size : Positive;
+   --  Handling of strings used in reports
+package AUnit_Framework.Message_Strings is
 
-package AUnit_Framework is
-   pragma Pure;
-   type Status is (Success, Failure);
-end AUnit_Framework;
+   type Message_String is private;
+
+   String_Pool_Exhausted : exception;
+
+   procedure New_Line (Spacing : Positive := 1);
+   function New_String (S : String) return Message_String;
+   procedure Put (I : Integer);
+   procedure Put (M : Message_String);
+   procedure Put (S : String);
+   procedure Put_Line (M : Message_String);
+   procedure Put_Line (S : String);
+
+private
+   subtype Index is Positive range 1 .. Message_String_Pool_Size;
+   type Message_String is record
+      First, Last : Index;
+   end record;
+end AUnit_Framework.Message_Strings;

@@ -2,7 +2,8 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---       A U N I T . T E S T _ R E S U L T S . T E X T _ R E P O R T E R    --
+--         A U N I T _ F R A M E W O R K . T E S T _ R E S U L T S .        --
+--                       T E X T _ R E P O R T E R                          --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --

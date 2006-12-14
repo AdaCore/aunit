@@ -2,7 +2,8 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                      A U N I T . A S S E R T I O N S                     --
+--                A U N I T _ F R A M E W O R K . T E S T S .               --
+--                T E S T _ C A S E S . A S S E R T I O N S                 --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --

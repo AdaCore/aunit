@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                           A U N I T . T E S T S                          --
+--                 A U N I T _ F R A M E W O R K . T E S T S                --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -34,12 +34,14 @@ generic
    with package Results is new AUnit_Framework.Test_Results (<>);
 package AUnit_Framework.Tests is
 
-   use Results;
+   use Results, Results.Message_Strings;
 
    type Test is abstract tagged limited private;
    type Test_Access is access all Test'Class;
 
-   procedure Run (T : access Test; R : Result_Access) is abstract;
+   procedure Run (T : access Test;
+                  R : Result_Access;
+                  S : out Status) is abstract;
    --  Run a test case or suite
 
 private

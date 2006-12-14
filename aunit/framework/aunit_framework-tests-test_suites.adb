@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . T E S T _ S U I T E S                    --
+--     A U N I T _ F R A M E W O R K . T E S T S . T E S T _ S U I T E S    --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -25,7 +25,6 @@
 ------------------------------------------------------------------------------
 
 --  A collection of test cases
-with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Tests.Test_Suites is
 
    --------------
@@ -37,20 +36,11 @@ package body AUnit_Framework.Tests.Test_Suites is
       if Length (S.Tests) =  Count_Type (Max_Test_Cases_Per_Suite) then
          if T.all in Test_Case'Class then
             declare
-               Error_String       : constant String :=
+               Error_Message       : constant String :=
                                       " overflows Max_Tests_Per_Suite:";
-               Message            :
-                  String
-                    (1 ..
-                       Name (Test_Case'Class (T.all))'Length
-                     + Error_String'Length);
             begin
-               Message (1 .. Name (Test_Case'Class (T.all))'Length) :=
-                 Name (Test_Case'Class (T.all));
-               Message
-                 (Name (Test_Case'Class (T.all))'Length + 1 .. Message'Last)
-                  := Error_String;
-               Put_Line (Message);
+               Put (Name (Test_Case'Class (T.all)));
+               Put_Line (Error_Message);
             end;
          else
             Put_Line ("Max_Tests_Per_Suite overflowed when adding sub-suite");
@@ -64,11 +54,17 @@ package body AUnit_Framework.Tests.Test_Suites is
    -- Run --
    ---------
 
-   procedure Run (S : access Test_Suite; R : Result_Access) is
-      C : Cursor := First (S.Tests);
+   procedure Run (Suite : access Test_Suite;
+                  R       : Result_Access;
+                  Outcome : out Status) is
+      C : Cursor := First (Suite.Tests);
+      Result : Status := Success;
    begin
       while Has_Element (C) loop
-         Run (Element (C), R);
+         Run (Element (C), R, Result);
+         if Result = Failure then
+            Outcome := Failure;
+         end if;
          Next (C);
       end loop;
    end Run;

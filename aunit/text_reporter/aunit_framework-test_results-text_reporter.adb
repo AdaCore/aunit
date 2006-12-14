@@ -2,7 +2,8 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---      A U N I T . T E S T _ R E S U L T S . T E X T _ R E P O R T E R     --
+--         A U N I T _ F R A M E W O R K . T E S T _ R E S U L T S .        --
+--                       T E X T _ R E P O R T E R                          --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -24,7 +25,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.IO; use GNAT.IO;
 with AUnit_Framework.Time_Measure; use AUnit_Framework.Time_Measure;
 
 --  Very simple reporter to console
@@ -38,9 +38,6 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
 
    procedure Dump_Success_List (L : in Success_Lists.List);
    --  List successful test routines
-
-   function Last_Index (S : String) return Natural;
-   --  Index of last non-space character
 
    procedure Report_Error (Error : Test_Failure);
    --  Report a single assertion failure or unexpected exception
@@ -100,11 +97,9 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       procedure Report_Success (Success : Test_Success) is
       begin
          Put ("      ");
-         Put (String (Success.Test_Name));
+         Put (Success.Test_Name);
          Put (" : ");
-         Put_Line (Success.Routine_Name
-           (Success.Routine_Name'First ..
-                Last_Index (Success.Routine_Name)));
+         Put_Line (Success.Routine_Name);
       end Report_Success;
 
       C : Cursor := First (L);
@@ -115,20 +110,6 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
          Next (C);
       end loop;
    end Dump_Success_List;
-
-   ----------------
-   -- Last_Index --
-   ----------------
-
-   function Last_Index (S : String) return Natural is
-      Result : Natural := S'Last;
-   begin
-      while Result >= S'First and then S (Result) = ' ' loop
-         Result := Result - 1;
-      end loop;
-
-      return Result;
-   end Last_Index;
 
    ------------
    -- Report --
@@ -233,16 +214,12 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    begin
       New_Line;
       Put ("      ");
-      Put (String (Error.Test_Name));
+      Put (Error.Test_Name);
       Put (" : ");
-      Put_Line (Error.Routine_Name
-        (Error.Routine_Name'First ..
-             Last_Index (Error.Routine_Name)));
+      Put_Line (Error.Routine_Name);
       Put ("      ");
       Put ("      ");
-      Put_Line (Error.Message
-        (Error.Message'First ..
-             Last_Index (Error.Message)));
+      Put_Line (Error.Message);
    end Report_Error;
 
 end AUnit_Framework.Test_Results.Text_Reporter;

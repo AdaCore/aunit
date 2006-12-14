@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                    A U N I T . T E S T _ R E S U L T S                   --
+--          A U N I T _ F R A M E W O R K . T E S T _ R E S U L T S         --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -25,7 +25,6 @@
 ------------------------------------------------------------------------------
 
 --  Record test results.
-with GNAT.IO; use GNAT.IO;
 package body AUnit_Framework.Test_Results is
 
    -----------------------
@@ -48,8 +47,8 @@ package body AUnit_Framework.Test_Results is
 
    procedure Add_Error
      (R : in out Result;
-      Test_Name      : Test_String;
-      Routine_Name   : Routine_String;
+      Test_Name      : Message_String;
+      Routine_Name   : Message_String;
       Message        : Message_String) is
 
       Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
@@ -58,14 +57,10 @@ package body AUnit_Framework.Test_Results is
    begin
       if Length (R.Errors_List) =  Count_Type (Max_Exceptions_Per_Harness) then
          declare
-            Error_String       : constant String :=
+            Error_Message       : constant String :=
                                    " overflows Max_Errors_Per_Harness:";
-            Error_Message      :
-               String (1 .. Test_Name'Length + Error_String'Length);
          begin
-            Error_Message (1 .. Test_Name'Length) := Test_Name;
-            Error_Message (Test_Name'Length + 1 .. Error_Message'Last)
-              := Error_String;
+            Put (Test_Name);
             Put_Line (Error_Message);
             Put (Routine_Name); Put (": ");
             Put_Line (Message);
@@ -81,8 +76,8 @@ package body AUnit_Framework.Test_Results is
 
    procedure Add_Failure
      (R : in out Result;
-      Test_Name      : Test_String;
-      Routine_Name   : Routine_String;
+      Test_Name      : Message_String;
+      Routine_Name   : Message_String;
       Message        : Message_String) is
 
       Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
@@ -91,14 +86,10 @@ package body AUnit_Framework.Test_Results is
    begin
       if Length (R.Failures_List) =  Count_Type (Max_Failures_Per_Harness) then
          declare
-            Error_String       : constant String :=
+            Error_Message      : constant String :=
                                    " overflows Max_Failures_Per_Harness:";
-            Error_Message      :
-               String (1 .. Test_Name'Length + Error_String'Length);
          begin
-            Error_Message (1 .. Test_Name'Length) := Test_Name;
-            Error_Message (Test_Name'Length + 1 .. Error_Message'Last)
-              := Error_String;
+            Put (Test_Name);
             Put_Line (Error_Message);
             Put (Routine_Name); Put (": ");
             Put_Line (Message);
@@ -114,8 +105,8 @@ package body AUnit_Framework.Test_Results is
 
    procedure Add_Success
      (R                       : in out Result;
-      Test_Name               : Test_String;
-      Routine_Name            : Routine_String) is
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String) is
 
       Val : constant Test_Success := (Test_Name, Routine_Name);
       use Success_Lists;
@@ -123,14 +114,11 @@ package body AUnit_Framework.Test_Results is
    begin
       if Length (R.Successes_List) = Count_Type (Max_Routines_Per_Harness) then
          declare
-            Error_String : constant String :=
+            Error_Message : constant String :=
                " overflows Max_Routines_Per_Harness (successful):";
-            Message      :
-              String (1 .. Test_Name'Length + Error_String'Length);
          begin
-            Message (1 .. Test_Name'Length) := Test_Name;
-            Message (Test_Name'Length + 1 .. Message'Last) := Error_String;
-            Put_Line (Message);
+            Put (Test_Name);
+            Put_Line (Error_Message);
             Put_Line (Routine_Name);
          end;
       else
@@ -203,22 +191,7 @@ package body AUnit_Framework.Test_Results is
    -- Format --
    ------------
 
-   function Format (Name : String) return Test_String is
-
-      Length : constant Natural := Name'Length;
-      Result : String (1 .. Test_String'Length) := (others => ' ');
-
-   begin
-      if Length > Result'Length then
-         Result (1 .. Result'Last - 3) :=
-           Name (Name'First .. Name'First + Result'Length - 4);
-         Result (Result'Last - 2 .. Result'Last) := "...";
-      else
-         Result (Result'First .. Result'First + Length - 1) := Name;
-      end if;
-
-      return Test_String (Result);
-   end Format;
+   function Format (Name : String) return Message_String renames New_String;
 
    ----------------
    -- Start_Test --

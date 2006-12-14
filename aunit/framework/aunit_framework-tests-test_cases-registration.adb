@@ -2,7 +2,8 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---          A U N I T. T E S T _ C A S E S . R E G I S T R A T I O N        --
+--      A U N I T _ F R A M E W O R K . T E S T S . T E S T _ C A S E S .   --
+--                          R E G I S T R A T I O N                         --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
@@ -38,22 +39,11 @@ package body Registration is
       Routine : Test_Routine;
       Name    : String) is
 
-      Formatted_Name : Routine_String := (others => ' ');
-      Length : constant Natural := Name'Length;
+      Formatted_Name : constant Message_String := New_String (Name);
       Val : Routine_Spec;
       use Routine_Lists;
 
    begin
-      if Length > Formatted_Name'Length then
-         Formatted_Name (Formatted_Name'First .. Formatted_Name'Last - 3)
-           := Name (Name'First .. Name'First + Formatted_Name'Length - 4);
-         Formatted_Name (Formatted_Name'Last - 2 .. Formatted_Name'Last) :=
-           "...";
-      else
-         Formatted_Name
-           (Formatted_Name'First .. Formatted_Name'First + Length - 1) := Name;
-      end if;
-
       Val  := (Routine, Formatted_Name);
       Add_Routine (Test, Val);
    end Register_Routine;
