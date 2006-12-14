@@ -1,5 +1,6 @@
 with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
+with AUnit_Framework;
 
 --  Unit tests for AUnit.Test_Cases.
 package body Test_Test_Case is
@@ -54,9 +55,10 @@ package body Test_Test_Case is
       Count  : constant Count_Type :=
                  AUnit.Test_Cases.Registration.Routine_Count (Simple);
       Old_Count : constant Count_Type := Test_Count (R);
+      Outcome   : AUnit_Framework.Status;
 
    begin
-      Run (Simple'Access, R'Access);
+      Run (Simple'Access, R'Access, Outcome);
 
       Assert
         (Count  = 3,

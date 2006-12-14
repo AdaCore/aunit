@@ -2,6 +2,7 @@ with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
 with Ada_Containers; use Ada_Containers;
+with AUnit_Framework;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
@@ -15,8 +16,9 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
+      Outcome : AUnit_Framework.Status;
    begin
-      Run (S'Access, R'Access);
+      Run (S'Access, R'Access, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -24,9 +26,10 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Routines (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
+      Outcome : AUnit_Framework.Status;
    begin
       Add_Test (S'Access, E'Access);
-      Run (S'Access, R'Access);
+      Run (S'Access, R'Access, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -34,9 +37,10 @@ package body Test_Test_Suite is
 
    procedure Test_One_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
+      Outcome : AUnit_Framework.Status;
    begin
       Add_Test (S'Access, O'Access);
-      Run (S'Access, R'Access);
+      Run (S'Access, R'Access, Outcome);
 
       Assert (Test_Count (R) = 1, "Wrong number of tests run");
       Assert (Failure_Count (R) = 0, "Wrong number of failures");
@@ -46,9 +50,11 @@ package body Test_Test_Suite is
    procedure Test_Inherited_Tests (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       Old_Count : constant Count_Type := Test_Count (R);
+      Outcome   : AUnit_Framework.Status;
+
    begin
       Add_Test (S'Access, I'Access);
-      Run (S'Access, R'Access);
+      Run (S'Access, R'Access, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = Old_Count + 4,
