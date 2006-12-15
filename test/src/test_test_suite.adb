@@ -2,7 +2,7 @@ with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
 with Ada_Containers; use Ada_Containers;
-with AUnit_Framework;
+with AUnit_Framework; use AUnit_Framework;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
@@ -16,12 +16,13 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      Outcome : AUnit_Framework.Status;
+      Outcome : Status;
    begin
       Run (S'Access, R'Access, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_No_Test_Case;
 
    procedure Test_No_Test_Routines (T : in out Test_Cases.Test_Case'Class) is
@@ -33,6 +34,7 @@ package body Test_Test_Suite is
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_No_Test_Routines;
 
    procedure Test_One_Test_Case (T : in out Test_Cases.Test_Case'Class) is
@@ -45,6 +47,7 @@ package body Test_Test_Suite is
       Assert (Test_Count (R) = 1, "Wrong number of tests run");
       Assert (Failure_Count (R) = 0, "Wrong number of failures");
       Assert (Successful (R), "Suite did not run successfully");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_One_Test_Case;
 
    procedure Test_Inherited_Tests (T : in out Test_Cases.Test_Case'Class) is
@@ -59,6 +62,7 @@ package body Test_Test_Suite is
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = Old_Count + 4,
               "Wrong number of tests run");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_Inherited_Tests;
 
    --  Register test routines to call:

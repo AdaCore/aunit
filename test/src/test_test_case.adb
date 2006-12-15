@@ -55,7 +55,10 @@ package body Test_Test_Case is
       Count  : constant Count_Type :=
                  AUnit.Test_Cases.Registration.Routine_Count (Simple);
       Old_Count : constant Count_Type := Test_Count (R);
-      Outcome   : AUnit_Framework.Status;
+
+      use AUnit_Framework;
+
+      Outcome   : Status;
 
    begin
       Run (Simple'Access, R'Access, Outcome);
@@ -78,6 +81,7 @@ package body Test_Test_Case is
       Assert (Is_Torn_Down (Simple), "Not torn down correctly");
       Assert (Success_Count (R) = 1, "Wrong success count");
       Assert (Failure_Count (R) = 3, "Wrong failure count");
+      Assert (Outcome = Failure, "Result flag incorrect");
    end Test_Run;
 
    procedure Test_Multiple_Failures_Wrapper (T : in out The_Test_Case'Class);
