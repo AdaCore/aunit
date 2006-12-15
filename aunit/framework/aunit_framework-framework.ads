@@ -39,14 +39,14 @@ with AUnit_Framework.Message_Strings;
 --  the consequent memory requirements.
 generic
    Max_Exceptions_Per_Harness : Natural;           --  Max unhandled exceptions
-                                                  --  per harness
+                                                   --  per harness
    Max_Failures_Per_Harness   : Natural;           --  Max assertion failures
-                                                  --   per harness
+                                                   --   per harness
    Max_Routines_Per_Test_Case : Natural;           --  Max routines per test
-                                                  --  case
+                                                   --  case
    Max_Test_Cases_Per_Suite   : Natural;           --  Max test cases per suite
    Message_String_Pool_Size   : Natural := 10_000; --  Size of pool to hold
-                                                  --  strings for reporting
+                                                   --  strings for reporting
 
 package AUnit_Framework.Framework is
 
