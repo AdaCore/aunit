@@ -60,6 +60,7 @@ package body AUnit_Framework.Tests.Test_Suites is
       C : Cursor := First (Suite.Tests);
       Result : Status := Success;
    begin
+      Outcome := Success;
       while Has_Element (C) loop
          Run (Element (C), R, Result);
          if Result = Failure then

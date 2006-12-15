@@ -128,6 +128,7 @@ package body AUnit_Framework.Tests.Test_Cases is
       Result : Status;
       C : Cursor;
    begin
+      Outcome := Success;
       Initialize (Test);
       Start_Test (R.all, Routine_Lists.Length (Test.Routines));
       Set_Up_Case (Test_Case'Class (Test.all));
