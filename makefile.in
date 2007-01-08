@@ -82,11 +82,17 @@ install: install_clean all
 	$(CP) support/aunit.gpr $(I_GPR)
 	$(CP) aunit/lib/* $(I_LIB)
 	gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//' -e 's/\\/\\\\/g' | while read f; do \
-	  if [ '$$f' != '' ]; then \
-	    echo $(CP) "$$f" "$(I_INC)"; \
+	  if [ "$$f" != "" ]; then \
+	    echo "installing $$f into $(I_INC)"; \
 	    $(CP) "$$f" "$(I_INC)"; \
 	  fi; \
 	done
+	$(CHMOD) 444 $(I_DOC)/*
+	$(CHMOD) 444 $(I_TPL)/*
+	$(CHMOD) 444 $(I_PLG)/*
+	$(CHMOD) 444 $(I_GPR)/*
+	$(CHMOD) 444 $(I_LIB)/*
+	$(CHMOD) 444 $(I_INC)/*
 	@echo $(SRC_LIST)
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'
@@ -101,4 +107,5 @@ doc:
 RMDIR	= rmdir
 MKDIR	= mkdir -p
 RM	= rm
-CP	= install -m 644
+CP	= cp -f
+CHMOD   = chmod 
