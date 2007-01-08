@@ -214,19 +214,20 @@ the ZFP profile without custom dynamic memory management, or the ``cert''
 run-time profile.
 
 @item At any level at which you wish to run tests, create a harness by
-instantiating procedure @code{@b{AUnit}.Test_Runner} with the top-level suite
+instantiating procedure @code{@b{AUnit}.Test_Runner} or function
+@code{@b{AUnit}.Test_Runner_With_Status} with the top-level suite
 function to be executed. This instantiation provides a routine
-that executes all of the tests in the suite. We will call this user-instantiated
-routine @code{@b{Run}} in the text for backward compatibility to tests
-developed for AUnit 1. Note that only one instance of @code{@b{Run}} can
-execute at a time.  This is a tradeoff made to reduce the stack requirement
+that executes all of the tests in the suite. We will call this
+user-instantiated routine @code{@b{Run}} in the text for backward compatibility
+to tests developed for AUnit 1. Note that only one instance of @code{@b{Run}}
+can execute at a time.  This is a tradeoff made to reduce the stack requirement
 of the framework by allocating test result reporting data structures
 statically. @code{@b{AUnit}.Test_Runner} must be instantiated at the library
 level.
 
-@item Build the code that calls the harness @code{@b{Run}} routine using gnatmake.
-The GNAT project file @i{aunit.gpr} contains all necessary switches, and
-should be imported into your root project file.
+@item Build the code that calls the harness @code{@b{Run}} routine using
+gnatmake. The GNAT project file @i{aunit.gpr} contains all necessary switches,
+and should be imported into your root project file.
 
 @end enumerate
 
@@ -243,16 +244,14 @@ is a typical instantiation. User-specific text is in boldface.
 package @b{AUnit} is new AUnit_Framework.Framework
   (Max_Exceptions_Per_Harness   => @b{5},
    Max_Failures_Per_Harness     => @b{20},
-   Max_Failure_Message_Size     => @b{150},
    Max_Routines_Per_Test_Case   => @b{50},
    Max_Test_Cases_Per_Suite     => @b{50},
-   Max_Test_Name_Size           => @b{30},
-   Max_Routine_Description_Size => @b{50});}
+   Message_String_Pool_Size     => @b{4096};}
 
 @noindent
 The term ``run'' in this discussion means the execution of a call to the
-@code{@b{Run}} routine that is an instantiation of
-@code{@b{AUnit}.Test_Runner}.
+@code{@b{Run}} routine that is an instantiation of either
+@code{@b{AUnit}.Test_Runner} or @code{@b{AUnit}.Test_Runner_With_Result}.
 
 The formal parameters of @code{AUnit_Framework.Framework} are:
 @itemize
@@ -269,12 +268,6 @@ and the exception is reported immediately rather than as part of the summary
 reporting.
 
 @item
-@i{Max_Failure_Message_Size}: the maximum length of a message describing an
-assertion failure or unhandled exception. If this limit is exceeded, the
-message describing the failed assertion is truncated, and the string ``...''
-is appended to it.
-
-@item
 @i{Max_Routines_Per_Test_Case}: the maximum number of routines that can be part
 of any test case. If this limit is exceeded, a warning is displayed and the
 routine in question is not added to the test case for execution.
@@ -285,12 +278,8 @@ that can be put into a suite. If this limit is exceeded, a warning is displayed
 and the test case is not added to the suite for execution.
 
 @item
-@i{Max_Test_Name_Size}: the largest size of any test case name. If exceeded,
-the string is truncated and ``...'' is appended.
-
-@item
-@i{Max_Routine_Description_Size}: the largest size of any test routine
-description. If exceeded, the string is truncated and ``...'' is appended.
+@i{Message_String_Pool__Size}: amount of space in bytes to be statically
+allocated for strings used in the AUnit report.  Default value is 10_000.
 
 
 @end itemize
@@ -829,10 +818,15 @@ private
 
    type @b{Template_Test} is new Test_Cases.Test_Case with @b{...};
 
+   -- Specifications of test routines, and declarations of access values
+   -- to them for use in Register_Routine:
+
 end @b{Template_Tests};}
 
 The body will follow the usual patterns with the fixture being based on the
-formal package @code{Instance}.
+formal package @code{Instance}. Note that due to a recent AI, accesses to
+test routines, along with the test routine specifications, must be defined
+in the package specification rather than in its body.
 
 Instances of @code{Template} will have associated instances of
 @code{Template_Tests}. The instances under test can be instantiated as is
@@ -1003,7 +997,7 @@ end Name;
 
 Should be changed to:
 
-@AEXP{function Name (T : @b{My_Test_Case}) return @b{AUnit}.Test_Results.Test_String is
+@AEXP{function Name (T : @b{My_Test_Case}) return @b{AUnit}.Test_String is
 begin
    return @b{AUnit}.Test_Results.Format (@b{"My test case"});
 end Name;
@@ -1034,7 +1028,7 @@ t function_Name_match
 b following_with_clauses
 
 : function_Name_match
-s/return .*String_Access/return AUnit.Test_Results.Test_String/
+s/return .*String_Access/return AUnit.Test_String/
 t spec_matched
 n
 b function_Name_match
