@@ -1141,7 +1141,7 @@ To build and install AUnit for a full Ada run-time:
    $ cd aunit-2.01-src
    $ make INSTALL=<gnat-root> install
 @end smallexample
-   Where <gnat-root> is for example /opt/gnatpro/6.01
+   Where <gnat-root> is for example /opt/gnat/6.0.1
 
 @item
 Specific installation:
@@ -1190,7 +1190,7 @@ To test AUnit:
    $ cd test
    $ make
 @end smallexample
-   The test suite's makefile support the following variables:
+   The test suite's makefile supports the following variables:
    * RTS
    * TOOL_PREFIX
 @end itemize
