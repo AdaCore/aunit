@@ -1116,8 +1116,136 @@ with the ZFP profile. This behavior is selected during compilation when the
 
 @node Installation and Use
 @chapter Installation and Use
-*** NYI ***
-[To be filled in once the installation mechanism is finalized]
+
+@noindent
+AUnit 2 now contains support for limited run-times such as zero-foot-print 
+(zfp) and certified run-time (cert). However, some functionalities have to be
+disabled on those run-times: the cert run-time does not provide Ada.Calendar
+and zfp does not support exceptions, and does not provide Ada.Calendar either.
+
+The AUnit library can be installed to take into account those limitations.
+
+@section Installing AUnit on UNIX systems
+
+@noindent
+@itemize
+@item
+Extract the archive:
+@smallexample
+   $ gunzip -dc aunit-2.01-src.tgz | tar xf -
+@end smallexample
+
+@item
+To build and install AUnit for a full Ada run-time:
+@smallexample
+   $ cd aunit-2.01-src
+   $ make INSTALL=<gnat-root> install
+@end smallexample
+   Where <gnat-root> is for example /opt/gnatpro/6.01
+
+@item
+Specific installation:
+
+   The AUnit makefile supports some specific options, activated using
+   environment variables. The following options are defined:
+@itemize
+@item
+   INSTALL: defines the AUnit base installation directory, should always be
+    set.
+
+@item
+   TOOL_PREFIX: defines the gnat tools prefix to use. For example, to compile
+    AUnit for powerpc VxWorks, TOOLS_PREFIX should be set to
+    powerpc-wrs-vxworks. If not set, the native compiler will be used.
+
+@item
+   RTS: defines the run-time used to compile AUnit. When set to zfp, this
+    automatically defines SUPPORT_CALENDAR and SUPPORT_EXCEPTION (see below).
+
+@item
+   SUPPORT_CALENDAR: takes the values yes (default) or no. If the compiler or
+    the run-time used do not provide Ada.Calendar, then you should set this
+    variable to 'no'.
+
+@item
+   SUPPORT_EXCEPTION: takes the values yes (default) or no. If the compiler or
+    the run-time used do not provide exceptions support, then you should set
+    this variable to 'no'.
+@end itemize
+   Example of installation of AUnit to /opt/gnatpro/5.04a1, for a cross ppc 
+   vxworksae compiler using the zfp run-time,
+@smallexample
+   $ cd <build-dir>
+   $ make INSTALL=/opt/gnatpro/5.04a1 RTS=zfp \
+       TOOL_PREFIX=powerpc-wrs-vxworksae install
+@end smallexample
+
+@item
+To test AUnit:
+
+   The AUnit test suite is in the test subdirectory of the source package. In
+   order to build and run the AUnit test suite, first install the AUnit
+   library, then:
+@smallexample
+   $ cd test
+   $ make
+@end smallexample
+   The test suite's makefile support the following variables:
+   * RTS
+   * TOOL_PREFIX
+@end itemize
+
+
+@section Installing AUnit on Windows systems
+
+On Windows, an install-shield wizard is available to easily install AUnit. This
+install shield will ask some questions during the installation:
+
+@itemize
+@item
+Selection of the compiler: the install-shield will try to detect all GNAT 
+compilers available in your system. You can directly select one of the detected
+compilers or enter the path of the desired compiler. The entered path is the 
+root path of the compiler: <path>/bin/*gnatmake.exe should be present.
+@item
+Selection of the installation directory: by default, AUnit is installed in the
+same root directory as the selected compiler. Enter another directory at this
+stage if you want to install AUnit in another directory.
+@item
+Selection of the run-time: if you want to compile AUnit with a specific 
+run-time, enter the run-time at this stage.
+@item
+Support for exceptions: select the support for exceptions in AUnit. If the
+selected run-time does not support exceptions, you should disable the exception
+support in AUnit at this stage.
+@item
+Support for Ada.Calendar: select the support for Ada.Calendar in AUnit. If the
+selected run-time does not provide Ada.Calendar, you should disable the
+Ada.Calendar support in AUnit at this stage.
+@end itemize
+
+After entering the information above, the install-shield will build and install
+aunit in the selected installation directory.
+
+@section Installed files
+
+@noindent
+The AUnit library is installed in the specified directory (<gnat-root> 
+identifies the root installation directory as specified during the installation
+procedures above):
+
+@itemize
+@item
+   the aunit.gpr project is installed in <gnat-root>/lib/gnat
+@item
+   the AUnit source files are installed in <gnat-root>/include/aunit
+@item
+   the AUnit library files are installed in <gnat-root>/lib/aunit
+@item
+   the AUnit documentation is installed in <gnat-root>/share/doc/aunit
+@item
+   the AUnit examples are installed in <gnat-root>/share/examples/aunit
+@end itemize
 
 @node GPS Support
 @chapter GPS Support
