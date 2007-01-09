@@ -261,4 +261,11 @@ ECHO.
 ECHO copying AUnit lib files in %I_LIB%
 COPY aunit\lib\*.* "%I_LIB%" > NUL
 
+ECHO.
+ECHO *******************************************
+ECHO * AUnit has been successfully installed ! *
+ECHO *******************************************
+ECHO.
+ECHO Press enter to close this window
+SET /P FINISH=
 :END
