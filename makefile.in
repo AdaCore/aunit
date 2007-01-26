@@ -107,5 +107,5 @@ doc:
 RMDIR	= rmdir
 MKDIR	= mkdir -p
 RM	= rm
-CP	= cp -f
-CHMOD   = chmod 
+CP	= cp
+CHMOD   = chmod
