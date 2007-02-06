@@ -1,4 +1,4 @@
-INSTALL	= /usr/gnat
+INSTALL	= @prefix@
 RTS =
 TOOL_PREFIX =
 # tell wether the runtime supports the exceptions
