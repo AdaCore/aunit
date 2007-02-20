@@ -22,7 +22,7 @@ REM ===== CONFIGURATION PHASE ===========
 REM Retrieving the GNAT compiler from registry
 SET GNATROOT=
 ECHO.>GNATROOT.TXT
-FOR /F "skip=7 tokens=1,3" %%A IN ('REG QUERY "HKLM\Software\Ada Core Technologies\GNAT" /S') DO (
+FOR /F "skip=9 tokens=1,3" %%A IN ('REG QUERY "HKLM\Software\Ada Core Technologies" /S') DO (
   if %%A == ROOT (
     ECHO %%B >> GNATROOT.TXT
     SET GNATROOT=%%B
@@ -48,10 +48,14 @@ IF '!GNATROOT!' == '' (
   ECHO Please specify the compiler you want to use
   ECHO ** Select one from the list, or directly enter gnatmake's full path:
   SET /A I = O
-  FOR /F %%A IN ('TYPE GNATROOT.TXT') DO (
-    FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
-      SET /A I=!I!+1
-      ECHO !I!- %%B found in %%A
+  SET PREV =
+  FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
+    IF '%%A' NEQ '!PREV!' (
+      SET PREV=%%A
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+        SET /A I=!I!+1
+        ECHO !I!- %%A\bin\%%B
+      )
     )
   )
   SET /P CHOICE=
@@ -65,13 +69,16 @@ SET GNATROOT=
 
 IF '!CHOICE!' LEQ '!I!' (
   SET /A I=0
-  FOR /F %%A IN ('TYPE GNATROOT.TXT') DO (
-    FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
-      SET /A I=!I!+1
-      IF !I! == !CHOICE! (
-        SET GNATMAKE=%%A\bin\%%B
-        SET GNATROOT=%%A
-        GOTO COMPILER_END
+  FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
+    IF '%%A' NEQ '!PREV!' (
+      SET PREV=%%A
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+        SET /A I=!I!+1
+        IF !I! == !CHOICE! (
+          SET GNATMAKE=%%A\bin\%%B
+          SET GNATROOT=%%A
+          GOTO COMPILER_END
+        )
       )
     )
   )
@@ -97,9 +104,7 @@ CD !OLD_PWD!
 REM We do not need GNATROOT.TXT anymore.
 DEL GNATROOT.TXT
 
-
 ECHO Using !GNATMAKE! to compile AUnit
-
 
 ECHO.
 ECHO *** INSTALLATION DIRECTORY ***
@@ -118,15 +123,35 @@ ECHO ** Press enter for default run-time:'
 SET /P RUNTIME=
 :SKIP_RUNTIME
 
+ECHO.
+ECHO *** AUNIT SUPPORT: GNAT.IO ***
+ECHO.
+ECHO Does the run-time contain the GNAT.IO Package ?
+ECHO ** Choose 1 or 2, or press enter for default
+ECHO 1- Yes, GNAT.IO is supported (default)
+ECHO 2- No, GNAT.IO is not support
+:SELECT_GNATIO
+SET CHOICE=
+SET /P CHOICE=
+SET SUPPORT_GNATIO=
+IF '!CHOICE!' == '' SET SUPPORT_GNATIO=yes
+IF '!CHOICE!' == '1' SET SUPPORT_GNATIO=yes
+IF '!CHOICE!' == '2' SET SUPPORT_GNATIO=no
+IF '!SUPPORT_GNATIO!' == '' (
+  ECHO.
+  ECHO ** Choose 1 or 2, or press enter for default
+  ECHO.
+  GOTO SELECT_GNATIO
+)
 
 ECHO.
 ECHO *** AUNIT SUPPORT: EXCEPTIONS ***
 ECHO.
-:SELECT_EXCEPTION
 ECHO AUnit support for exceptions
 ECHO ** Choose 1 or 2, or press enter for default
 ECHO 1- Enable (default)
 ECHO 2- Disable
+:SELECT_EXCEPTION
 SET CHOICE=
 SET /P CHOICE=
 SET SUPPORT_EXCEPTION=
@@ -143,11 +168,11 @@ IF '!SUPPORT_EXCEPTION!' == '' (
 ECHO.
 ECHO *** AUNIT SUPPORT: ADA.CALENDAR ***
 ECHO.
-:SELECT_CALENDAR
 ECHO AUnit support for Ada.Calendar
 ECHO ** Choose 1 or 2, or press enter for default
 ECHO 1- Enable (default)
 ECHO 2- Disable
+:SELECT_CALENDAR
 SET CHOICE=
 SET /P CHOICE=
 SET SUPPORT_CALENDAR=
@@ -184,6 +209,13 @@ ECHO *** BUILDING THE AUNIT LIBRARY ***
 ECHO **********************************
 ECHO.
 
+IF NOT %SUPPORT_GNATIO% EQU yes (
+  ECHO * no support for gnat.io *
+  SET GPR_FLAGS_GNATIO=-XSUPPORT_GNATIO=no
+) ELSE (
+  ECHO * gnat.io is supported *
+  SET GPR_FLAGS_GNATIO=-XSUPPORT_GNATIO=yes
+)
 IF NOT %SUPPORT_EXCEPTION% EQU yes (
   ECHO * no support for exceptions *
   SET GPR_FLAGS_EXCEPTION=-XSUPPORT_EXCEPTION=no
@@ -198,7 +230,7 @@ IF NOT %SUPPORT_CALENDAR% EQU yes (
   ECHO AUnit set-up with Ada.Calendar support
   SET GPR_FLAGS_CALENDAR=-XSUPPORT_CALENDAR=yes
 )
-SET GPR_FLAGS=!GPR_FLAGS_EXCEPTION! !GPR_FLAGS_CALENDAR!
+SET GPR_FLAGS=!GPR_FLAGS_EXCEPTION! !GPR_FLAGS_CALENDAR! !GPR_FLAGS_GNATIO!
 
 REM The following mkdirs are a workaround for missing gnatmake -p
 REM switch in versions prior to GNAT Pro 6.0.0
@@ -242,10 +274,6 @@ ECHO copying GPS plug-in in %I_PLG%
 COPY support\aunit.xml "%I_PLG%" > NUL
 
 ECHO.
-ECHO copying aunit.gpr in %I_GPR%
-COPY support\aunit.gpr "%I_GPR%" > NUL
-
-ECHO.
 ECHO copying AUnit source files in %I_INC%
 GNAT LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
 SET PREV=
@@ -255,11 +283,42 @@ FOR /F %%A IN ('TYPE files.txt') DO (
   )
   SET PREV=%%A
 )
+IF !SUPPORT_GNATIO! == no (
+  COPY aunit\gnatlib\*.* "%I_INC%" > NUL
+)
 DEL files.txt
 
 ECHO.
 ECHO copying AUnit lib files in %I_LIB%
-COPY aunit\lib\*.* "%I_LIB%" > NUL
+COPY aunit\obj\*.ali "%I_LIB%" > NUL
+IF EXIST aunit\lib\libaunit.a (
+  SET AUNITGPR=aunit.gpr
+  COPY aunit\lib\*.a "%I_LIB%" > NUL
+) ELSE (
+  SET AUNITGPR=aunit_nolib.gpr
+  REM Retrieve gnatmake's base name
+  SET GNATMAKENAME =
+  DIR /B %GNATMAKE% > GNATMAKE.TXT
+
+  SET AR =
+  SET FIRST = yes
+  FOR /F "delims=- tokens=1,2,3" %%A IN ('TYPE GNATMAKE.TXT') DO (
+    IF %%A == gnatmake.exe (
+       SET AR=!GNATROOT!\bin\ar.exe
+    ) ELSE IF %%B == gnatmake.exe (
+       SET AR=!GNATROOT!\bin\%%A-ar.exe
+    ) ELSE IF %%C == gnatmake.exe (
+       SET AR=!GNATROOT!\bin\%%A-%%B-ar.exe
+    )
+  )
+  DEL GNATMAKE.TXT
+  !AR! -r "%I_LIB%\libaunit.a" aunit\obj\*.o
+)
+
+
+ECHO.
+ECHO copying aunit.gpr in %I_GPR%
+COPY support\!AUNITGPR! "%I_GPR%\aunit.gpr" > NUL
 
 ECHO.
 ECHO *******************************************
