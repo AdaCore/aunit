@@ -1,0 +1,10 @@
+project AUnit is
+
+   for Source_Dirs use ("../../include/aunit");
+   for Object_Dir use "../../lib/aunit";
+
+   package Linker is
+     for Linker_Options use ("-launit");
+   end Linker;
+
+end AUnit;

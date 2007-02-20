@@ -3,6 +3,7 @@ project AUnit_Build is
    type Yes_No_Type is ("yes", "no");
    Exception_Support : Yes_No_Type := external ("SUPPORT_EXCEPTION", "yes");
    Calendar_Support : Yes_No_Type := external ("SUPPORT_CALENDAR", "yes");
+   Gnatio_Support : Yes_No_Type := external ("SUPPORT_GNATIO", "yes");
 
    for Source_Dirs use ("framework",
                         "containers",
@@ -20,6 +21,13 @@ project AUnit_Build is
          for Source_Dirs use project'Source_Dirs & "framework/calendar";
       when "no" =>
          for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
+   end case;
+
+   case Gnatio_Support is
+      when "no" =>
+         for Source_Dirs use project'Source_Dirs & "gnatlib";
+      when "yes" =>
+         null;
    end case;
 
    for Object_Dir use "obj";
