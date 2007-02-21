@@ -208,6 +208,19 @@ form of @code{Assert} always continues on a failed assertion, and provides you
 with a choice of behaviors.  This form allows writing test routines that are
 fully portable across run-time profiles.
 
+A final comment on assertions: while JUnit and some other members of the xUnit
+family of unit test frameworks provide specialized forms of assertions (e.g.
+@code{assertEqual}), we took a design decision in AUnit not to provide such
+forms.  Ada has a much more rich type system giving a plethora of possible
+scalar types, and leading to an explosion of possible special forms of
+assert routines.  This is exacerbated by the lack of a single root type for
+most types, as is found in Java.  With the introduction of AUnit 2 for use
+with restricted run-time profiles, where even 'Image is missing, providing a
+comprehensive set of special assert routines in the framework itself becomes
+even more unrealistic. Since AUnit is intended to be an extensible
+toolkit, users can certainly write their own custom collection of such assert
+routines to suit local usage.
+
 @item Create a suite function inside a package to gather together test cases
 and sub-suites. Test cases and suites must be statically allocated if using
 the ZFP profile without custom dynamic memory management, or the ``cert''
