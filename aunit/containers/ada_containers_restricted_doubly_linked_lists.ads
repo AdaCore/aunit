@@ -226,8 +226,7 @@ private
 
    Empty_List : constant List := (0, others => <>);
 
-   type List_Access is access all List;
-   for List_Access'Storage_Size use 0;
+   type List_Access is access constant List;
 
    type Cursor is
       record
