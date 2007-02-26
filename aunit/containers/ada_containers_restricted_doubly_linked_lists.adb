@@ -245,7 +245,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if Position.Container /= Container'Unrestricted_Access then
+      if Position.Container /= Container'Unchecked_Access then
          raise Program_Error;
       end if;
 
@@ -410,7 +410,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          Node := Container.First;
 
       else
-         if Position.Container /= Container'Unrestricted_Access then
+         if Position.Container /= Container'Unchecked_Access then
             raise Program_Error;
          end if;
 
@@ -419,7 +419,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
       while Node /= 0 loop
          if Nodes (Node).Element = Item then
-            return Cursor'(Container'Unrestricted_Access, Node);
+            return Cursor'(Container'Unchecked_Access, Node);
          end if;
 
          Node := Nodes (Node).Next;
@@ -438,7 +438,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          return No_Element;
       end if;
 
-      return Cursor'(Container'Unrestricted_Access, Container.First);
+      return Cursor'(Container'Unchecked_Access, Container.First);
    end First;
 
    -------------------
@@ -645,7 +645,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
    begin
       if Before.Container /= null then
-         if Before.Container /= Container'Unrestricted_Access then
+         if Before.Container /= Container'Unchecked_Access then
             raise Program_Error;
          end if;
 
@@ -668,7 +668,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       Allocate (Container, New_Item, New_Node);
       Insert_Internal (Container, Before.Node, New_Node);
 
-      Position := Cursor'(Container'Unrestricted_Access, New_Node);
+      Position := Cursor'(Container'Unchecked_Access, New_Node);
 
       for J in 2 .. Count loop
          Allocate (Container, New_Item, New_Node);
@@ -697,7 +697,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
    begin
       if Before.Container /= null then
-         if Before.Container /= Container'Unrestricted_Access then
+         if Before.Container /= Container'Unchecked_Access then
             raise Program_Error;
          end if;
 
@@ -720,7 +720,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       Allocate (Container, New_Node);
       Insert_Internal (Container, Before.Node, New_Node);
 
-      Position := Cursor'(Container'Unrestricted_Access, New_Node);
+      Position := Cursor'(Container'Unchecked_Access, New_Node);
 
       for J in 2 .. Count loop
          Allocate (Container, New_Node);
@@ -800,12 +800,8 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
      (Container : List;
       Process   : not null access procedure (Position : Cursor))
    is
-      C : List renames Container'Unrestricted_Access.all;
-      N : Node_Array renames C.Nodes;
---    B : Natural renames C.Busy;
-
-      Node  : Count_Type := Container.First;
-
+      N         : Node_Array renames Container.Nodes;
+      Node      : Count_Type := Container.First;
       Index     : Count_Type := 0;
       Index_Max : constant Count_Type := Container.Length;
 
@@ -818,7 +814,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       loop
          pragma Assert (Node /= 0);
 
-         Process (Cursor'(C'Unchecked_Access, Node));
+         Process (Cursor'(Container'Unchecked_Access, Node));
          pragma Assert (Container.Length = Index_Max);
          pragma Assert (N (Node).Prev /= -1);
 
@@ -842,7 +838,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          return No_Element;
       end if;
 
-      return Cursor'(Container'Unrestricted_Access, Container.Last);
+      return Cursor'(Container'Unchecked_Access, Container.Last);
    end Last;
 
    ------------------
@@ -957,11 +953,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       pragma Assert (Vet (Position), "bad cursor in Query_Element");
 
       declare
-         C : List renames Position.Container.all'Unrestricted_Access.all;
---       B : Natural renames C.Busy;
---       L : Natural renames C.Lock;
-
-         NN : Node_Array renames C.Nodes;
+         NN : Node_Array renames Position.Container.Nodes;
          N  : Node_Type renames NN (Position.Node);
 
       begin
@@ -984,7 +976,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if Position.Container /= Container'Unrestricted_Access then
+      if Position.Container /= Container'Unchecked_Access then
          raise Program_Error;
       end if;
 
@@ -1105,7 +1097,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          Node := Container.Last;
 
       else
-         if Position.Container /= Container'Unrestricted_Access then
+         if Position.Container /= Container'Unchecked_Access then
             raise Program_Error;
          end if;
 
@@ -1114,7 +1106,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
       while Node /= 0 loop
          if N (Node).Element = Item then
-            return Cursor'(Container'Unrestricted_Access, Node);
+            return Cursor'(Container'Unchecked_Access, Node);
          end if;
 
          Node := N (Node).Prev;
@@ -1131,12 +1123,8 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
      (Container : List;
       Process   : not null access procedure (Position : Cursor))
    is
-      C : List renames Container'Unrestricted_Access.all;
-      N : Node_Array renames C.Nodes;
---    B : Natural renames C.Busy;
-
-      Node : Count_Type := Container.Last;
-
+      N         : Node_Array renames Container.Nodes;
+      Node      : Count_Type := Container.Last;
       Index     : Count_Type := 0;
       Index_Max : constant Count_Type := Container.Length;
 
@@ -1149,7 +1137,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       loop
          pragma Assert (Node > 0);
 
-         Process (Cursor'(C'Unchecked_Access, Node));
+         Process (Cursor'(Container'Unchecked_Access, Node));
          pragma Assert (Container.Length = Index_Max);
          pragma Assert (N (Node).Prev /= -1);
 
@@ -1176,7 +1164,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
    begin
       if Before.Container /= null then
-         if Before.Container /= Container'Unrestricted_Access then
+         if Before.Container /= Container'Unchecked_Access then
             raise Program_Error;
          end if;
 
@@ -1187,7 +1175,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if Position.Container /= Container'Unrestricted_Access then
+      if Position.Container /= Container'Unchecked_Access then
          raise Program_Error;
       end if;
 
@@ -1285,8 +1273,8 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if I.Container /= Container'Unrestricted_Access
-        or else J.Container /= Container'Unrestricted_Access
+      if I.Container /= Container'Unchecked_Access
+        or else J.Container /= Container'Unchecked_Access
       then
          raise Program_Error;
       end if;
@@ -1331,7 +1319,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if I.Container /= Container'Unrestricted_Access
+      if I.Container /= Container'Unchecked_Access
         or else I.Container /= J.Container
       then
          raise Program_Error;
@@ -1390,7 +1378,7 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          raise Constraint_Error;
       end if;
 
-      if Position.Container /= Container'Unrestricted_Access then
+      if Position.Container /= Container'Unchecked_Access then
          raise Program_Error;
       end if;
 
