@@ -10,7 +10,7 @@ IF NOT '%I%' == '' (
 
 REM === reset of the used variables
 SET GNATROOT=
-SET GNATMAKE=
+SET GNAT=
 SET SUPPORT_EXCEPTION=
 SET SUPPORT_CALENDAR=
 SET INSTALL=
@@ -36,23 +36,23 @@ ECHO.
 
 SET CHOICE=
 IF '!GNATROOT!' == '' (
-  ECHO Please specify the full path to gnatmake:
+  ECHO Please specify the full path to gnat.exe:
   SET /P CHOICE=
   IF '!CHOICE!' == '' (
-    ECHO *** Error ! Please enter a valid path for gnatmake
+    ECHO *** Error ! Please enter a valid path for gnat.exe
     GOTO SELECT_COMPILER
   )
 
   GOTO ANALYSE_PATH
 ) ELSE (
   ECHO Please specify the compiler you want to use
-  ECHO ** Select one from the list, or directly enter gnatmake's full path:
+  ECHO ** Select one from the list, or directly enter gnat.exe's full path:
   SET /A I = O
   SET PREV =
   FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
     IF '%%A' NEQ '!PREV!' (
       SET PREV=%%A
-      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnat.exe') DO (
         SET /A I=!I!+1
         ECHO !I!- %%A\bin\%%B
       )
@@ -64,7 +64,7 @@ IF '!GNATROOT!' == '' (
     GOTO SELECT_COMPILER
   )
 )
-SET GNATMAKE=
+SET GNAT=
 SET GNATROOT=
 
 IF '!CHOICE!' LEQ '!I!' (
@@ -73,10 +73,10 @@ IF '!CHOICE!' LEQ '!I!' (
   FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
     IF '%%A' NEQ '!PREV!' (
       SET PREV=%%A
-      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnat.exe') DO (
         SET /A I=!I!+1
         IF !I! == !CHOICE! (
-          SET GNATMAKE=%%A\bin\%%B
+          SET GNAT=%%A\bin\%%B
           SET GNATROOT=%%A
           GOTO COMPILER_END
         )
@@ -92,7 +92,7 @@ IF %ERRORLEVEL% NEQ 0 (
   ECHO *** Error ! Path !CHOICE! does not exist
   GOTO SELECT_COMPILER
 )
-SET GNATMAKE=!CHOICE!
+SET GNAT=!CHOICE!
 
 SET OLD_PWD=!CD!
 CD !CHOICE!\..\..
@@ -106,7 +106,7 @@ REM We do not need GNATROOT.TXT anymore.
 DEL GNATROOT.TXT
 
 
-ECHO Using !GNATMAKE! to compile AUnit
+ECHO Using !GNAT! MAKE to compile AUnit
 
 
 ECHO.
@@ -213,8 +213,8 @@ REM switch in versions prior to GNAT Pro 6.0.0
 MKDIR aunit\lib 2> NUL
 MKDIR aunit\obj 2> NUL
 
-ECHO %GNATMAKE% %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
-%GNATMAKE% %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
+ECHO %GNAT% make %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
+%GNAT% make %ADA_FLAGS% -Paunit/aunit_build %GPR_FLAGS%
 
 :INSTALL
 ECHO.
@@ -255,7 +255,7 @@ COPY support\aunit.gpr "%I_GPR%" > NUL
 
 ECHO.
 ECHO copying AUnit source files in %I_INC%
-!GNATROOT!\bin\GNAT LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
+%GNAT% LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
 SET PREV=
 FOR /F %%A IN ('TYPE files.txt') DO (
   IF !PREV! NEQ %%A (
