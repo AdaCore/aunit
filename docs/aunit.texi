@@ -273,6 +273,8 @@ The formal parameters of @code{AUnit_Framework.Framework} are:
 that can be reported in test routines for a given run. If this value is
 exceeded, a warning is displayed and the exception is reported immediately
 rather than as part of the summary reporting.
+Note that when a restricted Ada run-time is used, not supporting
+exceptions, this parameter is unused.
 
 @item
 @i{Max_Failures_Per_Harness}: the maximum number of failed assertions that
