@@ -22,7 +22,7 @@ REM ===== CONFIGURATION PHASE ===========
 REM Retrieving the GNAT compiler from registry
 SET GNATROOT=
 ECHO.>GNATROOT.TXT
-FOR /F "skip=7 tokens=1,3" %%A IN ('REG QUERY "HKLM\Software\Ada Core Technologies\GNAT" /S') DO (
+FOR /F "skip=9 tokens=1,3" %%A IN ('REG QUERY "HKLM\Software\Ada Core Technologies" /S') DO (
   if %%A == ROOT (
     ECHO %%B >> GNATROOT.TXT
     SET GNATROOT=%%B
@@ -48,10 +48,14 @@ IF '!GNATROOT!' == '' (
   ECHO Please specify the compiler you want to use
   ECHO ** Select one from the list, or directly enter gnatmake's full path:
   SET /A I = O
-  FOR /F %%A IN ('TYPE GNATROOT.TXT') DO (
-    FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
-      SET /A I=!I!+1
-      ECHO !I!- %%B found in %%A
+  SET PREV =
+  FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
+    IF '%%A' NEQ '!PREV!' (
+      SET PREV=%%A
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+        SET /A I=!I!+1
+        ECHO !I!- %%A\bin\%%B
+      )
     )
   )
   SET /P CHOICE=
@@ -65,13 +69,17 @@ SET GNATROOT=
 
 IF '!CHOICE!' LEQ '!I!' (
   SET /A I=0
-  FOR /F %%A IN ('TYPE GNATROOT.TXT') DO (
-    FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
-      SET /A I=!I!+1
-      IF !I! == !CHOICE! (
-        SET GNATMAKE=%%A\bin\%%B
-        SET GNATROOT=%%A
-        GOTO COMPILER_END
+  SET PREV =
+  FOR /F %%A IN ('SORT GNATROOT.TXT') DO (
+    IF '%%A' NEQ '!PREV!' (
+      SET PREV=%%A
+      FOR /F %%B IN ('DIR /B %%A\bin\*gnatmake.exe') DO (
+        SET /A I=!I!+1
+        IF !I! == !CHOICE! (
+          SET GNATMAKE=%%A\bin\%%B
+          SET GNATROOT=%%A
+          GOTO COMPILER_END
+        )
       )
     )
   )
@@ -247,7 +255,7 @@ COPY support\aunit.gpr "%I_GPR%" > NUL
 
 ECHO.
 ECHO copying AUnit source files in %I_INC%
-GNAT LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
+!GNATROOT!\bin\GNAT LIST -s -d -Paunit/aunit_build %GPR_FLAGS% | sort > files.txt
 SET PREV=
 FOR /F %%A IN ('TYPE files.txt') DO (
   IF !PREV! NEQ %%A (
