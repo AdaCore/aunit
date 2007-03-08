@@ -860,7 +860,8 @@ Here is an example where the test program calls three different @code{Run}
 routines (because they need to be invoked in the contexts of distinct
 tasks):
 
-@AEXP{--------------------
+@smallexample
+--------------------
 
    Total Tests Run: 7
 
@@ -953,7 +954,8 @@ tasks):
  Delta     :  1.79301423486322E-07
  Max Error :  1.36508677850804E-10
 
-   Unexpected Errors: 0}
+   Unexpected Errors: 0
+@end smallexample
 
 @c ======================================================================
 
