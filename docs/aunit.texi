@@ -1223,7 +1223,7 @@ install shield will ask some questions during the installation:
 Selection of the compiler: the install-shield will try to detect all GNAT 
 compilers available in your system. You can directly select one of the detected
 compilers or enter the path of the desired compiler. The entered path is the 
-root path of the compiler: <path>/bin/*gnatmake.exe should be present.
+gnat.exe path of the compiler.
 @item
 Selection of the installation directory: by default, AUnit is installed in the
 same root directory as the selected compiler. Enter another directory at this
