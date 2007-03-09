@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006, AdaCore                        --
+--                       Copyright (C) 2006 - 2007, AdaCore                 --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -54,6 +54,8 @@ package AUnit_Framework.Framework is
      (Message_String_Pool_Size);
 
    subtype Test_String is Message_Strings.Message_String;
+
+   subtype Status is AUnit_Framework.Status;
 
    Max_Routines_Per_Harness : constant Natural :=
       Max_Routines_Per_Test_Case * Max_Test_Cases_Per_Suite;
