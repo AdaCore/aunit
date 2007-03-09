@@ -1,4 +1,4 @@
-with "../aunit.gpr";
+with "aunit.gpr";
 
 project Sample is
 
