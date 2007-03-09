@@ -295,6 +295,9 @@ and the test case is not added to the suite for execution.
 @item
 @i{Message_String_Pool__Size}: amount of space in bytes to be statically
 allocated for strings used in the AUnit report.  Default value is 10_000.
+If the value given is too small to accommodate the size of the strings
+needed for the run, exception 
+@code {AUnit_Framework.Message_String.String_Pool_Exhausted} will be raised.
 
 
 @end itemize
