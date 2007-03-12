@@ -116,10 +116,8 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    ------------
 
    procedure Report (R : in out Result) is
-      T : Duration;
-      Exp : Integer;
-      Dec : Integer;
-      Val : Integer;
+      T   : AUnit_Duration;
+      procedure Put_Measure is new Gen_Put_Measure;
    begin
       Put_Line ("--------------------");
       New_Line;
@@ -168,40 +166,9 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       if Elapsed  (R) /= Time_Measure.Null_Time then
          New_Line;
          T := Get_Measure (Elapsed (R));
-         Exp := 0;
 
-         while T >= 10.0 loop
-            T := T / 10.0;
-            Exp := Exp + 1;
-         end loop;
-
-         while T < 1.0 loop
-            T := T * 10.0;
-            Exp := Exp - 1;
-         end loop;
-
-         --  Integer (T - 0.5) is equivalent to Float'Floor, but works
-         --  with durations !
-         Val := Integer (T - 0.5);
-         T := (T - Duration (Val)) * 1000.0;
-         Dec := Integer (T - 0.5);
          Put ("Time: ");
-         Put (Val);
-         Put (".");
-
-         if Dec < 10 then
-            Put ("00");
-         elsif Dec < 100 then
-            Put ("0");
-         end if;
-
-         Put (Dec);
-
-         if Exp /= 0 then
-            Put ("E");
-            Put (Exp);
-         end if;
-
+         Put_Measure (T);
          Put_Line (" seconds");
       end if;
    end Report;
