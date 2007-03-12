@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006, AdaCore                        --
+--                    Copyright (C) 2006-2007, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -48,10 +48,58 @@ package body AUnit_Framework.Time_Measure is
    -- Get_Measure --
    -----------------
 
-   function Get_Measure (T : in Time) return Duration is
+   function Get_Measure (T : in Time) return AUnit_Duration is
       use type Ada.Calendar.Time;
    begin
-      return T.Stop - T.Start;
+      return AUnit_Duration (T.Stop - T.Start);
    end Get_Measure;
+
+   ---------
+   -- Put --
+   ---------
+
+   procedure Gen_Put_Measure (Measure : AUnit_Duration) is
+      T   : Duration := Duration (Measure);
+      Exp : Integer;
+      Dec : Integer;
+      Val : Integer;
+
+   begin
+      Exp := 0;
+
+      while T >= 10.0 loop
+         T := T / 10.0;
+         Exp := Exp + 1;
+      end loop;
+
+      while T < 1.0 loop
+         T := T * 10.0;
+         Exp := Exp - 1;
+      end loop;
+
+      --  We have here 1.0 <= T < 10.0
+
+      --  Integer (T - 0.5) is equivalent to Float'Floor, but works
+      --  with durations !
+      Val := Integer (T - 0.5);
+      T := (T - Duration (Val)) * 1000.0;
+      Dec := Integer (T - 0.5);
+
+      Put (Val);
+      Put (".");
+
+      if Dec < 10 then
+         Put ("00");
+      elsif Dec < 100 then
+         Put ("0");
+      end if;
+
+      Put (Dec);
+
+      if Exp /= 0 then
+         Put ("E");
+         Put (Exp);
+      end if;
+   end Gen_Put_Measure;
 
 end AUnit_Framework.Time_Measure;

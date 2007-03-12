@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006, AdaCore                        --
+--                    Copyright (C) 2006-2007, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,6 +33,8 @@ package AUnit_Framework.Time_Measure is
       Stop  : Ada.Calendar.Time;
    end record;
 
+   type AUnit_Duration is private;
+
    Null_Time : constant Time := (Start => Ada.Calendar.Time_Of (1901, 1, 1),
                                  Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
 
@@ -42,7 +44,17 @@ package AUnit_Framework.Time_Measure is
    procedure Stop_Measure (T : in out Time);
    --  Stop the measure
 
-   function Get_Measure (T : in Time) return Duration;
+   function Get_Measure (T : in Time) return AUnit_Duration;
    --  Get the measure
+
+   generic
+      with procedure Put (I : Integer) is <>;
+      with procedure Put (S : String) is <>;
+   procedure Gen_Put_Measure (Measure : AUnit_Duration);
+   --  Put the image of the measure
+
+private
+
+   type AUnit_Duration is new Duration;
 
 end AUnit_Framework.Time_Measure;
