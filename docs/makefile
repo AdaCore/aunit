@@ -15,7 +15,7 @@ version:
 %.dvi: %.texi
 ifneq (${TEXI2DVI},)
 	echo Building $@
-	-${TEXI2DVI} --expand --clean --quiet $<
+	${TEXI2DVI} --expand --clean --quiet $<
 else
 	@echo "--------------------------------------------------------"
 	@echo "texi2dvi not found, cannot build DVI or PS documentation"
@@ -25,7 +25,7 @@ endif
 %.ps: %.dvi
 ifneq (${DVIPS},)
 	echo Building $@
-	-${DVIPS} -q $< -o $@
+	${DVIPS} -q $< -o $@
 else
 	@echo "------------------------------------------------------"
 	@echo "dvips not found, cannot build POSTSCRIPT documentation"
@@ -51,7 +51,7 @@ endif
 %.info: %.texi
 ifneq (${MAKEINFO},)
 	echo Building $@
-	-${MAKEINFO} $<
+	${MAKEINFO} $<
 else
 	@echo "---------------------------------------------------"
 	@echo "makeinfo not found, cannot build INFO documentation"
@@ -61,7 +61,7 @@ endif
 %.html: %.texi
 ifneq (${MAKEINFO},)
 	echo Building $@
-	-${MAKEINFO} --html --no-split --css-include=aunit.css --ifinfo $<
+	${MAKEINFO} --html --no-split --css-include=aunit.css --ifinfo $<
 else
 	@echo "---------------------------------------------------"
 	@echo "makeinfo not found, cannot build HTML documentation"
@@ -71,7 +71,7 @@ endif
 %.txt: %.texi
 ifneq (${MAKEINFO},)
 	echo Building $@
-	-${MAKEINFO} --plaintext --no-headers $< --output $@
+	${MAKEINFO} --plaintext --no-headers $< --output $@
 else
 	@echo "---------------------------------------------------"
 	@echo "makeinfo not found, cannot build TEXT documentation"
