@@ -1,9 +1,10 @@
 
-AUnit 2.01 README
-January 9, 2007
+AUnit 2.02 README
+March 21, 2007
 
 This is a major update release of the Ada unit test framework AUnit, derived
-from the JUnit framework for Java.  Read docs/aunit.html for installation and usage.
+from the JUnit framework for Java. Read docs/aunit.html for installation and
+usage.
 
 Other compilers:
 ----------------
@@ -15,4 +16,4 @@ to the compilation system according to its conventions.
 Note that AUnit also uses the GNAT.IO package. This package should then be also
 made available.
 
-Maintainer: Ed Falis (falis@adacore.com)
+Maintainer: AdaCore (sales@adacore.com)
