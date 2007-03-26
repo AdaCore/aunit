@@ -43,7 +43,7 @@ package body PR_XXXX_XXX is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Test_Results.Test_String is
+   function Name (T : Test_Case) return Message_Strings.Message_String is
    begin
       return Test_Results.Format ("Test case name");
    end Name;
