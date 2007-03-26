@@ -6,6 +6,7 @@ a new AUnit release, and testing it:
 ------------------
 
 * verify the version number in version_information, README, configure.ac
+  remove the 'w' wavefront indication in version_information
 
 * verify the copyright notice in docs/aunit.texi
 
@@ -28,6 +29,13 @@ a new AUnit release, and testing it:
 * verify that aunit installs correctly on all supported platforms.
 
 * redo the sanity-checking
+
+AFTER RELEASE
+
+* update the version number in version_information, README, configure.ac
+  verify that the 'w' wavefront indication is present after MINOR_VERSION.
+
+* switch back the 'build-tags' script to HEAD.
 
  -------------------
 / Sanity-checking /
@@ -96,3 +104,5 @@ for Native and cross-platforms, non Windows platforms.
   Note that TOOL_PREFIX and RTS must be used here with the same values as when
   compiling.
 
+  The test suite should compile fine with any native compiler with full or zfp
+  run-times and vxworks cross compiler with full or zfp run-time.
