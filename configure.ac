@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT(aunit, 2.02w, report@adacore.com)
+AC_INIT(aunit, , report@adacore.com)
 AC_CONFIG_SRCDIR(aunit/framework/aunit_framework.ads)
 AC_PREFIX_DEFAULT(/usr/gnat)
 
