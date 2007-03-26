@@ -53,7 +53,7 @@
 
 @page
 
-Copyright @copyright{} 2000-2006, AdaCore
+Copyright @copyright{} 2000-2007, AdaCore
 
 @*
 
@@ -297,7 +297,7 @@ and the test case is not added to the suite for execution.
 allocated for strings used in the AUnit report - i.e. test and routine names
 and descriptions, and assertion failure messages content.  Default value is
 10_000. If the value given is too small to accommodate the size of the strings
-needed for the run, exception 
+needed for the run, exception
 @code{AUnit_Framework.Message_String.String_Pool_Exhausted} will be raised.
 
 
@@ -1139,7 +1139,7 @@ with the ZFP profile. This behavior is selected during compilation when the
 @chapter Installation and Use
 
 @noindent
-AUnit 2 now contains support for limited run-times such as zero-foot-print 
+AUnit 2 now contains support for limited run-times such as zero-foot-print
 (zfp) and certified run-time (cert). However, some functionalities have to be
 disabled on those run-times: the cert run-time does not provide Ada.Calendar
 and zfp does not support exceptions, and does not provide Ada.Calendar either.
@@ -1193,7 +1193,7 @@ Specific installation:
     the run-time used do not provide exceptions support, then you should set
     this variable to 'no'.
 @end itemize
-   Example of installation of AUnit to /opt/gnatpro/5.04a1, for a cross ppc 
+   Example of installation of AUnit to /opt/gnatpro/5.04a1, for a cross ppc
    vxworksae compiler using the zfp run-time,
 @smallexample
    $ cd <build-dir>
@@ -1224,16 +1224,16 @@ install shield will ask some questions during the installation:
 
 @itemize
 @item
-Selection of the compiler: the install-shield will try to detect all GNAT 
+Selection of the compiler: the install-shield will try to detect all GNAT
 compilers available in your system. You can directly select one of the detected
-compilers or enter the path of the desired compiler. The entered path is the 
+compilers or enter the path of the desired compiler. The entered path is the
 gnat.exe path of the compiler.
 @item
 Selection of the installation directory: by default, AUnit is installed in the
 same root directory as the selected compiler. Enter another directory at this
 stage if you want to install AUnit in another directory.
 @item
-Selection of the run-time: if you want to compile AUnit with a specific 
+Selection of the run-time: if you want to compile AUnit with a specific
 run-time, enter the run-time at this stage.
 @item
 Support for exceptions: select the support for exceptions in AUnit. If the
@@ -1251,7 +1251,7 @@ aunit in the selected installation directory.
 @section Installed files
 
 @noindent
-The AUnit library is installed in the specified directory (<gnat-root> 
+The AUnit library is installed in the specified directory (<gnat-root>
 identifies the root installation directory as specified during the installation
 procedures above):
 
