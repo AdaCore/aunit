@@ -1,1 +1,2 @@
 pragma Restrictions (No_Fixed_Point);
+pragma Restrictions (No_Implementation_Attributes);
