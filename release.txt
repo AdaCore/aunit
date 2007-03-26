@@ -38,6 +38,8 @@ for Native and cross-platforms, non Windows platforms.
 * verify that AUnit can be compiled and installed correctly
   (non Windows platform case).
 
+    $ gunzip -dc aunit-<version>-src.tgz | tar -xf -
+    $ cd aunit-<version>
     $ ./configure --prefix=<prefix>
     $ make install
 
@@ -46,9 +48,11 @@ for Native and cross-platforms, non Windows platforms.
   For compilation with a ZFP run-time, use
     $ make install RTS=zfp
 
+  Verify that in aunit-<version> directory the autom4te.cache, config.log,
+  config.status, makefile, release.txt files are *not* present.
+
   If the installation directory is not GNAT's directory, you need to set
   ADA_PROJECT_PATH environment variable to <prefix>/lib/gnat
-
 
 * verify that AUnit can be compiled and installed correctly
   (Windows case).
