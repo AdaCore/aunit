@@ -18,7 +18,8 @@ project Aunit_Tests_ZFP is
    end Binder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+      for Default_Switches ("ada") use
+          ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty", "-gnatec=../zfp.adc");
    end Compiler;
 
    package Builder is
