@@ -1,6 +1,6 @@
 
-AUnit 1.06 README
-16 November 2006
+AUnit 1.07 README
+March 23rd, 2007
 
 This is a minor update release of the Ada unit test framework AUnit, derived 
 from the JUnit framework for Java.  Read AUnit.html for usage.
@@ -56,6 +56,9 @@ test_harness [ -v | -V ]
      and error tests are listed.
 
 Changes:
+1.07    Fixed documentation, repackage the makefile to build the library and
+        tests
+
 1.06    Repackaged 1.05 to include prebuilt documentation
 
 1.05    Added Set_Up_Case and Tear_Down_Case to Test_Case
