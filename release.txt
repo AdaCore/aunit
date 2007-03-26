@@ -1,0 +1,94 @@
+This file contains information about the various steps required for producing
+a new AUnit release, and testing it:
+
+ -------------------
+/ Release process /
+------------------
+
+* verify the version number in version_information, README, configure.ac
+
+* verify the copyright notice in docs/aunit.texi
+
+* review the README for content, changelog. Verify the date is correct.
+
+* preform a Sanity-checking for linux native, windows native,
+  windows native using zfp runtime, cross ppc-vxworks on both linux and
+  windows.
+
+* put a tag in the CVS repository corresponding to the sources used by the
+  release:
+  $cvs tag aunit-2_02
+
+* switch nightly builds to use the branch by modifying the aunit line in
+  'build-tags' (from scripts/nightly CVS repository), and update this script
+  on nile, e.g:
+
+  aunit        aunit-2_02
+
+* verify that aunit installs correctly on all supported platforms.
+
+* redo the sanity-checking
+
+ -------------------
+/ Sanity-checking /
+------------------
+
+for Native and cross-platforms, non Windows platforms.
+
+* verify that AUnit can be compiled and installed correctly
+  (non Windows platform case).
+
+    $ ./configure --prefix=<prefix>
+    $ make install
+
+  For cross compiler, use
+    $ make install TOOL_PREFIX=<gnat tools prefix>
+  For compilation with a ZFP run-time, use
+    $ make install RTS=zfp
+
+  If the installation directory is not GNAT's directory, you need to set
+  ADA_PROJECT_PATH environment variable to <prefix>/lib/gnat
+
+
+* verify that AUnit can be compiled and installed correctly
+  (Windows case).
+
+  Make sure that the GNAT compiler you want to use has been installed using
+  the InstallShield.
+
+  Make sure that this compiler is *not* in the PATH.
+
+  Use the install-shield to install AUnit, verify that it is correctly compiled
+  and installed.
+
+
+* review the documentation
+  Verify that the documentation is correctly installed in
+  <prefix>/share/doc/aunit
+  In particular, make sure that pdf, txt, html, info formats are available, and
+  that the pdf version is properly formatted.
+
+  If the installation directory is not GPS's directory, you need to set
+  GPS_CUSTOM_PATH to <prefix>/share/gps/plug-ins
+
+  Launch gps and verify that the menu Help->AUnit->AUnit User's Guide exists
+  and correctly launches an explorer with aunit.html document.
+
+
+* verify that the aunit examples can be directly loaded by GPS, and can be
+  compiled without error:
+
+    $ cd <prefix>/share/examples/aunit
+    $ gps -Psample
+  Then press F4 to compile.
+
+
+* verify that the test suite can be compiled, and can be executed. Verify that
+  the results are clean: errors displayed should tell that they are expected.
+
+   $ cd <src dir>/test
+   $ make
+
+  Note that TOOL_PREFIX and RTS must be used here with the same values as when
+  compiling.
+
