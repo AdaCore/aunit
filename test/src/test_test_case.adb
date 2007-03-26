@@ -58,7 +58,7 @@ package body Test_Test_Case is
 
       use AUnit_Framework;
 
-      Outcome   : Status;
+      Outcome   : AUnit_Framework.Status;
 
    begin
       Run (Simple'Access, R'Access, Outcome);

@@ -16,7 +16,7 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      Outcome : Status;
+      Outcome : AUnit_Framework.Status;
    begin
       Run (S'Access, R'Access, Outcome);
 
