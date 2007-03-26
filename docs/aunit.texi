@@ -34,7 +34,7 @@
 @end macro
 
 @include version.texi
-@set VERSION @value{MAJOR_VERSION}.@value{MINOR_VERSION}@value{WAVE_VERSION}
+@set VERSION @value{MAJOR_VERSION}.@value{MINOR_VERSION}
 
 @c ----------------------------------------- END MACRO
 
