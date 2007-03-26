@@ -1,29 +1,4 @@
 INSTALL	= /usr/gnat
-RTS =
-TOOL_PREFIX =
-# tell wether the runtime supports the exceptions
-SUPPORT_EXCEPTION = yes
-# tell wether the runtime supports Ada.Calendar
-SUPPORT_CALENDAR = yes
-
-ifeq ($(RTS),zfp)
-   SUPPORT_EXCEPTION = no
-   SUPPORT_CALENDAR = no
-endif
-
-ifeq ($(TOOL_PREFIX),)
-   GNATMAKE  = gnatmake
-   GNATCLEAN = gnatclean
-else
-   GNATMAKE  = $(TOOL_PREFIX)-gnatmake
-   GNATCLEAN = $(TOOL_PREFIX)-gnatclean
-endif
-
-ifeq ($(RTS),)
-   ADA_FLAGS =
-else
-   ADA_FLAGS = --RTS=$(RTS)
-endif
 
 # Install directories
 
@@ -34,71 +9,51 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
-GPR_FLAGS_INSTALL = -XINSTALL_DIR=$(INSTALL)
-
-ifneq ($(SUPPORT_EXCEPTION),yes)
-   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=no
-else
-   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=yes
-endif
-
-ifneq ($(SUPPORT_CALENDAR),yes)
-   GPR_FLAGS_CALENDAR = -XSUPPORT_CALENDAR=no
-else
-   GPR_FLAGS_CALENDAR := -XSUPPORT_CALENDAR=yes
-endif
-
-GPR_FLAGS = $(GPR_FLAGS_INSTALL) $(GPR_FLAGS_EXCEPTION) $(GPR_FLAGS_CALENDAR)
-
 all:
-	@$(MKDIR) aunit/obj
-	@$(MKDIR) aunit/lib
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit/aunit_build $(GPR_FLAGS)
+	$(MKDIR) aunit/obj
+	$(MKDIR) aunit/lib
+	gnatmake -Paunit
 
 clean:
-	-$(GNATCLEAN) -f -r -Paunit/aunit_build $(GPR_FLAGS)
-	$(RM) -f $(I_GPR)/aunit.gpr
+	-gnatclean -Paunit
+	-gnatclean -Paunit_tests
 	-$(RMDIR) aunit/obj
+	-$(RMDIR) aunit/lib
 	-${MAKE} -C docs clean
 
 install_clean:
-	$(RM) -fr $(I_DOC)
-	$(RM) -fr $(I_TPL)
-	$(RM) -f $(I_PLG)/aunit.xml
-	$(RM) -fr $(I_LIB)
 	$(RM) -fr $(I_INC)
-	$(RM) -fr $(I_GPR)/aunit.gpr
+	$(RM) -fr $(I_LIB)
+	$(RM) -fr $(INSTALL)/share/examples/aunit
+	$(RM) -fr $(I_DOC)
+	$(RM) -f $(I_GPR)/aunit.gpr
 
-install: install_clean all
+install_dirs: install_clean
+	$(MKDIR) $(I_INC)
+	$(MKDIR) $(I_LIB)
 	$(MKDIR) $(I_DOC)
+	$(MKDIR) $(I_GPR)
 	$(MKDIR) $(I_TPL)
 	$(MKDIR) $(I_PLG)
-	$(MKDIR) $(I_GPR)
-	$(MKDIR) $(I_LIB)
-	$(MKDIR) $(I_INC)
-	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
-	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
-	-$(CP) support/aunit.xml $(I_PLG)
-	$(CP) support/aunit.gpr $(I_GPR)
+
+install: install_dirs
+	$(CP) aunit/framework/*.ad* aunit/text_reporter/*.ad* $(I_INC)
 	$(CP) aunit/lib/* $(I_LIB)
-	@IFS=$$'\012'; for f in `gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//'`; do \
-	  if [ '$$f' != '' ]; then \
-	    echo $(CP) "$$f" "$(I_INC)"; \
-	    $(CP) "$$f" "$(I_INC)"; \
-	  fi; \
-	done
-	@echo $(SRC_LIST)
-	@echo '------------------------------------------------------------------'
-	@echo '--  AUnit has now been installed.'
-	@echo '--  To be able to use the library, you may need to update your'
-	@echo '--  ADA_PROJECT_PATH or GPR_PROJECT_PATH to point to the path'
-	@echo '--  $(I_GPR)'
-	@echo '------------------------------------------------------------------'
+	$(CP) template/*.ad* template/*.gpr $(I_TPL)
+	$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
+	$(CP) support/aunit.gpr $(I_GPR)
+	$(CP) support/aunit.xml $(I_PLG)
 
 doc:
 	${MAKE} -C docs
 
+force:
+
+test: force
+	gnatmake -Paunit_tests
+	./harness
+
 RMDIR	= rmdir
 MKDIR	= mkdir -p
 RM	= rm
-CP	= install -m 644
+CP	= cp -p
