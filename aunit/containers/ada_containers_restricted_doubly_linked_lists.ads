@@ -7,7 +7,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---          Copyright (C) 2004-2006, Free Software Foundation, Inc.         --
+--          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
 -- GNAT. The copyright notice above, and the license provisions that follow --
@@ -34,6 +34,8 @@
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
 
+pragma Ada_05;
+
 with Ada_Containers; use Ada_Containers;
 
 generic
@@ -44,7 +46,6 @@ generic
 
 package Ada_Containers_Restricted_Doubly_Linked_Lists is
    pragma Pure;
-   pragma Ada_05;
 
    type List (Capacity : Count_Type) is tagged limited private;
 
@@ -228,11 +229,10 @@ private
 
    type List_Access is access constant List;
 
-   type Cursor is
-      record
-         Container : List_Access;
-         Node      : Count_Type := 0;
-      end record;
+   type Cursor is record
+      Container : List_Access;
+      Node      : Count_Type := 0;
+   end record;
 
    No_Element : constant Cursor := (null, 0);
 

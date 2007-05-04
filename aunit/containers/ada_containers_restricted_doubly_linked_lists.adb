@@ -7,7 +7,7 @@
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
---          Copyright (C) 2004-2006, Free Software Foundation, Inc.         --
+--          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
 -- GNAT. The copyright notice above, and the license provisions that follow --
@@ -34,11 +34,11 @@
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
 
+pragma Ada_05;
+
 with System;  use type System.Address;
 
 package body Ada_Containers_Restricted_Doubly_Linked_Lists is
-
-   pragma Ada_05;
 
    -----------------------
    -- Local Subprograms --
