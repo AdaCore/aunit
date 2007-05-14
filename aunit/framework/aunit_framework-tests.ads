@@ -23,6 +23,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Ada_05;
+
 with AUnit_Framework.Test_Results;
 
 --  Base Test Case or Test Suite

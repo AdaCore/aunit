@@ -24,6 +24,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Ada_05;
+
 with Ada_Containers; use Ada_Containers;
 with Ada_Containers_Restricted_Doubly_Linked_Lists;
 

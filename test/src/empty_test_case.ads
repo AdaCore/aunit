@@ -2,7 +2,6 @@ with AUnit; use AUnit;
 
 --  Test case with no routines.
 package Empty_Test_Case is
-   pragma Ada_05;
    use Test_Results;
 
    type The_Test_Case is new AUnit.Test_Cases.Test_Case with private;

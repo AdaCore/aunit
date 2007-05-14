@@ -24,6 +24,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+pragma Ada_05;
+
 with AUnit_Framework.Tests.Test_Cases;
 
 with Ada_Containers;

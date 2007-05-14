@@ -1,6 +1,5 @@
 --  Simple test case
 package body Empty_Test_Case is
-   pragma Ada_05;
 
    --  Test Routines:
 
