@@ -34,8 +34,6 @@
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
 
-pragma Ada_05;
-
 with Ada_Containers; use Ada_Containers;
 
 generic
@@ -51,7 +49,7 @@ package Ada_Containers_Restricted_Doubly_Linked_Lists is
 
    type Cursor is private;
 
-   Empty_List : constant List;
+   --  Empty_List : constant List;
 
    No_Element : constant Cursor;
 
@@ -72,14 +70,15 @@ package Ada_Containers_Restricted_Doubly_Linked_Lists is
       Position  : Cursor;
       New_Item  : Element_Type);
 
-   procedure Query_Element
-     (Position : Cursor;
-      Process  : not null access procedure (Element : Element_Type));
+   generic
+      with procedure Process (Element : Element_Type);
+   procedure Generic_Query_Element (Position : Cursor);
 
-   procedure Update_Element
+   generic
+      with procedure Process (Element : in out Element_Type);
+   procedure Generic_Update_Element
      (Container : in out List;
-      Position  : Cursor;
-      Process   : not null access procedure (Element : in out Element_Type));
+      Position  : Cursor);
 
 --     procedure Move
 --       (Target : in out List;
@@ -185,13 +184,13 @@ package Ada_Containers_Restricted_Doubly_Linked_Lists is
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   procedure Iterate
-     (Container : List;
-      Process   : not null access procedure (Position : Cursor));
+   generic
+      with procedure Process (Position : Cursor);
+   procedure Generic_Iterate (Container : List);
 
-   procedure Reverse_Iterate
-     (Container : List;
-      Process   : not null access procedure (Position : Cursor));
+   generic
+      with procedure Process (Position : Cursor);
+   procedure Generic_Reverse_Iterate (Container : List);
 
    generic
       with function "<" (Left, Right : Element_Type) return Boolean is <>;
@@ -225,7 +224,7 @@ private
       Length : Count_Type := 0;
    end record;
 
-   Empty_List : constant List := (0, others => <>);
+   --  Empty_List : constant List := (0, others => <>);
 
    type List_Access is access constant List;
 
