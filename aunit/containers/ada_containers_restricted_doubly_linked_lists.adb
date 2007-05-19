@@ -34,8 +34,6 @@
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
 
-pragma Ada_05;
-
 with System;  use type System.Address;
 
 package body Ada_Containers_Restricted_Doubly_Linked_Lists is
@@ -499,6 +497,94 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
    end Free;
 
    ---------------------
+   -- Generic_Iterate --
+   ---------------------
+
+   procedure Generic_Iterate (Container : List) is
+      N         : Node_Array renames Container.Nodes;
+      Node      : Count_Type := Container.First;
+      Index     : Count_Type := 0;
+      Index_Max : constant Count_Type := Container.Length;
+
+   begin
+      if Index_Max = 0 then
+         pragma Assert (Node = 0);
+         return;
+      end if;
+
+      loop
+         pragma Assert (Node /= 0);
+
+         Process (Cursor'(Container'Unchecked_Access, Node));
+         pragma Assert (Container.Length = Index_Max);
+         pragma Assert (N (Node).Prev /= -1);
+
+         Node := N (Node).Next;
+         Index := Index + 1;
+
+         if Index = Index_Max then
+            pragma Assert (Node = 0);
+            return;
+         end if;
+      end loop;
+   end Generic_Iterate;
+
+   ---------------------------
+   -- Generic_Query_Element --
+   ---------------------------
+
+   procedure Generic_Query_Element (Position : Cursor) is
+   begin
+      if Position.Node = 0 then
+         raise Constraint_Error;
+      end if;
+
+      pragma Assert (Vet (Position), "bad cursor in Query_Element");
+
+      declare
+         NN : Node_Array renames Position.Container.Nodes;
+         N  : Node_Type renames NN (Position.Node);
+
+      begin
+         Process (N.Element);
+         pragma Assert (N.Prev /= -1);
+      end;
+   end Generic_Query_Element;
+
+   -----------------------------
+   -- Generic_Reverse_Iterate --
+   -----------------------------
+
+   procedure Generic_Reverse_Iterate (Container : List) is
+      N         : Node_Array renames Container.Nodes;
+      Node      : Count_Type := Container.Last;
+      Index     : Count_Type := 0;
+      Index_Max : constant Count_Type := Container.Length;
+
+   begin
+      if Index_Max = 0 then
+         pragma Assert (Node = 0);
+         return;
+      end if;
+
+      loop
+         pragma Assert (Node > 0);
+
+         Process (Cursor'(Container'Unchecked_Access, Node));
+         pragma Assert (Container.Length = Index_Max);
+         pragma Assert (N (Node).Prev /= -1);
+
+         Node := N (Node).Prev;
+         Index := Index + 1;
+
+         if Index = Index_Max then
+            pragma Assert (Node = 0);
+            return;
+         end if;
+      end loop;
+   end Generic_Reverse_Iterate;
+
+   ---------------------
    -- Generic_Sorting --
    ---------------------
 
@@ -619,6 +705,35 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       end Sort;
 
    end Generic_Sorting;
+
+   ----------------------------
+   -- Generic_Update_Element --
+   ----------------------------
+
+   procedure Generic_Update_Element
+     (Container : in out List;
+      Position  : Cursor)
+   is
+   begin
+      if Position.Node = 0 then
+         raise Constraint_Error;
+      end if;
+
+      if Position.Container /= Container'Unchecked_Access then
+         raise Program_Error;
+      end if;
+
+      pragma Assert (Vet (Position), "bad cursor in Update_Element");
+
+      declare
+         NN : Node_Array renames Container.Nodes;
+         N  : Node_Type renames NN (Position.Node);
+
+      begin
+         Process (N.Element);
+         pragma Assert (N.Prev /= -1);
+      end;
+   end Generic_Update_Element;
 
    -----------------
    -- Has_Element --
@@ -792,42 +907,6 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
       return Container.Length = 0;
    end Is_Empty;
 
-   -------------
-   -- Iterate --
-   -------------
-
-   procedure Iterate
-     (Container : List;
-      Process   : not null access procedure (Position : Cursor))
-   is
-      N         : Node_Array renames Container.Nodes;
-      Node      : Count_Type := Container.First;
-      Index     : Count_Type := 0;
-      Index_Max : constant Count_Type := Container.Length;
-
-   begin
-      if Index_Max = 0 then
-         pragma Assert (Node = 0);
-         return;
-      end if;
-
-      loop
-         pragma Assert (Node /= 0);
-
-         Process (Cursor'(Container'Unchecked_Access, Node));
-         pragma Assert (Container.Length = Index_Max);
-         pragma Assert (N (Node).Prev /= -1);
-
-         Node := N (Node).Next;
-         Index := Index + 1;
-
-         if Index = Index_Max then
-            pragma Assert (Node = 0);
-            return;
-         end if;
-      end loop;
-   end Iterate;
-
    ----------
    -- Last --
    ----------
@@ -936,31 +1015,6 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          return Cursor'(Position.Container, Node);
       end;
    end Previous;
-
-   -------------------
-   -- Query_Element --
-   -------------------
-
-   procedure Query_Element
-     (Position : Cursor;
-      Process  : not null access procedure (Element : Element_Type))
-   is
-   begin
-      if Position.Node = 0 then
-         raise Constraint_Error;
-      end if;
-
-      pragma Assert (Vet (Position), "bad cursor in Query_Element");
-
-      declare
-         NN : Node_Array renames Position.Container.Nodes;
-         N  : Node_Type renames NN (Position.Node);
-
-      begin
-         Process (N.Element);
-         pragma Assert (N.Prev /= -1);
-      end;
-   end Query_Element;
 
    ---------------------
    -- Replace_Element --
@@ -1114,42 +1168,6 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
 
       return No_Element;
    end Reverse_Find;
-
-   ---------------------
-   -- Reverse_Iterate --
-   ---------------------
-
-   procedure Reverse_Iterate
-     (Container : List;
-      Process   : not null access procedure (Position : Cursor))
-   is
-      N         : Node_Array renames Container.Nodes;
-      Node      : Count_Type := Container.Last;
-      Index     : Count_Type := 0;
-      Index_Max : constant Count_Type := Container.Length;
-
-   begin
-      if Index_Max = 0 then
-         pragma Assert (Node = 0);
-         return;
-      end if;
-
-      loop
-         pragma Assert (Node > 0);
-
-         Process (Cursor'(Container'Unchecked_Access, Node));
-         pragma Assert (Container.Length = Index_Max);
-         pragma Assert (N (Node).Prev /= -1);
-
-         Node := N (Node).Prev;
-         Index := Index + 1;
-
-         if Index = Index_Max then
-            pragma Assert (Node = 0);
-            return;
-         end if;
-      end loop;
-   end Reverse_Iterate;
 
    ------------
    -- Splice --
@@ -1363,36 +1381,6 @@ package body Ada_Containers_Restricted_Doubly_Linked_Lists is
          end if;
       end;
    end Swap_Links;
-
-   --------------------
-   -- Update_Element --
-   --------------------
-
-   procedure Update_Element
-     (Container : in out List;
-      Position  : Cursor;
-      Process   : not null access procedure (Element : in out Element_Type))
-   is
-   begin
-      if Position.Node = 0 then
-         raise Constraint_Error;
-      end if;
-
-      if Position.Container /= Container'Unchecked_Access then
-         raise Program_Error;
-      end if;
-
-      pragma Assert (Vet (Position), "bad cursor in Update_Element");
-
-      declare
-         NN : Node_Array renames Container.Nodes;
-         N  : Node_Type renames NN (Position.Node);
-
-      begin
-         Process (N.Element);
-         pragma Assert (N.Prev /= -1);
-      end;
-   end Update_Element;
 
    ---------
    -- Vet --
