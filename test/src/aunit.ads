@@ -1,5 +1,3 @@
-pragma Ada_05;
-
 pragma Restrictions (No_Implicit_Dynamic_Code);
 with AUnit_Framework.Framework;
 package AUnit is new AUnit_Framework.Framework
