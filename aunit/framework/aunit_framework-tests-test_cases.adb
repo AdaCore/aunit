@@ -24,13 +24,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Unchecked_Conversion;
+
 --  Test cases
 package body AUnit_Framework.Tests.Test_Cases is
 
    The_Current_Test_Case : Test_Case_Access := null;
 
    package body Registration is separate;
-   package body Specific_Test_Case_Registration is separate;
 
    -----------------------
    -- Local Subprograms --
@@ -205,5 +206,28 @@ package body AUnit_Framework.Tests.Test_Cases is
    begin
       null;
    end Tear_Down_Case;
+
+   package body Specific_Test_Case_Registration is
+
+      ----------------------
+      -- Register_Wrapper --
+      ----------------------
+
+      procedure Register_Wrapper
+        (Test    : in out Specific_Test_Case'Class;
+         Routine : Specific_Test_Routine;
+         Name    : String) is
+
+         function Conv is
+            new Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
+
+      begin
+         Registration.Register_Routine
+           (Test_Case'Class (Test),
+            Conv (Routine),
+            Name);
+      end Register_Wrapper;
+
+   end Specific_Test_Case_Registration;
 
 end AUnit_Framework.Tests.Test_Cases;
