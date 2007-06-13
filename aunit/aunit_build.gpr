@@ -33,8 +33,14 @@ project AUnit_Build is
    end Builder;
 
    package Compiler is
-      for Default_Switches ("ada") use
-        ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+      case Exception_Support is
+         when "yes" =>
+            for Default_Switches ("ada") use
+              ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+         when "no" =>
+            for Default_Switches ("ada") use
+              ("-O1", "-gnatf", "-gnato", "-gnatws", "-gnaty");
+      end case;
    end Compiler;
 
 end AUnit_Build;
