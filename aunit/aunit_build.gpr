@@ -39,7 +39,7 @@ project AUnit_Build is
               ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
          when "no" =>
             for Default_Switches ("ada") use
-              ("-O1", "-gnatf", "-gnato", "-gnaty");
+              ("-O1", "-gnatf", "-gnato", "-gnatws", "-gnaty");
       end case;
    end Compiler;
 
