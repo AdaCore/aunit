@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR(aunit/framework/aunit_framework.ads)
 AC_PREFIX_DEFAULT(/usr/gnat)
 
 ##########################################
-# Initialization.
+# Initialization
 ##########################################
 
 AC_CANONICAL_SYSTEM
