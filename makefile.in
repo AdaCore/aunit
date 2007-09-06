@@ -89,8 +89,8 @@ install: install_clean all
 	done
 	$(CHMOD) 444 $(I_DOC)/*
 	$(CHMOD) 444 $(I_TPL)/*
-	$(CHMOD) 444 $(I_PLG)/*
-	$(CHMOD) 444 $(I_GPR)/*
+	$(CHMOD) 444 $(I_PLG)/aunit.xml
+	$(CHMOD) 444 $(I_GPR)/aunit.gpr
 	$(CHMOD) 444 $(I_LIB)/*
 	$(CHMOD) 444 $(I_INC)/*
 	@echo $(SRC_LIST)
