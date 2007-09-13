@@ -1,14 +1,12 @@
 with AUnit;
 
--- Suite for this level of tests:
+--  Suite for this level of tests:
 with Sample_Suite;
 
 procedure Harness is
 
-   procedure Run is new AUnit.Test_Runner (Sample_Suite);
+   procedure Run is new AUnit.Test_Runner (Sample_Suite.Suite);
 
 begin
    Run;
 end Harness;
-
-

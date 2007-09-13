@@ -1,15 +1,15 @@
-with AUnit; use AUnit;
-
---  List of tests and suites to compose:
 with PR_XXXX_XXX;
-function Sample_Suite return Test_Suites.Access_Test_Suite is
+
+package body Sample_Suite is
    use Test_Suites;
-   Result : Access_Test_Suite := new Test_Suite;
+
+   Result : aliased Test_Suite;
+
    Test_Case : aliased PR_XXXX_XXX.Test_Case;
-begin
-   --  You may add multiple tests or suites here:
-   Add_Test (Result, Test_Case'Access);
-   return Result;
+
+   function Suite return Access_Test_Suite is
+   begin
+      Add_Test (Result'Access, Test_Case'Access);
+      return Result'Access;
+   end Suite;
 end Sample_Suite;
-
-
