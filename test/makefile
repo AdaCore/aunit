@@ -28,7 +28,7 @@ GPRBUILD  = gprbuild
 GPRCLEAN  = gprclean
 
 ifeq ($(TARGET),powerpc-elf)
-   RUN = ./run
+   RUN = ./support/run-ppc-elf
 else
    RUN =
 endif
