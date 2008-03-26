@@ -2,11 +2,12 @@
 --                                                                          --
 --                         GNAT RUN-TIME COMPONENTS                         --
 --                                                                          --
---                         S Y S T E M . M E M O R Y                        --
+--                          A U N I T . M E M O R Y                         --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --          Copyright (C) 2001-2003 Free Software Foundation, Inc.          --
+--                        Copyright (C) 2008, AdaCore                       --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -31,7 +32,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  Dummy implementation.
+--  Memory allocation implementation using the gnat runtime methods.
 
 package body AUnit.Memory is
 

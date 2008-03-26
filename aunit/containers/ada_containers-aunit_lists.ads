@@ -2,11 +2,12 @@
 --                                                                          --
 --                         GNAT LIBRARY COMPONENTS                          --
 --                                                                          --
---   A D A . C O N T A I N E R S . D O U B L Y _ L I N K E D _ L I S T S    --
+--            A D A _ C O N T A I N E R S . A U N I T _ L I S T S           --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --          Copyright (C) 2004-2008, Free Software Foundation, Inc.         --
+--                      Copyright (C) 2008, AdaCore                         --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
 -- GNAT. The copyright notice above, and the license provisions that follow --
@@ -32,6 +33,14 @@
 --                                                                          --
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
+
+--  This unit is an adaptation of the Ada2005 runtime's
+--  Ada.Containers.Doubly_Linked_Lists with modifications to make this package
+--  compatible with the ZFP profiles and also compatible with AUnit's memory
+--  management.
+
+--  Some Ada2005 constructs have also been removed so that user tests can be
+--  compiled in Ada95.
 
 pragma Ada_2005;
 

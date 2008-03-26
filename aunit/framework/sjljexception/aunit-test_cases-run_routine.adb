@@ -2,13 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                A U N I T _ F R A M E W O R K . T E S T S .               --
---                T E S T _ C A S E S . R U N _ R O U T I N E               --
+--          A U N I T . T E S T _ C A S E S . R U N _ R O U T I N E         --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006, AdaCore                        --
+--                    Copyright (C) 2006-2008, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -29,7 +28,9 @@ with System;
 with Last_Chance_Handler;
 separate (AUnit.Test_Cases)
 
---  Version for run-time libraries that support exception handling
+--  Version for run-time libraries that support exception handling via gcc
+--  builtin setjmp/longjmp mechanism.
+
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    Subtest : Routine_Spec;

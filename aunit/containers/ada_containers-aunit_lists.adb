@@ -2,11 +2,12 @@
 --                                                                          --
 --                         GNAT LIBRARY COMPONENTS                          --
 --                                                                          --
---   A D A . C O N T A I N E R S . D O U B L Y _ L I N K E D _ L I S T S    --
+--            A D A _ C O N T A I N E R S . A U N I T _ L I S T S           --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
+--                      Copyright (C) 2008, AdaCore                         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
