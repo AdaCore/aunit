@@ -32,5 +32,7 @@ project Aunit_Tests is
          use "test_test_case-test_exceptions_with_exception.adb";
    end Naming;
 
+   package IDE renames AUnit_Build.IDE;
+
 end Aunit_Tests;
 
