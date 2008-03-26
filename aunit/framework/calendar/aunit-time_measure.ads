@@ -4,7 +4,7 @@
 --                                                                          --
 --          A U N I T _ F R A M E W O R K . T I M E _ M E A S U R E         --
 --                                                                          --
---                                 B o d y                                  --
+--                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
 --                    Copyright (C) 2006-2007, AdaCore                      --
@@ -24,82 +24,37 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body AUnit_Framework.Time_Measure is
+with Ada.Calendar;
 
-   -------------------
-   -- Start_Measure --
-   -------------------
+package AUnit.Time_Measure is
 
-   procedure Start_Measure (T : in out Time) is
-   begin
-      T.Start := Ada.Calendar.Clock;
-   end Start_Measure;
+   type Time is record
+      Start : Ada.Calendar.Time;
+      Stop  : Ada.Calendar.Time;
+   end record;
 
-   ------------------
-   -- Stop_Measure --
-   ------------------
+   type AUnit_Duration is private;
 
-   procedure Stop_Measure (T : in out Time) is
-   begin
-      T.Stop := Ada.Calendar.Clock;
-   end Stop_Measure;
+   Null_Time : constant Time := (Start => Ada.Calendar.Time_Of (1901, 1, 1),
+                                 Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
 
-   -----------------
-   -- Get_Measure --
-   -----------------
+   procedure Start_Measure (T : in out Time);
+   --  Start a new measure
 
-   function Get_Measure (T : in Time) return AUnit_Duration is
-      use type Ada.Calendar.Time;
-   begin
-      return AUnit_Duration (T.Stop - T.Start);
-   end Get_Measure;
+   procedure Stop_Measure (T : in out Time);
+   --  Stop the measure
 
-   ---------
-   -- Put --
-   ---------
+   function Get_Measure (T : in Time) return AUnit_Duration;
+   --  Get the measure
 
-   procedure Gen_Put_Measure (Measure : AUnit_Duration) is
-      T   : Duration := Duration (Measure);
-      Exp : Integer;
-      Dec : Integer;
-      Val : Integer;
+   generic
+      with procedure Put (I : Integer) is <>;
+      with procedure Put (S : String) is <>;
+   procedure Gen_Put_Measure (Measure : AUnit_Duration);
+   --  Put the image of the measure
 
-   begin
-      Exp := 0;
+private
 
-      while T >= 10.0 loop
-         T := T / 10.0;
-         Exp := Exp + 1;
-      end loop;
+   type AUnit_Duration is new Duration;
 
-      while T < 1.0 loop
-         T := T * 10.0;
-         Exp := Exp - 1;
-      end loop;
-
-      --  We have here 1.0 <= T < 10.0
-
-      --  Integer (T - 0.5) is equivalent to Float'Floor, but works
-      --  with durations !
-      Val := Integer (T - 0.5);
-      T := (T - Duration (Val)) * 1000.0;
-      Dec := Integer (T - 0.5);
-
-      Put (Val);
-      Put (".");
-
-      if Dec < 10 then
-         Put ("00");
-      elsif Dec < 100 then
-         Put ("0");
-      end if;
-
-      Put (Dec);
-
-      if Exp /= 0 then
-         Put ("E");
-         Put (Exp);
-      end if;
-   end Gen_Put_Measure;
-
-end AUnit_Framework.Time_Measure;
+end AUnit.Time_Measure;
