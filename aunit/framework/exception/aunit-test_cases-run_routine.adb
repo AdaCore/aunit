@@ -27,7 +27,7 @@
 
 with Ada.Exceptions; use Ada.Exceptions;
 
-separate (AUnit_Framework.Tests.Test_Cases)
+separate (AUnit.Test_Cases)
 
 --  Version for run-time libraries that support exception handling
 procedure Run_Routine

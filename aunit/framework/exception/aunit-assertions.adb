@@ -26,7 +26,9 @@
 
 --  Version for run-time libraries that support exception handling
 
-package body AUnit_Framework.Tests.Test_Cases.Assertions is
+with AUnit.Test_Cases; use AUnit.Test_Cases;
+
+package body AUnit.Assertions is
 
    ------------
    -- Assert --
@@ -52,4 +54,4 @@ package body AUnit_Framework.Tests.Test_Cases.Assertions is
       return Condition;
    end Assert;
 
-end AUnit_Framework.Tests.Test_Cases.Assertions;
+end AUnit.Assertions;
