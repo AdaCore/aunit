@@ -1,46 +1,61 @@
 project AUnit_Build is
 
-   type Yes_No_Type is ("yes", "no");
-   Exception_Support : Yes_No_Type := external ("SUPPORT_EXCEPTION", "yes");
-   Calendar_Support : Yes_No_Type := external ("SUPPORT_CALENDAR", "yes");
+   type Runtime_Type is ("full", "cert", "zfp", "hi");
+   type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
 
-   for Source_Dirs use ("framework",
-                        "containers",
-                        "text_reporter");
+   Runtime : Runtime_Type := external ("RTS", "full");
+   Target  : Target_Type  := external ("TARGET", "native");
 
-   case Exception_Support is
-      when "yes" =>
-         for Source_Dirs use project'Source_Dirs & "framework/exception";
-      when "no" =>
-         for Source_Dirs use project'Source_Dirs & "framework/noexception";
-   end case;
+   for Source_Dirs use ("framework", "containers", "reporters");
 
-   case Calendar_Support is
-      when "yes" =>
-         for Source_Dirs use project'Source_Dirs & "framework/calendar";
-      when "no" =>
-         for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
-   end case;
-
+   for Languages use ("Ada");
    for Object_Dir use "obj";
    for Library_Dir use "lib";
    for Library_Name use "aunit";
    for Library_Kind use "static";
 
-   package Builder is
-      for Default_Switches ("ada") use
-        ("-g", "-gnatQ");
-   end Builder;
+   case Runtime is
+      when "full" | "cert" =>
+         for Source_Dirs use project'Source_Dirs & "framework/exception";
+      when "zfp" | "hi" =>
+         for Languages use project'Languages & "C";
+         for Source_Dirs use project'Source_Dirs & "framework/noexception";
+         for Library_Options use ("sjlj.o");
+   end case;
+
+   case Target is
+      when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
+         for Source_Dirs use project'Source_Dirs &
+                             "framework/nocalendar" & "framework/staticmemory";
+
+      when others =>
+         case Runtime is
+            when "full" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "framework/calendar" & "framework/nativememory";
+
+            when "cert" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "framework/calendar" & "framework/staticmemory";
+
+            when "zfp" | "hi" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "framework/nocalendar" & "framework/staticmemory";
+
+         end case;
+   end case;
 
    package Compiler is
-      case Exception_Support is
-         when "yes" =>
-            for Default_Switches ("ada") use
-              ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
-         when "no" =>
-            for Default_Switches ("ada") use
-              ("-O1", "-gnatf", "-gnato", "-gnatws", "-gnaty");
-      end case;
+      for Default_Switches ("ada") use ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+      for Switches ("aunit-test_cases.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
+      for Switches ("aunit-test_results.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
+      for Switches ("aunit-test_suites.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
+      for Switches ("ada_containers-aunit_lists.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
    end Compiler;
 
+   package IDE is
+      for VCS_Kind use "Subversion";
+   end IDE;
+
 end AUnit_Build;
+
