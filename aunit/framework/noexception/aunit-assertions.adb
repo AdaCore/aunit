@@ -1,14 +1,13 @@
-------------------------------------------------------------------------------
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                 A U N I T _ F R A M E W O R K . T E S T S .              --
---                 T E S T _ C A S E S . R U N _ R O U T I N E              --
+--                A U N I T _ F R A M E W O R K . T E S T S .               --
+--                T E S T _ C A S E S _ A S S E R T I O N S                 --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006, AdaCore                        --
+--                       Copyright (C) 2000-2006, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -25,44 +24,33 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-separate (AUnit_Framework.Tests.Test_Cases)
-
 --  Version for run-time libraries that do not support exception handling
-procedure Run_Routine
-  (Test    : access Test_Case'Class;
-   Subtest : Routine_Spec;
-   R       : access Result;
-   Outcome : out Status) is
 
-   use Failure_Lists;
+with AUnit.Test_Cases; use AUnit.Test_Cases;
 
-begin
+package body AUnit.Assertions is
 
-   --  Reset failure list to capture failed assertions for one routine
+   ------------
+   -- Assert --
+   ------------
 
-   Clear (Test.Failures);
+   procedure Assert
+     (Condition : Boolean;
+      Message   : String) is
+   begin
+      if not Condition then
+         pragma Warnings (Off);
+         Register_Failure (Current_Test_Case, Message);
+         pragma Warnings (On);
+      end if;
+   end Assert;
 
-   --  Run test routine
+   function Assert
+     (Condition : Boolean;
+      Message   : String) return Boolean is
+   begin
+      Assert (Condition, Message);
+      return Condition;
+   end Assert;
 
-   Set_Up (Test.all);
-   Subtest.Routine.all (Test.all);
-   Tear_Down (Test.all);
-
-   if Is_Empty (Test.Failures) then
-      Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Subtest.Routine_Name);
-   else
-      Outcome := Failure;
-      declare
-         C : Cursor := First (Test.Failures);
-      begin
-         while Has_Element (C) loop
-            Add_Failure (R.all,
-                         Name (Test.all),
-                         Subtest.Routine_Name,
-                         Element (C));
-            Next (C);
-         end loop;
-      end;
-   end if;
-end Run_Routine;
+end AUnit.Assertions;
