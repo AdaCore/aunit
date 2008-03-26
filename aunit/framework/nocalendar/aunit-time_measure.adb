@@ -24,7 +24,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-package body AUnit_Framework.Time_Measure is
+package body AUnit.Time_Measure is
 
    -------------------
    -- Start_Measure --
@@ -66,4 +66,4 @@ package body AUnit_Framework.Time_Measure is
       null;
    end Gen_Put_Measure;
 
-end AUnit_Framework.Time_Measure;
+end AUnit.Time_Measure;

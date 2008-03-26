@@ -26,7 +26,7 @@
 
 --  Dummy package when Ada.Calendar is not supported
 
-package AUnit_Framework.Time_Measure is
+package AUnit.Time_Measure is
 
    type Time is null record;
 
@@ -51,4 +51,4 @@ private
 
    type AUnit_Duration is new Integer;
 
-end AUnit_Framework.Time_Measure;
+end AUnit.Time_Measure;
