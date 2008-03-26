@@ -1,29 +1,33 @@
-INSTALL	= @prefix@
 RTS =
-TOOL_PREFIX =
-# tell wether the runtime supports the exceptions
-SUPPORT_EXCEPTION = yes
-# tell wether the runtime supports Ada.Calendar
-SUPPORT_CALENDAR = yes
+TARGET =
+GPRCONFIG = gprconfig
+GPRBUILD  = gprbuild
+GNATCLEAN = gnatclean
 
-ifeq ($(RTS),zfp)
-   SUPPORT_EXCEPTION = no
-   SUPPORT_CALENDAR = no
-endif
-
-ifeq ($(TOOL_PREFIX),)
-   GNATMAKE  = gnatmake
-   GNATCLEAN = gnatclean
-else
-   GNATMAKE  = $(TOOL_PREFIX)-gnatmake
-   GNATCLEAN = $(TOOL_PREFIX)-gnatclean
-endif
+INSTALL	= @prefix@
+# INSTALL = $(shell which $(GPRBUILD) | sed -e 's/\/bin\/.*//')
 
 ifeq ($(RTS),)
-   ADA_FLAGS =
+   RTS_CONF =
+   RTS_ARG = -XRTS=full
 else
-   ADA_FLAGS = --RTS=$(RTS)
+   RTS_CONF = ,,$(RTS)
+   RTS_ARG = -XRTS=$(RTS)
 endif
+
+ifeq ($(TARGET),)
+   TARGET_CONF =
+   TARGET_ARG = -XTARGET=native
+else
+   TARGET_CONF = --target=$(TARGET)
+ifneq ($(filter %-wrs-vxworksae,$(TARGET)),)
+   TARGET_ARG = -XTARGET=vxworksae
+else
+   TARGET_ARG = -XTARGET=$(TARGET)
+endif
+endif
+
+GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
 
 # Install directories
 
@@ -34,26 +38,11 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
-GPR_FLAGS_INSTALL = -XINSTALL_DIR=$(INSTALL)
-
-ifneq ($(SUPPORT_EXCEPTION),yes)
-   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=no
-else
-   GPR_FLAGS_EXCEPTION = -XSUPPORT_EXCEPTION=yes
-endif
-
-ifneq ($(SUPPORT_CALENDAR),yes)
-   GPR_FLAGS_CALENDAR = -XSUPPORT_CALENDAR=no
-else
-   GPR_FLAGS_CALENDAR := -XSUPPORT_CALENDAR=yes
-endif
-
-GPR_FLAGS = $(GPR_FLAGS_INSTALL) $(GPR_FLAGS_EXCEPTION) $(GPR_FLAGS_CALENDAR)
-
 all:
 	@$(MKDIR) aunit/obj
 	@$(MKDIR) aunit/lib
-	$(GNATMAKE) $(ADA_FLAGS) -Paunit/aunit_build $(GPR_FLAGS)
+	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch -o gprconf.cgpr
+	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build $(GPRBUILD_FLAGS)
 
 clean:
 	-$(GNATCLEAN) -f -r -Paunit/aunit_build $(GPR_FLAGS)
@@ -80,7 +69,7 @@ install: install_clean all
 	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
 	-$(CP) support/aunit.xml $(I_PLG)
 	$(CP) support/aunit.gpr $(I_GPR)
-	$(CP) aunit/lib/* $(I_LIB)
+	-$(CP) aunit/lib/* $(I_LIB)
 	gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//' -e 's/\\/\\\\/g' | while read f; do \
 	  if [ "$$f" != "" ]; then \
 	    echo "installing $$f into $(I_INC)"; \
@@ -105,7 +94,7 @@ doc:
 	${MAKE} -C docs
 
 RMDIR	= rmdir
-MKDIR	= @MKDIR_P@
+MKDIR	= mkdir -p
 RM	= rm
 CP	= cp
 CHMOD	= chmod
