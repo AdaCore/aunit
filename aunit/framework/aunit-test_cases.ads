@@ -94,7 +94,7 @@ package AUnit.Test_Cases is
    end Registration;
 
    generic
-      type Specific_Test_Case is new Test_Case with private;
+      type Specific_Test_Case is abstract new Test_Case with private;
    package Specific_Test_Case_Registration is
          --  Specific Test Case registration
 
