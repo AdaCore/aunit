@@ -19,7 +19,7 @@ project AUnit_Build is
          for Source_Dirs use project'Source_Dirs & "framework/exception";
       when "zfp" | "hi" =>
          for Languages use project'Languages & "C";
-         for Source_Dirs use project'Source_Dirs & "framework/noexception";
+         for Source_Dirs use project'Source_Dirs & "framework/sjljexception";
          for Library_Options use ("sjlj.o");
    end case;
 
