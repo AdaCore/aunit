@@ -1,6 +1,6 @@
 project AUnit_Build is
 
-   type Runtime_Type is ("full", "cert", "zfp", "hi");
+   type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
    type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
 
    Runtime : Runtime_Type := external ("RTS", "full");
@@ -17,7 +17,7 @@ project AUnit_Build is
    case Runtime is
       when "full" | "cert" =>
          for Source_Dirs use project'Source_Dirs & "framework/exception";
-      when "zfp" | "hi" =>
+      when "zfp" | "hi" | "ravenscar" =>
          for Languages use project'Languages & "C";
          for Source_Dirs use project'Source_Dirs & "framework/sjljexception";
          for Library_Options use ("sjlj.o");
@@ -27,6 +27,17 @@ project AUnit_Build is
       when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
          for Source_Dirs use project'Source_Dirs &
                              "framework/nocalendar" & "framework/staticmemory";
+     
+      when "vxworksae" =>
+            case Runtime is
+               when "full" | "cert" =>
+                  for Source_Dirs use project'Source_Dirs &
+                            "framework/calendar" & "framework/staticmemory";
+
+               when "zfp" | "hi" | "ravenscar" =>
+                  for Source_Dirs use project'Source_Dirs &
+                            "framework/nocalendar" & "framework/staticmemory";
+            end case;
 
       when others =>
          case Runtime is
@@ -38,7 +49,7 @@ project AUnit_Build is
                for Source_Dirs use project'Source_Dirs &
                             "framework/calendar" & "framework/staticmemory";
 
-            when "zfp" | "hi" =>
+            when "zfp" | "hi" | "ravenscar" =>
                for Source_Dirs use project'Source_Dirs &
                             "framework/nocalendar" & "framework/staticmemory";
 
