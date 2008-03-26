@@ -26,7 +26,10 @@
 ------------------------------------------------------------------------------
 
 --  Very simple reporter to console
-generic
-package AUnit_Framework.Test_Results.Text_Reporter is
-   procedure Report (R : in out Result);
-end AUnit_Framework.Test_Results.Text_Reporter;
+package AUnit.Reporter.Text is
+
+   type Text_Reporter is new Reporter with null record;
+
+   procedure Report (Engine : Text_Reporter;
+                     R      : in out Result);
+end AUnit.Reporter.Text;

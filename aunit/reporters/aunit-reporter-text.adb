@@ -25,10 +25,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit_Framework.Time_Measure; use AUnit_Framework.Time_Measure;
+with GNAT.IO;            use GNAT.IO;
+with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
-package body AUnit_Framework.Test_Results.Text_Reporter is
+package body AUnit.Reporter.Text is
 
    procedure Dump_Error_List (L : in Error_Lists.List);
    --  List failed assertions
@@ -97,9 +98,9 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       procedure Report_Success (Success : Test_Success) is
       begin
          Put ("      ");
-         Put (Success.Test_Name);
+         Put (Success.Test_Name.all);
          Put (" : ");
-         Put_Line (Success.Routine_Name);
+         Put_Line (Success.Routine_Name.all);
       end Report_Success;
 
       C : Cursor := First (L);
@@ -115,7 +116,10 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    -- Report --
    ------------
 
-   procedure Report (R : in out Result) is
+   procedure Report (Engine : Text_Reporter;
+                     R      : in out Result)
+   is
+      pragma Unreferenced (Engine);
       T   : AUnit_Duration;
       procedure Put_Measure is new Gen_Put_Measure;
    begin
@@ -127,7 +131,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       New_Line; New_Line;
 
       declare
-         S : Success_Lists.List (Success_Count (R));
+         S : Success_Lists.List;
       begin
          Put ("   Successful Tests: ");
          Put (Integer (Success_Count (R)));
@@ -138,7 +142,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       end;
 
       declare
-         F : Failure_Lists.List (Failure_Count (R));
+         F : Failure_Lists.List;
       begin
          New_Line;
          Put ("   Failed Assertions: ");
@@ -151,7 +155,7 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
       end;
 
       declare
-         E : Error_Lists.List (Error_Count (R));
+         E : Error_Lists.List;
       begin
          New_Line;
          Put ("   Unexpected Errors: ");
@@ -181,12 +185,12 @@ package body AUnit_Framework.Test_Results.Text_Reporter is
    begin
       New_Line;
       Put ("      ");
-      Put (Error.Test_Name);
+      Put (Error.Test_Name.all);
       Put (" : ");
-      Put_Line (Error.Routine_Name);
+      Put_Line (Error.Routine_Name.all);
       Put ("      ");
       Put ("      ");
-      Put_Line (Error.Message);
+      Put_Line (Error.Message.all);
    end Report_Error;
 
-end AUnit_Framework.Test_Results.Text_Reporter;
+end AUnit.Reporter.Text;
