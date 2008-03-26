@@ -1,8 +1,8 @@
 with AUnit; use AUnit;
+with AUnit.Test_Cases;
 
 --  Test case with one routine.
 package One_Test_Case is
-   use Test_Results;
 
    type The_Test_Case is new AUnit.Test_Cases.Test_Case with private;
 

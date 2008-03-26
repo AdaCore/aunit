@@ -2,11 +2,13 @@ with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
 with Ada_Containers; use Ada_Containers;
-with AUnit_Framework; use AUnit_Framework;
+
+with AUnit.Test_Suites;  use AUnit.Test_Suites;
+with AUnit.Assertions;   use AUnit.Assertions;
+with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Unit tests for AUnit.Test_Suites
 package body Test_Test_Suite is
-   use Assertions, Test_Suites;
 
    S : aliased Test_Suite;
    R : aliased Result;
@@ -16,7 +18,7 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      Outcome : AUnit_Framework.Status;
+      Outcome : AUnit.Status;
    begin
       Run (S'Access, R'Access, Outcome);
 
@@ -27,7 +29,7 @@ package body Test_Test_Suite is
 
    procedure Test_No_Test_Routines (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      Outcome : AUnit_Framework.Status;
+      Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, E'Access);
       Run (S'Access, R'Access, Outcome);
@@ -39,7 +41,7 @@ package body Test_Test_Suite is
 
    procedure Test_One_Test_Case (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
-      Outcome : AUnit_Framework.Status;
+      Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, O'Access);
       Run (S'Access, R'Access, Outcome);
@@ -53,7 +55,7 @@ package body Test_Test_Suite is
    procedure Test_Inherited_Tests (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);
       Old_Count : constant Count_Type := Test_Count (R);
-      Outcome   : AUnit_Framework.Status;
+      Outcome   : AUnit.Status;
 
    begin
       Add_Test (S'Access, I'Access);

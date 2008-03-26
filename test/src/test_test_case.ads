@@ -1,7 +1,7 @@
 with AUnit; use AUnit;
+with AUnit.Test_Cases;
 --  Unit tests for AUnit.Test_Cases.
 package Test_Test_Case is
-   use Test_Results;
 
    type The_Test_Case is new Test_Cases.Test_Case with null record;
 

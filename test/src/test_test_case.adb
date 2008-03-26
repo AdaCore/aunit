@@ -1,10 +1,11 @@
 with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
-with AUnit_Framework;
+
+with AUnit.Assertions; use AUnit.Assertions;
+with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Unit tests for AUnit.Test_Cases.
 package body Test_Test_Case is
-   use Assertions;
 
    Simple :  aliased Simple_Test_Case.The_Test_Case;
    R : aliased Result;
@@ -20,7 +21,7 @@ package body Test_Test_Case is
       Simple_Test_Case.Register_Tests (Simple);
 
       Assert
-        (AUnit.Test_Cases.Registration.Routine_Count (Simple) =
+        (Test_Cases.Registration.Routine_Count (Simple) =
            Old_Count + Routines_In_Simple,
          "Routine not properly registered");
    end Test_Register_Tests;
@@ -53,12 +54,10 @@ package body Test_Test_Case is
       pragma Unreferenced (T);
       use Simple_Test_Case;
       Count  : constant Count_Type :=
-                 AUnit.Test_Cases.Registration.Routine_Count (Simple);
+                 Test_Cases.Registration.Routine_Count (Simple);
       Old_Count : constant Count_Type := Test_Count (R);
 
-      use AUnit_Framework;
-
-      Outcome   : AUnit_Framework.Status;
+      Outcome   : AUnit.Status;
 
    begin
       Run (Simple'Access, R'Access, Outcome);
@@ -112,7 +111,8 @@ package body Test_Test_Case is
 
    procedure Register_Tests (T : in out The_Test_Case) is
       package Register_Specific is
-        new AUnit.Test_Cases.Specific_Test_Case_Registration (The_Test_Case);
+        new AUnit.Test_Cases.Specific_Test_Case_Registration
+             (The_Test_Case);
       use Register_Specific;
    begin
       Register_Routine

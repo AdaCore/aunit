@@ -1,10 +1,10 @@
 with AUnit; use AUnit;
+with AUnit.Test_Cases;
 
 --  Simple test case.
 package Simple_Test_Case is
-   use Test_Results;
 
-   type The_Test_Case is new AUnit.Test_Cases.Test_Case with private;
+   type The_Test_Case is new Test_Cases.Test_Case with private;
 
    --  Register routines to be run:
    procedure Register_Tests (T : in out The_Test_Case);
@@ -30,7 +30,7 @@ package Simple_Test_Case is
    procedure Double_Failure (T : in out The_Test_Case);
 
 private
-   type The_Test_Case is new AUnit.Test_Cases.Test_Case with record
+   type The_Test_Case is new Test_Cases.Test_Case with record
       Is_Set_Up,
       Is_Torn_Down : Boolean := False;
    end record;

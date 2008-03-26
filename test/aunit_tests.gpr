@@ -1,4 +1,5 @@
-with "aunit";
+with "../aunit/aunit_build";
+with "support/support";
 
 project Aunit_Tests is
 
@@ -9,7 +10,12 @@ project Aunit_Tests is
    for Object_Dir use "obj";
 
    package Linker is
-      for Default_Switches ("ada") use ("-g");
+      case AUnit_Build.Target is
+         when "powerpc-elf" =>
+            for Default_Switches ("ada") use ("-g", "-Wl,-u,_start,-Ttext,0x100000");
+         when others =>
+            for Default_Switches ("ada") use ("-g");
+      end case;
    end Linker;
 
    package Binder is
@@ -17,16 +23,11 @@ project Aunit_Tests is
    end Binder;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-O1", "-gnatf", "-gnato", "-gnatwae", "-gnaty");
+      for Default_Switches ("ada") use
+        ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
    end Compiler;
 
-   package Builder is
-      for Default_Switches ("ada") use ("-g", "-gnatQ");
-   end Builder;
-
    package Naming is
-      for Implementation ("Test_Test_Case")
-         use "test_test_case.adb";
       for Implementation ("Test_Test_Case.Test_Exceptions")
          use "test_test_case-test_exceptions_with_exception.adb";
    end Naming;

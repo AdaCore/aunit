@@ -1,6 +1,8 @@
+with AUnit.Assertions;   use AUnit.Assertions;
+with AUnit.Test_Results; use AUnit.Test_Results;
+
 --  Simple test case
 package body Simple_Test_Case is
-   use Assertions;
 
    procedure Double_Failure_Wrapper (T : in out The_Test_Case'Class);
 

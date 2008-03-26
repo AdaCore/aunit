@@ -1,7 +1,8 @@
+with AUnit.Assertions;   use AUnit.Assertions;
+with AUnit.Test_Results; use AUnit.Test_Results;
+
 --  Test case that inherits a routine
 package body One_Test_Case.Inherited_Test_Case is
-
-   use Assertions;
 
    procedure Test_2 (T : in out Test_Cases.Test_Case'Class) is
       pragma Unreferenced (T);

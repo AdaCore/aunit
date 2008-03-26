@@ -1,7 +1,7 @@
+with AUnit.Test_Results;          use AUnit.Test_Results;
+
 --  Test case with one routine
 package body One_Test_Case is
-
-   use Assertions;
 
    --  Test Routines:
    procedure Test_1 (T : in out Test_Cases.Test_Case'Class) is

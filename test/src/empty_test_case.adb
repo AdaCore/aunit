@@ -1,3 +1,5 @@
+with AUnit.Test_Results; use AUnit.Test_Results;
+
 --  Simple test case
 package body Empty_Test_Case is
 

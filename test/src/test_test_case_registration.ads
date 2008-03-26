@@ -1,10 +1,10 @@
 with AUnit; use AUnit;
+with AUnit.Test_Cases;
 
 --  Unit tests for AUnit.Test_Cases.Registration.
 package Test_Test_Case_Registration is
-   use Test_Results;
 
-   type The_Test_Case is new AUnit.Test_Cases.Test_Case with null record;
+   type The_Test_Case is new Test_Cases.Test_Case with null record;
 
    --  Register routines to be run:
    procedure Register_Tests (T : in out The_Test_Case);

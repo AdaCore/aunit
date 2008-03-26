@@ -1,9 +1,12 @@
 with Empty_Test_Case;
 with Ada_Containers; use Ada_Containers;
 
+with AUnit.Assertions;
+with AUnit.Test_Results;
 --  Unit tests for AUnit.Test_Cases.Registration.
 package body Test_Test_Case_Registration is
-   use Assertions;
+
+   use AUnit.Assertions;
    use AUnit.Test_Cases.Registration;
 
    procedure Dummy_Test_Routine (T : in out Test_Cases.Test_Case'Class);
@@ -26,7 +29,7 @@ package body Test_Test_Case_Registration is
       Register_Routine (E, Dummy_Test_Routine'Access, "Dummy");
 
       Assert
-        (AUnit.Test_Cases.Registration.Routine_Count (E) = Initial_Count + 1,
+        (Test_Cases.Registration.Routine_Count (E) = Initial_Count + 1,
          "Register failed to update routine count");
    end Test_Register_Routine;
 
@@ -41,7 +44,7 @@ package body Test_Test_Case_Registration is
    function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return Format ("Test AUnit.Test_Cases.Registration");
+      return AUnit.Test_Results.Format ("Test AUnit.Test_Cases.Registration");
    end Name;
 
 end Test_Test_Case_Registration;
