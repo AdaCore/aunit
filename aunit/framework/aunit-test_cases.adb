@@ -25,9 +25,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
+with AUnit.Memory.Utils;
 
 --  Test cases
-package body AUnit_Framework.Tests.Test_Cases is
+package body AUnit.Test_Cases is
 
    The_Current_Test_Case : Test_Case_Access := null;
 
@@ -65,26 +66,24 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    procedure Add_Routine (T : in out Test_Case'Class; Val : Routine_Spec) is
    begin
-      if Routine_Lists.Length (T.Routines) =
-        Count_Type (Max_Routines_Per_Test_Case) then
-         declare
-            Error_Message : constant String :=
-               " has more routines than Max_Routines_Per_Test_Case";
-         begin
-            Put (Name (T));
-            Put_Line (Error_Message);
-         end;
-      else
-         Routine_Lists.Append (T.Routines, Val);
-      end if;
+      Routine_Lists.Append (T.Routines, Val);
    end Add_Routine;
 
    --------------------
    -- Format_Message --
    --------------------
 
-   function Format_Message (S : String) return Message_String
-                            renames New_String;
+   function Format_Message (S : String) return Message_String is
+      Ptr : constant Message_String :=
+                      AUnit.Memory.Utils.Message_Alloc (S'Length);
+   begin
+      --  Do not perform Ptr.all := S as this leads to a memcpy call which is
+      --  not available on zfp platforms
+      for J in S'Range loop
+         Ptr (J - S'First + 1) := S (J);
+      end loop;
+      return Ptr;
+   end Format_Message;
 
    ----------------
    -- Initialize --
@@ -103,19 +102,7 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    procedure Register_Failure (T : access Test_Case'Class; S : String) is
    begin
-      if Failure_Lists.Length (T.Failures) =
-        Count_Type (Max_Failures_Per_Harness) then
-         declare
-            Error_Message : constant String :=
-               " routine failure overflows Max_Failures_Per_Harness:";
-         begin
-            Put (Name (T.all));
-            Put_Line (Error_Message);
-            Put_Line (S);
-         end;
-      else
-         Failure_Lists.Append (T.Failures, Format_Message (S));
-      end if;
+      Failure_Lists.Append (T.Failures, Format_Message (S));
    end Register_Failure;
 
    ---------
@@ -230,4 +217,4 @@ package body AUnit_Framework.Tests.Test_Cases is
 
    end Specific_Test_Case_Registration;
 
-end AUnit_Framework.Tests.Test_Cases;
+end AUnit.Test_Cases;

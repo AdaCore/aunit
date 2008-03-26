@@ -27,7 +27,7 @@
 
 --  Test routine registration
 
-separate (AUnit_Framework.Tests.Test_Cases)
+separate (AUnit.Test_Cases)
 package body Registration is
 
    ----------------------
@@ -39,7 +39,7 @@ package body Registration is
       Routine : Test_Routine;
       Name    : String) is
 
-      Formatted_Name : constant Message_String := New_String (Name);
+      Formatted_Name : constant Message_String := Format (Name);
       Val : Routine_Spec;
       use Routine_Lists;
 

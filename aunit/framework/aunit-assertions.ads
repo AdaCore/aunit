@@ -25,8 +25,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-generic
-package AUnit_Framework.Tests.Test_Cases.Assertions is
+package AUnit.Assertions is
 
    procedure Assert
      (Condition : Boolean;
@@ -43,4 +42,4 @@ package AUnit_Framework.Tests.Test_Cases.Assertions is
    --  Functional version to allow calling routine to decide whether to
    --  continue or abandon execution
 
-end AUnit_Framework.Tests.Test_Cases.Assertions;
+end AUnit.Assertions;

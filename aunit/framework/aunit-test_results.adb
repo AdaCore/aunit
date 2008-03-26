@@ -24,8 +24,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with AUnit.Memory.Utils;
+
 --  Record test results.
-package body AUnit_Framework.Test_Results is
+package body AUnit.Test_Results is
 
    -----------------------
    -- Local Subprograms --
@@ -55,19 +57,7 @@ package body AUnit_Framework.Test_Results is
       use Error_Lists;
 
    begin
-      if Length (R.Errors_List) =  Count_Type (Max_Exceptions_Per_Harness) then
-         declare
-            Error_Message       : constant String :=
-                                   " overflows Max_Errors_Per_Harness:";
-         begin
-            Put (Test_Name);
-            Put_Line (Error_Message);
-            Put (Routine_Name); Put (": ");
-            Put_Line (Message);
-         end;
-      else
-         Append (R.Errors_List, Val);
-      end if;
+      Append (R.Errors_List, Val);
    end Add_Error;
 
    -----------------
@@ -84,19 +74,7 @@ package body AUnit_Framework.Test_Results is
       use Failure_Lists;
 
    begin
-      if Length (R.Failures_List) =  Count_Type (Max_Failures_Per_Harness) then
-         declare
-            Error_Message      : constant String :=
-                                   " overflows Max_Failures_Per_Harness:";
-         begin
-            Put (Test_Name);
-            Put_Line (Error_Message);
-            Put (Routine_Name); Put (": ");
-            Put_Line (Message);
-         end;
-      else
-         Append (R.Failures_List, Val);
-      end if;
+      Append (R.Failures_List, Val);
    end Add_Failure;
 
    -----------------
@@ -112,18 +90,7 @@ package body AUnit_Framework.Test_Results is
       use Success_Lists;
 
    begin
-      if Length (R.Successes_List) = Count_Type (Max_Routines_Per_Harness) then
-         declare
-            Error_Message : constant String :=
-               " overflows Max_Routines_Per_Harness (successful):";
-         begin
-            Put (Test_Name);
-            Put_Line (Error_Message);
-            Put_Line (Routine_Name);
-         end;
-      else
-         Append (R.Successes_List, Val);
-      end if;
+      Append (R.Successes_List, Val);
    end Add_Success;
 
    -----------------
@@ -140,7 +107,7 @@ package body AUnit_Framework.Test_Results is
    -- Error_Count --
    -----------------
 
-   function Error_Count (R : Result) return Errors_Range is
+   function Error_Count (R : Result) return Count_Type is
    begin
       return Error_Lists.Length (R.Errors_List);
    end Error_Count;
@@ -161,7 +128,7 @@ package body AUnit_Framework.Test_Results is
    -- Failure_Count --
    -------------------
 
-   function Failure_Count (R : Result) return Failures_Range is
+   function Failure_Count (R : Result) return Count_Type is
    begin
       return Failure_Lists.Length (R.Failures_List);
    end Failure_Count;
@@ -191,7 +158,17 @@ package body AUnit_Framework.Test_Results is
    -- Format --
    ------------
 
-   function Format (Name : String) return Message_String renames New_String;
+   function Format (Name : String) return Message_String is
+      Ptr : constant Message_String :=
+              AUnit.Memory.Utils.Message_Alloc (Name'Length);
+   begin
+      --  Do not perform Ptr.all := S as this leads to a memcpy call which is
+      --  not available on zfp platforms
+      for J in Name'Range loop
+         Ptr (J - Name'First + 1) := Name (J);
+      end loop;
+      return Ptr;
+   end Format;
 
    ----------------
    -- Start_Test --
@@ -206,7 +183,7 @@ package body AUnit_Framework.Test_Results is
    -- Success_Count --
    -------------------
 
-   function Success_Count (R : Result)  return Successes_Range is
+   function Success_Count (R : Result)  return Count_Type is
    begin
       return Success_Lists.Length (R.Successes_List);
    end Success_Count;
@@ -236,7 +213,7 @@ package body AUnit_Framework.Test_Results is
    procedure Swap (Left, Right : in out Error_Lists.List) is
 
       use Error_Lists;
-      Temp : List (Count_Type (Errors_Range'Last));
+      Temp : List;
 
    begin
       Transfer (Temp, Left);
@@ -247,7 +224,7 @@ package body AUnit_Framework.Test_Results is
    procedure Swap (Left, Right : in out Failure_Lists.List) is
 
       use Failure_Lists;
-      Temp : List (Count_Type (Failures_Range'Last));
+      Temp : List;
 
    begin
       Transfer (Temp, Left);
@@ -258,7 +235,7 @@ package body AUnit_Framework.Test_Results is
    procedure Swap (Left, Right : in out Success_Lists.List) is
 
       use Success_Lists;
-      Temp : List (Count_Type (Successes_Range'Last));
+      Temp : List;
 
    begin
       Transfer (Temp, Left);
@@ -287,7 +264,7 @@ package body AUnit_Framework.Test_Results is
 
    begin
       Clear (Target);
-      Assign (Target, Source);
+      Move (Target, Source);
       Clear (Source);
    end Transfer;
 
@@ -299,7 +276,7 @@ package body AUnit_Framework.Test_Results is
 
    begin
       Clear (Target);
-      Assign (Target, Source);
+      Move (Target, Source);
       Clear (Source);
    end Transfer;
 
@@ -311,7 +288,7 @@ package body AUnit_Framework.Test_Results is
 
    begin
       Clear (Target);
-      Assign (Target, Source);
+      Move (Target, Source);
       Clear (Source);
    end Transfer;
 
@@ -324,4 +301,4 @@ package body AUnit_Framework.Test_Results is
       Success_Lists.Clear (R.Successes_List);
    end Clear;
 
-end AUnit_Framework.Test_Results;
+end AUnit.Test_Results;

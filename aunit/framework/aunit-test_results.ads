@@ -25,25 +25,13 @@
 ------------------------------------------------------------------------------
 
 with Ada_Containers;
-with Ada_Containers_Restricted_Doubly_Linked_Lists;
+with Ada_Containers.AUnit_Lists;
 
-with AUnit_Framework.Time_Measure, AUnit_Framework.Message_Strings;
+with AUnit.Time_Measure;
 
 --  Test reporting.
 --
---  Generic formals size the reporting data structures, which have to be
---  be statically allocated (ZFP subset does not allow dynamic allocation by
---  default). Since failure messages can be rather large, this allows tradeoffs
---  between verbosity and memory requirements.
-generic
-   Max_Routines_Per_Harness : Positive;   --  Max test cases per harness
-   Max_Exceptions_Per_Harness : Natural;  --  Max unhandled exceptions per
-                                          --  harness
-   Max_Failures_Per_Harness : Natural;    --  Max failed routines per harness
-   with package Message_Strings is new AUnit_Framework.Message_Strings (<>);
-package AUnit_Framework.Test_Results is
-
-   use Message_Strings;
+package AUnit.Test_Results is
 
    type Result is limited private;
    type Result_Access is access all Result;
@@ -67,23 +55,13 @@ package AUnit_Framework.Test_Results is
 
    use Ada_Containers;
 
-   subtype Successes_Range is Count_Type
-      range 0 .. Count_Type (Max_Routines_Per_Harness);
-   package Success_Lists is
-     new Ada_Containers_Restricted_Doubly_Linked_Lists
-       (Test_Success);
+   package Success_Lists is new Ada_Containers.AUnit_Lists (Test_Success);
    --  Containers for successes
 
-   subtype Errors_Range is Count_Type
-      range 0 .. Count_Type (Max_Exceptions_Per_Harness);
-   package Error_Lists is
-     new Ada_Containers_Restricted_Doubly_Linked_Lists (Test_Failure);
+   package Error_Lists is new Ada_Containers.AUnit_Lists (Test_Failure);
    --  Containers for unexpected exceptions
 
-   subtype Failures_Range is Count_Type
-      range 0 .. Count_Type (Max_Failures_Per_Harness);
-   package Failure_Lists is
-     new Ada_Containers_Restricted_Doubly_Linked_Lists (Test_Failure);
+   package Failure_Lists is new Ada_Containers.AUnit_Lists (Test_Failure);
    --  Containers for failures
 
    procedure Add_Error
@@ -110,14 +88,14 @@ package AUnit_Framework.Test_Results is
                           T : Time_Measure.Time);
    --  Set Elapsed time for reporter:
 
-   function Error_Count (R : Result) return Errors_Range;
+   function Error_Count (R : Result) return Count_Type;
    --  Number of routines with unexpected exceptions
 
    procedure Errors (R : in out Result;
                      E : in out Error_Lists.List);
    --  List of routines with unexpected exceptions
 
-   function Failure_Count (R : Result) return Failures_Range;
+   function Failure_Count (R : Result) return Count_Type;
    --  Number of failed routines
 
    procedure Failures (R : in out Result;
@@ -133,7 +111,7 @@ package AUnit_Framework.Test_Results is
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
    --  Set count for a test run
 
-   function Success_Count (R : Result) return Successes_Range;
+   function Success_Count (R : Result) return Count_Type;
    --  Number of successful routines
 
    procedure Successes (R : in out Result;
@@ -153,12 +131,12 @@ private
 
    type Result is limited record
       Tests_Run      : Count_Type := 0;
-      Errors_List    : Error_Lists.List (Errors_Range'Last);
-      Failures_List  : Failure_Lists.List (Failures_Range'Last);
-      Successes_List : Success_Lists.List (Successes_Range'Last);
+      Errors_List    : Error_Lists.List;
+      Failures_List  : Failure_Lists.List;
+      Successes_List : Success_Lists.List;
       Elapsed_Time   : Time_Measure.Time := Time_Measure.Null_Time;
    end record;
 
    pragma Inline (Error_Count, Failure_Count, Success_Count, Test_Count);
 
-end AUnit_Framework.Test_Results;
+end AUnit.Test_Results;

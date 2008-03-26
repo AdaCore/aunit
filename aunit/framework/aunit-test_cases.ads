@@ -25,15 +25,14 @@
 ------------------------------------------------------------------------------
 
 with Ada_Containers; use Ada_Containers;
-with Ada_Containers_Restricted_Doubly_Linked_Lists;
+with Ada_Containers.AUnit_Lists;
+with AUnit.Tests;
+with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case: a collection of test routines
-generic
-   Max_Routines_Per_Test_Case : Natural;
-   Max_Failures_Per_Harness : Natural;
-package AUnit_Framework.Tests.Test_Cases is
+package AUnit.Test_Cases is
 
-   type Test_Case is abstract new Test with private;
+   type Test_Case is abstract new AUnit.Tests.Test with private;
    type Test_Case_Access is access all Test_Case'Class;
 
    type Test_Routine is access procedure (Test : in out Test_Case'Class);
@@ -114,22 +113,17 @@ private
    type Routine_Access is access all Routine_Spec;
    --  Test routine description
 
-   subtype Routine_Range is Natural range 1 .. Max_Routines_Per_Test_Case;
-
-   package Routine_Lists is
-     new Ada_Containers_Restricted_Doubly_Linked_Lists (Routine_Spec);
+   package Routine_Lists is new Ada_Containers.AUnit_Lists (Routine_Spec);
    --  Container for test routines
 
    package Failure_Lists is
-     new Ada_Containers_Restricted_Doubly_Linked_Lists (Message_String);
+     new Ada_Containers.AUnit_Lists (Message_String);
    --  Container for failed assertion messages per routine
 
-   type Test_Case is abstract new Test with record
+   type Test_Case is abstract new AUnit.Tests.Test with record
       Name     : Message_String;
-      Routines : aliased Routine_Lists.List
-        (Count_Type (Max_Routines_Per_Test_Case));
-      Failures : aliased Failure_Lists.List
-        (Count_Type (Max_Failures_Per_Harness));
+      Routines : aliased Routine_Lists.List;
+      Failures : aliased Failure_Lists.List;
    end record;
 
-end AUnit_Framework.Tests.Test_Cases;
+end AUnit.Test_Cases;

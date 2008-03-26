@@ -23,18 +23,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit_Framework.Test_Results;
+with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Base Test Case or Test Suite
 --
 --  This base type allows composition of both test cases and sub-suites into a
 --  test suite (Composite pattern)
 
-generic
-   with package Results is new AUnit_Framework.Test_Results (<>);
-package AUnit_Framework.Tests is
-
-   use Results, Results.Message_Strings;
+package AUnit.Tests is
 
    type Test is abstract tagged limited private;
    type Test_Access is access all Test'Class;
@@ -48,4 +44,4 @@ private
 
    type Test is abstract tagged limited null record;
 
-end AUnit_Framework.Tests;
+end AUnit.Tests;

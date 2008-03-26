@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---     A U N I T _ F R A M E W O R K . T E S T S . T E S T _ S U I T E S    --
+--            A U N I T _ F R A M E W O R K . F R A M E W O R K             --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2006, AdaCore                   --
+--                    Copyright (C) 2006-2007, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,50 +24,21 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  A collection of test cases
-package body AUnit_Framework.Tests.Test_Suites is
+with AUnit.Reporter;
+with AUnit.Test_Suites;
 
-   --------------
-   -- Add_Test --
-   --------------
+--  Framework using text reporter
+package AUnit.Run is
 
-   procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class) is
-   begin
-      if Length (S.Tests) =  Count_Type (Max_Test_Cases_Per_Suite) then
-         if T.all in Test_Case'Class then
-            declare
-               Error_Message       : constant String :=
-                                      " overflows Max_Tests_Per_Suite:";
-            begin
-               Put (Name (Test_Case'Class (T.all)));
-               Put_Line (Error_Message);
-            end;
-         else
-            Put_Line ("Max_Tests_Per_Suite overflowed when adding sub-suite");
-         end if;
-      else
-         Append (S.Tests, Test_Access'(T.all'Unchecked_Access));
-      end if;
-   end Add_Test;
+   generic
+      with function Suite return AUnit.Test_Suites.Access_Test_Suite;
+   procedure Test_Runner (Reporter : AUnit.Reporter.Reporter'Class;
+                          Timed    : Boolean := True);
 
-   ---------
-   -- Run --
-   ---------
+   generic
+      with function Suite return AUnit.Test_Suites.Access_Test_Suite;
+   function Test_Runner_With_Status
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Timed    : Boolean := True) return Status;
 
-   procedure Run (Suite : access Test_Suite;
-                  R       : Result_Access;
-                  Outcome : out Status) is
-      C : Cursor := First (Suite.Tests);
-      Result : Status := Success;
-   begin
-      Outcome := Success;
-      while Has_Element (C) loop
-         Run (Element (C), R, Result);
-         if Result = Failure then
-            Outcome := Failure;
-         end if;
-         Next (C);
-      end loop;
-   end Run;
-
-end AUnit_Framework.Tests.Test_Suites;
+end AUnit.Run;
