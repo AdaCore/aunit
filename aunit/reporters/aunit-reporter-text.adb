@@ -97,7 +97,7 @@ package body AUnit.Reporter.Text is
       procedure Report_Success (Success : Test_Success) is
       begin
          Put ("      ");
-         Put (Success.Test_Name.all);
+         Put_Line (Success.Test_Name.all);
       end Report_Success;
 
       C : Cursor := First (L);
