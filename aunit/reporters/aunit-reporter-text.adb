@@ -185,13 +185,14 @@ package body AUnit.Reporter.Text is
       Put_Line (Error.Test_Name.all);
       Put ("      ");
       Put ("      ");
-      Put (Error.Message.all);
+      Put_Line (Error.Message.all);
       if Error.Source_Name /= null then
-         Put (" (");
+         Put ("      ");
+         Put ("      ");
+         Put ("at ");
          Put (Error.Source_Name.all);
          Put (":");
-         Put (Error.Line);
-         Put_Line (")");
+         Put_Line (Error.Line);
       else
          New_Line;
       end if;
