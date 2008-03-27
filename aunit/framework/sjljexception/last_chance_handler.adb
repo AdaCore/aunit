@@ -66,7 +66,7 @@ package body Last_Chance_Handler is
 
    procedure Test_Runner is
    begin
-      AUnit.Simple_Test_Cases.Run_Test (The_Test);
+      AUnit.Simple_Test_Cases.Run_Test (The_Test.all);
    end Test_Runner;
 
    ------------

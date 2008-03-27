@@ -50,7 +50,7 @@ begin
    Set_Up (Test.all);
 
    begin
-      Run_Test (Test);
+      Run_Test (Test.all);
    exception
       when Assertion_Error =>
          null;

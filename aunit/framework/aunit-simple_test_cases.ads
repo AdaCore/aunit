@@ -36,7 +36,7 @@ package AUnit.Simple_Test_Cases is
    function Name (Test : Test_Case) return Message_String is abstract;
    --  Test case name
 
-   procedure Run_Test (Test : access Test_Case) is abstract;
+   procedure Run_Test (Test : in out Test_Case) is abstract;
    --  Perform the test.
 
    procedure Set_Up (Test : in out Test_Case);
@@ -54,12 +54,12 @@ package AUnit.Simple_Test_Cases is
    function Format_Name (Test : Test_Case) return Message_String;
    --  Return the name as printed in report.
 
-private
-
    procedure Run (Test : access Test_Case;
                   R       : Result_Access;
                   Outcome : out Status);
-   --  Run test case
+   --  Run test case. Do not override
+
+private
 
    package Failure_Lists is
      new Ada_Containers.AUnit_Lists (Test_Failure);

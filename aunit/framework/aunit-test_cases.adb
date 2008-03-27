@@ -60,9 +60,9 @@ package body AUnit.Test_Cases is
    -- Run_Test --
    --------------
 
-   procedure Run_Test (Test : access Test_Case) is
+   procedure Run_Test (Test : in out Test_Case) is
    begin
-      Test.Routine.Routine (Test.all);
+      Test.Routine.Routine (Test);
    end Run_Test;
 
    ---------

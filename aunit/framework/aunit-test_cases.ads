@@ -82,12 +82,12 @@ package AUnit.Test_Cases is
       --  Add test routine for a specific test case
    end Specific_Test_Case_Registration;
 
-   procedure Run (Test : access Test_Case;
+   procedure Run (Test    : access Test_Case;
                   R       : Result_Access;
                   Outcome : out Status);
    --  Run test case. Do not override.
 
-   procedure Run_Test (Test : access Test_Case);
+   procedure Run_Test (Test : in out Test_Case);
    --  Perform the current test procedure. Do not override.
 
    function Format_Name (Test : Test_Case) return Message_String;
