@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . A S S E R T I O N S                      --
+--                A U N I T . S I M P L E _ T E S T _ C A S E S             --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                        Copyright (C) 2008, AdaCore                       --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,41 +24,81 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  Version for run-time libraries that support exception handling
-with AUnit.Simple_Test_Cases; use AUnit.Simple_Test_Cases;
+package body AUnit.Simple_Test_Cases is
 
-package body AUnit.Assertions is
+   The_Current_Test_Case : Test_Case_Access := null;
+
+   procedure Run_Routine
+     (Test    : access Test_Case'Class;
+      R       : access Result;
+      Outcome : out Status);
+   --  Run one test routine
+
+   -----------------
+   -- Run_Routine --
+   -----------------
+
+   procedure Run_Routine
+     (Test    : access Test_Case'Class;
+      R       : access Result;
+      Outcome : out Status) is separate;
 
    ------------
-   -- Assert --
+   -- Set_Up --
    ------------
 
-   procedure Assert
-     (Condition : Boolean;
-      Message   : String;
-      Source    : String := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line) is
+   procedure Set_Up (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin
-      if not Condition then
-         Register_Failure (Message, Source, Line);
-         raise Assertion_Error;
-      end if;
-   end Assert;
+      null;
+   end Set_Up;
 
-   ------------
-   -- Assert --
-   ------------
+   ---------------
+   -- Tear_Down --
+   ---------------
 
-   function Assert
-     (Condition : Boolean;
-      Message   : String;
-      Source    : String := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line) return Boolean is
+   procedure Tear_Down (Test : in out Test_Case) is
+      pragma Unreferenced (Test);
    begin
-      if not Condition then
-         Register_Failure (Message, Source, Line);
-      end if;
-      return Condition;
-   end Assert;
+      null;
+   end Tear_Down;
 
-end AUnit.Assertions;
+   ----------------------
+   -- Register_Failure --
+   ----------------------
+
+   procedure Register_Failure
+     (S           : String;
+      Source_Name : String;
+      Source_Line : Natural)
+   is
+   begin
+      Failure_Lists.Append
+        (The_Current_Test_Case.Failures,
+         (Format_Name (The_Current_Test_Case.all),
+          Format (S), Format (Source_Name), Source_Line));
+   end Register_Failure;
+
+   -----------------
+   -- Format_Name --
+   -----------------
+
+   function Format_Name (Test : Test_Case) return Message_String is
+   begin
+      return Name (Test_Case'Class (Test));
+   end Format_Name;
+
+   ---------
+   -- Run --
+   ---------
+
+   procedure Run (Test    : access Test_Case;
+                  R       : Result_Access;
+                  Outcome : out Status) is
+   begin
+      The_Current_Test_Case := Test_Case_Access (Test);
+      Start_Test (R.all, 1);
+      Run_Routine (Test, R, Outcome);
+   end Run;
+
+end AUnit.Simple_Test_Cases;

@@ -27,10 +27,16 @@
 --  Test Suite Framework
 package AUnit is
 
-   type Message_String is access all String;
+   type Message_String is access String;
 
    subtype Test_String is Message_String;
 
    type Status is (Success, Failure);
+
+   --  String manipulation functions.
+
+   function Format (S : String) return Message_String;
+   function Message_Alloc (Length : Natural) return Message_String;
+   procedure Message_Free (Msg : in out Message_String);
 
 end AUnit;

@@ -1,5 +1,7 @@
+--
+--  Copyright (C) 2008, AdaCore
+--
 with AUnit.Assertions;   use AUnit.Assertions;
-with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case that inherits a routine
 package body One_Test_Case.Inherited_Test_Case is
@@ -40,7 +42,7 @@ package body One_Test_Case.Inherited_Test_Case is
    function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return  Format ("Inherited Test Case");
+      return Format ("Inherited Test Case");
    end Name;
 
 end One_Test_Case.Inherited_Test_Case;

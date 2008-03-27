@@ -1,8 +1,10 @@
+--
+--  Copyright (C) 2008, AdaCore
+--
 with Empty_Test_Case;
 with Ada_Containers; use Ada_Containers;
 
 with AUnit.Assertions;
-with AUnit.Test_Results;
 --  Unit tests for AUnit.Test_Cases.Registration.
 package body Test_Test_Case_Registration is
 
@@ -44,7 +46,7 @@ package body Test_Test_Case_Registration is
    function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return AUnit.Test_Results.Format ("Test AUnit.Test_Cases.Registration");
+      return Format ("Test AUnit.Test_Cases.Registration");
    end Name;
 
 end Test_Test_Case_Registration;

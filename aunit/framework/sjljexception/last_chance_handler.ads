@@ -30,11 +30,17 @@
 
 with System;
 with AUnit; use AUnit;
+with AUnit.Simple_Test_Cases;
 
 package Last_Chance_Handler is
 
    function Get_Last_Msg return Message_String;
+   function Get_Source return Message_String;
+   function Get_Line return Natural;
    --  Return the last exception message
+
+   function Setjmp (Test : AUnit.Simple_Test_Cases.Test_Case_Access)
+                    return Integer;
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");

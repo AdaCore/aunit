@@ -1,3 +1,6 @@
+--
+--  Copyright (C) 2008, AdaCore
+--
 with Empty_Test_Case;
 with One_Test_Case;
 with One_Test_Case.Inherited_Test_Case;
@@ -90,7 +93,7 @@ package body Test_Test_Suite is
    function Name (T : The_Test_Case) return Test_String is
       pragma Unreferenced (T);
    begin
-      return  Format ("Test AUnit.Test_Suites");
+      return Format ("Test AUnit.Test_Suites");
    end Name;
 
 end Test_Test_Suite;

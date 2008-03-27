@@ -1,6 +1,7 @@
-with AUnit.Test_Results; use AUnit.Test_Results;
-
---  Simple test case
+--
+--  Copyright (C) 2008, AdaCore
+--
+--  Empty test case.
 package body Empty_Test_Case is
 
    --  Test Routines:

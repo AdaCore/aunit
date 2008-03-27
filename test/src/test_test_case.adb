@@ -1,3 +1,6 @@
+--
+--  Copyright (C) 2008, AdaCore
+--
 with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
 
@@ -141,7 +144,7 @@ package body Test_Test_Case is
    function Name (T : The_Test_Case) return Test_String is
    pragma Unreferenced (T);
    begin
-      return  Format ("Test AUnit.Test_Cases");
+      return Format ("Test AUnit.Test_Cases");
    end Name;
 
 end Test_Test_Case;

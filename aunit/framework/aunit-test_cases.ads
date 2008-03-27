@@ -26,20 +26,17 @@
 
 with Ada_Containers; use Ada_Containers;
 with Ada_Containers.AUnit_Lists;
-with AUnit.Tests;
+with AUnit.Simple_Test_Cases;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case: a collection of test routines
 package AUnit.Test_Cases is
 
-   type Test_Case is abstract new AUnit.Tests.Test with private;
+   type Test_Case is abstract new AUnit.Simple_Test_Cases.Test_Case with
+     private;
    type Test_Case_Access is access all Test_Case'Class;
 
    type Test_Routine is access procedure (Test : in out Test_Case'Class);
-
-   Assertion_Error : exception;
-   --  For run-time libraries that support exception handling, raised when an
-   --  assertion fails in order to abandon execution of a test routine
 
    type Routine_Spec is record
       Routine      : Test_Routine;
@@ -48,37 +45,14 @@ package AUnit.Test_Cases is
 
    procedure Add_Routine (T : in out Test_Case'Class; Val : Routine_Spec);
 
-   function Name (Test : Test_Case) return Message_String is abstract;
-   --  Test case name
-
-   procedure Register_Failure (T : access Test_Case'Class; S : String);
-   --  Record test routine failure message
-
    procedure Register_Tests (Test : in out Test_Case) is abstract;
    --  Register test methods with test suite
-
-   procedure Run (Test : access Test_Case;
-                  R       : Result_Access;
-                  Outcome : out Status);
-   --  Run test case
-
-   procedure Set_Name (Test : in out Test_Case'Class; Name : Message_String);
-   --  Set name of test
-
-   procedure Set_Up (Test : in out Test_Case);
-   --  Set up performed before each test routine
 
    procedure Set_Up_Case (Test : in out Test_Case);
    --  Set up performed before each test case (set of test routines)
 
-   procedure Tear_Down (Test : in out Test_Case);
-   --  Tear down performed after each test routine
-
    procedure Tear_Down_Case (Test : in out Test_Case);
    --  Tear down performed after each test case
-
-   function Current_Test_Case return Test_Case_Access;
-   --  The running test case
 
    package Registration is
 
@@ -108,6 +82,19 @@ package AUnit.Test_Cases is
       --  Add test routine for a specific test case
    end Specific_Test_Case_Registration;
 
+   procedure Run (Test : access Test_Case;
+                  R       : Result_Access;
+                  Outcome : out Status);
+   --  Run test case. Do not override.
+
+   procedure Run_Test (Test : access Test_Case);
+   --  Perform the current test procedure. Do not override.
+
+   function Format_Name (Test : Test_Case) return Message_String;
+   --  Format the name as displayed in the result
+   --  This returns "Name: Routine_Name"
+   --  Do not override.
+
 private
 
    type Routine_Access is access all Routine_Spec;
@@ -120,10 +107,9 @@ private
      new Ada_Containers.AUnit_Lists (Message_String);
    --  Container for failed assertion messages per routine
 
-   type Test_Case is abstract new AUnit.Tests.Test with record
-      Name     : Message_String;
+   type Test_Case is abstract new AUnit.Simple_Test_Cases.Test_Case with record
       Routines : aliased Routine_Lists.List;
-      Failures : aliased Failure_Lists.List;
+      Routine  : Routine_Spec;
    end record;
 
 end AUnit.Test_Cases;

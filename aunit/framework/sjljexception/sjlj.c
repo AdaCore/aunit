@@ -33,12 +33,12 @@ typedef int jmp_buf[5];
 static jmp_buf JMPBUF[5];
 static int insetjmp = 0;
 
-int mysetjmp (void (*next (void *)), void *arg1)
+int mysetjmp (void (*next ()))
 {
   int ret;
   if (!__builtin_setjmp (JMPBUF[insetjmp])) {
     insetjmp++;
-    next(arg1);
+    next();
     insetjmp--;
     return 0;
   }

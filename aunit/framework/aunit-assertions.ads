@@ -24,11 +24,19 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with GNAT.Source_Info;
+
 package AUnit.Assertions is
+
+   Assertion_Error : exception;
+   --  For run-time libraries that support exception handling, raised when an
+   --  assertion fails in order to abandon execution of a test routine
 
    procedure Assert
      (Condition : Boolean;
-      Message   : String);
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line);
    --  Test "Condition" and record "Message" if false.
    --  If the Ada run-time library supports exception handling, a failed
    --  condition passed to this routine causes the calling routine to be
@@ -37,7 +45,9 @@ package AUnit.Assertions is
 
    function Assert
      (Condition : Boolean;
-      Message   : String) return Boolean;
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) return Boolean;
    --  Functional version to allow calling routine to decide whether to
    --  continue or abandon execution
 

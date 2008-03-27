@@ -23,14 +23,10 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-
 with Ada.Unchecked_Conversion;
-with AUnit.Memory.Utils;
 
 --  Test cases
 package body AUnit.Test_Cases is
-
-   The_Current_Test_Case : Test_Case_Access := null;
 
    package body Registration is separate;
 
@@ -38,27 +34,8 @@ package body AUnit.Test_Cases is
    -- Local Subprograms --
    -----------------------
 
-   function Format_Message (S : String) return Message_String;
-   --  Format error string
-
    procedure Initialize (T : access Test_Case'Class);
    --  Initialize test case
-
-   procedure Run_Routine
-     (Test    : access Test_Case'Class;
-      Subtest : Routine_Spec;
-      R       : access Result;
-      Outcome : out Status);
-   --  Run one test routine
-
-   -----------------------
-   -- Current_Test_Case --
-   -----------------------
-
-   function Current_Test_Case return Test_Case_Access is
-   begin
-      return The_Current_Test_Case;
-   end Current_Test_Case;
 
    -----------------
    -- Add_Routine --
@@ -69,41 +46,24 @@ package body AUnit.Test_Cases is
       Routine_Lists.Append (T.Routines, Val);
    end Add_Routine;
 
-   --------------------
-   -- Format_Message --
-   --------------------
-
-   function Format_Message (S : String) return Message_String is
-      Ptr : constant Message_String :=
-                      AUnit.Memory.Utils.Message_Alloc (S'Length);
-   begin
-      --  Do not perform Ptr.all := S as this leads to a memcpy call which is
-      --  not available on zfp platforms
-      for J in S'Range loop
-         Ptr (J - S'First + 1) := S (J);
-      end loop;
-      return Ptr;
-   end Format_Message;
-
    ----------------
    -- Initialize --
    ----------------
 
    procedure Initialize (T : access Test_Case'Class) is
    begin
-      Set_Name (T.all, Name (T.all));
       Routine_Lists.Clear (T.Routines);
       Register_Tests (T.all);
    end Initialize;
 
-   ----------------------
-   -- Register_Failure --
-   ----------------------
+   --------------
+   -- Run_Test --
+   --------------
 
-   procedure Register_Failure (T : access Test_Case'Class; S : String) is
+   procedure Run_Test (Test : access Test_Case) is
    begin
-      Failure_Lists.Append (T.Failures, Format_Message (S));
-   end Register_Failure;
+      Test.Routine.Routine (Test.all);
+   end Run_Test;
 
    ---------
    -- Run --
@@ -118,13 +78,13 @@ package body AUnit.Test_Cases is
    begin
       Outcome := Success;
       Initialize (Test);
-      Start_Test (R.all, Routine_Lists.Length (Test.Routines));
       Set_Up_Case (Test_Case'Class (Test.all));
       C := First (Test.Routines);
 
       while Has_Element (C) loop
-         The_Current_Test_Case := Test_Case_Access (Test);
-         Run_Routine (Test, Element (C), R, Result);
+         Test.Routine := Element (C);
+         AUnit.Simple_Test_Cases.Run
+           (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access, R, Result);
          if Result = Failure then
             Outcome := Failure;
          end if;
@@ -135,33 +95,34 @@ package body AUnit.Test_Cases is
    end Run;
 
    -----------------
-   -- Run_Routine --
+   -- Format_Name --
    -----------------
 
-   procedure Run_Routine
-     (Test    : access Test_Case'Class;
-      Subtest : Routine_Spec;
-      R       : access Result;
-      Outcome : out Status) is separate;
-
-   --------------
-   -- Set_Name --
-   --------------
-
-   procedure Set_Name (Test : in out Test_Case'Class; Name : Message_String) is
+   function Format_Name (Test : Test_Case) return Message_String is
+      Test_Name : Message_String :=
+                    AUnit.Simple_Test_Cases.Name
+                      (AUnit.Simple_Test_Cases.Test_Case'Class (Test));
+      Ret       : constant Message_String :=
+                    Message_Alloc (Test_Name'Length +
+                                         Test.Routine.Routine_Name'Length + 3);
    begin
-      Test.Name := Name;
-   end Set_Name;
+      for J in 1 .. Test_Name'Length loop
+         Ret (J) := Test_Name (J - 1 + Test_Name'First);
+      end loop;
 
-   ------------
-   -- Set_Up --
-   ------------
+      Ret (Test_Name'Length + 1) := ' ';
+      Ret (Test_Name'Length + 2) := ':';
+      Ret (Test_Name'Length + 3) := ' ';
 
-   procedure Set_Up (Test : in out Test_Case) is
-      pragma Unreferenced (Test);
-   begin
-      null;
-   end Set_Up;
+      for J in Test_Name'Length + 4 .. Ret'Last loop
+         Ret (J) := Test.Routine.Routine_Name
+           (J - Test_Name'Length - 4 + Test.Routine.Routine_Name'First);
+      end loop;
+
+      Message_Free (Test_Name);
+
+      return Ret;
+   end Format_Name;
 
    ------------------
    --  Set_Up_Case --
@@ -173,16 +134,6 @@ package body AUnit.Test_Cases is
    begin
       null;
    end Set_Up_Case;
-
-   ---------------
-   -- Tear_Down --
-   ---------------
-
-   procedure Tear_Down (Test : in out Test_Case) is
-      pragma Unreferenced (Test);
-   begin
-      null;
-   end Tear_Down;
 
    --------------------
    -- Tear_Down_Case --

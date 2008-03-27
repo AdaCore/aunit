@@ -23,27 +23,31 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+with System;
 with System.Storage_Elements; use System.Storage_Elements;
 with Interfaces.C;
 with Ada.Unchecked_Conversion;
-with AUnit.Memory.Utils;
 
 package body Last_Chance_Handler is
 
-   Exception_Msg : Message_String := null;
+   Exception_Msg    : Message_String := null;
+   Exception_Source : Message_String := null;
+   Exception_Line   : Natural := 0;
 
-   ------------------
-   -- Get_Last_Msg --
-   ------------------
+   The_Test : AUnit.Simple_Test_Cases.Test_Case_Access := null;
 
-   function Get_Last_Msg return Message_String is
-   begin
-      if Exception_Msg = null then
-         return AUnit.Memory.Utils.Message_Alloc (0);
-      else
-         return Exception_Msg;
-      end if;
-   end Get_Last_Msg;
+   procedure Test_Runner;
+   --  Wrapper called by the C setjmp that runs the test case
+
+   function C_Setjmp (Acc : System.Address) return Integer;
+   pragma Import (C, C_Setjmp, "mysetjmp");
+   procedure C_Longjmp;
+   pragma Import (C, C_Longjmp, "mylongjmp");
+   pragma No_Return (C_Longjmp);
+
+   ---------------------------
+   --  C Strings management --
+   ---------------------------
 
    type chars_ptr is access all Character;
    pragma No_Strict_Aliasing (chars_ptr);
@@ -55,6 +59,69 @@ package body Last_Chance_Handler is
       new Ada.Unchecked_Conversion (chars_ptr, System.Address);
 
    function To_Ada (Item : chars_ptr) return Message_String;
+
+   -----------------
+   -- Test_Runner --
+   -----------------
+
+   procedure Test_Runner is
+   begin
+      AUnit.Simple_Test_Cases.Run_Test (The_Test);
+   end Test_Runner;
+
+   ------------
+   -- Setjmp --
+   ------------
+
+   function Setjmp (Test : AUnit.Simple_Test_Cases.Test_Case_Access)
+                    return Integer is
+   begin
+      The_Test := Test;
+      return C_Setjmp (Test_Runner'Address);
+   end Setjmp;
+
+   ------------------
+   -- Get_Last_Msg --
+   ------------------
+
+   function Get_Last_Msg return Message_String is
+   begin
+      if Exception_Msg = null then
+         return AUnit.Message_Alloc (0);
+      else
+         return Exception_Msg;
+      end if;
+   end Get_Last_Msg;
+
+   ----------------
+   -- Get_Source --
+   ----------------
+
+   function Get_Source return Message_String is
+   begin
+      if Exception_Msg = null then
+         return AUnit.Message_Alloc (0);
+      else
+         return Exception_Source;
+      end if;
+   end Get_Source;
+
+   --------------
+   -- Get_Line --
+   --------------
+
+   function Get_Line return Natural is
+   begin
+      if Exception_Msg = null then
+         return 0;
+      else
+         return Exception_Line;
+      end if;
+   end Get_Line;
+
+   ------------
+   -- To_Ada --
+   ------------
 
    function To_Ada (Item : chars_ptr) return Message_String is
       use Interfaces.C;
@@ -89,7 +156,7 @@ package body Last_Chance_Handler is
          Length := Length + 1;
       end loop;
 
-      Result := AUnit.Memory.Utils.Message_Alloc (Natural (Length));
+      Result := AUnit.Message_Alloc (Natural (Length));
 
       for J in Result'Range loop
          Result (J) := To_Ada (Peek (Item + size_t (J - 1)));
@@ -103,17 +170,13 @@ package body Last_Chance_Handler is
    -------------------------
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
-      pragma Unreferenced (Line);
-
-      procedure Longjmp;
-      pragma Import (C, Longjmp, "mylongjmp");
-      pragma No_Return (Longjmp);
-
    begin
       --  Save the exception message before performing the longjmp
-      Exception_Msg := To_Ada (To_chars_ptr (Msg));
+      Exception_Msg    := To_Ada (To_chars_ptr (Msg));
+      Exception_Source := Exception_Msg;
+      Exception_Line   := Line;
       --  No return procedure.
-      Longjmp;
+      C_Longjmp;
    end Last_Chance_Handler;
 
 end Last_Chance_Handler;

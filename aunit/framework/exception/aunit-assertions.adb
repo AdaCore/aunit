@@ -25,8 +25,7 @@
 ------------------------------------------------------------------------------
 
 --  Version for run-time libraries that support exception handling
-
-with AUnit.Test_Cases; use AUnit.Test_Cases;
+with AUnit.Simple_Test_Cases; use AUnit.Simple_Test_Cases;
 
 package body AUnit.Assertions is
 
@@ -36,20 +35,24 @@ package body AUnit.Assertions is
 
    procedure Assert
      (Condition : Boolean;
-      Message   : String) is
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) is
    begin
       if not Condition then
-         Register_Failure (Current_Test_Case, Message);
+         Register_Failure (Message, Source, Line);
          raise Assertion_Error;
       end if;
    end Assert;
 
    function Assert
      (Condition : Boolean;
-      Message   : String) return Boolean is
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) return Boolean is
    begin
       if not Condition then
-         Register_Failure (Current_Test_Case, Message);
+         Register_Failure (Message, Source, Line);
       end if;
       return Condition;
    end Assert;

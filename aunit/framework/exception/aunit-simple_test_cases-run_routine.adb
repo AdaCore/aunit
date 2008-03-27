@@ -24,41 +24,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with System;
-with Last_Chance_Handler;
-separate (AUnit.Test_Cases)
+with Ada.Exceptions;   use Ada.Exceptions;
+with AUnit.Assertions; use AUnit.Assertions;
 
---  Version for run-time libraries that support exception handling via gcc
---  builtin setjmp/longjmp mechanism.
+separate (AUnit.Simple_Test_Cases)
 
+--  Version for run-time libraries that support exception handling
 procedure Run_Routine
   (Test    : access Test_Case'Class;
-   Subtest : Routine_Spec;
    R       : access Result;
    Outcome : out Status) is
 
    Unexpected_Exception : Boolean := False;
-   pragma Warnings (Off);
-   function Setjmp (Acc : System.Address;
-                    T : System.Address) return Integer;
-   pragma Import (C, Setjmp, "mysetjmp");
-   pragma Warnings (On);
-
-   function String_Compare (Str1, Str2 : String) return Boolean;
-   function String_Compare (Str1, Str2 : String) return Boolean is
-   begin
-      if Str1'Length /= Str2'Length then
-         return False;
-      end if;
-      for J in Str1'Range loop
-         if Str1 (J) /= Str2 (J - Str1'First + Str2'First) then
-            return False;
-         end if;
-      end loop;
-      return True;
-   end String_Compare;
-
-   Res : Integer;
 
    use Failure_Lists;
 
@@ -73,32 +50,25 @@ begin
    Set_Up (Test.all);
 
    begin
-      Res := Setjmp (Subtest.Routine.all'Address, Test.all'Address);
-
-      if Res /= 0 then
-         declare
-            Last_Message : constant Message_String :=
-                             Last_Chance_Handler.Get_Last_Msg;
-         begin
-            if not String_Compare
-                    (Last_Message.all, "aunit-assertions.adb:43")
-            then
-               Unexpected_Exception := True;
-               Add_Error
-                 (R.all,
-                  Name (Test.all),
-                  Subtest.Routine_Name,
-                  Last_Message);
-            end if;
-         end;
-      end if;
+      Run_Test (Test);
+   exception
+      when Assertion_Error =>
+         null;
+      when E : others =>
+         Unexpected_Exception := True;
+         Add_Error
+           (R.all,
+            (Format_Name (Test.all),
+             Format (Exception_Name (E)),
+             null,
+             0));
    end;
 
    Tear_Down (Test.all);
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Subtest.Routine_Name);
+      Add_Success (R.all, Format_Name (Test.all));
    else
       Outcome := Failure;
       declare
@@ -106,11 +76,10 @@ begin
       begin
          while Has_Element (C) loop
             Add_Failure (R.all,
-                         Name (Test.all),
-                         Subtest.Routine_Name,
                          Element (C));
             Next (C);
          end loop;
       end;
    end if;
+
 end Run_Routine;

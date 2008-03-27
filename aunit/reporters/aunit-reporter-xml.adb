@@ -97,11 +97,8 @@ package body AUnit.Reporter.XML is
       procedure Report_Success (Success : Test_Success) is
       begin
          Put_Line ("    <Test>");
-         Put      ("      <TestCase>");
-         Put      (Success.Test_Name.all);
-         Put_Line ("</TestCase>");
          Put      ("      <Name>");
-         Put      (Success.Routine_Name.all);
+         Put      (Success.Test_Name.all);
          Put_Line ("</Name>");
          Put_Line ("    </Test>");
       end Report_Success;
@@ -189,9 +186,6 @@ package body AUnit.Reporter.XML is
    procedure Report_Error (Error : Test_Failure; Is_Assert : Boolean) is
    begin
       Put_Line ("    <Test>");
-      Put      ("      <TestCase>");
-      Put      (Error.Test_Name.all);
-      Put_Line ("</TestCase>");
       Put      ("      <Name>");
       Put      (Error.Test_Name.all);
       Put_Line ("</Name>");
@@ -205,6 +199,18 @@ package body AUnit.Reporter.XML is
       Put      ("      <Message>");
       Put      (Error.Message.all);
       Put_Line ("</Message>");
+
+      if Error.Source_Name /= null then
+         Put_Line ("      <Location>");
+         Put      ("        <File>");
+         Put      (Error.Source_Name.all);
+         Put_Line ("</File>");
+         Put      ("        <Line>");
+         Put      (Error.Line);
+         Put_Line ("</Line>");
+         Put_Line ("      </Location>");
+      end if;
+
       Put_Line ("    </Test>");
    end Report_Error;
 

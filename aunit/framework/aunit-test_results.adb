@@ -24,8 +24,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Memory.Utils;
-
 --  Record test results.
 package body AUnit.Test_Results is
 
@@ -48,16 +46,13 @@ package body AUnit.Test_Results is
    ---------------
 
    procedure Add_Error
-     (R : in out Result;
-      Test_Name      : Message_String;
-      Routine_Name   : Message_String;
-      Message        : Message_String) is
+     (R       : in out Result;
+      Failure : Test_Failure) is
 
-      Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
       use Error_Lists;
 
    begin
-      Append (R.Errors_List, Val);
+      Append (R.Errors_List, Failure);
    end Add_Error;
 
    -----------------
@@ -66,15 +61,12 @@ package body AUnit.Test_Results is
 
    procedure Add_Failure
      (R : in out Result;
-      Test_Name      : Message_String;
-      Routine_Name   : Message_String;
-      Message        : Message_String) is
+      Failure : Test_Failure) is
 
-      Val : constant Test_Failure := (Test_Name, Routine_Name, Message);
       use Failure_Lists;
 
    begin
-      Append (R.Failures_List, Val);
+      Append (R.Failures_List, Failure);
    end Add_Failure;
 
    -----------------
@@ -83,10 +75,9 @@ package body AUnit.Test_Results is
 
    procedure Add_Success
      (R                       : in out Result;
-      Test_Name               : Message_String;
-      Routine_Name            : Message_String) is
+      Test_Name               : Message_String) is
 
-      Val : constant Test_Success := (Test_Name, Routine_Name);
+      Val : constant Test_Success := (Test_Name => Test_Name);
       use Success_Lists;
 
    begin
@@ -153,22 +144,6 @@ package body AUnit.Test_Results is
    begin
       return R.Elapsed_Time;
    end Elapsed;
-
-   ------------
-   -- Format --
-   ------------
-
-   function Format (Name : String) return Message_String is
-      Ptr : constant Message_String :=
-              AUnit.Memory.Utils.Message_Alloc (Name'Length);
-   begin
-      --  Do not perform Ptr.all := S as this leads to a memcpy call which is
-      --  not available on zfp platforms
-      for J in Name'Range loop
-         Ptr (J - Name'First + 1) := Name (J);
-      end loop;
-      return Ptr;
-   end Format;
 
    ----------------
    -- Start_Test --

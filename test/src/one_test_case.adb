@@ -1,5 +1,6 @@
-with AUnit.Test_Results;          use AUnit.Test_Results;
-
+--
+--  Copyright (C) 2008, AdaCore
+--
 --  Test case with one routine
 package body One_Test_Case is
 
