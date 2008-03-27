@@ -4,8 +4,8 @@ GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
 GNATCLEAN = gnatclean
 
-INSTALL	= @prefix@
-# INSTALL = $(shell which $(GPRBUILD) | sed -e 's/\/bin\/.*//')
+# INSTALL	= @prefix@
+INSTALL = $(shell which $(GPRBUILD) | sed -e 's/\/bin\/.*//')
 
 ifeq ($(RTS),)
    RTS_CONF =
