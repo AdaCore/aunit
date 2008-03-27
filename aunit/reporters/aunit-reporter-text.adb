@@ -192,7 +192,8 @@ package body AUnit.Reporter.Text is
          Put ("at ");
          Put (Error.Source_Name.all);
          Put (":");
-         Put_Line (Error.Line);
+         Put (Error.Line);
+         New_Line;
       else
          New_Line;
       end if;
