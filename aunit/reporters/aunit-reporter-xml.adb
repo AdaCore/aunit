@@ -99,6 +99,12 @@ package body AUnit.Reporter.XML is
          Put_Line ("    <Test>");
          Put      ("      <Name>");
          Put      (Success.Test_Name.all);
+
+         if Success.Routine_Name /= null then
+            Put (" : ");
+            Put (Success.Routine_Name.all);
+         end if;
+
          Put_Line ("</Name>");
          Put_Line ("    </Test>");
       end Report_Success;
@@ -188,13 +194,21 @@ package body AUnit.Reporter.XML is
       Put_Line ("    <Test>");
       Put      ("      <Name>");
       Put      (Error.Test_Name.all);
+
+      if Error.Routine_Name /= null then
+         Put (" : ");
+         Put (Error.Routine_Name.all);
+      end if;
+
       Put_Line ("</Name>");
       Put      ("      <FailureType>");
+
       if Is_Assert then
          Put   ("Assertion");
       else
          Put   ("Error");
       end if;
+
       Put_Line ("</FailureType>");
       Put      ("      <Message>");
       Put      (Error.Message.all);

@@ -90,10 +90,8 @@ package AUnit.Test_Cases is
    procedure Run_Test (Test : in out Test_Case);
    --  Perform the current test procedure. Do not override.
 
-   function Format_Name (Test : Test_Case) return Message_String;
-   --  Format the name as displayed in the result
-   --  This returns "Name: Routine_Name"
-   --  Do not override.
+   function Routine_Name (Test : Test_Case)return Message_String;
+   --  Routine name. Returns the routine under test. Do not override.
 
 private
 

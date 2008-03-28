@@ -40,6 +40,7 @@ package AUnit.Test_Results is
 
    type Test_Failure is record
       Test_Name    : Message_String;
+      Routine_Name : Message_String;
       Message      : Message_String;
       Source_Name  : Message_String;
       Line         : Natural;
@@ -50,6 +51,7 @@ package AUnit.Test_Results is
 
    type Test_Success is record
       Test_Name    : Message_String;
+      Routine_Name : Message_String;
    end record;
    --  Decription of a test routine success
 
@@ -76,7 +78,8 @@ package AUnit.Test_Results is
 
    procedure Add_Success
      (R                       : in out Result;
-      Test_Name               : Message_String);
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String);
    --  Record a test routine success
 
    procedure Set_Elapsed (R : in out Result;

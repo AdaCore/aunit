@@ -36,6 +36,9 @@ package AUnit.Simple_Test_Cases is
    function Name (Test : Test_Case) return Message_String is abstract;
    --  Test case name
 
+   function Routine_Name (Test : Test_Case) return Message_String;
+   --  Routine name. By default return a null Message_String
+
    procedure Run_Test (Test : in out Test_Case) is abstract;
    --  Perform the test.
 
@@ -50,9 +53,6 @@ package AUnit.Simple_Test_Cases is
       Source_Name : String;
       Source_Line : Natural);
    --  Record test routine failure message
-
-   function Format_Name (Test : Test_Case) return Message_String;
-   --  Return the name as printed in report.
 
    procedure Run (Test : access Test_Case;
                   R       : Result_Access;

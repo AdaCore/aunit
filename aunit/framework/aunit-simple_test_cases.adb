@@ -43,6 +43,16 @@ package body AUnit.Simple_Test_Cases is
       R       : access Result;
       Outcome : out Status) is separate;
 
+   ------------------
+   -- Routine_Name --
+   ------------------
+
+   function Routine_Name (Test : Test_Case) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Routine_Name;
+
    ------------
    -- Set_Up --
    ------------
@@ -75,18 +85,10 @@ package body AUnit.Simple_Test_Cases is
    begin
       Failure_Lists.Append
         (The_Current_Test_Case.Failures,
-         (Format_Name (The_Current_Test_Case.all),
+         (Name (The_Current_Test_Case.all),
+          Routine_Name (The_Current_Test_Case.all),
           Format (S), Format (Source_Name), Source_Line));
    end Register_Failure;
-
-   -----------------
-   -- Format_Name --
-   -----------------
-
-   function Format_Name (Test : Test_Case) return Message_String is
-   begin
-      return Name (Test_Case'Class (Test));
-   end Format_Name;
 
    ---------
    -- Run --

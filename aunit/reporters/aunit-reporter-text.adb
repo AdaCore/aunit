@@ -97,7 +97,14 @@ package body AUnit.Reporter.Text is
       procedure Report_Success (Success : Test_Success) is
       begin
          Put ("      ");
-         Put_Line (Success.Test_Name.all);
+         Put (Success.Test_Name.all);
+
+         if Success.Routine_Name /= null then
+            Put (" : ");
+            Put_Line (Success.Routine_Name.all);
+         else
+            New_Line;
+         end if;
       end Report_Success;
 
       C : Cursor := First (L);
@@ -182,7 +189,15 @@ package body AUnit.Reporter.Text is
    begin
       New_Line;
       Put ("      ");
-      Put_Line (Error.Test_Name.all);
+      Put (Error.Test_Name.all);
+
+      if Error.Routine_Name /= null then
+         Put (" : ");
+         Put_Line (Error.Routine_Name.all);
+      else
+         New_Line;
+      end if;
+
       Put ("      ");
       Put ("      ");
       Put_Line (Error.Message.all);

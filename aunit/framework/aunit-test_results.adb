@@ -75,9 +75,10 @@ package body AUnit.Test_Results is
 
    procedure Add_Success
      (R                       : in out Result;
-      Test_Name               : Message_String) is
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String) is
 
-      Val : constant Test_Success := (Test_Name => Test_Name);
+      Val : constant Test_Success := (Test_Name, Routine_Name);
       use Success_Lists;
 
    begin

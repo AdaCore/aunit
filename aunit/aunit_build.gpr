@@ -9,8 +9,8 @@ project AUnit_Build is
    for Source_Dirs use ("framework", "containers", "reporters");
 
    for Languages use ("Ada");
-   for Object_Dir use "obj";
-   for Library_Dir use "lib";
+   for Object_Dir use "obj/" & Target & "-" & Runtime;
+   for Library_Dir use "lib/" & Target & "-" & Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
 
@@ -27,7 +27,7 @@ project AUnit_Build is
       when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
          for Source_Dirs use project'Source_Dirs &
                              "framework/nocalendar" & "framework/staticmemory";
-
+     
       when "vxworksae" =>
             case Runtime is
                when "full" | "cert" =>
@@ -57,13 +57,7 @@ project AUnit_Build is
    end case;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
-      for Switches ("aunit.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
-      for Switches ("aunit-simple_test_cases.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
-      for Switches ("aunit-test_cases.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
-      for Switches ("aunit-test_results.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
-      for Switches ("aunit-test_suites.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
-      for Switches ("ada_containers-aunit_lists.adb") use Compiler'Default_Switches ("Ada") & "-gnat05";
+      for Default_Switches ("ada") use ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty", "-gnat05");
    end Compiler;
 
    package IDE is

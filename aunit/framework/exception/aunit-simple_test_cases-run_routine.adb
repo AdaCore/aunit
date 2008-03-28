@@ -58,7 +58,8 @@ begin
          Unexpected_Exception := True;
          Add_Error
            (R.all,
-            (Format_Name (Test.all),
+            (Name (Test.all),
+             Routine_Name (Test.all),
              Format (Exception_Name (E)),
              null,
              0));
@@ -68,7 +69,7 @@ begin
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Format_Name (Test.all));
+      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
    else
       Outcome := Failure;
       declare

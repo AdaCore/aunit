@@ -94,35 +94,14 @@ package body AUnit.Test_Cases is
       Tear_Down_Case (Test_Case'Class (Test.all));
    end Run;
 
-   -----------------
-   -- Format_Name --
-   -----------------
+   ------------------
+   -- Routine_Name --
+   ------------------
 
-   function Format_Name (Test : Test_Case) return Message_String is
-      Test_Name : Message_String :=
-                    AUnit.Simple_Test_Cases.Name
-                      (AUnit.Simple_Test_Cases.Test_Case'Class (Test));
-      Ret       : constant Message_String :=
-                    Message_Alloc (Test_Name'Length +
-                                         Test.Routine.Routine_Name'Length + 3);
+   function Routine_Name (Test : Test_Case)return Message_String is
    begin
-      for J in 1 .. Test_Name'Length loop
-         Ret (J) := Test_Name (J - 1 + Test_Name'First);
-      end loop;
-
-      Ret (Test_Name'Length + 1) := ' ';
-      Ret (Test_Name'Length + 2) := ':';
-      Ret (Test_Name'Length + 3) := ' ';
-
-      for J in Test_Name'Length + 4 .. Ret'Last loop
-         Ret (J) := Test.Routine.Routine_Name
-           (J - Test_Name'Length - 4 + Test.Routine.Routine_Name'First);
-      end loop;
-
-      Message_Free (Test_Name);
-
-      return Ret;
-   end Format_Name;
+      return Test.Routine.Routine_Name;
+   end Routine_Name;
 
    ------------------
    --  Set_Up_Case --
