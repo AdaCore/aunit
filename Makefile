@@ -39,10 +39,8 @@ I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
 all:
-	@$(MKDIR) aunit/obj
-	@$(MKDIR) aunit/lib
 	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch -o gprconf.cgpr
-	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build $(GPRBUILD_FLAGS)
+	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
 
 clean:
 	-$(GNATCLEAN) -f -r -Paunit/aunit_build $(GPR_FLAGS)
