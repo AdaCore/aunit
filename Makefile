@@ -2,7 +2,7 @@ RTS =
 TARGET =
 GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
-GNATCLEAN = gnatclean
+GPRCLEAN = gprclean
 
 # INSTALL	= @prefix@
 INSTALL = $(shell which $(GPRBUILD) | sed -e 's/\/bin\/.*//')
@@ -43,9 +43,8 @@ all:
 	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
 
 clean:
-	-$(GNATCLEAN) -f -r -Paunit/aunit_build $(GPR_FLAGS)
+	-$(GPRCLEAN) -f -r -Paunit/aunit_build $(GPR_FLAGS)
 	$(RM) -f $(I_GPR)/aunit.gpr
-	-$(RMDIR) aunit/obj
 	-${MAKE} -C docs clean
 
 install_clean:
