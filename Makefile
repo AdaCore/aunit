@@ -67,13 +67,10 @@ install: install_clean all
 	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
 	-$(CP) support/aunit.xml $(I_PLG)
 	$(CP) support/aunit.gpr $(I_GPR)
-	-$(CP) aunit/lib/* $(I_LIB)
-	gnat list -s -d -Paunit/aunit_build $(GPR_FLAGS) | sort | uniq | sed -e 's/^ *//' -e 's/\\/\\\\/g' | while read f; do \
-	  if [ "$$f" != "" ]; then \
-	    echo "installing $$f into $(I_INC)"; \
-	    $(CP) "$$f" "$(I_INC)"; \
-	  fi; \
-	done
+	-$(CP) -r aunit/lib/* $(I_LIB)
+	$(CP) -r aunit/framework $(I_INC)
+	$(CP) -r aunit/containers $(I_INC)
+	$(CP) -r aunit/reporters $(I_INC)
 	$(CHMOD) 444 $(I_DOC)/*
 	$(CHMOD) 444 $(I_TPL)/*
 	$(CHMOD) 444 $(I_PLG)/aunit.xml

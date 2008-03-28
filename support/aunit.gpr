@@ -1,9 +1,66 @@
 project AUnit is
 
-   for Source_Dirs use ("../../include/aunit");
-   for Library_Dir use "../../lib/aunit";
+   type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
+   type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
+
+   Runtime : Runtime_Type := external ("RTS", "full");
+   Target  : Target_Type  := external ("TARGET", "native");
+
+   for Library_Dir use "../../lib/aunit/" & Target & "-" & Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
    for Externally_Built use "true";
+
+   for Source_Dirs use ("../../include/aunit/framework",
+                        "../../include/aunit/containers",
+                        "../../include/aunit/reporters");
+
+   case Runtime is
+      when "full" | "cert" =>
+         for Source_Dirs use project'Source_Dirs & 
+                            "../../include/aunit/framework/exception";
+      when "zfp" | "hi" | "ravenscar" =>
+         for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/sjljexception";
+   end case;
+
+   case Target is
+      when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
+         for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/nocalendar" &
+                            "../../include/aunit/framework/staticmemory";
+     
+      when "vxworksae" =>
+            case Runtime is
+               when "full" | "cert" =>
+                  for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/calendar" &
+                            "../../include/aunit/framework/staticmemory";
+
+               when "zfp" | "hi" | "ravenscar" =>
+                  for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/nocalendar" &
+                            "../../include/aunit/framework/staticmemory";
+            end case;
+
+      when others =>
+         case Runtime is
+            when "full" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/calendar" &
+                            "../../include/aunit/framework/nativememory";
+
+            when "cert" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/calendar" &
+                            "../../include/aunit/framework/staticmemory";
+
+            when "zfp" | "hi" | "ravenscar" =>
+               for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/nocalendar" &
+                            "../../include/aunit/framework/staticmemory";
+
+         end case;
+   end case;
 
 end AUnit;
