@@ -24,13 +24,13 @@ package Shape is
    procedure Set_Width (Obj : in out Shape_Type; W : Natural);
    pragma Postcondition
      (Width (Obj) = W                     -- expected result
---  ???      and Height (Obj) = Height (Obj'Old) -- independence
+      and Height (Obj) = Height (Obj'Old) -- independence
      );
 
    procedure Set_Height (Obj : in out Shape_Type; H : Natural);
    pragma Postcondition
      (Height (Obj) = H                     -- expected result
---  ???      and Width (Obj) = Width (Obj'Old)    -- independence
+      and Width (Obj) = Width (Obj'Old)    -- independence
      );
 
    function Area (Obj : in Shape_Type) return Natural is abstract;
