@@ -3,9 +3,9 @@
 --
 package body Rectangle is
 
-   function Get_Area (Obj : Rectangle_Type) return Natural is
+   function Area (Obj : Rectangle_Type) return Natural is
    begin
-      return Obj.Get_Width * Obj.Get_Height;
-   end Get_Area;
+      return Obj.Width * Obj.Height;
+   end Area;
 
 end Rectangle;

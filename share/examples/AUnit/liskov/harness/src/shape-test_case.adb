@@ -21,28 +21,28 @@ package body Shape.Test_Case is
 
    procedure Test_Set_Width (T : in out The_Test_Case) is
    begin
-      Set_Width (T.The_Shape.all, 3);
+      T.The_Shape.Set_Width (3);
       Assert
-        (Get_Width (T.The_Shape.all) = 3,
-         "Get_Width did not return the correct value after a Set_Width");
+        (T.The_Shape.Width = 3,
+         "Width did not return the correct value after a Set_Width");
 
-      Set_Width (T.The_Shape.all, 7);
+      T.The_Shape.Set_Width (7);
       Assert
-        (Get_Width (T.The_Shape.all) = 7,
-         "Get_Width did not return the correct value after a 2nd Set_Width");
+        (T.The_Shape.Width = 7,
+         "Width did not return the correct value after a 2nd Set_Width");
    end Test_Set_Width;
 
    procedure Test_Set_Height (T : in out The_Test_Case) is
    begin
-      Set_Height (T.The_Shape.all, 3);
+      T.The_Shape.Set_Height (3);
       Assert
-        (Get_Height (T.The_Shape.all) = 3,
-         "Get_Height did not return the correct value after a Set_Height");
+        (T.The_Shape.Height = 3,
+         "Height did not return the correct value after a Set_Height");
 
-      Set_Height (T.The_Shape.all, 7);
+      T.The_Shape.Set_Height (7);
       Assert
-        (Get_Height (T.The_Shape.all) = 7,
-         "Get_Height did not return the correct value after a 2nd Set_Height");
+        (T.The_Shape.Height = 7,
+         "Height did not return the correct value after a 2nd Set_Height");
    end Test_Set_Height;
 
 end Shape.Test_Case;

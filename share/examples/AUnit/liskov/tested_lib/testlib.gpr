@@ -9,8 +9,8 @@ project TestLib is
    for Library_Kind use "static";
 
    package Compiler is
-      for Default_Switches ("ada") use 
-            ("-g", "-O1", "-gnat05", "-gnatwa.Xe", "-gnaty");
+      for Default_Switches ("ada") use
+            ("-g", "-O1", "-gnat05", "-gnatwa.Xe", "-gnaty", "-gnata", "-gnatf");
    end Compiler;
 
 end TestLib;

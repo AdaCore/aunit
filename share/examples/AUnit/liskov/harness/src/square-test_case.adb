@@ -3,8 +3,6 @@
 --
 with AUnit.Assertions;   use AUnit.Assertions;
 
-with Shape;
-
 package body Square.Test_Case is
 
    ----------
@@ -27,20 +25,17 @@ package body Square.Test_Case is
       Test_Set_Width (Test);
       Test_Set_Height (Test);
       Test_Get_Area (Test);
-
-      --  Test that a Square is a correct Rectangle
-      --  (Liskov substitution principle)
-      Rectangle.Test_Case.Run_Test
-        (Rectangle.Test_Case.The_Test_Case (Test));
    end Run_Test;
 
    -----------------
    -- Set_Up_Case --
    -----------------
 
+   Local_Square : aliased Square_Type;
+
    procedure Set_Up (Test : in out The_Test_Case) is
    begin
-      Test.The_Shape := new Square_Type;
+      Test.The_Shape := Local_Square'Access;
    end Set_Up;
 
    -------------------
@@ -49,11 +44,11 @@ package body Square.Test_Case is
 
    procedure Test_Get_Area (T : in out The_Test_Case) is
    begin
-      Shape.Set_Width (T.The_Shape.all, 3);
-      Assert (Square.Get_Area (Square_Type (T.The_Shape.all)) = 9,
+      T.The_Shape.Set_Width (3);
+      Assert (T.The_Shape.Area = 9,
               "Wrong area returned for object square");
-      Shape.Set_Height (T.The_Shape.all, 5);
-      Assert (Square.Get_Area (Square_Type (T.The_Shape.all)) = 25,
+      T.The_Shape.Set_Height (5);
+      Assert (T.The_Shape.Area = 25,
               "Wrong area returned for object square");
    end Test_Get_Area;
 

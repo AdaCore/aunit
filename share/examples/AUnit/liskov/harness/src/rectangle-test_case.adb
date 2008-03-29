@@ -25,16 +25,17 @@ package body Rectangle.Test_Case is
       Shape.Test_Case.Run_Test (Shape.Test_Case.The_Test_Case (Test));
    end Run_Test;
 
+   Local_Rectangle : aliased Rectangle_Type;
    procedure Set_Up (Test : in out The_Test_Case) is
    begin
-      Test.The_Shape := new Rectangle_Type;
+      Test.The_Shape := Local_Rectangle'Access;
    end Set_Up;
 
    procedure Test_Get_Area (T : in out The_Test_Case) is
    begin
       Shape.Set_Width (T.The_Shape.all, 3);
       Shape.Set_Height (T.The_Shape.all, 5);
-      Assert (Shape.Get_Area (T.The_Shape.all) = 15,
+      Assert (Shape.Area (T.The_Shape.all) = 15,
               "Wrong area returned for object rectangle");
    end Test_Get_Area;
 

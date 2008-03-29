@@ -3,24 +3,24 @@
 --
 package body Shape is
 
-   procedure Set_Width (Obj : in out Shape_Type; Width : Natural) is
+   procedure Set_Width (Obj : in out Shape_Type; W : Natural) is
    begin
-      Obj.Width := Width;
+      Obj.Width := W;
    end Set_Width;
 
-   procedure Set_Height (Obj : in out Shape_Type; Height : Natural) is
+   procedure Set_Height (Obj : in out Shape_Type; H : Natural) is
    begin
-      Obj.Height := Height;
+      Obj.Height := H;
    end Set_Height;
 
-   function Get_Width (Obj : in Shape_Type) return Natural is
+   function Width (Obj : in Shape_Type) return Natural is
    begin
       return Obj.Width;
-   end Get_Width;
+   end Width;
 
-   function Get_Height (Obj : in Shape_Type) return Natural is
+   function Height (Obj : in Shape_Type) return Natural is
    begin
       return Obj.Height;
-   end Get_Height;
+   end Height;
 
 end Shape;
