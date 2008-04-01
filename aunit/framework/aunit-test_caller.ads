@@ -49,17 +49,13 @@
 --     package Caller is new AUnit.Test_Caller (Math_Test.Test);
 --     The_Suite       : AUnit.Test_Suites.Test_Suite_Access :=
 --                         new AUnit.Test_Suites.Test_Suite;
---      Addition_TC    : Caller.Test_Case_Access :=
---                         new Caller.Test_Case;
---      Subtraction_TC : Caller.Test_Case_Access :=
---                         new Caller.Test_Case;
 --  begin
---     Caller.Create (Addition_TC.all, "Test Addition on integers",
---                    Math_Test.Test_Addition'Access);
---     Caller.Create (Subtraction_TC.all, "Test Subtraction on integers",
---                    Math_Test.Test_Subtraction'Access);
---     The_Suite.Add_Test (Addition_TC);
---     The_Suite.Add_Test (Subtraction_TC);
+--     The_Suite.Add_Test
+--      (Caller.Create ("Test Addition on integers",
+--                      Math_Test.Test_Addition'Access));
+--     The_Suite.Add_Test
+--      (Caller.Create ("Test Subtraction on integers",
+--                      Math_Test.Test_Subtraction'Access));
 --     return The_Suite;
 --  end Suite;
 
@@ -77,10 +73,23 @@ package AUnit.Test_Caller is
 
    type Test_Method is access procedure (Test : in out Test_Fixture);
 
+   function Create
+     (Name : String;
+      Test : Test_Method) return Test_Case_Access;
+   --  Return a test case from a test fixture method, reporting the result
+   --  of the test using the Name parameter.
+   --  It is only available on run-time where dynamic allocation is allowed.
+   --  (it returns null in case of static allocation).
+   --  In case of limited run-times where allocation is not possible, use
+   --  the procedural version below with a statically allocated test case
+   --  parameter.
+
    procedure Create
      (TC   : out Test_Case'Class;
       Name : String;
       Test : Test_Method);
+   --  Initialize a test case from a test fixture method, reporting the result
+   --  of the test using the Name parameter.
 
    function Name (Test : Test_Case) return Message_String;
    --  Test case name

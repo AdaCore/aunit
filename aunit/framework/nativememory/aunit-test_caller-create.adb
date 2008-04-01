@@ -2,9 +2,9 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                    A U N I T . T E S T _ C A L L E R                     --
+--              A U N I T . T E S T _ C A L L E R . C R E A T E             --
 --                                                                          --
---                                 S o d y                                  --
+--                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
 --                       Copyright (C) 2008, AdaCore                        --
@@ -23,65 +23,14 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-
-package body AUnit.Test_Caller is
-
-   ------------
-   -- Create --
-   ------------
-
-   procedure Create
-     (TC   : out Test_Case'Class;
-      Name : String;
-      Test : Test_Method)
-   is
-   begin
-      TC.Name   := Format (Name);
-      TC.Method := Test;
-   end Create;
-
-   ------------
-   -- Create --
-   ------------
-
-   function Create
-     (Name : String;
-      Test : Test_Method) return Test_Case_Access is separate;
-
-   ----------
-   -- Name --
-   ----------
-
-   function Name (Test : Test_Case) return Message_String is
-   begin
-      return Test.Name;
-   end Name;
-
-   --------------
-   -- Run_Test --
-   --------------
-
-   procedure Run_Test (Test : in out Test_Case) is
-   begin
-      Test.Method (Test_Fixture (Test.Fixture));
-   end Run_Test;
-
-   ------------
-   -- Set_Up --
-   ------------
-
-   procedure Set_Up (Test : in out Test_Case) is
-   begin
-      Test.Fixture.Set_Up;
-   end Set_Up;
-
-   ---------------
-   -- Tear_Down --
-   ---------------
-
-   procedure Tear_Down (Test : in out Test_Case) is
-   begin
-      Test.Fixture.Tear_Down;
-   end Tear_Down;
-
-end AUnit.Test_Caller;
+separate (AUnit.Test_Caller)
+function Create
+  (Name : String;
+   Test : Test_Method) return Test_Case_Access
+is
+   Ret : Test_Case_Access := new Test_Case;
+begin
+   Ret.Name   := Format (Name);
+   Ret.Method := Test;
+   return Ret;
+end Create;
