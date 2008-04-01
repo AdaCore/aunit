@@ -43,10 +43,14 @@ package AUnit.Simple_Test_Cases is
    --  Perform the test.
 
    procedure Set_Up (Test : in out Test_Case);
-   --  Set up performed before each test routine
+   --  Set up performed before each test
 
    procedure Tear_Down (Test : in out Test_Case);
-   --  Tear down performed after each test routine
+   --  Tear down performed after each test
+
+   ----------------------------------------------
+   --  Below are internal routines. Do not use --
+   ----------------------------------------------
 
    procedure Register_Failure
      (S           : String;
