@@ -41,7 +41,7 @@ package body AUnit.Memory is
 
    package SSE renames System.Storage_Elements;
 
-   Default_Size : constant := 20 * 1_024;
+   Default_Size : constant := 100 * 1_024;
 
    type Mark_Id is new SSE.Integer_Address;
 
