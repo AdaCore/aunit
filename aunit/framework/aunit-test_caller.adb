@@ -4,7 +4,7 @@
 --                                                                          --
 --                    A U N I T . T E S T _ C A L L E R                     --
 --                                                                          --
---                                 S o d y                                  --
+--                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
 --                       Copyright (C) 2008, AdaCore                        --
@@ -72,7 +72,7 @@ package body AUnit.Test_Caller is
 
    procedure Set_Up (Test : in out Test_Case) is
    begin
-      Test.Fixture.Set_Up;
+      Set_Up (Test.Fixture);
    end Set_Up;
 
    ---------------
@@ -81,7 +81,7 @@ package body AUnit.Test_Caller is
 
    procedure Tear_Down (Test : in out Test_Case) is
    begin
-      Test.Fixture.Tear_Down;
+      Tear_Down (Test.Fixture);
    end Tear_Down;
 
 end AUnit.Test_Caller;
