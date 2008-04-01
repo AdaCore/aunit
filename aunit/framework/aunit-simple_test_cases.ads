@@ -24,6 +24,12 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  This type is used to implement a simple test case: define a subclass that
+--  overrides the Run_Test and Name methods.
+--
+--  You don't usually need to use that class, but Test_Fixture/Test_Caller
+--  or Test_Case instead.
+
 with Ada_Containers.AUnit_Lists;
 with AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
