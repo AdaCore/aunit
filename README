@@ -1,23 +1,25 @@
+AUnit 3.0.0w README
+April 1st, 2008
 
-AUnit 2.02 README
-March 26th, 2007
-
-This is a minor update release of the Ada unit test framework AUnit, derived
-from the JUnit framework for Java. Read docs/aunit.html for installation and
-usage.
-
-Other compilers:
-----------------
-
-Currently AUnit is written to work with the open source GNAT Ada compilation
-system.  To that end, GNAT project files have been provided.  For other
-compilation systems, the sources in aunit/* must be made accessible
-to the compilation system according to its conventions.
-Note that AUnit also uses the GNAT.IO package. This package should then be also
-made available.
+This is a major update release of the Ada unit test framework AUnit, derived
+from the JUnit/CPPUnit frameworks for Java/C++. Read docs/aunit.html for
+installation and usage.
 
 Changes:
 --------
+
+3.00: Major rewrite:
+      - Removal of the genericity of the AUnit framework.
+      - Replace it by dynamic allocation emulation on platforms with limited
+        run-time (zero footprint, cert), using kind of a Storage Pool.
+      - Provide a new XML reporter, modify the way a harness is run to allow
+        easy switch between Text, XML or customized reporters.
+      - Provide the following new tagged types: Simple_Test_Case, Test_Fixture,
+        Test_Caller matching CPPUnit's TestCase, TestFixture and TestCaller
+        classes.
+      - On ZFP runtimes, use gcc builtin setjmp/longjmp mechanism to emulate
+        exception propagation.
+      - Report error locations when available.
 
 2.02: Documentation additions and modifications. Allow usage of no_fixed_point
       restriction.
