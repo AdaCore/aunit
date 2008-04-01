@@ -30,13 +30,6 @@ package body AUnit.Test_Cases is
 
    package body Registration is separate;
 
-   -----------------------
-   -- Local Subprograms --
-   -----------------------
-
-   procedure Initialize (T : access Test_Case'Class);
-   --  Initialize test case
-
    -----------------
    -- Add_Routine --
    -----------------
@@ -45,16 +38,6 @@ package body AUnit.Test_Cases is
    begin
       Routine_Lists.Append (T.Routines, Val);
    end Add_Routine;
-
-   ----------------
-   -- Initialize --
-   ----------------
-
-   procedure Initialize (T : access Test_Case'Class) is
-   begin
-      Routine_Lists.Clear (T.Routines);
-      Register_Tests (T.all);
-   end Initialize;
 
    --------------
    -- Run_Test --
@@ -77,7 +60,9 @@ package body AUnit.Test_Cases is
       C : Cursor;
    begin
       Outcome := Success;
-      Initialize (Test);
+      Routine_Lists.Clear (Test.Routines);
+      Register_Tests (Test_Case'Class (Test.all));
+
       Set_Up_Case (Test_Case'Class (Test.all));
       C := First (Test.Routines);
 
