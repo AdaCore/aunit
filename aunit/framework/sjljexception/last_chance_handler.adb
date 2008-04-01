@@ -172,8 +172,8 @@ package body Last_Chance_Handler is
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
    begin
       --  Save the exception message before performing the longjmp
-      Exception_Msg    := To_Ada (To_chars_ptr (Msg));
-      Exception_Source := Exception_Msg;
+      Exception_Msg    := Format ("Unexpected exception in zfp profile");
+      Exception_Source := To_Ada (To_chars_ptr (Msg));
       Exception_Line   := Line;
       --  No return procedure.
       C_Longjmp;

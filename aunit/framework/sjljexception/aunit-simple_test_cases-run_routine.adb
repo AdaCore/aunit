@@ -61,35 +61,27 @@ begin
 
    Clear (Test.Failures);
 
-   --  Run test routine
-
-   Set_Up (Test.all);
-
    begin
       Res := Last_Chance_Handler.Setjmp (Test_Case_Access (Test));
 
       if Res /= 0 then
          declare
-            Last_Message : constant Message_String :=
-                             Last_Chance_Handler.Get_Last_Msg;
+            Src : constant Message_String :=
+                    Last_Chance_Handler.Get_Source;
          begin
-            if not String_Compare
-                    (Last_Message.all, "aunit-assertions.adb:44")
-            then
+            if not String_Compare (Src.all, "aunit-assertions.adb:44") then
                Unexpected_Exception := True;
                Add_Error
                  (R.all,
                   (Name (Test.all),
                    Routine_Name (Test.all),
-                   Last_Message,
+                   Last_Chance_Handler.Get_Last_Msg,
                    Last_Chance_Handler.Get_Source,
                    Last_Chance_Handler.Get_Line));
             end if;
          end;
       end if;
    end;
-
-   Tear_Down (Test.all);
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
@@ -100,7 +92,7 @@ begin
          C : Cursor := First (Test.Failures);
       begin
          while Has_Element (C) loop
-            Add_Failure (R.all, (Element (C)));
+            Add_Failure (R.all, Element (C));
             Next (C);
          end loop;
       end;

@@ -45,10 +45,6 @@ begin
 
    Clear (Test.Failures);
 
-   --  Run test routine
-
-   Set_Up (Test.all);
-
    begin
       Run_Test (Test.all);
    exception
@@ -64,8 +60,6 @@ begin
              null,
              0));
    end;
-
-   Tear_Down (Test.all);
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;

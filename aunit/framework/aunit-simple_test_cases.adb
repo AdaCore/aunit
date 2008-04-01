@@ -100,7 +100,11 @@ package body AUnit.Simple_Test_Cases is
    begin
       The_Current_Test_Case := Test_Case_Access (Test);
       Start_Test (R.all, 1);
+
+      --  Run test routine
+      Set_Up (Test_Case'Class (Test.all));
       Run_Routine (Test, R, Outcome);
+      Tear_Down (Test_Case'Class (Test.all));
    end Run;
 
 end AUnit.Simple_Test_Cases;
