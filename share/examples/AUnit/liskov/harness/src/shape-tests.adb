@@ -3,23 +3,13 @@
 --
 with AUnit.Assertions; use AUnit.Assertions;
 
-package body Shape.Test_Case is
-
-   --------------
-   -- Run_Test --
-   --------------
-
-   procedure Run_Test (Test : in out The_Test_Case) is
-   begin
-      Test_Set_Width (Test);
-      Test_Set_Height (Test);
-   end Run_Test;
+package body Shape.Tests is
 
    --------------------
    -- Test_Set_Width --
    --------------------
 
-   procedure Test_Set_Width (T : in out The_Test_Case) is
+   procedure Test_Set_Width (T : in out Test) is
    begin
       T.The_Shape.Set_Width (3);
       Assert
@@ -32,7 +22,7 @@ package body Shape.Test_Case is
          "Width did not return the correct value after a 2nd Set_Width");
    end Test_Set_Width;
 
-   procedure Test_Set_Height (T : in out The_Test_Case) is
+   procedure Test_Set_Height (T : in out Test) is
    begin
       T.The_Shape.Set_Height (3);
       Assert
@@ -45,4 +35,4 @@ package body Shape.Test_Case is
          "Height did not return the correct value after a 2nd Set_Height");
    end Test_Set_Height;
 
-end Shape.Test_Case;
+end Shape.Tests;

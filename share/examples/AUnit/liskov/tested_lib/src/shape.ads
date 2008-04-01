@@ -18,22 +18,22 @@ package Shape is
    --     Set_Width  (New_Shape (W, H), X) = New_Shape (X, H))
    --     Set_Height (New_Shape (W, H), X) = New_Shape (W, X))
 
-   function Width (Obj : in Shape_Type) return Natural;
-   function Height (Obj : in Shape_Type) return Natural;
+   function Width (Obj : Shape_Type) return Natural;
+   function Height (Obj : Shape_Type) return Natural;
 
    procedure Set_Width (Obj : in out Shape_Type; W : Natural);
-   pragma Postcondition
-     (Width (Obj) = W                     -- expected result
-      and Height (Obj) = Height (Obj'Old) -- independence
-     );
+--     pragma Postcondition
+--       (Width (Obj) = W                     -- expected result
+--        and Height (Obj) = Height (Obj'Old) -- independence
+--       );
 
    procedure Set_Height (Obj : in out Shape_Type; H : Natural);
-   pragma Postcondition
-     (Height (Obj) = H                     -- expected result
-      and Width (Obj) = Width (Obj'Old)    -- independence
-     );
+--     pragma Postcondition
+--       (Height (Obj) = H                     -- expected result
+--        and Width (Obj) = Width (Obj'Old)    -- independence
+--       );
 
-   function Area (Obj : in Shape_Type) return Natural is abstract;
+   function Area (Obj : Shape_Type) return Natural is abstract;
 
 private
    type Shape_Type is abstract tagged record

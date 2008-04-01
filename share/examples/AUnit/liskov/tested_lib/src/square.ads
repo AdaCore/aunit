@@ -11,14 +11,14 @@ package Square is
    --   for all Obj : Eight (Obj) = Width (Obj)
 
    procedure Set_Width (Obj : in out Square_Type; W : Natural);
-   pragma Postcondition
-     (Height (Obj) = Width (Obj)  -- this is the class invariant
-     );
+--     pragma Postcondition
+--       (Height (Obj) = Width (Obj)  -- this is the class invariant
+--       );
 
    procedure Set_Height (Obj : in out Square_Type; H : Natural);
-   pragma Postcondition
-     (Height (Obj) = Width (Obj)  -- this is the class invariant
-     );
+--     pragma Postcondition
+--       (Height (Obj) = Width (Obj)  -- this is the class invariant
+--       );
 
 private
 

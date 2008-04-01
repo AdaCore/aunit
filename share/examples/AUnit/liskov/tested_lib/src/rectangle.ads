@@ -9,7 +9,7 @@ package Rectangle is
    type Rectangle_Type is new Shape.Shape_Type with private;
 
    function Area (Obj : Rectangle_Type) return Natural;
-   pragma Postcondition (Area'Result = Width (Obj) * Height (Obj));
+--     pragma Postcondition (Area'Result = Width (Obj) * Height (Obj));
 
 private
 
