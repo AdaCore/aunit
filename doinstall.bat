@@ -146,10 +146,10 @@ GOTO END_SELECT_RUNTIME
   ECHO.>OPTS.TXT
 :START_SELECT_RUNTIME
   CLS
-  ECHO * Selected Platform *
+  ECHO * Selected Platform^:
   ECHO !TARGET!
   ECHO.
-  ECHO * Runtime^(s^)      *
+  ECHO * Runtime^(s^)^:
   TYPE OPTS.TXT
   ECHO.
   ECHO Please select the compiler you want to use for this platform:
@@ -171,7 +171,14 @@ GOTO END_SELECT_RUNTIME
   IF "!TARGET!" == "pentium-mingw32msv" (
     SET PLATFORM="native"
   ) ELSE (
-    SET PLATFORM=!TARGET!
+    ECHO !TARGET!>TMP.TXT
+    FINDSTR vxworksae TMP.TXT
+    DEL TMP.TXT
+    IF %ERRORLEVEL% == 1 (
+      SET PLATFORM=!TARGET!
+    ) ELSE (
+      SET PLATFORM=vxworksae
+    )
   )
   ECHO %GPRBUILDROOT%\bin\gprbuild --config=!TARGET!-!RUNTIME!.cgpr -XRUNTIME=!RUNTIME! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ERROR >> !SCRIPT!
   CLS
