@@ -3,21 +3,21 @@ TARGET =
 
 ifeq ($(RTS),)
    RTS_CONF =
-   RTS_ARG = -XRTS=full
+   RTS_ARG = -XRUNTIME=full
 else
    RTS_CONF = ,,$(RTS)
-   RTS_ARG = -XRTS=$(RTS)
+   RTS_ARG = -XRUNTIME=$(RTS)
 endif
 
 ifeq ($(TARGET),)
    TARGET_CONF =
-   TARGET_ARG = -XTARGET=native
+   TARGET_ARG = -XPLATFORM=native
 else
    TARGET_CONF = --target=$(TARGET)
 ifneq ($(filter %-wrs-vxworksae,$(TARGET)),)
-   TARGET_ARG = -XTARGET=vxworksae
+   TARGET_ARG = -XPLATFORM=vxworksae
 else
-   TARGET_ARG = -XTARGET=$(TARGET)
+   TARGET_ARG = -XPLATFORM=$(TARGET)
 endif
 endif
 
@@ -35,11 +35,8 @@ endif
 
 all:
 	echo $(TARGET_ARG)
-	-$(MKDIR) obj
-	-$(MKDIR) support/obj
-	-$(MKDIR) support/lib
 	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch -o gprconf.cgpr
-	$(GPRBUILD) --config=gprconf.cgpr -Paunit_tests $(GPRBUILD_FLAGS)
+	$(GPRBUILD) --config=gprconf.cgpr -Paunit_tests -p $(GPRBUILD_FLAGS)
 	-$(RUN) ./aunit_harness
 
 clean:
