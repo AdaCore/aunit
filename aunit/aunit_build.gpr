@@ -3,16 +3,16 @@ project AUnit_Build is
    type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
    type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
 
-   Runtime : Runtime_Type := external ("RTS", "full");
-   Target  : Target_Type  := external ("TARGET", "native");
-
-   for Source_Dirs use ("framework", "containers", "reporters");
+   Runtime : Runtime_Type := external ("RUNTIME", "full");
+   Target  : Target_Type  := external ("PLATFORM", "native");
 
    for Languages use ("Ada");
    for Object_Dir use "obj/" & Target & "-" & Runtime;
    for Library_Dir use "lib/" & Target & "-" & Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
+
+   for Source_Dirs use ("framework", "containers", "reporters");
 
    case Runtime is
       when "full" | "cert" =>
@@ -27,7 +27,7 @@ project AUnit_Build is
       when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
          for Source_Dirs use project'Source_Dirs &
                              "framework/nocalendar" & "framework/staticmemory";
-     
+
       when "vxworksae" =>
             case Runtime is
                when "full" | "cert" =>
@@ -57,7 +57,9 @@ project AUnit_Build is
    end case;
 
    package Compiler is
-      for Default_Switches ("ada") use ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty", "-gnat05");
+      for Default_Switches ("ada") use
+        ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty",
+         "-gnat05");
    end Compiler;
 
    package IDE is
