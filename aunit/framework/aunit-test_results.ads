@@ -39,40 +39,39 @@ package AUnit.Test_Results is
    --  top-level test suite.
 
    type Test_Failure is record
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
       Message      : Message_String;
       Source_Name  : Message_String;
       Line         : Natural;
    end record;
+   type Test_Failure_Access is access all Test_Failure;
    --  Description of a test routine failures and unexpected exceptions
    --  Unexpected exceptions are only logged when exception handling is
    --  available in the run-time library
 
-   type Test_Success is record
+   type Test_Result is record
       Test_Name    : Message_String;
       Routine_Name : Message_String;
+      Failure      : Test_Failure_Access;
+      Error        : Test_Failure_Access;
    end record;
-   --  Decription of a test routine success
+   --  Decription of a test routine result
 
    use Ada_Containers;
 
-   package Success_Lists is new Ada_Containers.AUnit_Lists (Test_Success);
-   --  Containers for successes
-
-   package Error_Lists is new Ada_Containers.AUnit_Lists (Test_Failure);
-   --  Containers for unexpected exceptions
-
-   package Failure_Lists is new Ada_Containers.AUnit_Lists (Test_Failure);
-   --  Containers for failures
+   package Result_Lists is new Ada_Containers.AUnit_Lists (Test_Result);
+   --  Containers for all test results
 
    procedure Add_Error
      (R                       : in out Result;
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String;
       Failure                 : Test_Failure);
    --  Record an unexpected exception
 
    procedure Add_Failure
      (R                       : in out Result;
+      Test_Name               : Message_String;
+      Routine_Name            : Message_String;
       Failure                 : Test_Failure);
    --  Record a test routine failure
 
@@ -90,14 +89,14 @@ package AUnit.Test_Results is
    --  Number of routines with unexpected exceptions
 
    procedure Errors (R : in out Result;
-                     E : in out Error_Lists.List);
+                     E : in out Result_Lists.List);
    --  List of routines with unexpected exceptions
 
    function Failure_Count (R : Result) return Count_Type;
    --  Number of failed routines
 
    procedure Failures (R : in out Result;
-                       F : in out Failure_Lists.List);
+                       F : in out Result_Lists.List);
    --  List of failed routines
 
    function Elapsed (R : Result) return Time_Measure.Time;
@@ -110,7 +109,7 @@ package AUnit.Test_Results is
    --  Number of successful routines
 
    procedure Successes (R : in out Result;
-                        S : in out Success_Lists.List);
+                        S : in out Result_Lists.List);
    --  List of successful routines
 
    function Successful (R : Result) return Boolean;
@@ -124,14 +123,12 @@ package AUnit.Test_Results is
 
 private
 
+   pragma Inline (Errors, Failures, Successes);
+
    type Result is limited record
       Tests_Run      : Count_Type := 0;
-      Errors_List    : Error_Lists.List;
-      Failures_List  : Failure_Lists.List;
-      Successes_List : Success_Lists.List;
+      Result_List    : Result_Lists.List;
       Elapsed_Time   : Time_Measure.Time := Time_Measure.Null_Time;
    end record;
-
-   pragma Inline (Error_Count, Failure_Count, Success_Count, Test_Count);
 
 end AUnit.Test_Results;

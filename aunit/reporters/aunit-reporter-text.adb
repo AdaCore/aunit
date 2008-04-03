@@ -30,91 +30,31 @@ with AUnit.Time_Measure; use AUnit.Time_Measure;
 --  Very simple reporter to console
 package body AUnit.Reporter.Text is
 
-   procedure Dump_Error_List (L : in Error_Lists.List);
-   --  List failed assertions
+   procedure Dump_Result_List (L : Result_Lists.List);
+   --  Dump a result list
 
-   procedure Dump_Failure_List (L : in Failure_Lists.List);
-   --  List failed assertions
-
-   procedure Dump_Success_List (L : in Success_Lists.List);
-   --  List successful test routines
-
-   procedure Report_Error (Error : Test_Failure);
+   procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
    ----------------------
-   --  Dump_Error_List --
+   -- Dump_Result_List --
    ----------------------
 
-   procedure Dump_Error_List (L : Error_Lists.List) is
+   procedure Dump_Result_List (L : Result_Lists.List) is
 
-      use Error_Lists;
+      use Result_Lists;
 
       C : Cursor := First (L);
-
    begin
 
       --  Note: can't use Iterate because it violates restriction
       --  No_Implicit_Dynamic_Code
 
       while Has_Element (C) loop
-         Report_Error (Element (C));
+         Report_Test (Element (C));
          Next (C);
       end loop;
-   end Dump_Error_List;
-
-   ------------------------
-   --  Dump_Failure_List --
-   ------------------------
-
-   procedure Dump_Failure_List (L : Failure_Lists.List) is
-
-      use Failure_Lists;
-
-      C : Cursor := First (L);
-
-   begin
-
-      --  Note: can't use Iterate because it violates restriction
-      --  No_Implicit_Dynamic_Code
-
-      while Has_Element (C) loop
-         Report_Error (Element (C));
-         Next (C);
-      end loop;
-   end Dump_Failure_List;
-
-   -----------------------
-   -- Dump_Success_List --
-   -----------------------
-
-   procedure Dump_Success_List (L : in Success_Lists.List) is
-
-      use Success_Lists;
-
-      procedure Report_Success (Success : Test_Success);
-
-      procedure Report_Success (Success : Test_Success) is
-      begin
-         Put ("      ");
-         Put (Success.Test_Name.all);
-
-         if Success.Routine_Name /= null then
-            Put (" : ");
-            Put_Line (Success.Routine_Name.all);
-         else
-            New_Line;
-         end if;
-      end Report_Success;
-
-      C : Cursor := First (L);
-
-   begin
-      while Has_Element (C) loop
-         Report_Success (Element (C));
-         Next (C);
-      end loop;
-   end Dump_Success_List;
+   end Dump_Result_List;
 
    ------------
    -- Report --
@@ -135,18 +75,18 @@ package body AUnit.Reporter.Text is
       New_Line; New_Line;
 
       declare
-         S : Success_Lists.List;
+         S : Result_Lists.List;
       begin
          Put ("   Successful Tests: ");
          Put (Integer (Success_Count (R)));
          New_Line;
 
          Successes (R, S);
-         Dump_Success_List (S);
+         Dump_Result_List (S);
       end;
 
       declare
-         F : Failure_Lists.List;
+         F : Result_Lists.List;
       begin
          New_Line;
          Put ("   Failed Assertions: ");
@@ -154,12 +94,12 @@ package body AUnit.Reporter.Text is
          New_Line;
 
          Failures (R, F);
-         Dump_Failure_List (F);
+         Dump_Result_List (F);
          New_Line;
       end;
 
       declare
-         E : Error_Lists.List;
+         E : Result_Lists.List;
       begin
          New_Line;
          Put ("   Unexpected Errors: ");
@@ -167,7 +107,7 @@ package body AUnit.Reporter.Text is
          New_Line;
 
          Errors (R, E);
-         Dump_Error_List (E);
+         Dump_Result_List (E);
          New_Line;
       end;
 
@@ -181,37 +121,47 @@ package body AUnit.Reporter.Text is
       end if;
    end Report;
 
-   ------------------
-   -- Report_Error --
-   ------------------
+   -----------------
+   -- Report_Test --
+   -----------------
 
-   procedure Report_Error (Error : Test_Failure) is
+   procedure Report_Test (Test : Test_Result) is
+      Error : Test_Failure_Access;
    begin
       New_Line;
       Put ("      ");
-      Put (Error.Test_Name.all);
+      Put (Test.Test_Name.all);
 
-      if Error.Routine_Name /= null then
+      if Test.Routine_Name /= null then
          Put (" : ");
-         Put_Line (Error.Routine_Name.all);
+         Put_Line (Test.Routine_Name.all);
       else
          New_Line;
       end if;
 
-      Put ("      ");
-      Put ("      ");
-      Put_Line (Error.Message.all);
-      if Error.Source_Name /= null then
+      if Test.Error /= null or else Test.Failure /= null then
+         if Test.Error /= null then
+            Error := Test.Error;
+         else
+            Error := Test.Failure;
+         end if;
+
          Put ("      ");
          Put ("      ");
-         Put ("at ");
-         Put (Error.Source_Name.all);
-         Put (":");
-         Put (Error.Line);
-         New_Line;
-      else
-         New_Line;
+         Put_Line (Error.Message.all);
+
+         if Error.Source_Name /= null then
+            Put ("      ");
+            Put ("      ");
+            Put ("at ");
+            Put (Error.Source_Name.all);
+            Put (":");
+            Put (Error.Line);
+            New_Line;
+         else
+            New_Line;
+         end if;
       end if;
-   end Report_Error;
+   end Report_Test;
 
 end AUnit.Reporter.Text;

@@ -24,35 +24,150 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with AUnit.Memory.Utils;
+
 --  Record test results.
+
 package body AUnit.Test_Results is
 
    -----------------------
    -- Local Subprograms --
    -----------------------
 
-   procedure Swap (Left, Right : in out Error_Lists.List);
-   procedure Swap (Left, Right : in out Failure_Lists.List);
-   procedure Swap (Left, Right : in out Success_Lists.List);
-   procedure Transfer (Target : in out Error_Lists.List;
-                       Source : in out Error_Lists.List);
-   procedure Transfer (Target : in out Failure_Lists.List;
-                       Source : in out Failure_Lists.List);
-   procedure Transfer (Target : in out Success_Lists.List;
-                       Source : in out Success_Lists.List);
+   function Alloc_Failure is new AUnit.Memory.Utils.Gen_Alloc
+     (Test_Failure, Test_Failure_Access);
+
+   E_Count : Count_Type;
+   F_Count : Count_Type;
+   S_Count : Count_Type;
+
+   procedure Iterate_Error (Position : Result_Lists.Cursor);
+   procedure Iterate_Failure (Position : Result_Lists.Cursor);
+   procedure Iterate_Success (Position : Result_Lists.Cursor);
+
+   function Is_Error (Position : Result_Lists.Cursor) return Boolean;
+   function Is_Failure (Position : Result_Lists.Cursor) return Boolean;
+   function Is_Success (Position : Result_Lists.Cursor) return Boolean;
+
+   generic
+      with function Test (Position : Result_Lists.Cursor) return Boolean;
+   procedure Gen_Extract (R : in out Result;
+                          E : in out Result_Lists.List);
+
+   -------------------
+   -- Iterate_Error --
+   -------------------
+
+   procedure Iterate_Error (Position : Result_Lists.Cursor) is
+   begin
+      if Result_Lists.Element (Position).Error /= null then
+         E_Count := E_Count + 1;
+      end if;
+   end Iterate_Error;
+
+   ---------------------
+   -- Iterate_Failure --
+   ---------------------
+
+   procedure Iterate_Failure (Position : Result_Lists.Cursor) is
+   begin
+      if Result_Lists.Element (Position).Failure /= null then
+         F_Count := F_Count + 1;
+      end if;
+   end Iterate_Failure;
+
+   ---------------------
+   -- Iterate_Success --
+   ---------------------
+
+   procedure Iterate_Success (Position : Result_Lists.Cursor) is
+   begin
+      if Result_Lists.Element (Position).Error = null
+        and then Result_Lists.Element (Position).Failure = null
+      then
+         S_Count := S_Count + 1;
+      end if;
+   end Iterate_Success;
+
+   -----------------
+   -- Gen_Extract --
+   -----------------
+
+   procedure Gen_Extract
+     (R : in out Result;
+      E : in out Result_Lists.List)
+   is
+      C : Result_Lists.Cursor;
+      Prev : Result_Lists.Cursor;
+      use Result_Lists;
+   begin
+      C := First (R.Result_List);
+      Prev := No_Element;
+
+      while Has_Element (C) loop
+         if Test (C) then
+            Splice (Target   => E,
+                    Before   => No_Element,
+                    Source   => R.Result_List,
+                    Position => C);
+
+            if Prev = No_Element then
+               C := First (R.Result_List);
+            else
+               C := Next (Prev);
+            end if;
+         else
+            Prev := C;
+            Next (C);
+         end if;
+      end loop;
+   end Gen_Extract;
+
+   --------------
+   -- Is_Error --
+   --------------
+
+   function Is_Error (Position : Result_Lists.Cursor) return Boolean is
+   begin
+      return Result_Lists.Element (Position).Error /= null;
+   end Is_Error;
+
+   ----------------
+   -- Is_Failure --
+   ----------------
+
+   function Is_Failure (Position : Result_Lists.Cursor) return Boolean is
+   begin
+      return Result_Lists.Element (Position).Failure /= null;
+   end Is_Failure;
+
+   ----------------
+   -- Is_Success --
+   ----------------
+
+   function Is_Success (Position : Result_Lists.Cursor) return Boolean is
+   begin
+      return not Is_Error (Position) and then not Is_Failure (Position);
+   end Is_Success;
 
    ---------------
    -- Add_Error --
    ---------------
 
    procedure Add_Error
-     (R       : in out Result;
-      Failure : Test_Failure) is
-
-      use Error_Lists;
-
+     (R            : in out Result;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
+      Failure      : Test_Failure)
+   is
+      Val : constant Test_Result := (Test_Name, Routine_Name,
+                                     Failure => null,
+                                     Error   => Alloc_Failure);
+      use Result_Lists;
    begin
-      Append (R.Errors_List, Failure);
+
+      Val.Error.all := Failure;
+      Append (R.Result_List, Val);
    end Add_Error;
 
    -----------------
@@ -60,13 +175,19 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Add_Failure
-     (R : in out Result;
-      Failure : Test_Failure) is
+     (R            : in out Result;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
+      Failure      : Test_Failure) is
 
-      use Failure_Lists;
-
+      Val : constant Test_Result := (Test_Name, Routine_Name,
+                                     Failure => Alloc_Failure,
+                                     Error   => null);
+      use Result_Lists;
    begin
-      Append (R.Failures_List, Failure);
+
+      Val.Failure.all := Failure;
+      Append (R.Result_List, Val);
    end Add_Failure;
 
    -----------------
@@ -78,11 +199,11 @@ package body AUnit.Test_Results is
       Test_Name               : Message_String;
       Routine_Name            : Message_String) is
 
-      Val : constant Test_Success := (Test_Name, Routine_Name);
-      use Success_Lists;
+      Val : constant Test_Result := (Test_Name, Routine_Name, null, null);
+      use Result_Lists;
 
    begin
-      Append (R.Successes_List, Val);
+      Append (R.Result_List, Val);
    end Add_Success;
 
    -----------------
@@ -101,19 +222,20 @@ package body AUnit.Test_Results is
 
    function Error_Count (R : Result) return Count_Type is
    begin
-      return Error_Lists.Length (R.Errors_List);
+      E_Count := 0;
+      R.Result_List.Iterate (Iterate_Error'Access);
+      return E_Count;
    end Error_Count;
 
    ------------
    -- Errors --
    ------------
 
-   procedure Errors
-     (R : in out Result;
-      E : in out Error_Lists.List)
-   is
+   procedure Errors (R : in out Result;
+                     E : in out Result_Lists.List) is
+      procedure Extract is new Gen_Extract (Is_Error);
    begin
-      Swap (E, R.Errors_List);
+      Extract (R, E);
    end Errors;
 
    -------------------
@@ -122,19 +244,20 @@ package body AUnit.Test_Results is
 
    function Failure_Count (R : Result) return Count_Type is
    begin
-      return Failure_Lists.Length (R.Failures_List);
+      F_Count := 0;
+      R.Result_List.Iterate (Iterate_Failure'Access);
+      return F_Count;
    end Failure_Count;
 
    --------------
    -- Failures --
    --------------
 
-   procedure Failures
-     (R : in out Result;
-      F : in out Failure_Lists.List)
-   is
+   procedure Failures (R : in out Result;
+                       F : in out Result_Lists.List) is
+      procedure Extract is new Gen_Extract (Is_Failure);
    begin
-      Swap (F, R.Failures_List);
+      Extract (R, F);
    end Failures;
 
    -------------
@@ -161,16 +284,20 @@ package body AUnit.Test_Results is
 
    function Success_Count (R : Result)  return Count_Type is
    begin
-      return Success_Lists.Length (R.Successes_List);
+      S_Count := 0;
+      R.Result_List.Iterate (Iterate_Success'Access);
+      return S_Count;
    end Success_Count;
 
    ---------------
    -- Successes --
    ---------------
 
-   procedure Successes (R : in out Result; S : in out Success_Lists.List) is
+   procedure Successes (R : in out Result;
+                        S : in out Result_Lists.List) is
+      procedure Extract is new Gen_Extract (Is_Success);
    begin
-      Swap (S, R.Successes_List);
+      Extract (R, S);
    end Successes;
 
    ----------------
@@ -182,43 +309,6 @@ package body AUnit.Test_Results is
       return Success_Count (R) = Test_Count (R);
    end Successful;
 
-   ----------
-   -- Swap --
-   ----------
-
-   procedure Swap (Left, Right : in out Error_Lists.List) is
-
-      use Error_Lists;
-      Temp : List;
-
-   begin
-      Transfer (Temp, Left);
-      Transfer (Left, Right);
-      Transfer (Right, Temp);
-   end Swap;
-
-   procedure Swap (Left, Right : in out Failure_Lists.List) is
-
-      use Failure_Lists;
-      Temp : List;
-
-   begin
-      Transfer (Temp, Left);
-      Transfer (Left, Right);
-      Transfer (Right, Temp);
-   end Swap;
-
-   procedure Swap (Left, Right : in out Success_Lists.List) is
-
-      use Success_Lists;
-      Temp : List;
-
-   begin
-      Transfer (Temp, Left);
-      Transfer (Left, Right);
-      Transfer (Right, Temp);
-   end Swap;
-
    ----------------
    -- Test_Count --
    ----------------
@@ -228,53 +318,15 @@ package body AUnit.Test_Results is
       return Ada_Containers.Count_Type (R.Tests_Run);
    end Test_Count;
 
-   --------------
-   -- Transfer --
-   --------------
-
-   procedure Transfer
-     (Target : in out Error_Lists.List;
-      Source : in out Error_Lists.List)
-   is
-      use Error_Lists;
-
-   begin
-      Clear (Target);
-      Move (Target, Source);
-      Clear (Source);
-   end Transfer;
-
-   procedure Transfer
-     (Target : in out Failure_Lists.List;
-      Source : in out Failure_Lists.List)
-   is
-      use Failure_Lists;
-
-   begin
-      Clear (Target);
-      Move (Target, Source);
-      Clear (Source);
-   end Transfer;
-
-   procedure Transfer
-     (Target : in out Success_Lists.List;
-      Source : in out Success_Lists.List)
-   is
-      use Success_Lists;
-
-   begin
-      Clear (Target);
-      Move (Target, Source);
-      Clear (Source);
-   end Transfer;
+   -----------
+   -- Clear --
+   -----------
 
    procedure Clear (R : in out Result) is
    begin
       R.Tests_Run    := 0;
       R.Elapsed_Time := Time_Measure.Null_Time;
-      Error_Lists.Clear (R.Errors_List);
-      Failure_Lists.Clear (R.Failures_List);
-      Success_Lists.Clear (R.Successes_List);
+      Result_Lists.Clear (R.Result_List);
    end Clear;
 
 end AUnit.Test_Results;

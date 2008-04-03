@@ -73,9 +73,9 @@ begin
                Unexpected_Exception := True;
                Add_Error
                  (R.all,
-                  (Name (Test.all),
-                   Routine_Name (Test.all),
-                   Last_Chance_Handler.Get_Last_Msg,
+                  Name (Test.all),
+                  Routine_Name (Test.all),
+                  (Last_Chance_Handler.Get_Last_Msg,
                    Last_Chance_Handler.Get_Source,
                    Last_Chance_Handler.Get_Line));
             end if;
@@ -92,7 +92,8 @@ begin
          C : Cursor := First (Test.Failures);
       begin
          while Has_Element (C) loop
-            Add_Failure (R.all, Element (C));
+            Add_Failure
+              (R.all, Name (Test.all), Routine_Name (Test.all), Element (C));
             Next (C);
          end loop;
       end;

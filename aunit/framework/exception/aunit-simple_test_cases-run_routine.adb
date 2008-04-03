@@ -54,14 +54,12 @@ begin
          Unexpected_Exception := True;
          Add_Error
            (R.all,
-            (Name (Test.all),
-             Routine_Name (Test.all),
-             Format (Exception_Name (E)),
-             null,
-             0));
+            Name (Test.all),
+            Routine_Name (Test.all),
+            (Format (Exception_Name (E)), null, 0));
    end;
 
-   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
+   if not Unexpected_Exception and then Is_Empty (The_Failures) then
       Outcome := Success;
       Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
    else
@@ -71,6 +69,8 @@ begin
       begin
          while Has_Element (C) loop
             Add_Failure (R.all,
+                         Name (Test.all),
+                         Routine_Name (Test.all),
                          Element (C));
             Next (C);
          end loop;

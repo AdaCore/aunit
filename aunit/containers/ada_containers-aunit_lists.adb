@@ -733,6 +733,32 @@ package body Ada_Containers.AUnit_Lists is
       return Container.Length = 0;
    end Is_Empty;
 
+   -------------
+   -- Iterate --
+   -------------
+
+   procedure Iterate
+     (Container : List;
+      Process   : not null access procedure (Position : Cursor))
+   is
+      C : List renames Container'Unrestricted_Access.all;
+      B : Natural renames C.Busy;
+
+      Node : Node_Access := Container.First;
+
+   begin
+      B := B + 1;
+
+      begin
+         while Node /= null loop
+            Process (Cursor'(Container'Unchecked_Access, Node));
+            Node := Node.Next;
+         end loop;
+      end;
+
+      B := B - 1;
+   end Iterate;
+
    ----------
    -- Last --
    ----------

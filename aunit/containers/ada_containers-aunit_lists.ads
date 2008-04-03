@@ -181,10 +181,10 @@ package Ada_Containers.AUnit_Lists is
 
    function Has_Element (Position : Cursor) return Boolean;
 
---     procedure Iterate
---       (Container : List;
---        Process   : not null access procedure (Position : Cursor));
---
+   procedure Iterate
+     (Container : List;
+      Process   : not null access procedure (Position : Cursor));
+
 --     procedure Reverse_Iterate
 --       (Container : List;
 --        Process   : not null access procedure (Position : Cursor));

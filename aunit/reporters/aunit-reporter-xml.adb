@@ -30,46 +30,19 @@ with AUnit.Time_Measure; use AUnit.Time_Measure;
 --  Very simple reporter to console
 package body AUnit.Reporter.XML is
 
-   procedure Dump_Error_List (L : in Error_Lists.List);
+   procedure Dump_Result_List (L : Result_Lists.List);
    --  List failed assertions
 
-   procedure Dump_Failure_List (L : in Failure_Lists.List);
-   --  List failed assertions
-
-   procedure Dump_Success_List (L : in Success_Lists.List);
-   --  List successful test routines
-
-   procedure Report_Error (Error : Test_Failure; Is_Assert : Boolean);
+   procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
    ----------------------
-   --  Dump_Error_List --
+   -- Dump_Result_List --
    ----------------------
 
-   procedure Dump_Error_List (L : Error_Lists.List) is
+   procedure Dump_Result_List (L : Result_Lists.List) is
 
-      use Error_Lists;
-
-      C : Cursor := First (L);
-
-   begin
-
-      --  Note: can't use Iterate because it violates restriction
-      --  No_Implicit_Dynamic_Code
-
-      while Has_Element (C) loop
-         Report_Error (Element (C), False);
-         Next (C);
-      end loop;
-   end Dump_Error_List;
-
-   ------------------------
-   --  Dump_Failure_List --
-   ------------------------
-
-   procedure Dump_Failure_List (L : Failure_Lists.List) is
-
-      use Failure_Lists;
+      use Result_Lists;
 
       C : Cursor := First (L);
 
@@ -79,44 +52,10 @@ package body AUnit.Reporter.XML is
       --  No_Implicit_Dynamic_Code
 
       while Has_Element (C) loop
-         Report_Error (Element (C), True);
+         Report_Test (Element (C));
          Next (C);
       end loop;
-   end Dump_Failure_List;
-
-   -----------------------
-   -- Dump_Success_List --
-   -----------------------
-
-   procedure Dump_Success_List (L : in Success_Lists.List) is
-
-      use Success_Lists;
-
-      procedure Report_Success (Success : Test_Success);
-
-      procedure Report_Success (Success : Test_Success) is
-      begin
-         Put_Line ("    <Test>");
-         Put      ("      <Name>");
-         Put      (Success.Test_Name.all);
-
-         if Success.Routine_Name /= null then
-            Put (" : ");
-            Put (Success.Routine_Name.all);
-         end if;
-
-         Put_Line ("</Name>");
-         Put_Line ("    </Test>");
-      end Report_Success;
-
-      C : Cursor := First (L);
-
-   begin
-      while Has_Element (C) loop
-         Report_Success (Element (C));
-         Next (C);
-      end loop;
-   end Dump_Success_List;
+   end Dump_Result_List;
 
    ------------
    -- Report --
@@ -158,27 +97,27 @@ package body AUnit.Reporter.XML is
       Put_Line ("  </Statistics>");
 
       declare
-         S : Success_Lists.List;
+         S : Result_Lists.List;
       begin
          Put_Line ("  <SuccessfulTests>");
          Successes (R, S);
-         Dump_Success_List (S);
+         Dump_Result_List (S);
          Put_Line ("  </SuccessfulTests>");
       end;
 
       Put_Line ("  <FailedTests>");
       declare
-         F : Failure_Lists.List;
+         F : Result_Lists.List;
       begin
          Failures (R, F);
-         Dump_Failure_List (F);
+         Dump_Result_List (F);
       end;
 
       declare
-         E : Error_Lists.List;
+         E : Result_Lists.List;
       begin
          Errors (R, E);
-         Dump_Error_List (E);
+         Dump_Result_List (E);
       end;
       Put_Line ("  </FailedTests>");
 
@@ -189,43 +128,56 @@ package body AUnit.Reporter.XML is
    -- Report_Error --
    ------------------
 
-   procedure Report_Error (Error : Test_Failure; Is_Assert : Boolean) is
+   procedure Report_Test (Test : Test_Result) is
+      Error     : Test_Failure_Access;
+      Is_Assert : Boolean;
    begin
       Put_Line ("    <Test>");
       Put      ("      <Name>");
-      Put      (Error.Test_Name.all);
+      Put      (Test.Test_Name.all);
 
-      if Error.Routine_Name /= null then
+      if Test.Routine_Name /= null then
          Put (" : ");
-         Put (Error.Routine_Name.all);
+         Put (Test.Routine_Name.all);
       end if;
 
       Put_Line ("</Name>");
-      Put      ("      <FailureType>");
 
-      if Is_Assert then
-         Put   ("Assertion");
-      else
-         Put   ("Error");
-      end if;
+      if Test.Failure /= null or else Test.Error /= null then
+         if Test.Failure /= null then
+            Is_Assert := True;
+            Error := Test.Failure;
+         else
+            Is_Assert := False;
+            Error := Test.Error;
+         end if;
 
-      Put_Line ("</FailureType>");
-      Put      ("      <Message>");
-      Put      (Error.Message.all);
-      Put_Line ("</Message>");
+         Put      ("      <FailureType>");
 
-      if Error.Source_Name /= null then
-         Put_Line ("      <Location>");
-         Put      ("        <File>");
-         Put      (Error.Source_Name.all);
-         Put_Line ("</File>");
-         Put      ("        <Line>");
-         Put      (Error.Line);
-         Put_Line ("</Line>");
-         Put_Line ("      </Location>");
+         if Is_Assert then
+            Put   ("Assertion");
+         else
+            Put   ("Error");
+         end if;
+
+         Put_Line ("</FailureType>");
+         Put      ("      <Message>");
+         Put      (Error.Message.all);
+         Put_Line ("</Message>");
+
+         if Error.Source_Name /= null then
+            Put_Line ("      <Location>");
+            Put      ("        <File>");
+            Put      (Error.Source_Name.all);
+            Put_Line ("</File>");
+            Put      ("        <Line>");
+            Put      (Error.Line);
+            Put_Line ("</Line>");
+            Put_Line ("      </Location>");
+         end if;
       end if;
 
       Put_Line ("    </Test>");
-   end Report_Error;
+   end Report_Test;
 
 end AUnit.Reporter.XML;

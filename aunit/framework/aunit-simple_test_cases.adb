@@ -85,9 +85,7 @@ package body AUnit.Simple_Test_Cases is
    begin
       Failure_Lists.Append
         (The_Current_Test_Case.Failures,
-         (Name (The_Current_Test_Case.all),
-          Routine_Name (The_Current_Test_Case.all),
-          Format (S), Format (Source_Name), Source_Line));
+         (Format (S), Format (Source_Name), Source_Line));
    end Register_Failure;
 
    ---------
