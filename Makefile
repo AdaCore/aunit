@@ -49,12 +49,16 @@ clean:
 	-${MAKE} -C docs clean
 
 install_clean:
+	$(CHMOD) -R 777 $(I_DOC)
 	$(RM) -fr $(I_DOC)
+	$(CHMOD) -R 777 $(I_TPL)
 	$(RM) -fr $(I_TPL)
 	$(RM) -f $(I_PLG)/aunit.xml
+	$(CHMOD) -R 777 $(I_LIB)
 	$(RM) -fr $(I_LIB)
+	$(CHMOD) -R 777 $(I_INC)
 	$(RM) -fr $(I_INC)
-	$(RM) -fr $(I_GPR)/aunit.gpr
+	$(RM) -f $(I_GPR)/aunit.gpr
 
 install: install_clean all
 	$(MKDIR) $(I_DOC)
@@ -76,7 +80,8 @@ install: install_clean all
 	$(CHMOD) 444 $(I_PLG)/aunit.xml
 	$(CHMOD) 444 $(I_GPR)/aunit.gpr
 	$(CHMOD) 444 $(I_LIB)/*
-	$(CHMOD) 444 $(I_INC)/*
+	find $(I_INC) -type d -exec $(CHMOD) 555 {} \;
+	find $(I_INC) -type f -exec $(CHMOD) 444 {} \;
 	@echo $(SRC_LIST)
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'
