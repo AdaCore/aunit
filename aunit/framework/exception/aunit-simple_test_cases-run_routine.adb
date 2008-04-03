@@ -59,7 +59,7 @@ begin
             (Format (Exception_Name (E)), null, 0));
    end;
 
-   if not Unexpected_Exception and then Is_Empty (The_Failures) then
+   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
       Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
    else
