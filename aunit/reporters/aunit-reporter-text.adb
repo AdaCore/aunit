@@ -128,7 +128,10 @@ package body AUnit.Reporter.Text is
    procedure Report_Test (Test : Test_Result) is
       Error : Test_Failure_Access;
    begin
-      New_Line;
+      if Test.Error /= null or else Test.Failure /= null then
+         New_Line;
+      end if;
+
       Put ("      ");
       Put (Test.Test_Name.all);
 
