@@ -60,7 +60,7 @@ for /F "skip=1" %%A IN ('%GPRBUILDROOT%\bin\gprconfig --show-targets') DO (
   SET LAST_TARGET=%%A
 )
 
-IF '!I!' LEQ '1' (
+IF "!I!" EQU "1" (
   ECHO %LAST_TARGET% > TARGETS.TXT
 ) ELSE (
   ECHO.>TARGETS.TXT
@@ -92,7 +92,7 @@ IF '!I!' LEQ '1' (
   ) ELSE (
     SET /P CHOICE="Enter a target number, or <enter> to continue the setup: "
   )
-  IF '!CHOICE!' LEQ '' (
+  IF "!CHOICE!" EQU "" (
     IF '!ONESELECTED!' == '' (
       GOTO SELECT_TARGETS
     ) ELSE (
@@ -108,7 +108,7 @@ IF '!I!' LEQ '1' (
         SET FOUND=1
       )
     )
-    IF !FOUND! LEQ '0' (
+    IF "!FOUND!" EQU "0" (
       IF '!J!' == '!CHOICE!' (
         SET /A I=!I!-1
         ECHO %%A >> TARGETS.TXT
@@ -189,8 +189,34 @@ GOTO END_SELECT_RUNTIME
   TYPE OPTS.TXT
   ECHO.
   ECHO Do you want to add another runtime for this platform ?
-  CHOICE /C YN /M "Press Y for Yes, N for No."
-  IF "%ERRORLEVEL%" NEQ "2" ( GOTO START_SELECT_RUNTIME )
+:ANOTHER_RUNTIME_QUESTION
+  SET CHOICE=
+  SET /P CHOICE=Enter Y for Yes, N or just ^<Enter^> for No^:
+  ECHO !CHOICE!
+
+  IF "!CHOICE!" EQU "Y" (
+    GOTO START_SELECT_RUNTIME
+ ) ELSE (
+    IF "!CHOICE!" EQU "y" (
+      GOTO START_SELECT_RUNTIME
+    )
+  )
+
+  IF "!CHOICE!" EQU "N" (
+    GOTO END_ANOTHER_RUNTIME_QUESTION )
+  ) ELSE (
+    IF "!CHOICE!" EQU "n" (
+      GOTO END_ANOTHER_RUNTIME_QUESTION
+    ) ELSE (
+      IF "!CHOICE!" EQU "" (
+        GOTO END_ANOTHER_RUNTIME_QUESTION
+      )
+    )
+  )
+
+  GOTO ANOTHER_RUNTIME_QUESTION
+
+:END_ANOTHER_RUNTIME_QUESTION
   DEL OPTS.TXT
   EXIT /B
 
