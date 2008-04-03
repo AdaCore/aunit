@@ -49,14 +49,14 @@ clean:
 	-${MAKE} -C docs clean
 
 install_clean:
-	$(CHMOD) -R 777 $(I_DOC)
+	-$(CHMOD) -R 777 $(I_DOC)
 	$(RM) -fr $(I_DOC)
-	$(CHMOD) -R 777 $(I_TPL)
+	-$(CHMOD) -R 777 $(I_TPL)
 	$(RM) -fr $(I_TPL)
 	$(RM) -f $(I_PLG)/aunit.xml
-	$(CHMOD) -R 777 $(I_LIB)
+	-$(CHMOD) -R 777 $(I_LIB)
 	$(RM) -fr $(I_LIB)
-	$(CHMOD) -R 777 $(I_INC)
+	-$(CHMOD) -R 777 $(I_INC)
 	$(RM) -fr $(I_INC)
 	$(RM) -f $(I_GPR)/aunit.gpr
 
