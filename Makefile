@@ -75,7 +75,7 @@ install: install_clean all
 	$(CP) -r aunit/framework $(I_INC)
 	$(CP) -r aunit/containers $(I_INC)
 	$(CP) -r aunit/reporters $(I_INC)
-	$(CHMOD) 444 $(I_DOC)/*
+	-$(CHMOD) 444 $(I_DOC)/*
 	$(CHMOD) 444 $(I_TPL)/*
 	$(CHMOD) 444 $(I_PLG)/aunit.xml
 	$(CHMOD) 444 $(I_GPR)/aunit.gpr
