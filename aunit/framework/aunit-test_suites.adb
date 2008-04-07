@@ -24,6 +24,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Unchecked_Conversion;
+with AUnit.Memory.Utils;
+
 --  A collection of test cases
 package body AUnit.Test_Suites is
 
@@ -55,5 +58,19 @@ package body AUnit.Test_Suites is
          Next (C);
       end loop;
    end Run;
+
+   function New_Suite return Access_Test_Suite is
+      type Access_Type is access all Test_Suite;
+      function Alloc is new AUnit.Memory.Utils.Gen_Alloc
+        (Test_Suite, Access_Type);
+      function Convert is new Ada.Unchecked_Conversion
+        (Access_Type, Access_Test_Suite);
+      Ret : constant Access_Type := Alloc;
+      Obj : Test_Suite;
+      for Obj'Address use Ret.all'Address;
+      pragma Warnings (Off, Obj);
+   begin
+      return Convert (Ret);
+   end New_Suite;
 
 end AUnit.Test_Suites;

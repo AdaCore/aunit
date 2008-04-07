@@ -3,8 +3,8 @@ project AUnit is
    type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
    type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
 
-   Runtime : Runtime_Type := external ("RTS", "full");
-   Target  : Target_Type  := external ("TARGET", "native");
+   Runtime : Runtime_Type := external ("RUNTIME", "full");
+   Target  : Target_Type  := external ("PLATFORM", "native");
 
    for Library_Dir use "../../lib/aunit/" & Target & "-" & Runtime;
    for Library_Name use "aunit";

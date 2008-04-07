@@ -68,17 +68,18 @@ install: install_clean all
 	$(MKDIR) $(I_LIB)
 	$(MKDIR) $(I_INC)
 	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
-	-$(CP) template/*.ad[bs] template/*.gpr $(I_TPL)
 	-$(CP) support/aunit.xml $(I_PLG)
 	$(CP) support/aunit.gpr $(I_GPR)
+	$(CP) -r examples/* $(I_TPL)
 	-$(CP) -r aunit/lib/* $(I_LIB)
 	$(CP) -r aunit/framework $(I_INC)
 	$(CP) -r aunit/containers $(I_INC)
 	$(CP) -r aunit/reporters $(I_INC)
 	-$(CHMOD) 444 $(I_DOC)/*
-	$(CHMOD) 444 $(I_TPL)/*
 	$(CHMOD) 444 $(I_PLG)/aunit.xml
 	$(CHMOD) 444 $(I_GPR)/aunit.gpr
+	find $(I_TPL) -type d -exec $(CHMOD) 555 {} \;
+	find $(I_TPL) -type f -exec $(CHMOD) 444 {} \;
 	find $(I_LIB) -type d -exec $(CHMOD) 555 {} \;
 	find $(I_LIB) -type f -exec $(CHMOD) 444 {} \;
 	find $(I_INC) -type d -exec $(CHMOD) 555 {} \;

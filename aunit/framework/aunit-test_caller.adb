@@ -24,6 +24,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Unchecked_Conversion;
+with AUnit.Memory.Utils;
+
 package body AUnit.Test_Caller is
 
    ------------
@@ -46,7 +49,22 @@ package body AUnit.Test_Caller is
 
    function Create
      (Name : String;
-      Test : Test_Method) return Test_Case_Access is separate;
+      Test : Test_Method) return Test_Case_Access
+   is
+      type Access_Type is access all Test_Case;
+      function Alloc is new AUnit.Memory.Utils.Gen_Alloc
+        (Test_Case, Access_Type);
+      function Convert is new Ada.Unchecked_Conversion
+        (Access_Type, Test_Case_Access);
+      Ret : constant Access_Type := Alloc;
+      Obj : Test_Case;
+      for Obj'Address use Ret.all'Address;
+      pragma Warnings (Off, Obj);
+   begin
+      Obj.Name    := Format (Name);
+      Obj.Method  := Test;
+      return Convert (Ret);
+   end Create;
 
    ----------
    -- Name --

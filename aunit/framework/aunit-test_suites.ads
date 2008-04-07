@@ -42,6 +42,9 @@ package AUnit.Test_Suites is
                   Outcome    : out Status);
    --  Run all tests collected into this suite
 
+   function New_Suite return Access_Test_Suite;
+   --  Create a new test suite
+
 private
 
    use Ada_Containers;

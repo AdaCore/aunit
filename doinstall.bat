@@ -254,6 +254,7 @@ ECHO.
 ECHO uninstalling previous AUnit library in %INSTALL% if needed
 DEL /Q "%I_GPR%\aunit.gpr" 2> NUL
 DEL /Q "%I_TPL%\*.ad*" 2> NUL
+RMDIR /Q/S "%I_TPL%" 2> NUL
 DEL /Q "%I_DOC%\*.*" 2> NUL
 RMDIR /Q/S "%I_INC%" 2> NUL
 RMDIR /Q/S "%I_LIB%" 2> NUL
@@ -267,7 +268,7 @@ MKDIR "%I_INC%" 2> NUL
 
 ECHO.
 ECHO copying examples in %I_TPL%
-COPY template\*.* "%I_TPL%" > NUL
+XCOPY /S/Q /EXCLUDE:support\exclude.txt examples "%I_TPL%" > NUL
 ECHO.
 ECHO copying documentation in %I_DOC%
 COPY docs\*.html "%I_DOC%" > NUL 2> NUL
