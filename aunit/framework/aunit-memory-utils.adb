@@ -34,8 +34,14 @@ package body AUnit.Memory.Utils is
 
    function Gen_Alloc return Name is
       function To_Name is new Ada.Unchecked_Conversion (System.Address, Name);
+      Ret : constant System.Address := AUnit_Alloc (Object'Object_Size / 8);
+      --  Declare an actual object at Ret Address so that the default
+      --  initialisation is performed.
+      Obj : Object;
+      for Obj'Address use Ret;
+      pragma Warnings (Off, Obj);
    begin
-      return To_Name (AUnit_Alloc (Object'Object_Size / 8));
+      return To_Name (Ret);
    end Gen_Alloc;
 
 end AUnit.Memory.Utils;

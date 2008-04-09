@@ -56,14 +56,11 @@ package body AUnit.Test_Caller is
         (Test_Case, Access_Type);
       function Convert is new Ada.Unchecked_Conversion
         (Access_Type, Test_Case_Access);
-      Ret : constant Access_Type := Alloc;
-      Obj : Test_Case;
-      for Obj'Address use Ret.all'Address;
-      pragma Warnings (Off, Obj);
+      Ret : constant Test_Case_Access := Convert (Alloc);
    begin
-      Obj.Name    := Format (Name);
-      Obj.Method  := Test;
-      return Convert (Ret);
+      Ret.Name    := Format (Name);
+      Ret.Method  := Test;
+      return Ret;
    end Create;
 
    ----------

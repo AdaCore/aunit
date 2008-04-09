@@ -26,7 +26,7 @@
 package AUnit.Memory.Utils is
 
    generic
-      type Object (<>) is limited private;
+      type Object is limited private;
       type Name is access Object;
    function Gen_Alloc return Name;
 

@@ -78,11 +78,6 @@ package AUnit.Test_Caller is
       Test : Test_Method) return Test_Case_Access;
    --  Return a test case from a test fixture method, reporting the result
    --  of the test using the Name parameter.
-   --  It is only available on run-time where dynamic allocation is allowed.
-   --  (it returns null in case of static allocation).
-   --  In case of limited run-times where allocation is not possible, use
-   --  the procedural version below with a statically allocated test case
-   --  parameter.
 
    procedure Create
      (TC   : out Test_Case'Class;
