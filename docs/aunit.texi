@@ -158,7 +158,7 @@ With this new version, we also created examples to show the new
 features of the Framework. You can find those examples in the AUnit
 installation directory:
 <aunit-root>/share/examples/aunit, or from the source distribution
-AUnit-@value{VERSION}/examples.
+aunit-@value{VERSION}-src/examples.
 
 The following examples are provided:
 @itemize
@@ -351,7 +351,7 @@ of how to use these methods.
 You can find a compilable example of
 @code{AUnit.Simple_Test_Cases.Test_Case} usage in your AUnit installation
 directory: <aunit-root>/share/examples/aunit/simple_test/ or from the
-source distribution AUnit-@value{VERSION}/examples/simple_test/
+source distribution aunit-@value{VERSION}-src/examples/simple_test/
 
 @c ----------------------
 @node AUnit.Test_Cases
@@ -512,7 +512,7 @@ limited run-times.
 You can find a compilable example of
 @code{AUnit.Test_Caller} usage in your AUnit installation
 directory: <aunit-root>/share/examples/aunit/test_caller/ or from the
-source distribution AUnit-@value{VERSION}/examples/test_caller/
+source distribution aunit-@value{VERSION}-src/examples/test_caller/
 
 @c ======================================================================
 
@@ -637,7 +637,7 @@ Once you have several test cases, organize them into a Suite.
 You can find a compilable example of fixture set up using
 @code{AUnit.Test_Fixture} in your AUnit installation
 directory: <aunit-root>/share/examples/aunit/test_fixture/ or from the
-AUnit source distribution AUnit-@value{VERSION}/examples/test_fixture/.
+AUnit source distribution aunit-@value{VERSION}-src/examples/test_fixture/.
 
 @c ======================================================================
 
@@ -910,7 +910,7 @@ testing and generic packages testing.
 A full example of test organisation is available in the AUnit
 installation directory: <AUnit-root>/share/examples/aunit/calculator, or
 from the AUnit source distribution
-AUnit-@value{VERSION}/examples/calculator.
+aunit-@value{VERSION}-src/examples/calculator.
 
 @c ---------------------------
 @node OOP considerations
@@ -1302,10 +1302,8 @@ The instantiated test case objects are added to a suite in the usual manner.
 @node Using AUnit with Restricted Run-Time Libraries
 @chapter Using AUnit with Restricted Run-Time Libraries
 
-FROM THIS POINT, THE DOCUMENTATION NEEDS TO BE UPDATED !!!!!!!!!!!!!!
-
 @noindent
-AUnit 2 is a reimplementation of the original AUnit so that it can be used in
+AUnit 3 - like AUnit 2 - is designed so that it can be used in
 environments with restricted Ada run-time libraries, such as ZFP and the cert
 run-time profile on Wind River Systems PSC ARINC-653.  The patterns given in
 this document for writing tests, suites and harnesses are not the only
@@ -1316,17 +1314,30 @@ In general, dynamic allocation and deallocation must be used carefully in test
 code.  For the cert profile on PSC ARINC-653, all dynamic allocation must be
 done prior to setting the application partition into ``normal'' mode.
 Deallocation is prohibited in this profile. For the default ZFP profile,
-dynamic memory management is not implemented, and should not be used unless
+dynamic memory management is not provided as part of the run-time, as it is
+not available on a bare board environment, and should not be used unless
 you have provided implementations as described in the GNAT Pro High Integrity
 User Guide.
+
+Starting with AUnit 3, a simple memory management mechanism has been
+included in the framework, using kind of a storage pool. This memory
+management mechanism uses a static array allocation at startup, simulating
+dynamic allocation afterwards by allocating parts of this array upon request.
+Delallocation is not permitted.
+
+By default, the allocated array is a 100 kBytes array. This value can be changed by modifying it from the Source files: 
+aunit-@value{VERSION}-src/aunit/framework/staticmemory/aunit-memory.adb
+
+To allocate a new object, you can use @code{AUnit.Memory.Utils.Gen_Alloc}.
 
 Additional restrictions relevant to the default ZFP profile include:
 @enumerate
 @item
-Normally AUnit will list any unexpected exceptions that occur during test
-execution. However, since the default ZFP profile does not support exception
-propagation, control is instead passed to the user last chance handler. As
-in all ZFP profiles, such a last chance handler is required.
+Normally the ZFP profile requires a user defined __gnat_secondary_stack method
+to handle raised exceptions. However, AUnit now provides a mechanism to
+simulate exception propagation using gcc builtin setjmp/longjmp mechanism.
+This mechanism uses the __gnat_secondary_stack method, and thus it should not
+be redefined by another library or object.
 
 @item
 AUnit requires @code{GNAT.IO} provided in @file{g-io.ad?} in the full or cert
@@ -1336,36 +1347,46 @@ switch.
 
 @item
 The AUnit framework has been modified so that no call the the secondary
-stack is performed. However, if the unit under test, or the tests themselves
-require use of the secondary stack, then the test suite must export symbol
-@code{__gnat_get_secondary_stack}. This is not actually used unless the
-application or unit tests require the secondary stack, in which case it must
-be fully implemented.
-
-@item
-Failed assertions do not abandon execution of the calling test routine in
-ZFP profiles that do not support exception propagation. A functional form of
-the @code{Assert} subprogram allows the calling routine to determine whether
-to continue or abandon its further execution. This behavior is selected during
-compilation when the @i{makefile}'s @code{SUPPORT_EXCEPTION} variable is set
-to @code{no}.
+stack is performed, nor any call to memcpy or memset. However, if the unit
+under test, or the tests themselves require use of those methods, then the
+test suite must export those symbols. This is not actually used unless the
+application or unit tests require the secondary stack, memcpy or memset in
+which case it must be fully implemented.
 
 @item
 The timed parameter of the Harness @code{Run} routine has no effect when used
-with the ZFP profile. This behavior is selected during compilation when the
-@i{makefile}'s @code{SUPPORT_CALENDAR} variable is set to @code{no}.
+with the ZFP profile, and on profiles not supporting Ada.Calendar.
 @end enumerate
 
 @node Installation and Use
 @chapter Installation and Use
 
 @noindent
-AUnit 2 now contains support for limited run-times such as zero-foot-print
-(zfp) and certified run-time (cert). However, some functionalities have to be
-disabled on those run-times: the cert run-time does not provide Ada.Calendar
-and zfp does not support exceptions, and does not provide Ada.Calendar either.
+AUnit 3 contains support for limited run-times such as zero-foot-print
+(zfp) and certified run-time (cert). It can now be installed simultaneously
+for several targets and run-times.
 
-The AUnit library can be installed to take into account those limitations.
+@c --------------------------------------
+@section Note on gprbuild
+
+@noindent
+In order to compile and install AUnit, you will now need gprbuild. On most
+cross-platforms gprbuild version 1.1 is required, while on native platform,
+any version can be used.
+
+@c ---------------------------------------------------------
+@section aunit project file and support for other platforms/run-times
+
+AUnit 3 can now be installed once for several targets and run-times.
+In order to allow this, the AUnit project now includes scenario variables
+to allow selection of those targets and/or run-times. The scenario variable
+used are:
+@itemize
+@item @b{PLATFORM}: the supported values are "native" (default),
+"powerpc-elf", "vxworksae", "erc32-elf" and "leon-elf".
+@item @b{RUNTIME}: the supported values are "full" (default), "cert", "zfp",
+"hi" and "ravenscar".
+@end itemize
 
 @c --------------------------------------
 @section Installing AUnit on UNIX systems
@@ -1375,120 +1396,186 @@ The AUnit library can be installed to take into account those limitations.
 @item
 Extract the archive:
 @smallexample
-   $ gunzip -dc aunit-2.01-src.tgz | tar xf -
+   $ gunzip -dc aunit-@value{VERSION}-src.tgz | tar xf -
 @end smallexample
 
 @item
-To build and install AUnit for a full Ada run-time:
+To build AUnit for a full Ada run-time:
 @smallexample
-   $ cd aunit-2.01-src
-   $ make INSTALL=<gnat-root> install
+   $ cd aunit-@value{VERSION}-src
+   $ make
 @end smallexample
-   Where <gnat-root> is for example /opt/gnat/6.0.1
+
+To build AUnit for a zfp run-time targetting powerpc-elf platform@footnote{
+Note that some platforms may require gprbuild version 1.1 or later}:
+@smallexample
+   $ cd aunit-@value{VERSION}-src
+   $ make TARGET=powerpc-elf RTS=zfp
+@end smallexample
+
+Once AUnit the above procedure for building AUnit has been done for all
+desired platforms, you can install it:
+@smallexample
+   $ make install INSTALL=<gnat-root>
+@end smallexample
+   Where <gnat-root> is for example /opt/gnat/6.0.1. If INSTALL is not
+specified, then AUnit will use the root directory where gprbuild is installed.
 
 @item
 Specific installation:
 
    The AUnit makefile supports some specific options, activated using
    environment variables. The following options are defined:
+
 @itemize
 @item
    INSTALL: defines the AUnit base installation directory, should always be
     set.
 
 @item
-   TOOL_PREFIX: defines the gnat tools prefix to use. For example, to compile
-    AUnit for powerpc VxWorks, TOOLS_PREFIX should be set to
+   TARGET: defines the gnat tools prefix to use. For example, to compile
+    AUnit for powerpc VxWorks, TARGET should be set to
     powerpc-wrs-vxworks. If not set, the native compiler will be used.
 
 @item
-   RTS: defines the run-time used to compile AUnit. When set to zfp, this
-    automatically defines SUPPORT_CALENDAR and SUPPORT_EXCEPTION (see below).
-
-@item
-   SUPPORT_CALENDAR: takes the values yes (default) or no. If the compiler or
-    the run-time used do not provide Ada.Calendar, then you should set this
-    variable to 'no'.
-
-@item
-   SUPPORT_EXCEPTION: takes the values yes (default) or no. If the compiler or
-    the run-time used do not provide exceptions support, then you should set
-    this variable to 'no'.
+   RTS: defines the run-time used to compile AUnit.
 @end itemize
-   Example of installation of AUnit to /opt/gnatpro/5.04a1, for a cross ppc
-   vxworksae compiler using the zfp run-time,
-@smallexample
-   $ cd <build-dir>
-   $ make INSTALL=/opt/gnatpro/5.04a1 RTS=zfp \
-       TOOL_PREFIX=powerpc-wrs-vxworksae install
-@end smallexample
 
 @item
 To test AUnit:
 
-   The AUnit test suite is in the test subdirectory of the source package. In
-   order to build and run the AUnit test suite, first install the AUnit
-   library, then:
+   The AUnit test suite is in the test subdirectory of the source package.
 @smallexample
    $ cd test
    $ make
 @end smallexample
    The test suite's makefile supports the following variables:
    * RTS
-   * TOOL_PREFIX
+   * TARGET
 @end itemize
 
 @c -----------------------------------------
 @section Installing AUnit on Windows systems
 
-On Windows, an install-shield wizard is available to easily install AUnit. This
-install shield will ask some questions during the installation:
+On Windows, an install-shield wizard is available to easily install AUnit. 
+If you are installing from the source package, then you will need a tool to
+uncompress the tar.gz file, then you can manually launch the doinstall.bat
+script included in the source package.
+
+Both ways will ask some questions during the installation:
 
 @itemize
+
 @item
-Selection of the compiler: the install-shield will try to detect all GNAT
-compilers available in your system. You can directly select one of the detected
-compilers or enter the path of the desired compiler. The entered path is the
-gnat.exe path of the compiler.
+Selection of the targets (optional): the install-shield will try to detect all
+GNAT compilers available in your system. If only one target is found, then
+this target is automatically selected, and the script starts with the next
+step.
+If compilers for several targets are found, then the script will display a
+list of available targets. You can then select one or several targets,
+pressing enter to continue.
+
+@smallexample
+*** Select the targets you want AUnit to be compiled for.
+*(1) pentium-mingw32msv
+ (2) powerpc-elf
+ (3) i686-pc-cygwin
+Enter a target number, or <enter> to continue the setup: 
+@end smallexample
+
+@item
+Selection of the run-time: For all selected targets, the script will ask you
+to select the Ada compiler/Ada run-time that will be used to compile AUnit.
+As in the previous step, several run-times for the same target can be selected.
+
+@smallexample
+pentium-mingw32msv
+
+* Runtime(s):
+
+
+Please select the compiler you want to use for this platform:
+
+--------------------------------------------------
+gprconfig has found the following compilers on your PATH.
+Only those matching the target and the selected compilers are displayed.
+*(A) GNAT for Ada in c:\gnatpro\6.2.0w\bin\ version 6.2 (default runtime)
+ (B) GCC-ASM for Asm in c:\gnatpro\6.2.0w\bin\ version 4.1.3
+ (C) GCC-ASM for Asm2 in c:\gnatpro\6.2.0w\bin\ version 4.1.3
+ (D) GCC-ASM for Asm_Cpp in c:\gnatpro\6.2.0w\bin\ version 4.1.3
+*(E) GCC for C in c:\gnatpro\6.2.0w\bin\ version 4.1.3
+Select or unselect the following compiler (or "s" to save):
+s
+@end smallexample
+
+@noindent
+Once the GNAT compiler is selected, you will see a resume of the selected
+run-time for the current platform:
+
+@smallexample
+* Selected Platform *
+pentium-mingw32msv
+
+* Runtime(s)      *
+
+full
+
+Do you want to add another runtime for this platform ?
+Enter Y for Yes, N or just <Enter> for No:
+@end smallexample
+
+Note that this script uses gprconfig for this step. This tool also shows
+other non-Ada compilers that may be present on your system. You can ignore
+them.
+
+@item 
+At this stage, the AUnit library starts compiling. Once the compilation is
+done, the message
+@smallexample
+
+*** AUNIT COMPILED SUCCESSFULLY ***
+
+@end smallexample
+should be displayed.
+
 @item
 Selection of the installation directory: by default, AUnit is installed in the
-same root directory as the selected compiler. Enter another directory at this
+same root directory as gprbuild. Enter another directory at this
 stage if you want to install AUnit in another directory.
-@item
-Selection of the run-time: if you want to compile AUnit with a specific
-run-time, enter the run-time at this stage.
-@item
-Support for exceptions: select the support for exceptions in AUnit. If the
-selected run-time does not support exceptions, you should disable the exception
-support in AUnit at this stage.
-@item
-Support for Ada.Calendar: select the support for Ada.Calendar in AUnit. If the
-selected run-time does not provide Ada.Calendar, you should disable the
-Ada.Calendar support in AUnit at this stage.
+
+@smallexample
+Please enter AUnit base installation directory
+** Press enter for installing in 'C:\GNATPRO\6.1.1':
+@end smallexample
+
 @end itemize
 
-After entering the information above, the install-shield will build and install
+After entering the information above, the install-shield will install
 aunit in the selected installation directory.
+
+Note that contrary to AUnit 2 installation procedures, the support for
+exception, memory, Ada.Calendar is automatically selected depending on the
+run-time used.
 
 @c ---------------------
 @section Installed files
 
 @noindent
-The AUnit library is installed in the specified directory (<gnat-root>
+The AUnit library is installed in the specified directory (<aunit-root>
 identifies the root installation directory as specified during the installation
 procedures above):
 
 @itemize
 @item
-   the aunit.gpr project is installed in <gnat-root>/lib/gnat
+   the aunit.gpr project is installed in <aunit-root>/lib/gnat
 @item
-   the AUnit source files are installed in <gnat-root>/include/aunit
+   the AUnit source files are installed in <aunit-root>/include/aunit
 @item
-   the AUnit library files are installed in <gnat-root>/lib/aunit
+   the AUnit library files are installed in <aunit-root>/lib/aunit
 @item
-   the AUnit documentation is installed in <gnat-root>/share/doc/aunit
+   the AUnit documentation is installed in <aunit-root>/share/doc/aunit
 @item
-   the AUnit examples are installed in <gnat-root>/share/examples/aunit
+   the AUnit examples are installed in <aunit-root>/share/examples/aunit
 @end itemize
 
 @node GPS Support
@@ -1497,7 +1584,8 @@ procedures above):
 @noindent
 The GPS IDE has a menu @b{Edit -> Unit Testing} to
 generate template code for test cases, test suites and harnesses. The
-current templates are for AUnit 1.x, so will need to be migrated as described
-in ``Migrating Tests from AUnit 1 to AUnit 2''.
+current templates are for AUnit 1.x, and AUnit 2.x. The next version of GPS
+will also include support for AUnit 3. In the mean time, you can use AUnit 1.x
+templates that require very minor changes to be adapted to AUnit 3.
 
 @bye
