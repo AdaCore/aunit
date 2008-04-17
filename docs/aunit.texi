@@ -108,7 +108,7 @@ unmodified in any copy.
 * Fixture::
 * Suite::
 * Reporting::
-* Tests Organisation::
+* Test Organization::
 * Using AUnit with Restricted Run-Time Libraries::
 * Installation and Use::
 * GPS Support::
@@ -135,41 +135,42 @@ AUnit 3 brings several enhancements over AUnit 2 and AUnit 1:
 @item Removal of the genericity of the AUnit framework, making the AUnit 3
 API as close as possible to AUnit 1.
 
-@item Implement dynamic allocation emulation using kind of a Storage Pool,
-to maintain the compatibility of AUnit with limited run-times.
+@item Emulates dynamic memory management for limited run-time profiles.
 
-@item Provide a new XML reporter, modify the way a harness is run to allow
-easy switch between Text, XML or customized reporters.
+@item Provides a new XML reporter, and changes harness invocation to support
+easy switching among text, XML and customized reporters.
 
-@item Provide the following new tagged types: Simple_Test_Case, Test_Fixture,
-Test_Caller matching CppUnit's TestCase, TestFixture and TestCaller classes.
+@item Provides new tagged types Simple_Test_Case, Test_Fixture and
+Test_Caller that correspond to CppUnit's TestCase, TestFixture and TestCaller
+classes.
 
-@item On ZFP runtimes, use gcc builtin setjmp/longjmp mechanism to emulate
-exception propagation.
+@item Emulates exception propagation for restricted run-time profiles
+(e.g. ZFP), by using the  gcc builtin setjmp/longjmp mechanism.
 
-@item Report error locations when available.
+@item Reports the source location of an error when possible.
 
 @end itemize
 
 @c --------------
 @section Examples
 
-With this new version, we also created examples to show the new
-features of the Framework. You can find those examples in the AUnit
+With this version, we have provided new examples illustrating the enhanced
+features of the framework. These examples are in the AUnit
 installation directory:
-<aunit-root>/share/examples/aunit, or from the source distribution
-aunit-@value{VERSION}-src/examples.
+<aunit-root>/share/examples/aunit, and are also available in the source
+distribution aunit-@value{VERSION}-src/examples.
 
 The following examples are provided:
 @itemize
-@item simple_test: uses AUnit.Simple_Test_Cases
+@item simple_test: shows use of AUnit.Simple_Test_Cases
 (@pxref{AUnit.Simple_Test_Cases}).
-@item test_caller: uses AUnit.Test_Caller (@pxref{AUnit.Test_Caller}).
-@item test_fixture: example of test Fixture (@pxref{Fixture}).
-@item liskov: This suite tests the liskov substitution principle on two
-simple tagged type. (@pxref{OOP considerations})
-@item failures: example of failing test suite (@pxref{Reporting}).
-@item calculator: Full example of a test suite organisation.
+@item test_caller: shows use of AUnit.Test_Caller (@pxref{AUnit.Test_Caller}).
+@item test_fixture: example of a test fixture (@pxref{Fixture}).
+@item liskov: This suite tests conformance to the Liskov Substitution Principle
+of a pair of simple tagged types. (@pxref{OOP considerations})
+@item failures: example of handling and reporting failed tests
+(@pxref{Reporting}).
+@item calculator: a full example of test suite organization.
 @end itemize
 
 @c ----------------------------------
@@ -223,10 +224,10 @@ Several test case types are available:
 cases. Needs overriding of @code{Name} and @code{Run_Test}.
 @item @code{AUnit.Test_Cases.Test_Case}: the traditional AUnit test case type,
 allowing multiple test routines registration, each being run and reported
-independantely.
-@item @code{AUnit.Test_Fixtures.Test_Fixture}: used in conjunction with
-@code{AUnit.Test_Caller}, this allows an easy creation of test suites using
-several test cases sharing the same fixture (@pxref{Fixture}).
+independently.
+@item @code{AUnit.Test_Fixtures.Test_Fixture}: used together with
+@code{AUnit.Test_Caller}, this allows easy creation of test suites comprising
+several test cases that share the same fixture (@pxref{Fixture}).
 @end itemize
 
 @xref{Test Cases}, for simple examples of use of these types.
@@ -274,8 +275,8 @@ of the framework by allocating test result reporting data structures
 statically.
 
 @item Build the code that calls the harness @code{@b{Run}} routine using
-gnatmake. The GNAT project file @i{aunit.gpr} contains all necessary switches,
-and should be imported into your root project file.
+gnatmake or gprbuild. The GNAT project file @i{aunit.gpr} contains all
+necessary switches, and should be imported into your root project file.
 
 @end enumerate
 
@@ -291,8 +292,8 @@ and should be imported into your root project file.
 @end menu
 
 @noindent
-In this chapter, we will introduce how to use the different forms of Test
-Cases. We will use for this a very simple test routine, that verifies
+In this chapter, we will introduce how to use the various forms of Test
+Cases. We will illustrate with a very simple test routine, that verifies
 that the sum of two Moneys with the same currency result in a value
 which is the sum of the values of the two Moneys:
 
@@ -364,27 +365,31 @@ source distribution aunit-@value{VERSION}-src/examples/simple_test/
 It allows a very flexible composition of Test routines inside a single
 test case, each being reported independantely.
 
-The following methods needs or may be overriden:
+The following subprograms must be considered for inheritance, overriding or
+completion:
 
 @itemize
 
-@item @code{function Name (T : Test_Case) return Messsage String is abstract;}:
-inherited. @xref{AUnit.Simple_Test_Cases}.
+@item @code{function Name (T : Test_Case) return Messsage String is abstract;}
+Inherited. @xref{AUnit.Simple_Test_Cases}.
 
 @item @code{procedure Set_Up (T : in out Test_Case)} and @code{procedure
-Tear_Down (T : in out Test_Case)}: Inherited. @xref{AUnit.Simple_Test_Cases}.
+Tear_Down (T : in out Test_Case)}
+Inherited. @xref{AUnit.Simple_Test_Cases}.
 
 @item @code{procedure Set_Up_Case (T : in out Test_Case)} and
-@code{procedure Tear_Down_Case (T : in out Test_Case)} (default
-implementation do nothing): 
+@code{procedure Tear_Down_Case (T : in out Test_Case)}
+Default implementation does nothing.
 
-These procedures allow to respectively Set Up and Tear Down the test
-case once before all routines are run. The inherited @code{Set_Up} and
-@code{Tear_Down} being called before and after each routine.
+
+The latter procedures provide an opportunity to Set Up and Tear Down the test
+case before and after all test routines have been executed. In contrast, the
+inherited @code{Set_Up} and @code{Tear_Down} are called before and after the
+execution of each individual test routine.
 
 @item @code{procedure Register_Tests (T : in out Test_Case) is
-abstract}:
-This procedure needs to be overriden. It is responsible for registering all
+abstract}
+This procedure must be overriden. It is responsible for registering all
 the test routines that will be run. You need to use either
 @code{Registration.Register_Routine} or the generic
 @code{Specific_Test_Case.Register_Wrapper} methods defined in
@@ -399,7 +404,7 @@ The former procedure is used mainly for dispatching calls
 
 @end itemize
 
-Using this type to test our money addition, the package spec looks as follows.
+Using this type to test our money addition, the package spec is:
 
 @AEXP{with AUnit; use AUnit;
 with AUnit.Test_Cases; use AUnit.Test_Cases;
@@ -455,16 +460,15 @@ end @b{Money_Tests};}
 @section AUnit.Test_Caller
 
 @noindent
-@code{Test_Caller} is a generic package that is meant to be used in
-conjunction with
+@code{Test_Caller} is a generic package that is used with
 @code{AUnit.Test_Fixtures.Test_Fixture}. @code{Test_Fixture} is a very
-simple type, that only provides the @code{Set_Up} and @code{Tear_Down}
-procedures. This type is meant to contain a set of user defined test
-methods, all using the same Set up and Tear down mechanisms. Once those
-methods are defined, the Test_Caller package is used to allow their
-translation into a set of Test Cases for inclusion in a test suite.
+simple type that provides only the @code{Set_Up} and @code{Tear_Down}
+procedures. This type is meant to contain a set of user-defined test
+routines, all using the same Set up and Tear down mechanisms. Once those
+routines are defined, the Test_Caller package is used to incorporate them
+directly into a test suite.
 
-With our money test example, the Test_Fixture will look like:
+With our money example, the Test_Fixture is:
 
 @AEXP{with AUnit.Test_Fixtures;
 package @b{Money_Tests} is
@@ -474,8 +478,8 @@ package @b{Money_Tests} is
 
 end @b{Money_Tests};}
 
-And the test suite (@pxref{Suite}) calling the test cases created from
-this Test_Fixture will then be:
+The test suite (@pxref{Suite}) calling the test cases created from
+this Test_Fixture is:
 
 @AEXP{with AUnit.Test_Suites;
 
@@ -507,10 +511,10 @@ package body Money_Suite is
 end Money_Suite;}
 
 Note that @code{New_Suite} and @code{Create} are fully compatible with
-limited run-times.
+limited run-times (in particular, those without dynamic allocation support).
 
 You can find a compilable example of
-@code{AUnit.Test_Caller} usage in your AUnit installation
+@code{AUnit.Test_Caller} use in the AUnit installation
 directory: <aunit-root>/share/examples/aunit/test_caller/ or from the
 source distribution aunit-@value{VERSION}-src/examples/test_caller/
 
@@ -684,11 +688,13 @@ package body @b{My_Suite} is
    end @b{Suite};
 end @b{My_Suite};}
 
-Note that instead of statically allocating the test cases and suites,
-you can now use @code{AUnit.Test_Suites.New_Suite} and/or
-@code{AUnit.Memory.Utils.Gen_Alloc} to use the AUnit mechanisms of
-memory allocation compatible with limited run-times (@pxref{Using AUnit
-with Restricted Run-Time Libraries}).
+Instead of statically allocating test cases and suites,
+you can also use @code{AUnit.Test_Suites.New_Suite} and/or
+@code{AUnit.Memory.Utils.Gen_Alloc}. These routines emulate dynamic
+memory management (@pxref{Using AUnit with Restricted Run-Time Libraries}).
+Similarly, if you know that the tests will always be executed for a run-time
+profile that supports dynamic memory management, you can allocate these
+objects directly with the Ada @code{"new"} operator.
 
 @noindent
 The harness is:
@@ -725,11 +731,9 @@ with AUnit.Tests;
 package body @b{Composite_Suite} is
    use Test_Suites;
 
-   --  This time, we will dynamically allocate the suite using the
-   --  New_Suite function.
-   --  Note that we will use the 'Suite' functions provided in This_Suite
-   --  and That_Suite.
-   --  We will also use Ada 2005 dotted notation for calling Add_Test.
+   --  Here we dynamically allocate the suite using the New_Suite function
+   --  We use the 'Suite' functions provided in This_Suite and That_Suite
+   --  We also use Ada 2005 distinguished receiver notation to call Add_Test
 
    function @b{Suite} return Access_Test_Suite is
       @b{Result} : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
@@ -827,7 +831,7 @@ matches the one used by CppUnit.
 
 Note that text set in the Assert methods, or as test case names should
 be compatible with utf-8 character encoding, or the XML will not be
-correctly formated.
+correctly formatted.
 
 @smallexample
 <?xml version='1.0' encoding='utf-8' ?>
@@ -867,8 +871,8 @@ correctly formated.
 
 @c ======================================================================
 
-@node Tests Organisation
-@chapter Tests Organisation
+@node Test Organization
+@chapter Test Organization
 
 @menu
 * General considerations::
@@ -880,34 +884,40 @@ correctly formated.
 @node General considerations
 @section General considerations
 
-This section will discuss ways of organizing a AUnit test harness,
-considering available Ada constructs.
+This section will discuss an approach to organizing an AUnit test harness,
+considering some possibilities offered by Ada language features.
 
-The general idea behind those solutions for test organisation is that it
-is a good idea to have test package being child packages of the tested
-unit.
-This allows visibility over the private part, which we generally want in
-unit tests, and make the child package inherit some of the properties of
-the parent package (for example, if the tested package is a generic
-package, then the child package must be also generic, and any
-instantiation of the parent package will create a child test package
-according to this instantiation).
+The general idea behind this approach to test organization is that making the
+test case a child of the unit under test gives some useful facilities.
+The test case gains visibility to the private part of the unit under test.
+This offers a more ``white box'' approach to examining the state of the unit
+under test than would, for instance, accessor functions defined in a separate
+fixture that is a child of the unit under test. Making the test case a child of
+the unit under test also provides a way to make the test case share certain
+characteristics of the unit under test.  For instance, if the unit under test
+is generic, then any child package (here the test case) must be also generic:
+any instantiation of the parent package will require an instantiation of the
+test case in order to accomplish its aims.
 
-Another general idea is that the test type should match the tested type:
+Another useful concept is matching the test case type to that of the unit
+under test:
 
 @itemize
-@item If we test a generic package, then the test package should be
-generic as well.
-@item If we test a tagged type, then the test procedures should be
-dispatching, and the test case type for a child type should be a child
-of the test case type for the parent.
+@item When testing a generic package, the test package should also be
+generic.
+@item When testing a tagged type, then test routines should be
+dispatching, and the test case type for a derived tagged type should be a
+derivation of the test case type for the parent.
 @item etc.
 @end itemize
 
-The following sections will concentrate on tagged types hierarchy
-testing and generic packages testing.
+Maintaining such similarity of properties between the test case and unit under
+test can facilitate the testing of units derived in various ways.
 
-A full example of test organisation is available in the AUnit
+The following sections will concentrate on applying these concepts to
+the testing of tagged type hierarchies and to the testing of generic units.
+
+A full example of this kind of test organization is available in the AUnit
 installation directory: <AUnit-root>/share/examples/aunit/calculator, or
 from the AUnit source distribution
 aunit-@value{VERSION}-src/examples/calculator.
@@ -963,7 +973,7 @@ following test case:
 with AUnit.Test_Fixtures; use AUnit.Test_Fixtures;
 
 --  We make this package a child package of Parent so that it can have
---  visibility over its private part
+--  visibility to its private part
 package @b{Root.Tests} is
 
    type @b{Parent_Access} is access all @b{Root.Parent'Class};
@@ -1022,12 +1032,12 @@ package body @b{Root_Suite} is
 end @b{Root_Suite};}
 
 @noindent
-Now, we will define the test suite testing the @code{Child} type. For
-this, we need to inherit a test fixture from @code{Parent_Test},
+Now we define the test suite for the @code{Child} type. To do this,
+we inherit a test fixture from @code{Parent_Test},
 overriding the @code{Set_Up} procedure to initialize @code{Fixture} with
-a @code{Child} object. We will override also @code{Test_P2} to adapt it
-to the new implementation, we define a new @code{Test_P3} to test
-@code{P3}, and we keep @code{Test_P1} untouched, as @code{P1} has not changed.
+a @code{Child} object. We also override @code{Test_P2} to adapt it
+to the new implementation. We define a new @code{Test_P3} to test
+@code{P3}. And we inherit @code{Test_P1}, since @code{P1} is unchanged.
 
 @AEXP{with @b{Root.Tests}; use @b{Root.Tests};
 with AUnit; use AUnit;
@@ -1073,14 +1083,14 @@ with @b{Branch.Tests};
 package body @b{Branch_Suite} is
    package @b{Caller} is new AUnit.Test_Caller with (@b{Branch.Tests.Parent_Test});
 
-   --  In this suite, we will use the Ada 2005 dotted notation for ease
-   --  of writing.
+   --  In this suite, we use Ada 2005 distinguished receiver notation to
+   --  simplify the code.
 
    function Suite return Access_Test_Suite is
       Ret : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
    begin
-      --  We use the inherited Test_P1. Note that this is still
-      --  Branch.Tests.Set_Up that will be called, thus Test_P1 will be run
+      --  We use the inherited Test_P1. Note that it is
+      --  Branch.Tests.Set_Up that will be called, and so Test_P1 will be run
       --  against an object of type Child
       @b{Ret}.Add_Test 
         (@b{Caller}.Create (@b{"Test Child : P1"}, @b{Branch.Tests.Test_P1'Access}));
@@ -1097,7 +1107,7 @@ end @b{Branch_Suite};}
 @subsection Using AUnit.Test_Cases
 
 @noindent
-Using a @code{AUnit.Test_Cases.Test_Case} derived type, we obtain the
+Using an @code{AUnit.Test_Cases.Test_Case} derived type, we obtain the
 following code for testing @code{Parent}:
 
 @AEXP{with AUnit; use AUnit;
@@ -1196,7 +1206,7 @@ package @b{Branch.Tests} is
    procedure Register_Tests (@b{C} : in out @b{Child_Test});
 
    --  Override Set_Up_Case so that the fixture changes.
-   procedure Set_Up (@b{C} : in out @b{Child_Test});
+   procedure Set_Up_Case (@b{C} : in out @b{Child_Test});
 
    --  Test routines:
    procedure @b{Test_P2} (@b{C} : in out @b{Child_Test});
@@ -1260,9 +1270,10 @@ hierarchy that reflects that of the units under test.
 
 When testing generic units, one would like to apply the same generic tests
 to all instantiations in an application.  A simple approach is to make the
-test case unit a generic unit, child package of the unit under test.
+test case a child package of the unit under test (which then must also be
+generic).
 
-For instance, suppose the generic unit to test is a package (though it could
+For instance, suppose the generic unit under test is a package (it could
 be a subprogram, and the same principle would apply):
 @AEXP{generic
    -- Formal parameter list
@@ -1283,8 +1294,8 @@ package @b{Template.Gen_Tests} is
 
 end @b{Template.Gen_Tests};}
 
-The body will follow the usual patterns with the fixture being based on the
-parent package @code{Template}. Note that due to a recent AI, accesses to
+The body will follow the usual patterns with the fixture based on the
+parent package @code{Template}. Note that due to an Ada AI, accesses to
 test routines, along with the test routine specifications, must be defined
 in the package specification rather than in its body.
 
@@ -1305,13 +1316,13 @@ The instantiated test case objects are added to a suite in the usual manner.
 @noindent
 AUnit 3 - like AUnit 2 - is designed so that it can be used in
 environments with restricted Ada run-time libraries, such as ZFP and the cert
-run-time profile on Wind River Systems PSC ARINC-653.  The patterns given in
+run-time profile on Wind River Systems' VxWorks 653.  The patterns given in
 this document for writing tests, suites and harnesses are not the only
 patterns that can be used with AUnit, but they are compatible with the
 restricted run-time libraries provided with GNAT Pro.
 
 In general, dynamic allocation and deallocation must be used carefully in test
-code.  For the cert profile on PSC ARINC-653, all dynamic allocation must be
+code.  For the cert profile on VxWorks 653, all dynamic allocation must be
 done prior to setting the application partition into ``normal'' mode.
 Deallocation is prohibited in this profile. For the default ZFP profile,
 dynamic memory management is not provided as part of the run-time, as it is
@@ -1320,24 +1331,26 @@ you have provided implementations as described in the GNAT Pro High Integrity
 User Guide.
 
 Starting with AUnit 3, a simple memory management mechanism has been
-included in the framework, using kind of a storage pool. This memory
-management mechanism uses a static array allocation at startup, simulating
+included in the framework, using a kind of storage pool. This memory
+management mechanism uses a static array allocated at startup, and simulates
 dynamic allocation afterwards by allocating parts of this array upon request.
-Delallocation is not permitted.
+Deallocation is not permitted.
 
-By default, the allocated array is a 100 kBytes array. This value can be changed by modifying it from the Source files: 
-aunit-@value{VERSION}-src/aunit/framework/staticmemory/aunit-memory.adb
+By default, the allocated array is a 100 KB array. This value can be changed
+by modifying its size in the file: 
+@file{aunit-@value{VERSION}-src/aunit/framework/staticmemory/aunit-memory.adb}
 
-To allocate a new object, you can use @code{AUnit.Memory.Utils.Gen_Alloc}.
+To allocate a new object, you use @code{AUnit.Memory.Utils.Gen_Alloc}.
 
 Additional restrictions relevant to the default ZFP profile include:
 @enumerate
 @item
-Normally the ZFP profile requires a user defined __gnat_secondary_stack method
+Normally the ZFP profile requires a user-defined 
+@code{__gnat_last_chance_handler} routine
 to handle raised exceptions. However, AUnit now provides a mechanism to
 simulate exception propagation using gcc builtin setjmp/longjmp mechanism.
-This mechanism uses the __gnat_secondary_stack method, and thus it should not
-be redefined by another library or object.
+This mechanism defines the @code{__gnat_last_chance_handler} routine, so it
+should not be redefined elswhere.
 
 @item
 AUnit requires @code{GNAT.IO} provided in @file{g-io.ad?} in the full or cert
@@ -1346,12 +1359,11 @@ is a run-time library unit it must be compiled with the gnatmake ``-a''
 switch.
 
 @item
-The AUnit framework has been modified so that no call the the secondary
+The AUnit framework has been modified so that no call to the secondary
 stack is performed, nor any call to memcpy or memset. However, if the unit
-under test, or the tests themselves require use of those methods, then the
-test suite must export those symbols. This is not actually used unless the
-application or unit tests require the secondary stack, memcpy or memset in
-which case it must be fully implemented.
+under test, or the tests themselves require use of those routines, then the
+application or test framework must define those symbols and provide the
+requisite implementations.
 
 @item
 The timed parameter of the Harness @code{Run} routine has no effect when used
@@ -1363,23 +1375,23 @@ with the ZFP profile, and on profiles not supporting Ada.Calendar.
 
 @noindent
 AUnit 3 contains support for limited run-times such as zero-foot-print
-(zfp) and certified run-time (cert). It can now be installed simultaneously
+(ZFP) and certified run-time (cert). It can now be installed simultaneously
 for several targets and run-times.
 
 @c --------------------------------------
 @section Note on gprbuild
 
 @noindent
-In order to compile and install AUnit, you will now need gprbuild. On most
-cross-platforms gprbuild version 1.1 is required, while on native platform,
-any version can be used.
+In order to compile and install AUnit, you need gprbuild. On
+cross-platforms gprbuild version 1.1 or later is required, while on native
+platforms any version can be used.
 
 @c ---------------------------------------------------------
 @section aunit project file and support for other platforms/run-times
 
-AUnit 3 can now be installed once for several targets and run-times.
-In order to allow this, the AUnit project now includes scenario variables
-to allow selection of those targets and/or run-times. The scenario variable
+AUnit can be installed once for several targets and run-times.
+To support this, the AUnit project includes scenario variables
+to select those targets and/or run-times. The scenario variables
 used are:
 @itemize
 @item @b{PLATFORM}: the supported values are "native" (default),
@@ -1407,14 +1419,14 @@ To build AUnit for a full Ada run-time:
 @end smallexample
 
 To build AUnit for a zfp run-time targetting powerpc-elf platform@footnote{
-Note that some platforms may require gprbuild version 1.1 or later}:
+Note that cross platforms require gprbuild version 1.1 or later}:
 @smallexample
    $ cd aunit-@value{VERSION}-src
    $ make TARGET=powerpc-elf RTS=zfp
 @end smallexample
 
-Once AUnit the above procedure for building AUnit has been done for all
-desired platforms, you can install it:
+Once the above build procedure has been performed for all
+desired platforms, you can install AUnit:
 @smallexample
    $ make install INSTALL=<gnat-root>
 @end smallexample
@@ -1457,18 +1469,19 @@ To test AUnit:
 @c -----------------------------------------
 @section Installing AUnit on Windows systems
 
-On Windows, an install-shield wizard is available to easily install AUnit. 
-If you are installing from the source package, then you will need a tool to
-uncompress the tar.gz file, then you can manually launch the doinstall.bat
+On Windows, an InstallShield wizard is available to easily install AUnit. 
+If you are installing from the source package, you will first need a tool to
+uncompress the tar.gz file, then you can manually launch the 
+@file{doinstall.bat}
 script included in the source package.
 
-Both ways will ask some questions during the installation:
+Both methods need user responses during the installation:
 
 @itemize
 
 @item
-Selection of the targets (optional): the install-shield will try to detect all
-GNAT compilers available in your system. If only one target is found, then
+Selection of targets (optional): the InstallShield will try to detect all
+GNAT compilers available on your system. If only one target is found, then
 this target is automatically selected, and the script starts with the next
 step.
 If compilers for several targets are found, then the script will display a
@@ -1509,8 +1522,8 @@ s
 @end smallexample
 
 @noindent
-Once the GNAT compiler is selected, you will see a resume of the selected
-run-time for the current platform:
+Once the GNAT compiler is selected, you will see a summary of the selected
+run-times for the current platform:
 
 @smallexample
 * Selected Platform *
@@ -1526,7 +1539,7 @@ Enter Y for Yes, N or just <Enter> for No:
 
 Note that this script uses gprconfig for this step. This tool also shows
 other non-Ada compilers that may be present on your system. You can ignore
-them.
+them since they are not needed to build AUnit.
 
 @item 
 At this stage, the AUnit library starts compiling. Once the compilation is
@@ -1550,12 +1563,12 @@ Please enter AUnit base installation directory
 
 @end itemize
 
-After entering the information above, the install-shield will install
-aunit in the selected installation directory.
+After entering the information above, the InstallShield will install
+AUnit in the selected installation directory.
 
-Note that contrary to AUnit 2 installation procedures, the support for
-exception, memory, Ada.Calendar is automatically selected depending on the
-run-time used.
+Note that in contrast to the AUnit 2 installation procedures, support for
+exception handling, memory allocation and Ada.Calendar is automatically
+selected depending on the run-time used.
 
 @c ---------------------
 @section Installed files
@@ -1585,7 +1598,7 @@ procedures above):
 The GPS IDE has a menu @b{Edit -> Unit Testing} to
 generate template code for test cases, test suites and harnesses. The
 current templates are for AUnit 1.x, and AUnit 2.x. The next version of GPS
-will also include support for AUnit 3. In the mean time, you can use AUnit 1.x
-templates that require very minor changes to be adapted to AUnit 3.
+will also include support for AUnit 3. In the meantime, the AUnit 1.x
+templates require only very minor modification for use with AUnit 3.
 
 @bye
