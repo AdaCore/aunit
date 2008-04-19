@@ -42,7 +42,7 @@
 
 @title AUnit Cookbook
 @subtitle AUnit - version @value{VERSION}
-@subtitle Document revision level $Revision$
+@subtitle Configuration level $Revision$
 @subtitle Date: @today{}
 @author AdaCore
 
@@ -70,7 +70,7 @@ unmodified in any copy.
 <font size="+2">
 <p><font color="#33ff33">A</font><font color="#cc0000">U</font>nit Cookbook
 <p>AUnit - version @value{VERSION}
-<p>Document revision level $Revision$
+<p>Configuration level $Revision$
 <p>Date: @today{}
 <p>AdaCore
 </font>
@@ -313,11 +313,11 @@ different test case types available in AUnit.
 
 @noindent
 @code{AUnit.Simple_Test_Cases.Test_Case} is the root type of all test
- cases. Although generaly not meant to be used directly, it provides a
+ cases. Although generally not meant to be used directly, it provides a
  simple and quick way to run a test.
 
 This tagged type has several methods that need to be defined, or may be
-overriden.
+overridden.
 
 @itemize
 @item @code{function Name (T : Test_Case) return Message_String is abstract}:
@@ -363,14 +363,14 @@ source distribution aunit-@value{VERSION}-src/examples/simple_test/
 @code{Run_Test} procedure.
 
 It allows a very flexible composition of Test routines inside a single
-test case, each being reported independantely.
+test case, each being reported independently.
 
 The following subprograms must be considered for inheritance, overriding or
 completion:
 
 @itemize
 
-@item @code{function Name (T : Test_Case) return Messsage String is abstract;}
+@item @code{function Name (T : Test_Case) return Message_String is abstract;}
 Inherited. @xref{AUnit.Simple_Test_Cases}.
 
 @item @code{procedure Set_Up (T : in out Test_Case)} and @code{procedure
@@ -389,7 +389,7 @@ execution of each individual test routine.
 
 @item @code{procedure Register_Tests (T : in out Test_Case) is
 abstract}
-This procedure must be overriden. It is responsible for registering all
+This procedure must be overridden. It is responsible for registering all
 the test routines that will be run. You need to use either
 @code{Registration.Register_Routine} or the generic
 @code{Specific_Test_Case.Register_Wrapper} methods defined in
@@ -680,7 +680,7 @@ package body @b{My_Suite} is
    @b{Test_1 : aliased Test_Case_1.Test_Case;}
    @b{Test_2 : aliased Test_Case_2.Test_Case;}
 
-   function @b{Suite} return Acces_Test_Suite is
+   function @b{Suite} return Access_Test_Suite is
    begin
       Add_Test (@b{Result'Access, Test_Case_1'Access});
       Add_Test (@b{Result'Access, Test_Case_2'Access});
@@ -1050,7 +1050,7 @@ package @b{Branch.Tests} is
    procedure Set_Up (@b{C} : in out @b{Child_Test});
 
    --  Test routines:
-   --  Test_P2 is overriden
+   --  Test_P2 is overridden
    procedure @b{Test_P2} (@b{C} : in out @b{Child_Test});
    --  Test_P3 is new
    procedure @b{Test_P3} (@b{C} : in out @b{Child_Test});
@@ -1094,7 +1094,7 @@ package body @b{Branch_Suite} is
       --  against an object of type Child
       @b{Ret}.Add_Test 
         (@b{Caller}.Create (@b{"Test Child : P1"}, @b{Branch.Tests.Test_P1'Access}));
-      --  We use the overriden Test_P2
+      --  We use the overridden Test_P2
       @b{Ret}.Add_Test
         (@b{Caller}.Create (@b{"Test Child : P2"}, @b{Branch.Tests.Test_P2'Access}));
       --  We use the new Test_P2
@@ -1300,7 +1300,7 @@ test routines, along with the test routine specifications, must be defined
 in the package specification rather than in its body.
 
 Instances of @code{Template} will define automatically the Tests child
-package that can be directly instanciated as follow:
+package that can be directly instantiated as follow:
 
 @AEXP{with Template.Gen_Test;
 with Instance_Of_Template;
@@ -1350,7 +1350,7 @@ Normally the ZFP profile requires a user-defined
 to handle raised exceptions. However, AUnit now provides a mechanism to
 simulate exception propagation using gcc builtin setjmp/longjmp mechanism.
 This mechanism defines the @code{__gnat_last_chance_handler} routine, so it
-should not be redefined elswhere.
+should not be redefined elsewhere.
 
 @item
 AUnit requires @code{GNAT.IO} provided in @file{g-io.ad?} in the full or cert
@@ -1418,7 +1418,7 @@ To build AUnit for a full Ada run-time:
    $ make
 @end smallexample
 
-To build AUnit for a zfp run-time targetting powerpc-elf platform@footnote{
+To build AUnit for a zfp run-time targeting powerpc-elf platform@footnote{
 Note that cross platforms require gprbuild version 1.1 or later}:
 @smallexample
    $ cd aunit-@value{VERSION}-src
