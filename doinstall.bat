@@ -19,16 +19,6 @@ SET TOOL_PREFIX=
 
 REM ===== CONFIGURATION PHASE ===========
 
-REM Retrieving the GNAT compiler from registry
-SET GPRBUILDROOT=
-REG QUERY "HKLM\Software\Ada Core Technologies\GPRBUILD" /v ROOT > REGS.TXT | GOTO MISSINGGPRBUILD
-FOR /F "skip=2 tokens=1,3" %%A IN (REGS.TXT) DO (
-  if %%A == ROOT (
-    SET GPRBUILDROOT=%%B
-  )
-)
-DEL REGS.TXT
-
 CLS
 ECHO.
 ECHO.
@@ -37,18 +27,52 @@ ECHO **************************
 ECHO *** PREPARING TO SETUP ***
 ECHO **************************
 ECHO.
-:SELECT_GPRBUILD
 
-SET CHOICE=
-IF '!GPRBUILDROOT!' == '' (
-  ECHO Please specify the full path to gprbuild.exe:
-  SET /P CHOICE=
-  IF '!CHOICE!' == '' (
-    ECHO *** Error ! Please enter a valid path for gprbuild.exe
-    GOTO SELECT_GPRBUILD
+REM Retrieving gprbuild from default path
+
+CALL :FINDINPATH
+IF %ERRORLEVEL% == 0 (
+  FOR /F %%A IN (PATH.TXT) DO (
+    SET GPRBUILDROOT=%%A
+    DEL PATH.TXT
+    GOTO SELECT_TARGET
   )
-
 )
+DEL PATH.TXT
+
+REM Retrieving gprbuild from registry
+
+SET GPRBUILDROOT=
+REG QUERY "HKLM\Software\Ada Core Technologies\GPRBUILD" /v ROOT > REGS.TXT 2> NUL
+IF !ERRORLEVEL! == 0 (
+  FOR /F "skip=2 tokens=1,3" %%A IN (REGS.TXT) DO (
+    if %%A == ROOT (
+      SET GPRBUILDROOT=%%B
+      DEL REGS.TXT
+      GOTO SELECT_TARGET
+    )
+  )
+)
+
+:GPRBUILD_FROM_GNAT
+REM Retrieving gprbuild from installed gnat compiler
+
+IF '!GPRBUILDROOT!' == '' (
+  REG QUERY "HKLM\Software\Ada Core Technologies" /S > REGS.TXT 2> NUL
+  FOR /F "skip=9 tokens=1,3" %%A IN (REGS.TXT) DO (
+    IF %%A == ROOT (
+      DIR /B %%B\bin\gprbuild.exe > NUL 2> NUL
+      IF !ERRORLEVEL! == 0 (
+         SET GPRBUILDROOT=%%B
+         DEL REGS.TXT
+         GOTO SELECT_TARGET
+      )
+    )
+  )
+)
+
+DEL REGS.TXT
+IF '!GPRBUILDROOT!' == '' ( GOTO MISSINGGPRBUILD )
 
 :SELECT_TARGET
 SET /A I = 0
@@ -304,6 +328,33 @@ ECHO Press enter to close this window
 SET /P FINISH=
 
 GOTO END
+
+REM *********************
+REM * UTILITY FUNCTIONS *
+REM *********************
+
+:FINDINPATH
+SETLOCAL ENABLEEXTENSIONS
+SET INTPATH="%PATH:;=" "%"
+ECHO.> PATH.TXT
+CALL :SHIFTPATH %INTPATH%
+EXIT /B %ERRORLEVEL%
+
+:SHIFTPATH
+if "%~1" NEQ "" (
+  DIR %~1\gprbuild.exe > NUL 2> NUL
+  IF %ERRORLEVEL% == 0 (
+    ECHO %~1\..\ > PATH.TXT
+    EXIT /B 0
+  )
+  SHIFT
+  GOTO SHIFTPATH
+)
+EXIT /B 1
+
+REM ***************************
+REM * ERROR DISPLAY FUNCTIONS *
+REM ***************************
 
 :MISSINGGPRBUILD
 ECHO.
