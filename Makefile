@@ -78,11 +78,8 @@ install: install_clean all
 	-$(CHMOD) 444 $(I_DOC)/*
 	$(CHMOD) 444 $(I_PLG)/aunit.xml
 	$(CHMOD) 444 $(I_GPR)/aunit.gpr
-	find $(I_TPL) -type d -exec $(CHMOD) 555 {} \;
 	find $(I_TPL) -type f -exec $(CHMOD) 444 {} \;
-	find $(I_LIB) -type d -exec $(CHMOD) 555 {} \;
 	find $(I_LIB) -type f -exec $(CHMOD) 444 {} \;
-	find $(I_INC) -type d -exec $(CHMOD) 555 {} \;
 	find $(I_INC) -type f -exec $(CHMOD) 444 {} \;
 	@echo $(SRC_LIST)
 	@echo '------------------------------------------------------------------'
