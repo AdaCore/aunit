@@ -261,14 +261,7 @@ FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
     IF "!TARGET!" == "pentium-mingw32msv" (
       SET PLATFORM="native"
     ) ELSE (
-      ECHO !TARGET!>TMP.TXT
-      FINDSTR vxworksae TMP.TXT
-      IF %ERRORLEVEL% == 1 (
-        SET PLATFORM=!TARGET!
-      ) ELSE (
-        SET PLATFORM=vxworksae
-      )
-      DEL TMP.TXT
+      SET PLATFORM=!TARGET!
     )
 
     ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ^:ERROR>> RUN.BAT
