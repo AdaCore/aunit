@@ -1,4 +1,5 @@
 @ECHO OFF
+SETLOCAL
 
 REM === Test defered variable evaluation
 SET I=
@@ -8,7 +9,121 @@ IF NOT '%I%' == '' (
   GOTO END
 )
 
-SETLOCAL
+GOTO START
+
+REM *********************
+REM * UTILITY FUNCTIONS *
+REM *********************
+
+REM ==== FINDINPATH ==========================================================
+REM Walks through the PATH and searches for gprbuild.exe
+REM OUTPUT: PATH.TXT
+
+:FINDINPATH
+SETLOCAL ENABLEEXTENSIONS
+SET INTPATH="%PATH:;=" "%"
+ECHO.> PATH.TXT
+CALL :SHIFTPATH %INTPATH%
+EXIT /B %ERRORLEVEL%
+
+:SHIFTPATH
+if "%~1" NEQ "" (
+  DIR %~1\gprbuild.exe > NUL 2> NUL
+  IF %ERRORLEVEL% == 0 (
+    ECHO %~1\..\> PATH.TXT
+    EXIT /B 0
+  )
+  SHIFT
+  GOTO SHIFTPATH
+)
+EXIT /B 1
+
+REM ==== FINDINREGISTRY =======================================================
+REM Tries to retrieve gprbuild installation dir from GPRBUILD registry key
+REM OUTPUT: PATH.TXT
+
+:FINDINREGISTRY
+SET GPRBUILDROOT=
+ECHO.> PATH.TXT
+REG QUERY "HKLM\Software\Ada Core Technologies\GPRBUILD" /v ROOT > REGS.TXT 2> NUL
+IF !ERRORLEVEL! == 0 (
+  FOR /F "skip=2 tokens=1,3" %%A IN (REGS.TXT) DO (
+    if %%A == ROOT (
+      ECHO %%B> PATH.TXT
+      DEL REGS.TXT
+      EXIT /B 0
+    )
+  )
+)
+DEL REGS.TXT
+EXIT /B 1
+
+REM ==== FINDINGNATREGISTRY ===================================================
+REM Retrieving gprbuild from installed gnat compiler
+REM OUTPUT: PATH.TXT
+
+:FINDINGNATREGISTRY
+ECHO.> PATH.TXT
+REG QUERY "HKLM\Software\Ada Core Technologies" /S > REGS.TXT 2> NUL
+IF !ERRORLEVEL! == 0 (
+  FOR /F "skip=9 tokens=1,3" %%A IN (REGS.TXT) DO (
+    IF %%A == ROOT (
+      DIR /B %%B\bin\gprbuild.exe > NUL 2> NUL
+      IF !ERRORLEVEL! == 0 (
+        ECHO %%B> PATH.TXT
+        DEL REGS.TXT
+        EXIT /B 0
+      )
+    )
+  )
+)
+DEL REGS.TXT
+EXIT /B 1
+
+REM ==== FINDRTS =============================================================
+REM Uses gprconfig to retrieve all possible runtimes of a specific target
+REM OUTPUT: RTS.TXT
+
+:FINDRTS
+"%GPRBUILDROOT%\bin\gprconfig" --target=%TARGET% --config=Ada,* --config=C > OUTPUT.TXT < NUL
+ECHO.>RTS.TXT
+FOR /F "delims=^( skip=3 tokens=2,3" %%A IN (OUTPUT.TXT) DO (
+  SET /A OK=0
+  FOR /F "tokens=4" %%C IN ('ECHO %%A') DO (
+    IF "%%C" == "Ada" ( SET /A OK=1 )
+  )
+  IF !OK! == 1 (
+    FOR /F %%C IN ('ECHO %%B') DO (
+      SET RTS=%%C
+      IF "%%C" == "sjlj" ( SET RTS=full )
+      IF "%%C" == "zcx" ( SET RTS=full )
+      IF "%%C" == "default" ( SET RTS=full )
+      ECHO !RTS!>> RTS.TXT
+    )
+  )
+)
+DEL OUTPUT.TXT
+SORT RTS.TXT > RTS2.TXT
+SET PREV=
+ECHO.>RTS.TXT
+FOR /F %%A IN (RTS2.TXT) DO (
+  IF "!PREV!" NEQ "%%A" (
+    ECHO %%A >> RTS.TXT
+    SET PREV=%%A
+  )
+)
+DEL RTS2.TXT
+EXIT /B 1
+
+REM ***************************************************************************
+REM ***************************************************************************
+REM ****                                                                   ****
+REM ****                    START THE SCRIPT                               ****
+REM ****                                                                   ****
+REM ***************************************************************************
+REM ***************************************************************************
+
+:START
 
 REM === reset of the used variables
 SET GPRBUILDROOT=
@@ -17,7 +132,7 @@ SET INSTALL=
 SET RUNTIME=
 SET TOOL_PREFIX=
 
-REM ===== CONFIGURATION PHASE ===========
+REM ===== CONFIGURATION PHASE ================================================
 
 CLS
 ECHO.
@@ -28,60 +143,36 @@ ECHO *** PREPARING TO SETUP ***
 ECHO **************************
 ECHO.
 
-REM Retrieving gprbuild from default path
+REM Retrieving gprbuild path
 
 CALL :FINDINPATH
+IF %ERRORLEVEL% == 1 (
+  CALL :FINDINREGISTRY
+  IF %ERRORLEVEL% == 1 (
+    CALL :FINDINGNATREGISTRY
+  )
+)
 IF %ERRORLEVEL% == 0 (
-  FOR /F %%A IN (PATH.TXT) DO (
+  FOR /F "delims=;" %%A IN (PATH.TXT) DO (
     SET GPRBUILDROOT=%%A
-    DEL PATH.TXT
-    GOTO SELECT_TARGET
   )
 )
 DEL PATH.TXT
 
-REM Retrieving gprbuild from registry
-
-SET GPRBUILDROOT=
-REG QUERY "HKLM\Software\Ada Core Technologies\GPRBUILD" /v ROOT > REGS.TXT 2> NUL
-IF !ERRORLEVEL! == 0 (
-  FOR /F "skip=2 tokens=1,3" %%A IN (REGS.TXT) DO (
-    if %%A == ROOT (
-      SET GPRBUILDROOT=%%B
-      DEL REGS.TXT
-      GOTO SELECT_TARGET
-    )
-  )
-)
-
-:GPRBUILD_FROM_GNAT
-REM Retrieving gprbuild from installed gnat compiler
-
-IF '!GPRBUILDROOT!' == '' (
-  REG QUERY "HKLM\Software\Ada Core Technologies" /S > REGS.TXT 2> NUL
-  FOR /F "skip=9 tokens=1,3" %%A IN (REGS.TXT) DO (
-    IF %%A == ROOT (
-      DIR /B %%B\bin\gprbuild.exe > NUL 2> NUL
-      IF !ERRORLEVEL! == 0 (
-         SET GPRBUILDROOT=%%B
-         DEL REGS.TXT
-         GOTO SELECT_TARGET
-      )
-    )
-  )
-)
-
-DEL REGS.TXT
 IF '!GPRBUILDROOT!' == '' ( GOTO MISSINGGPRBUILD )
 
 :SELECT_TARGET
 SET /A I = 0
-SET TARGETS=
 ECHO.>TARGETSCHOICE.TXT
-for /F "skip=1" %%A IN ('%GPRBUILDROOT%\bin\gprconfig --show-targets') DO (
-  ECHO %%A >> TARGETSCHOICE.TXT
-  SET /A I=!I!+1
-  SET LAST_TARGET=%%A
+FOR /F "skip=1" %%A IN ('"!GPRBUILDROOT!\bin\gprconfig" --show-targets') DO (
+  SET TARGET=%%A
+  CALL :FINDRTS
+  FOR /F %%B IN (RTS.TXT) DO (
+    SET LAST_TARGET=%%A ^(%%B^)
+    ECHO !LAST_TARGET!>> TARGETSCHOICE.TXT
+    SET /A I=!I!+1
+  )
+  DEL RTS.TXT
 )
 
 IF "!I!" EQU "1" (
@@ -94,9 +185,9 @@ IF "!I!" EQU "1" (
   SET OPTIONS=
   CLS
   ECHO *** Select the targets you want AUnit to be compiled for.
-  FOR /F %%A IN (TARGETSCHOICE.TXT) DO (
+  FOR /F "delims=;" %%A IN (TARGETSCHOICE.TXT) DO (
     SET FOUND=0
-    FOR /F %%B IN (TARGETS.TXT) DO (
+    FOR /F "delims=;" %%B IN (TARGETS.TXT) DO (
       IF '%%A' == '%%B' (
         SET FOUND=1
       )
@@ -124,10 +215,10 @@ IF "!I!" EQU "1" (
     )
   )
   SET /A J=0
-  FOR /F %%A IN (TARGETSCHOICE.TXT) DO (
+  FOR /F "delims=;" %%A IN (TARGETSCHOICE.TXT) DO (
     SET /A J=!J!+1
     SET FOUND=0
-    FOR /F %%B IN (TARGETS.TXT) DO (
+    FOR /F "delims=;" %%B IN (TARGETS.TXT) DO (
       IF '%%A' == '%%B' (
         SET FOUND=1
       )
@@ -135,7 +226,7 @@ IF "!I!" EQU "1" (
     IF "!FOUND!" EQU "0" (
       IF '!J!' == '!CHOICE!' (
         SET /A I=!I!-1
-        ECHO %%A >> TARGETS.TXT
+        ECHO %%A>> TARGETS.TXT
         SET ONESELECTED=1
       )
     )
@@ -144,14 +235,44 @@ IF "!I!" EQU "1" (
     GOTO SELECT_TARGETS
   )
 )
-DEL TARGETSCHOICE.TXT
 
 :END_SELECT_TARGETS
+DEL TARGETSCHOICE.TXT
+
+CLS
+ECHO.
+ECHO.
+ECHO.
+ECHO ****************************
+ECHO *** PREPARING TO COMPILE ***
+ECHO ****************************
+ECHO.
 
 ECHO ECHO OFF>                   RUN.BAT
 
-FOR /F %%A IN (TARGETS.TXT) DO (
-  CALL :SELECT_RUNTIME %%A RUN.BAT
+FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
+  FOR /F "delims=^(^) tokens=1,2" %%B IN ('ECHO %%A') DO (
+    SET TARGET=%%~nxB
+    SET RTS=%%C
+    DEL !TARGET!-!RTS!.cgpr
+    IF !RTS! == full (SET RUNTIME=) ELSE (SET RUNTIME=!RTS!)
+    "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C -o !TARGET!-!RTS!.cgpr 1> NUL 2> NUL || GOTO :ERROR
+
+    IF "!TARGET!" == "pentium-mingw32msv" (
+      SET PLATFORM="native"
+    ) ELSE (
+      ECHO !TARGET!>TMP.TXT
+      FINDSTR vxworksae TMP.TXT
+      IF %ERRORLEVEL% == 1 (
+        SET PLATFORM=!TARGET!
+      ) ELSE (
+        SET PLATFORM=vxworksae
+      )
+      DEL TMP.TXT
+    )
+
+    ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ^:ERROR>> RUN.BAT
+  )
 )
 DEL TARGETS.TXT
 
@@ -159,103 +280,22 @@ ECHO GOTO END>>                  RUN.BAT
 ECHO ^:ERROR>>                   RUN.BAT
 ECHO ECHO *** BUILD FAILED ***>> RUN.BAT
 ECHo ECHO.>>                     RUN.BAT
-ECHO EXIT /B 1>>                 RUN.BAT
+ECHO EXIT /B 1 >>                RUN.BAT
 ECHO ^:END>>                     RUN.BAT
 
-GOTO END_SELECT_RUNTIME
-
-:SELECT_RUNTIME
-  SET TARGET=%1
-  SET SCRIPT=%2
-  ECHO.>OPTS.TXT
-:START_SELECT_RUNTIME
-  CLS
-  ECHO * Selected Platform^:
-  ECHO !TARGET!
-  ECHO.
-  ECHO * Runtime^(s^)^:
-  TYPE OPTS.TXT
-  ECHO.
-  ECHO Please select the compiler you want to use for this platform:
-  ECHO.
-  %GPRBUILDROOT%\bin\gprconfig --target=!TARGET! --config=Ada,* --config=C -o !TARGET!.cgpr || GOTO ERROR
-  ECHO.>RTS.TXT
-  FOR /F "tokens=1,4" %%B IN (!TARGET!.cgpr) DO (
-    IF "%%B" == "Binder'Required_Switches" (
-      ECHO %%C>>RTS.TXT
-    )
-  )
-  FINDSTR RTS= RTS.TXT>RTSOPT.TXT || ECHO ^(^"--RTS=full^"^)^;>RTSOPT.TXT
-  DEL RTS.TXT
-  for /F "delims=^)" %%B in (RTSOPT.TXT) DO (SET OPT=%%B)
-  SET RUNTIME=!OPT:~8,-1!
-  ECHO !RUNTIME!>>OPTS.TXT
-  DEL RTSOPT.TXT
-  RENAME !TARGET!.cgpr !TARGET!-!RUNTIME!.cgpr
-  IF "!TARGET!" == "pentium-mingw32msv" (
-    SET PLATFORM="native"
-  ) ELSE (
-    ECHO !TARGET!>TMP.TXT
-    FINDSTR vxworksae TMP.TXT
-    DEL TMP.TXT
-    IF %ERRORLEVEL% == 1 (
-      SET PLATFORM=!TARGET!
-    ) ELSE (
-      SET PLATFORM=vxworksae
-    )
-  )
-  ECHO %GPRBUILDROOT%\bin\gprbuild --config=!TARGET!-!RUNTIME!.cgpr -XRUNTIME=!RUNTIME! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ERROR >> !SCRIPT!
-  CLS
-  ECHO * Selected Platform *
-  ECHO !TARGET!
-  ECHO.
-  ECHO * Runtime^(s^)      *
-  TYPE OPTS.TXT
-  ECHO.
-  ECHO Do you want to add another runtime for this platform ?
-:ANOTHER_RUNTIME_QUESTION
-  SET CHOICE=
-  SET /P CHOICE=Enter Y for Yes, N or just ^<Enter^> for No^:
-  ECHO !CHOICE!
-
-  IF "!CHOICE!" EQU "Y" (
-    GOTO START_SELECT_RUNTIME
- ) ELSE (
-    IF "!CHOICE!" EQU "y" (
-      GOTO START_SELECT_RUNTIME
-    )
-  )
-
-  IF "!CHOICE!" EQU "N" (
-    GOTO END_ANOTHER_RUNTIME_QUESTION )
-  ) ELSE (
-    IF "!CHOICE!" EQU "n" (
-      GOTO END_ANOTHER_RUNTIME_QUESTION
-    ) ELSE (
-      IF "!CHOICE!" EQU "" (
-        GOTO END_ANOTHER_RUNTIME_QUESTION
-      )
-    )
-  )
-
-  GOTO ANOTHER_RUNTIME_QUESTION
-
-:END_ANOTHER_RUNTIME_QUESTION
-  DEL OPTS.TXT
-  EXIT /B
-
-:END_SELECT_RUNTIME
-
-CLS
 ECHO.
 ECHO *** NOW COMPILING AUNIT ***
 ECHO.
 CALL RUN.BAT || GOTO ERROR
 DEL RUN.BAT
-CLS
+IF !ERRORLEVEL! == 1 (
+  GOTO ERROR
+)
 ECHO.
 ECHO *** AUNIT COMPILED SUCCESSFULLY ***
 ECHO.
+SET /P TOTO=
+CLS
 ECHO Please enter AUnit base installation directory
 ECHO ** Press enter for installing in '%GPRBUILDROOT%':
 SET /P INSTALL=
@@ -328,29 +368,6 @@ ECHO Press enter to close this window
 SET /P FINISH=
 
 GOTO END
-
-REM *********************
-REM * UTILITY FUNCTIONS *
-REM *********************
-
-:FINDINPATH
-SETLOCAL ENABLEEXTENSIONS
-SET INTPATH="%PATH:;=" "%"
-ECHO.> PATH.TXT
-CALL :SHIFTPATH %INTPATH%
-EXIT /B %ERRORLEVEL%
-
-:SHIFTPATH
-if "%~1" NEQ "" (
-  DIR %~1\gprbuild.exe > NUL 2> NUL
-  IF %ERRORLEVEL% == 0 (
-    ECHO %~1\..\ > PATH.TXT
-    EXIT /B 0
-  )
-  SHIFT
-  GOTO SHIFTPATH
-)
-EXIT /B 1
 
 REM ***************************
 REM * ERROR DISPLAY FUNCTIONS *
