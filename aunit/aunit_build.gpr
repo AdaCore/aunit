@@ -61,12 +61,6 @@ project AUnit_Build is
       for Default_Switches ("ada") use
         ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty",
          "-gnat05");
-      case Runtime is
-         when "zfp" =>
-            for Default_Switches ("ada") use Compiler'Default_Switches ("ada") &
-            "-gnatec=../../zfp.adc";
-         when others =>
-      end case;
    end Compiler;
 
    package IDE is
