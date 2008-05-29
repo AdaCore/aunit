@@ -1,7 +1,8 @@
 project AUnit_Build is
 
    type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
-   type Target_Type is ("native", "powerpc-elf", "vxworksae", "erc32-elf", "leon-elf");
+   type Target_Type is ("native", "powerpc-elf", "powerpc-wrs-vxworksae",
+                         "x86-wrs-vxworksae", "erc32-elf", "leon-elf");
 
    Runtime : Runtime_Type := external ("RUNTIME", "full");
    Target  : Target_Type  := external ("PLATFORM", "native");
@@ -28,7 +29,7 @@ project AUnit_Build is
          for Source_Dirs use project'Source_Dirs &
                              "framework/nocalendar" & "framework/staticmemory";
 
-      when "vxworksae" =>
+      when "powerpc-wrs-vxworksae" | "x86-wrs-vxworksae" =>
             case Runtime is
                when "full" | "cert" =>
                   for Source_Dirs use project'Source_Dirs &
