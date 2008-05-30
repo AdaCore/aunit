@@ -31,7 +31,7 @@ project AUnit is
                             "../../include/aunit/framework/nocalendar" &
                             "../../include/aunit/framework/staticmemory";
      
-      when  => "powerpc-wrs-vxworksae" | "i586-wrs-vxworksae" =>
+      when "powerpc-wrs-vxworksae" | "i586-wrs-vxworksae" =>
             case Runtime is
                when "full" | "cert" =>
                   for Source_Dirs use project'Source_Dirs &
