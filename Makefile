@@ -20,11 +20,7 @@ ifeq ($(TARGET),)
    TARGET_ARG = -XPLATFORM=native
 else
    TARGET_CONF = --target=$(TARGET)
-ifneq ($(filter %-wrs-vxworksae,$(TARGET)),)
-   TARGET_ARG = -XPLATFORM=vxworksae
-else
    TARGET_ARG = -XPLATFORM=$(TARGET)
-endif
 endif
 
 GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
