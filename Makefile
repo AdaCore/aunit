@@ -45,7 +45,6 @@ all:
 clean:
 	$(RM) -fr aunit/obj
 	$(RM) -fr aunit/lib
-	$(RM) -f $(I_GPR)/aunit.gpr
 	-${MAKE} -C docs clean
 
 install_clean:
