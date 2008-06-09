@@ -27,10 +27,10 @@ CALL :SHIFTPATH %INTPATH%
 EXIT /B %ERRORLEVEL%
 
 :SHIFTPATH
-if "%~1" NEQ "" (
-  DIR %~1\gprbuild.exe > NUL 2> NUL
-  IF %ERRORLEVEL% == 0 (
-    ECHO %~1\..\> PATH.TXT
+IF "%~1" NEQ "" (
+  DIR "%~1\gprbuild.exe" > NUL 2> NUL
+  IF !ERRORLEVEL! == 0 (
+    ECHO %~1\..> PATH.TXT
     EXIT /B 0
   )
   SHIFT
@@ -43,10 +43,10 @@ REM Tries to retrieve gprbuild installation dir from GPRBUILD registry key
 REM OUTPUT: PATH.TXT
 
 :FINDINREGISTRY
-SET GPRBUILDROOT=
 ECHO.> PATH.TXT
 REG QUERY "HKLM\Software\Ada Core Technologies\GPRBUILD" /v ROOT > REGS.TXT 2> NUL
 IF !ERRORLEVEL! == 0 (
+  ECHO FOUND IN REGISTRY
   FOR /F "skip=2 tokens=1,3" %%A IN (REGS.TXT) DO (
     if %%A == ROOT (
       ECHO %%B> PATH.TXT
@@ -64,16 +64,15 @@ REM OUTPUT: PATH.TXT
 
 :FINDINGNATREGISTRY
 ECHO.> PATH.TXT
-REG QUERY "HKLM\Software\Ada Core Technologies" /S > REGS.TXT 2> NUL
-IF !ERRORLEVEL! == 0 (
-  FOR /F "skip=9 tokens=1,3" %%A IN (REGS.TXT) DO (
-    IF %%A == ROOT (
-      DIR /B %%B\bin\gprbuild.exe > NUL 2> NUL
-      IF !ERRORLEVEL! == 0 (
-        ECHO %%B> PATH.TXT
-        DEL REGS.TXT
-        EXIT /B 0
-      )
+REG QUERY "HKLM\Software\Ada Core Technologies" /S > REGS.TXT
+
+FOR /F "skip=9 tokens=1,3" %%A IN (REGS.TXT) DO (
+  IF "%%A" == "ROOT" (
+    DIR "%%B\bin\gprbuild.exe" > NUL 2> NUL
+    IF !ERRORLEVEL! == 0 (
+      ECHO %%B> PATH.TXT
+      DEL REGS.TXT
+      EXIT /B 0
     )
   )
 )
@@ -248,7 +247,7 @@ ECHO *** PREPARING TO COMPILE ***
 ECHO ****************************
 ECHO.
 
-ECHO ECHO OFF>                   RUN.BAT
+ECHO.>                   RUN.BAT
 
 FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
   FOR /F "delims=^(^) tokens=1,2" %%B IN ('ECHO %%A') DO (
@@ -256,7 +255,7 @@ FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
     SET RTS=%%C
     DEL !TARGET!-!RTS!.cgpr
     IF !RTS! == full (SET RUNTIME=) ELSE (SET RUNTIME=!RTS!)
-    "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C -o !TARGET!-!RTS!.cgpr 1> NUL 2> NUL || GOTO :ERROR
+    "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C -o !TARGET!-!RTS!.cgpr 1> NUL 2> NUL || GOTO ERROR
 
     IF "!TARGET!" == "pentium-mingw32msv" (
       SET PLATFORM="native"
@@ -264,7 +263,8 @@ FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
       SET PLATFORM=!TARGET!
     )
 
-    ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ^:ERROR>> RUN.BAT
+    ECHO ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr>> RUN.BAT
+    ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ERROR>> RUN.BAT
   )
 )
 DEL TARGETS.TXT
@@ -272,7 +272,7 @@ DEL TARGETS.TXT
 ECHO GOTO END>>                  RUN.BAT
 ECHO ^:ERROR>>                   RUN.BAT
 ECHO ECHO *** BUILD FAILED ***>> RUN.BAT
-ECHo ECHO.>>                     RUN.BAT
+ECHO ECHO.>>                     RUN.BAT
 ECHO EXIT /B 1 >>                RUN.BAT
 ECHO ^:END>>                     RUN.BAT
 
@@ -287,6 +287,7 @@ IF !ERRORLEVEL! == 1 (
 ECHO.
 ECHO *** AUNIT COMPILED SUCCESSFULLY ***
 ECHO.
+ECHO Type ^<Enter^> to continue
 SET /P TOTO=
 CLS
 ECHO Please enter AUnit base installation directory
@@ -309,11 +310,17 @@ ECHO.
 
 ECHO.
 ECHO uninstalling previous AUnit library in %INSTALL% if needed
+ATTRIB -R "%I_GPR%\aunit.gpr" 2> NUL
 DEL /Q "%I_GPR%\aunit.gpr" 2> NUL
-DEL /Q "%I_TPL%\*.ad*" 2> NUL
+ATTRIB -R "%I_TPL%" 2> NUL
 RMDIR /Q/S "%I_TPL%" 2> NUL
+ATTRIB -R "%I_DOC%\*.*" 2> NUL
 DEL /Q "%I_DOC%\*.*" 2> NUL
+ATTRIB -R "%I_PLG%\aunit.xml" 2> NUL
+DEL /Q "%I_PLG%\aunit.xml"
+ATTRIB -R "%I_INC%" 2> NUL
 RMDIR /Q/S "%I_INC%" 2> NUL
+ATTRIB -R "%I_LIB%" 2> NUL
 RMDIR /Q/S "%I_LIB%" 2> NUL
 
 MKDIR "%I_DOC%" 2> NUL
@@ -325,32 +332,32 @@ MKDIR "%I_INC%" 2> NUL
 
 ECHO.
 ECHO copying examples in %I_TPL%
-XCOPY /S/Q /EXCLUDE:support\exclude.txt examples "%I_TPL%" > NUL
+XCOPY /S/Q /EXCLUDE:support\exclude.txt examples "%I_TPL%" > NUL || GOTO ERROR
 ECHO.
 ECHO copying documentation in %I_DOC%
-COPY docs\*.html "%I_DOC%" > NUL 2> NUL
-COPY docs\*.pdf "%I_DOC%" > NUL 2> NUL
-COPY docs\*.txt "%I_DOC%" > NUL 2> NUL
+COPY docs\*.html "%I_DOC%" > NUL || GOTO ERROR
+COPY docs\*.pdf "%I_DOC%" > NUL || GOTO ERROR
+COPY docs\*.txt "%I_DOC%" > NUL || GOTO ERROR
 ECHO.
 ECHO copying GPS plug-in in %I_PLG%
-COPY support\aunit.xml "%I_PLG%" > NUL
+COPY support\aunit.xml "%I_PLG%" > NUL || GOTO ERROR
 
 ECHO.
 ECHO copying aunit.gpr in %I_GPR%
-COPY support\aunit.gpr "%I_GPR%" > NUL
+COPY support\aunit.gpr "%I_GPR%" > NUL || GOTO ERROR
 
 ECHO.
 ECHO copying AUnit source files in %I_INC%
-MKDIR "%I_INC%\framework" 2> NUL
-MKDIR "%I_INC%\reporters" 2> NUL
-MKDIR "%I_INC%\containers" 2> NUL
-XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\framework "%I_INC%\framework"   > NUL
-XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\reporters "%I_INC%\reporters"   > NUL
-XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\containers "%I_INC%\containers" > NUL
+MKDIR "%I_INC%\framework"
+MKDIR "%I_INC%\reporters"
+MKDIR "%I_INC%\containers"
+XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\framework "%I_INC%\framework"   > NUL || GOTO ERROR
+XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\reporters "%I_INC%\reporters"   > NUL || GOTO ERROR
+XCOPY /S/Q /EXCLUDE:support\exclude.txt aunit\containers "%I_INC%\containers" > NUL || GOTO ERROR
 
 ECHO.
 ECHO copying AUnit lib files in %I_LIB%
-XCOPY /S/Q aunit\lib\*.* "%I_LIB%" > NUL
+XCOPY /S/Q aunit\lib\*.* "%I_LIB%" > NUL || GOTO ERROR
 
 ECHO.
 ECHO *******************************************
