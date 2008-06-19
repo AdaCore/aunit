@@ -63,14 +63,14 @@ package AUnit.Test_Cases is
       --  Add test routine to test case
 
       function Routine_Count (Test : Test_Case'Class) return Count_Type;
-         --  Count of registered routines in test case
+      --  Count of registered routines in test case
 
    end Registration;
 
    generic
       type Specific_Test_Case is abstract new Test_Case with private;
    package Specific_Test_Case_Registration is
-         --  Specific Test Case registration
+      --  Specific Test Case registration
 
       type Specific_Test_Routine is access procedure
         (Test : in out Specific_Test_Case'Class);
@@ -82,15 +82,16 @@ package AUnit.Test_Cases is
       --  Add test routine for a specific test case
    end Specific_Test_Case_Registration;
 
-   procedure Run (Test    : access Test_Case;
-                  R       : Result_Access;
-                  Outcome : out Status);
+   procedure Run
+     (Test    : access Test_Case;
+      R       : Result_Access;
+      Outcome : out Status);
    --  Run test case. Do not override.
 
    procedure Run_Test (Test : in out Test_Case);
    --  Perform the current test procedure. Do not override.
 
-   function Routine_Name (Test : Test_Case)return Message_String;
+   function Routine_Name (Test : Test_Case) return Message_String;
    --  Routine name. Returns the routine under test. Do not override.
 
 private

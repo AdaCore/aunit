@@ -52,12 +52,14 @@ package body AUnit.Test_Cases is
    -- Run --
    ---------
 
-   procedure Run (Test : access Test_Case;
-                  R    : Result_Access;
-                  Outcome : out Status) is
+   procedure Run
+     (Test    : access Test_Case;
+      R       : Result_Access;
+      Outcome : out Status)
+   is
       use Routine_Lists;
       Result : Status;
-      C : Cursor;
+      C      : Cursor;
    begin
       Outcome := Success;
       Routine_Lists.Clear (Test.Routines);
@@ -70,9 +72,11 @@ package body AUnit.Test_Cases is
          Test.Routine := Element (C);
          AUnit.Simple_Test_Cases.Run
            (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access, R, Result);
+
          if Result = Failure then
             Outcome := Failure;
          end if;
+
          Next (C);
       end loop;
 
@@ -118,11 +122,10 @@ package body AUnit.Test_Cases is
       procedure Register_Wrapper
         (Test    : in out Specific_Test_Case'Class;
          Routine : Specific_Test_Routine;
-         Name    : String) is
-
+         Name    : String)
+      is
          function Conv is
             new Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
-
       begin
          Registration.Register_Routine
            (Test_Case'Class (Test),
