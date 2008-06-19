@@ -30,7 +30,7 @@ package AUnit.Assertions is
 
    Assertion_Error : exception;
    --  For run-time libraries that support exception handling, raised when an
-   --  assertion fails in order to abandon execution of a test routine
+   --  assertion fails in order to abandon execution of a test routine.
 
    procedure Assert
      (Condition : Boolean;
@@ -48,7 +48,7 @@ package AUnit.Assertions is
       Message   : String;
       Source    : String := GNAT.Source_Info.File;
       Line      : Natural := GNAT.Source_Info.Line) return Boolean;
-   --  Functional version to allow calling routine to decide whether to
-   --  continue or abandon execution
+   --  Functional version to allow the calling routine to decide whether to
+   --  continue or abandon the execution.
 
 end AUnit.Assertions;
