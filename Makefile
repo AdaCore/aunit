@@ -5,7 +5,7 @@ GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 
 # INSTALL	= @prefix@
-INSTALL = $(shell which $(GPRBUILD) | sed -e 's/\/bin\/.*//')
+INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/(\/bin\/)?gprbuild.*//')
 
 ifeq ($(RTS),)
    RTS_CONF =
@@ -34,6 +34,8 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
+.PHONY: all clean install_clean install
+
 all:
 	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch -o gprconf.cgpr
 	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
@@ -44,6 +46,10 @@ clean:
 	-${MAKE} -C docs clean
 
 install_clean:
+ifeq ($(INSTALL),)
+	@echo 'Error when installing: $$INSTALL is empty...'
+	@echo "Please set an installation path before installing !"
+else
 	-$(CHMOD) -R 777 $(I_DOC)
 	$(RM) -fr $(I_DOC)
 	-$(CHMOD) -R 777 $(I_TPL)
@@ -54,8 +60,10 @@ install_clean:
 	-$(CHMOD) -R 777 $(I_INC)
 	$(RM) -fr $(I_INC)
 	$(RM) -f $(I_GPR)/aunit.gpr
+endif
 
-install: install_clean all
+install: all install_clean
+ifneq ($(INSTALL),)
 	$(MKDIR) $(I_DOC)
 	$(MKDIR) $(I_TPL)
 	$(MKDIR) $(I_PLG)
@@ -83,6 +91,7 @@ install: install_clean all
 	@echo '--  ADA_PROJECT_PATH or GPR_PROJECT_PATH to point to the path'
 	@echo '--  $(I_GPR)'
 	@echo '------------------------------------------------------------------'
+endif
 
 doc:
 	${MAKE} -C docs
