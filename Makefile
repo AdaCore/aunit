@@ -5,7 +5,7 @@ GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 
 # INSTALL	= @prefix@
-INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/(\/bin\/)?gprbuild.*//')
+INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//')
 
 ifeq ($(RTS),)
    RTS_CONF =
