@@ -253,7 +253,7 @@ FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
   FOR /F "delims=^(^) tokens=1,2" %%B IN ('ECHO %%A') DO (
     SET TARGET=%%~nxB
     SET RTS=%%C
-    DEL !TARGET!-!RTS!.cgpr
+    DEL !TARGET!-!RTS!.cgpr 1> NUL 2> NUL
     IF !RTS! == full (SET RUNTIME=) ELSE (SET RUNTIME=!RTS!)
     "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C -o !TARGET!-!RTS!.cgpr 1> NUL 2> NUL || GOTO ERROR
 
