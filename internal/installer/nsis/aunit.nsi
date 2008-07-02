@@ -45,7 +45,7 @@ VIAddVersionKey  "ProductName" "${APPNAME}"
 VIAddVersionKey  "Comments" ""
 VIAddVersionKey  "CompanyName" "AdaCore"
 VIAddVersionKey  "FileDescription" "${APPNAMEANDVERSION} Installer"
-VIAddVersionKey  "FileVersion" "1.0.0.0"
+VIAddVersionKey  "FileVersion" "${PVERSION}"
 VIAddVersionKey  "LegalCopyright" "Copyright ©AdaCore"
 VIProductVersion "${PVERSION}"
 
@@ -55,9 +55,9 @@ VIProductVersion "${PVERSION}"
 !insertmacro Locate
 !insertmacro un.Locate
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
-!define MUI_PAGE_CUSTOMFUNCTION_PRE onComponents
-  !insertmacro MUI_PAGE_COMPONENTS
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE onLicenseLeave
+  !insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -88,7 +88,6 @@ Var NUM ;the target section
 Var MAX ;max target section
 Var FNUM ;field number as returnrd by .ini file
 Var GPRBUILDROOT ;root directory of gprbuild
-!define BASESECNUM 2 ;first target section
 
 Function CopyCb
    StrCpy $1 $R8 '' $R2
@@ -107,15 +106,20 @@ FunctionEnd
 ;--------------------------------
 ;Installer Sections
 
-Section "AUnit Sources" SecSrc
-  SectionIn RO
-
-  SetOutPath "$INSTDIR\src\aunit"
-  File /r /x .svn /x internal "${PRJ}*.*"
-SectionEnd
-
 SectionGroup /e "Compiled library" SecGrp
-Section "-"
+Section "-" BaseSecNum
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
 SectionEnd
 Section /o "-"
 SectionEnd
@@ -167,9 +171,8 @@ Section /o "-"
 SectionEnd
 SectionGroupEnd
 
-Section "-Real binary installation procedure"
-
-  StrCpy $NUM "${BASESECNUM}"
+Section "-installbin"
+  StrCpy $NUM "${BaseSecNum}"
   StrCpy $FNUM "1"
 
   compilesections:
@@ -181,8 +184,7 @@ Section "-Real binary installation procedure"
   SectionGetFlags $NUM $R1
   IntOp $R1 $R1 & ${SF_SELECTED}
 
-  StrCmp "0" $R1 +2
-  Goto compile
+  StrCmp "0" $R1 0 compile
   Goto continuecompile
 
   compile:
@@ -192,15 +194,13 @@ Section "-Real binary installation procedure"
   ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XRUNTIME"
   ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XPLATFORM"
 
-  nsExec::ExecToLog /OEM '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o config.cgpr'
+  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o config.cgpr'
   Pop $0
-  StrCmp "0" $0 +2
-  Goto abortcompile
+  StrCmp $0 "0" 0 abortcompile
 
-  nsExec::ExecToLog /OEM '"$GPRBUILDROOT\bin\gprbuild" --config=config.cgpr -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5'
+  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" --config=config.cgpr -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5'
   Pop $0
-  StrCmp "0" $0 +2
-  Goto abortcompile
+  StrCmp $0 "0" 0 abortcompile
 
   continuecompile:
 
@@ -221,7 +221,6 @@ Section "-Real binary installation procedure"
   SetOutPath "$INSTDIR\lib\aunit"
   StrCpy $R0 "$PLUGINSDIR\aunit\lib"
   StrCpy $R1 "$INSTDIR\lib\aunit"
-  StrLen $R2 $R0
   ${Locate} "$R0" "/L=FDE" "CopyCb"
   Rename "$PLUGINSDIR\aunit\lib\*.*" "$INSTDIR\lib\aunit"
 
@@ -252,31 +251,51 @@ Section "Examples" SecExamples
   File /r /x .svn "${PRJ}examples\*.*"
 SectionEnd
 
-Function onComponents
+Section /o "Sources" SecSrc
+  SetOutPath "$INSTDIR\src\aunit"
+  File /r /x .svn /x internal "${PRJ}*.*"
+SectionEnd
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} "The AUnit documentation"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} "A set of AUnit examples"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecSrc} "The AUnit source package"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecGrp} "The AUnit library"
+  !verbose push
+  ${elseif} $0 >= ${BaseSecNum}
+    IntOp $NUM $0 - ${BaseSecNum}
+    IntOp $NUM $NUM + 1
+    ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Target"
+    ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Version"
+    ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Runtime"
+    ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Path"
+    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:"
+    EnableWindow $mui.ComponentsPage.DescriptionText 1
+    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT for $R1 version $R2 - runtime: $R3 - found in $R4"
+  !verbose pop
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+Function onLicenseLeave
+  !verbose push
+
   Banner::show /NOUNLOAD "Analyzing installed software"
-  Banner::getWindow /NOUNLOAD
-  Pop $1
 
   nsExec::Exec '"$PLUGINSDIR\setup_utility.exe"'
   Pop $0
-  StrCmp "0" $0 +2
-  Goto abortinstall
+  StrCmp "0" $0 0 abortinstall
 
   Banner::Destroy
-  InstallOptions::initDialog /NOUNLOAD "$PLUGINSDIR\aunit.ini"
 
   ReadINIStr $GPRBUILDROOT "$PLUGINSDIR\aunit.ini" "Settings" "Install"
   StrCpy $INSTDIR $GPRBUILDROOT
   ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Settings" "NumFields"
   StrCpy $MAX $0
-  IntOp $MAX $MAX + ${BASESECNUM}
-  StrCpy $NUM "${BASESECNUM}"
+  IntOp $MAX $MAX + ${BaseSecNum}
+  StrCpy $NUM "${BaseSecNum}"
   StrCpy $FNUM "1"
 
   fillsections:
-  StrCmp $MAX $NUM +2
-  Goto +2
-  Goto endoninit
+  StrCmp $MAX $NUM endoninit
 
   ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Name"
   SectionSetText $NUM "$R1"
@@ -292,6 +311,7 @@ Function onComponents
   abort "Can't install"
 
   endoninit:
+  !verbose pop
 FunctionEnd
 
 Function .onInit
@@ -302,18 +322,6 @@ Function .onInit
   SetOutPath "$PLUGINSDIR"
   File /r /x .svn "${PRJ}aunit"
 FunctionEnd
-
-LangString DESC_SecSrc ${LANG_ENGLISH} "Installation of AUnit Sources."
-LangString DESC_SecGrp ${LANG_ENGLISH} "Compiled library."
-LangString DESC_SecDoc ${LANG_ENGLISH} "The AUnit documentation."
-LangString DESC_SecExamples ${LANG_ENGLISH} "A set of examples"
-
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecSrc} $(DESC_SecSrc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecGrp} $(DESC_SecGrp)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} $(DESC_SecDoc)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
 ;Uninstaller Section
