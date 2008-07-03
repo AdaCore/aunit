@@ -4,7 +4,7 @@ project AUnit is
    type Target_Type is
      ("native", 
       "powerpc-elf", "erc32-elf", "leon-elf", 
-      "powerpc-wrs-vxworksae", powerpc-wrs-vxworks, "i586-wrs-vxworksae");
+      "powerpc-wrs-vxworksae", "powerpc-wrs-vxworks", "i586-wrs-vxworksae");
 
    Runtime : Runtime_Type := external ("RUNTIME", "full");
    Target  : Target_Type  := external ("PLATFORM", "native");
