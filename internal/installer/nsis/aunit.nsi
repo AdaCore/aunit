@@ -53,7 +53,6 @@ VIProductVersion "${PVERSION}"
 ;Pages
 
 !insertmacro Locate
-!insertmacro un.Locate
 !insertmacro MUI_PAGE_WELCOME
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE onLicenseLeave
   !insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
@@ -171,58 +170,79 @@ Section /o "-"
 SectionEnd
 SectionGroupEnd
 
+;-------------------------------------------------------------
+; this section is in charge of installing the compiled library.
+
 Section "-installbin"
+  ; NUM is the section number
   StrCpy $NUM "${BaseSecNum}"
+  ; FNUM is the Field number, as set in aunit.ini
   StrCpy $FNUM "1"
 
+  ; start of loop for compilations
   compilesections:
-  StrCmp $MAX $NUM +2
-  Goto +2
-  Goto compileend
 
-  ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Target"
+  ; if NUM is MAX, we finished the compilation process.
+  StrCmp $MAX $NUM compileend
+
+  ; We get the flags from section $NUM
   SectionGetFlags $NUM $R1
+  ; And see if the flag SF_SELECTED is set
   IntOp $R1 $R1 & ${SF_SELECTED}
+  ; $R1==0 => not selected, we skip compilation for this section
+  StrCmp "0" $R1 continuecompile
 
-  StrCmp "0" $R1 0 compile
-  Goto continuecompile
-
-  compile:
+  ; Get the values needed for the compilation process
+  ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Target"
   ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Version"
   ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Runtime"
   ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Path"
   ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XRUNTIME"
   ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XPLATFORM"
 
+  ; We first create a config file for the target/runtime
   nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o config.cgpr'
   Pop $0
+  ; if exit code is not 0, we abort
   StrCmp $0 "0" 0 abortcompile
 
+  ; Actual compilation
   nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" --config=config.cgpr -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5'
   Pop $0
+  ; if exit code is not 0, we abort
   StrCmp $0 "0" 0 abortcompile
 
   continuecompile:
 
+  ; $NUM := $NUM + 1; $FNUM := $FNUM + 1
   IntOp $NUM $NUM + 1
   IntOp $FNUM $FNUM + 1
+  ; and we return to the begining of the loop
   Goto compilesections
 
+  ; compilation error occured: we abort installation
   abortcompile:
   MessageBox MB_OK|MB_ICONSTOP "The compilation failed. Aborting the installation."
   abort
 
+  ; Now that everything is compiled, we install the files
   compileend:
 
   SetOutPath "$INSTDIR\lib\gnat"
-  File "/oname=$INSTDIR\lib\gnat\aunit.gpr" "${PRJ}support\aunit.gpr"
+  File "${PRJ}support\aunit.gpr"
   SetOutPath "$INSTDIR\include\aunit"
   File /r /x *.gpr /x *.cgpr /x *~ /x *.adc /x .svn "${PRJ}aunit\*.*"
   SetOutPath "$INSTDIR\lib\aunit"
+  ; next 4 lines: recursive copy of aunit\lib to INSTDIR\lib\aunit
   StrCpy $R0 "$PLUGINSDIR\aunit\lib"
   StrCpy $R1 "$INSTDIR\lib\aunit"
+  StrLen $R2 $R0
   ${Locate} "$R0" "/L=FDE" "CopyCb"
-  Rename "$PLUGINSDIR\aunit\lib\*.*" "$INSTDIR\lib\aunit"
+
+  ; copy also README and COPYING
+  SetOutPath "$INSTDIR\share\doc\aunit"
+  File "${PRJ}README"
+  File "${PRJ}COPYING"
 
   ;Write the installation path into the registry
   WriteRegStr HKLM "SOFTWARE\Ada Core Technologies\AUnit" "ROOT" "$INSTDIR"
@@ -253,8 +273,12 @@ SectionEnd
 
 Section /o "Sources" SecSrc
   SetOutPath "$INSTDIR\src\aunit"
-  File /r /x .svn /x internal "${PRJ}*.*"
+  File /r /x .svn /x internal /x *~ "${PRJ}*.*"
 SectionEnd
+
+;------------------------------------------------------------
+; Description initialisation for all sections
+; the description is seen in the page MUI_PAGE_COMPONENTS
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} "The AUnit documentation"
@@ -269,12 +293,18 @@ SectionEnd
     ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Version"
     ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Runtime"
     ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Path"
+    ; Clear previous page
     SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:"
     EnableWindow $mui.ComponentsPage.DescriptionText 1
-    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT for $R1 version $R2 - runtime: $R3 - found in $R4"
+    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT $R2 for $R1 ($R3 runtime) found in $R4"
   !verbose pop
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+;---------------------------------------------------------------
+; This function is called after the user accepted the license
+; it is in charge of running the external setup utility that
+; determines available configurations, and place them into 
+; the aunit.ini file.
 Function onLicenseLeave
   !verbose push
 
@@ -286,11 +316,16 @@ Function onLicenseLeave
 
   Banner::Destroy
 
+  ; Now that the tool is run, we initialize some global variable:
+  ; $INSTDIR: default installation path (gprbuild root dir)
+  ; $MAX: last compilation section containing actual data
   ReadINIStr $GPRBUILDROOT "$PLUGINSDIR\aunit.ini" "Settings" "Install"
   StrCpy $INSTDIR $GPRBUILDROOT
   ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Settings" "NumFields"
   StrCpy $MAX $0
   IntOp $MAX $MAX + ${BaseSecNum}
+
+  ; Now we are initializing the Sec number (NUM) and Field number (FNum)
   StrCpy $NUM "${BaseSecNum}"
   StrCpy $FNUM "1"
 
@@ -298,6 +333,7 @@ Function onLicenseLeave
   StrCmp $MAX $NUM endoninit
 
   ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Name"
+  ; Set the text for section NUM to 'Field FNUM->Name'
   SectionSetText $NUM "$R1"
 
   IntOp $NUM $NUM + 1
@@ -315,7 +351,6 @@ Function onLicenseLeave
 FunctionEnd
 
 Function .onInit
-
   ;Extract InstallOptions INI files
   InitPluginsDir
   File /oname=$PLUGINSDIR\setup_utility.exe "${UTILITY}"
@@ -325,33 +360,29 @@ FunctionEnd
 
 ;--------------------------------
 ;Uninstaller Section
-Var Deleted
-
-;Callback for removing empty directories
-Function un.DelEmptyCb
-   RmDir $R9
-   StrCpy $Deleted "1"
-   Push $0
-FunctionEnd
-
 Section "Uninstall"
 
   RMDir /r "$INSTDIR\src\aunit"
+  RMDir "$INSTDIR\src"
   RMDir /r "$INSTDIR\include\aunit"
+  RMDir "$INSTDIR\include"
   RMDir /r "$INSTDIR\lib\aunit"
-  RMDir /r "$INSTDIR\share\doc\aunit"
-  RMDir /r "$INSTDIR\share\examples\aunit"
   Delete "$INSTDIR\lib\gnat\aunit.gpr"
+  RMDir "$INSTDIR\lib\gnat"
+  RMDir "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\share\doc\aunit"
+  RMDir "$INSTDIR\share\doc"
+  RMDir /r "$INSTDIR\share\examples\aunit"
+  RMDir "$INSTDIR\share\examples"
   Delete "$INSTDIR\share\gps\plug-ins\aunit.xml"
-
-  deleteEmptyDirs:
-  StrCpy $Deleted "0"
-  ${un.Locate} "$INSTDIR" "/L=DE" "un.DelEmptyCb"
-  StrCmp $Deleted "0" +2
-  Goto deleteEmptyDirs
+  RMDir "$INSTDIR\share\gps\plug-ins"
+  RMDir "$INSTDIR\share\gps"
+  RMDir "$INSTDIR\share"
+  Delete "$INSTDIR\uninstall-${SHORTNAME}.exe"
+  RMDir "$INSTDIR"
 
   ; Delete other shortcuts
-  DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\AUnit"
+  DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}-${VERSION}"
   DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ada Core Technologies\AUnit"
         
 SectionEnd
