@@ -1,8 +1,10 @@
 project AUnit_Build is
 
-   type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
-   type Target_Type is ("native", "powerpc-elf", "powerpc-wrs-vxworksae",
-                         "i586-wrs-vxworksae", "erc32-elf", "leon-elf");
+   type Runtime_Type is ("full", "cert", "kernel", "zfp", "hi", "ravenscar");
+   type Target_Type is
+     ("native", 
+      "powerpc-elf", "erc32-elf", "leon-elf", 
+      "powerpc-wrs-vxworksae", powerpc-wrs-vxworks, "i586-wrs-vxworksae");
 
    Runtime : Runtime_Type := external ("RUNTIME", "full");
    Target  : Target_Type  := external ("PLATFORM", "native");
@@ -16,7 +18,7 @@ project AUnit_Build is
    for Source_Dirs use ("framework", "containers", "reporters");
 
    case Runtime is
-      when "full" | "cert" =>
+      when "full" | "cert" | "kernel" =>
          for Source_Dirs use project'Source_Dirs & "framework/exception";
       when "zfp" | "hi" | "ravenscar" =>
          for Languages use project'Languages & "C";
@@ -24,37 +26,20 @@ project AUnit_Build is
          for Library_Options use ("sjlj.o");
    end case;
 
-   case Target is
-      when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
-         for Source_Dirs use project'Source_Dirs &
-                             "framework/nocalendar" & "framework/staticmemory";
+   case Runtime is
+      when "full" | "cert" | "kernel" =>
+         for Source_Dirs use project'Source_Dirs & "framework/calendar";
 
-      when "powerpc-wrs-vxworksae" | "i586-wrs-vxworksae" =>
-            case Runtime is
-               when "full" | "cert" =>
-                  for Source_Dirs use project'Source_Dirs &
-                            "framework/calendar" & "framework/staticmemory";
+      when "zfp" | "hi" | "ravenscar" =>
+         for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
+   end case;
 
-               when "zfp" | "hi" | "ravenscar" =>
-                  for Source_Dirs use project'Source_Dirs &
-                            "framework/nocalendar" & "framework/staticmemory";
-            end case;
+   case Runtime is
+      when "full" | "kernel" =>
+         for Source_Dirs use project'Source_Dirs & "framework/nativememory";
 
-      when others =>
-         case Runtime is
-            when "full" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "framework/calendar" & "framework/nativememory";
-
-            when "cert" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "framework/calendar" & "framework/staticmemory";
-
-            when "zfp" | "hi" | "ravenscar" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "framework/nocalendar" & "framework/staticmemory";
-
-         end case;
+      when "cert" | "zfp" | "hi" | "ravenscar" =>
+         for Source_Dirs use project'Source_Dirs & "framework/staticmemory";
    end case;
 
    package Compiler is

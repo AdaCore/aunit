@@ -1,8 +1,10 @@
 project AUnit is
 
-   type Runtime_Type is ("full", "cert", "zfp", "hi", "ravenscar");
-   type Target_Type is ("native", "powerpc-elf", "powerpc-wrs-vxworksae",
-                        "i586-wrs-vxworksae", "erc32-elf", "leon-elf");
+   type Runtime_Type is ("full", "cert", "kernel", "zfp", "hi", "ravenscar");
+   type Target_Type is
+     ("native", 
+      "powerpc-elf", "erc32-elf", "leon-elf", 
+      "powerpc-wrs-vxworksae", powerpc-wrs-vxworks, "i586-wrs-vxworksae");
 
    Runtime : Runtime_Type := external ("RUNTIME", "full");
    Target  : Target_Type  := external ("PLATFORM", "native");
@@ -17,7 +19,7 @@ project AUnit is
                         "../../include/aunit/reporters");
 
    case Runtime is
-      when "full" | "cert" =>
+      when "full" | "cert" | "kernel" =>
          for Source_Dirs use project'Source_Dirs & 
                             "../../include/aunit/framework/exception";
       when "zfp" | "hi" | "ravenscar" =>
@@ -25,43 +27,20 @@ project AUnit is
                             "../../include/aunit/framework/sjljexception";
    end case;
 
-   case Target is
-      when "powerpc-elf" | "erc32-elf" | "leon-elf" =>
-         for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/nocalendar" &
-                            "../../include/aunit/framework/staticmemory";
-     
-      when "powerpc-wrs-vxworksae" | "i586-wrs-vxworksae" =>
-            case Runtime is
-               when "full" | "cert" =>
-                  for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/calendar" &
-                            "../../include/aunit/framework/staticmemory";
+   case Runtime is
+      when "full" | "cert" | "kernel" =>
+         for Source_Dirs use project'Source_Dirs & "framework/calendar";
 
-               when "zfp" | "hi" | "ravenscar" =>
-                  for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/nocalendar" &
-                            "../../include/aunit/framework/staticmemory";
-            end case;
+      when "zfp" | "hi" | "ravenscar" =>
+         for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
+   end case;
 
-      when others =>
-         case Runtime is
-            when "full" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/calendar" &
-                            "../../include/aunit/framework/nativememory";
+   case Runtime is
+      when "full" | "kernel" =>
+         for Source_Dirs use project'Source_Dirs & "framework/nativememory";
 
-            when "cert" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/calendar" &
-                            "../../include/aunit/framework/staticmemory";
-
-            when "zfp" | "hi" | "ravenscar" =>
-               for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/nocalendar" &
-                            "../../include/aunit/framework/staticmemory";
-
-         end case;
+      when "cert" | "zfp" | "hi" | "ravenscar" =>
+         for Source_Dirs use project'Source_Dirs & "framework/staticmemory";
    end case;
 
 end AUnit;
