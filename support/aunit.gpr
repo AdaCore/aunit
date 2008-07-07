@@ -29,18 +29,22 @@ project AUnit is
 
    case Runtime is
       when "full" | "cert" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & "framework/calendar";
+         for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/calendar";
 
       when "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
+         for Source_Dirs use project'Source_Dirs & 
+                            "../../include/aunit/framework/nocalendar";
    end case;
 
    case Runtime is
       when "full" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & "framework/nativememory";
+         for Source_Dirs use project'Source_Dirs & 
+                            "../../include/aunit/framework/nativememory";
 
       when "cert" | "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs & "framework/staticmemory";
+         for Source_Dirs use project'Source_Dirs &
+                            "../../include/aunit/framework/staticmemory";
    end case;
 
 end AUnit;
