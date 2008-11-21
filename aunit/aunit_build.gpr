@@ -45,7 +45,7 @@ project AUnit_Build is
    package Compiler is
       for Default_Switches ("ada") use
         ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty",
-         "-gnat05", "--RTS=" & Runtime);
+         "-gnat05");
    end Compiler;
 
    package IDE is
