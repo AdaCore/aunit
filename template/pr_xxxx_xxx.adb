@@ -1,6 +1,8 @@
+with AUnit.Assertions; use AUnit.Assertions;
+
 --  Template for test case body.
 package body PR_XXXX_XXX is
-   use Assertions;
+
    --  Example test routine. Provide as many as are needed:
    procedure Test1 (R : in out AUnit.Test_Cases.Test_Case'Class);
 
@@ -43,9 +45,9 @@ package body PR_XXXX_XXX is
    end Register_Tests;
 
    --  Identifier of test case:
-   function Name (T : Test_Case) return Message_Strings.Message_String is
+   function Name (T : Test_Case) return Message_String is
    begin
-      return Test_Results.Format ("Test case name");
+      return Format ("Test case name");
    end Name;
 
 end PR_XXXX_XXX;

@@ -1,4 +1,5 @@
-with AUnit; use AUnit;
+with AUnit.Test_Suites; use AUnit.Test_Suites;
+
 package Sample_Suite is
-   function Suite return Test_Suites.Access_Test_Suite;
+   function Suite return Access_Test_Suite;
 end Sample_Suite;
