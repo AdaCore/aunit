@@ -1,8 +1,8 @@
 RTS =
 TARGET =
-GPRCONFIG = /GNATPRO/6.1.2/bin/gprconfig
-GPRBUILD  = /GNATPRO/6.1.2/bin/gprbuild
-GPRCLEAN = /GNATPRO/6.1.2/bin/gprclean
+GPRCONFIG = gprconfig
+GPRBUILD  = gprbuild
+GPRCLEAN = gprclean
 
 # INSTALL	= @prefix@
 INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//')
