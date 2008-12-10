@@ -1,7 +1,6 @@
 with PR_XXXX_XXX;
 
 package body Sample_Suite is
-   use Test_Suites;
 
    Result : aliased Test_Suite;
 
@@ -12,4 +11,5 @@ package body Sample_Suite is
       Add_Test (Result'Access, Test_Case'Access);
       return Result'Access;
    end Suite;
+
 end Sample_Suite;
