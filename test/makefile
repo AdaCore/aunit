@@ -35,8 +35,8 @@ endif
 
 all:
 	echo $(TARGET_ARG)
-	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch -o gprconf.cgpr
-	$(GPRBUILD) --config=gprconf.cgpr -Paunit_tests -p $(GPRBUILD_FLAGS)
+	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch
+	$(GPRBUILD) $(TARGET_CONF) -Paunit_tests -p $(GPRBUILD_FLAGS)
 	-$(RUN) ./aunit_harness
 
 clean:

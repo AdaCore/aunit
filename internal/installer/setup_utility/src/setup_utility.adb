@@ -49,6 +49,19 @@ procedure Setup_Utility is
    is
       Cur  : Build_Target_Access := Build_Targets;
       Last : Build_Target_Access := null;
+
+      function Same_Target (T1, T2 : String) return Boolean is
+      begin
+         if T1 = T2
+           or else (T1 = "pentium-mingw32msv" and then T2 = "i686-pc-mingw32")
+           or else (T2 = "pentium-mingw32msv" and then T1 = "i686-pc-mingw32")
+         then
+            return True;
+         else
+            return False;
+         end if;
+      end Same_Target;
+
    begin
       if Build_Targets = null then
          Build_Targets := new Build_Target'
@@ -59,7 +72,7 @@ procedure Setup_Utility is
             Next    => null);
       else
          while Cur /= null loop
-            if Cur.Target.all = Target
+            if Same_Target (Cur.Target.all, Target)
               and then Cur.Runtime.all = Runtime
             then
                return;
@@ -161,7 +174,24 @@ begin
          if First_Line then
             First_Line := False;
          else
-            Targets (Index) := new String'(Get_Line (Iter));
+            declare
+               Line       : constant String := Get_Line (Iter);
+               Initialized : Boolean := False;
+            begin
+               for J in Line'Range loop
+                  if Line (J) = ' ' then
+                     Targets (Index) :=
+                       new String'(Line (Line'First .. J - 1));
+                     Initialized := True;
+                     exit;
+                  end if;
+               end loop;
+
+               if not Initialized then
+                  Targets (Index) := new String'(Line);
+               end if;
+            end;
+
             Index := Index + 1;
          end if;
 
@@ -264,7 +294,9 @@ begin
             Ada.Text_IO.Put_Line (File, "XRUNTIME=" & Target.Runtime.all);
          end if;
 
-         if Target.Target.all = "pentium-mingw32msv" then
+         if Target.Target.all = "pentium-mingw32msv"
+           or else Target.Target.all = "i686-pc-mingw32"
+         then
             Ada.Text_IO.Put_Line (File, "XPLATFORM=native");
          else
             Ada.Text_IO.Put_Line (File, "XPLATFORM=" & Target.Target.all);

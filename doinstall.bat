@@ -86,13 +86,25 @@ REM OUTPUT: RTS.TXT
 :FINDRTS
 "%GPRBUILDROOT%\bin\gprconfig" --target=%TARGET% --config=Ada,* --config=C > OUTPUT.TXT < NUL
 ECHO.>RTS.TXT
-FOR /F "delims=^( skip=3 tokens=2,3" %%A IN (OUTPUT.TXT) DO (
+FOR /F "delims=^( skip=3 tokens=1,2,3" %%A IN (OUTPUT.TXT) DO (
+  REM old gprconfig show compilers as " (A) compiler string (rts)"
+  REM while new ones show "  1. compiler string (rts)"
+  REM as we use '(' as delimiter to get the rts string, we need to verify if
+  REM the string we got is the first form that matches the delimiter, or of
+  REM the new form
+  IF "%%A" == " " (
+    SET S=%%B
+    SET RTSSTR=%%C
+  ) ELSE (
+    SET S=%%A
+    SET RTSSTR=%%B
+  )
   SET /A OK=0
-  FOR /F "tokens=4" %%C IN ('ECHO %%A') DO (
+  FOR /F "tokens=4" %%C IN ('ECHO !S!') DO (
     IF "%%C" == "Ada" ( SET /A OK=1 )
   )
   IF !OK! == 1 (
-    FOR /F %%C IN ('ECHO %%B') DO (
+    FOR /F %%C IN ('ECHO !RTSSTR!') DO (
       SET RTS=%%C
       IF "%%C" == "sjlj" ( SET RTS=full )
       IF "%%C" == "zcx" ( SET RTS=full )
@@ -255,16 +267,19 @@ FOR /F "delims=;" %%A IN (TARGETS.TXT) DO (
     SET RTS=%%C
     DEL !TARGET!-!RTS!.cgpr 1> NUL 2> NUL
     IF !RTS! == full (SET RUNTIME=) ELSE (SET RUNTIME=!RTS!)
-    "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C -o !TARGET!-!RTS!.cgpr 1> NUL 2> NUL || GOTO ERROR
 
     IF "!TARGET!" == "pentium-mingw32msv" (
+      SET PLATFORM="native"
+    ) ELSE IF "!TARGET!" == "i686-pc-mingw32" (
       SET PLATFORM="native"
     ) ELSE (
       SET PLATFORM=!TARGET!
     )
 
-    ECHO ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr>> RUN.BAT
-    ECHO "!GPRBUILDROOT!\bin\gprbuild" --config=!TARGET!-!RTS!.cgpr -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ERROR>> RUN.BAT
+    ECHO ECHO "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C >> RUN.BAT
+    ECHO "!GPRBUILDROOT!\bin\gprconfig" --batch --target=!TARGET! --config=Ada,,!RUNTIME! --config=C 1> NUL 2> NUL ^|^| GOTO ERROR>> RUN.BAT
+    ECHO ECHO "!GPRBUILDROOT!\bin\gprbuild" --target=!TARGET! -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr>> RUN.BAT
+    ECHO "!GPRBUILDROOT!\bin\gprbuild" --target=!TARGET! -XRUNTIME=!RTS! -XPLATFORM=!PLATFORM! -p -f -Paunit/aunit_build.gpr ^|^| GOTO ERROR>> RUN.BAT
   )
 )
 DEL TARGETS.TXT
