@@ -19,7 +19,8 @@ project Support is
    case AUnit_Build.Target is
       when "native" =>
          for Source_Dirs use ();
-      when "vxworksae" =>
+      when "powerpc-wrs-vxworksae" | "powerpc-wrs-vxworks" | 
+           "i586-wrs-vxworksae" =>
          for Source_Dirs use ("src", "src/vxworksae");
       when "powerpc-elf" =>
          for Source_Dirs use ("src", "src/ppc-elf");

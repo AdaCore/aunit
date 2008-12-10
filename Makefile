@@ -1,8 +1,8 @@
 RTS =
 TARGET =
-GPRCONFIG = gprconfig
-GPRBUILD  = gprbuild
-GPRCLEAN = gprclean
+GPRCONFIG = /GNATPRO/6.1.2/bin/gprconfig
+GPRBUILD  = /GNATPRO/6.1.2/bin/gprbuild
+GPRCLEAN = /GNATPRO/6.1.2/bin/gprclean
 
 # INSTALL	= @prefix@
 INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//')
@@ -20,7 +20,7 @@ ifeq ($(TARGET),)
    TARGET_ARG = -XPLATFORM=native
 else
    TARGET_CONF = --target=$(TARGET)
-   TARGET_ARG = -XPLATFORM=$(TARGET)
+   TARGET_ARG = --target=$(TARGET) -XPLATFORM=$(TARGET)
 endif
 
 GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
@@ -37,8 +37,8 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 .PHONY: all clean install_clean install
 
 all:
-	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch -o gprconf.cgpr
-	$(GPRBUILD) --config=gprconf.cgpr -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
+	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch
+	$(GPRBUILD) -Paunit/aunit_build -p -f $(GPRBUILD_FLAGS)
 
 clean:
 	$(RM) -fr aunit/obj
