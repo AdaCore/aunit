@@ -1,5 +1,5 @@
 AUnit 3.1.0 README
-October 21, 2008
+December 11, 2008
 
 This is a minor release of the Ada unit test framework AUnit, derived
 from the JUnit/CPPUnit frameworks for Java/C++. Read docs/aunit.html for
@@ -9,6 +9,8 @@ Changes:
 --------
 
 3.1.0 Support for VxWorks "kernel" run-time library.
+      Update of the template directory, according to AUnit 3 API.
+      Update installation scripts.
 
 3.00: Major rewrite:
       - Removal of the genericity of the AUnit framework.
