@@ -1,0 +1,33 @@
+OBJDIR=obj/$(TARGET)
+OBJEXT=.o
+
+ifeq ($(TARGET),powerpc-elf)
+  SRCDIR=support/ppc-elf
+  SUPPORTLIB=$(OBJDIR)/libsupport.a
+  LARGS=-largs -lgnat $(SUPPORTLIB) -Wl,-u,_start,-Ttext,0x100000
+  CLEANSUPPORTLIB=cleansupport
+else
+  SRCDIR=
+  SUPPORTLIB=
+  LARGS=
+  CLEANSUPPORTLIB=
+endif
+
+C_SRC=$(wildcard $(SRCDIR)/*.c)
+ASM_SRC=$(wildcard $(SRCDIR)/*.s)
+OBJS=$(subst $(SRCDIR),$(OBJDIR),$(subst .c,$(OBJEXT),$(C_SRC)) $(subst .s,$(OBJEXT),$(ASM_SRC)))
+
+$(OBJDIR)/libsupport.a: $(OBJDIR) $(OBJS)
+	$(TARGET)-ar rc $(OBJDIR)/libsupport.a $(OBJS)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+cleansupport:
+	rm -rf $(OBJDIR)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(TARGET)-gcc -c $< -o $@
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.s
+	$(TARGET)-as $< -o $@

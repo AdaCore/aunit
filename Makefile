@@ -4,10 +4,10 @@ GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 
-# INSTALL	= @prefix@
 INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//')
 
 ifeq ($(RTS),)
+   RTS=full
    RTS_CONF =
    RTS_ARG = -XRUNTIME=full
 else
@@ -16,12 +16,15 @@ else
 endif
 
 ifeq ($(TARGET),)
+   TARGET=native
    TARGET_CONF =
    TARGET_ARG = -XPLATFORM=native
 else
    TARGET_CONF = --target=$(TARGET)
    TARGET_ARG = --target=$(TARGET) -XPLATFORM=$(TARGET)
 endif
+
+SUBDIR=$(TARGET)-$(RTS)
 
 GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
 
@@ -34,16 +37,34 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
-.PHONY: all clean install_clean install
+.PHONY: all clean targets installed-targets install_clean install
 
-all:
+all: support/aunit_shared.gpr
 	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch
-	$(GPRBUILD) -Paunit/aunit_build -p -f $(GPRBUILD_FLAGS)
+	$(GPRBUILD) -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
+
+installed-targets:
+	@echo $(TARGET) >> installed-targets
+	@echo native >> installed-targets
+
+targets: installed-targets
+# make sure that "native" is in the targets list, as it is the default in 
+# the project template
+	@$(RM) -f targets
+	for f in $(shell cat installed-targets | sort -u); \
+	  do echo -n ", \"$$f\"" >> targets; \
+	done
+
+support/aunit_shared.gpr: support/aunit_shared.gpr.in targets
+	cat $< | sed -e 's/@TARGETS@/$(shell cat targets | sed -e 's/^, //')/' > $@
 
 clean:
 	$(RM) -fr aunit/obj
 	$(RM) -fr aunit/lib
 	-${MAKE} -C docs clean
+	$(RM) -f installed-targets
+	$(RM) -f targets
+	$(RM) -f support/aunit_shared.gpr
 
 install_clean:
 ifeq ($(INSTALL),)
@@ -60,9 +81,10 @@ else
 	-$(CHMOD) -R 777 $(I_INC)
 	$(RM) -fr $(I_INC)
 	$(RM) -f $(I_GPR)/aunit.gpr
+	$(RM) -f $(I_GPR)/aunit_shared.gpr
 endif
 
-install: all install_clean
+install: install_clean support/aunit_shared.gpr
 ifneq ($(INSTALL),)
 	$(MKDIR) $(I_DOC)
 	$(MKDIR) $(I_TPL)
@@ -72,18 +94,12 @@ ifneq ($(INSTALL),)
 	$(MKDIR) $(I_INC)
 	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
 	-$(CP) support/aunit.xml $(I_PLG)
-	$(CP) support/aunit.gpr $(I_GPR)
+	$(CP) support/*.gpr $(I_GPR)
 	$(CP) -r examples/* $(I_TPL)
 	-$(CP) -r aunit/lib/* $(I_LIB)
 	$(CP) -r aunit/framework $(I_INC)
 	$(CP) -r aunit/containers $(I_INC)
 	$(CP) -r aunit/reporters $(I_INC)
-	-$(CHMOD) 444 $(I_DOC)/*
-	$(CHMOD) 444 $(I_PLG)/aunit.xml
-	$(CHMOD) 444 $(I_GPR)/aunit.gpr
-	find $(I_TPL) -type f -exec $(CHMOD) 444 {} \;
-	find $(I_LIB) -type f -exec $(CHMOD) 444 {} \;
-	find $(I_INC) -type f -exec $(CHMOD) 444 {} \;
 	@echo $(SRC_LIST)
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'

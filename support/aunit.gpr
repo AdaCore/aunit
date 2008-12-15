@@ -1,50 +1,20 @@
+with "AUnit_Shared";
+
 project AUnit is
 
-   type Runtime_Type is ("full", "cert", "kernel", "zfp", "hi", "ravenscar");
-   type Target_Type is
-     ("native", 
-      "powerpc-elf", "erc32-elf", "leon-elf", 
-      "powerpc-wrs-vxworksae", "powerpc-wrs-vxworks", "i586-wrs-vxworksae");
+   for Library_Dir use
+     "../../lib/aunit/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
 
-   Runtime : Runtime_Type := external ("RUNTIME", "full");
-   Target  : Target_Type  := external ("PLATFORM", "native");
-
-   for Library_Dir use "../../lib/aunit/" & Target & "-" & Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
    for Externally_Built use "true";
 
-   for Source_Dirs use ("../../include/aunit/framework",
-                        "../../include/aunit/containers",
-                        "../../include/aunit/reporters");
-
-   case Runtime is
-      when "full" | "cert" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & 
-                            "../../include/aunit/framework/exception";
-      when "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/sjljexception";
-   end case;
-
-   case Runtime is
-      when "full" | "cert" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/calendar";
-
-      when "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs & 
-                            "../../include/aunit/framework/nocalendar";
-   end case;
-
-   case Runtime is
-      when "full" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & 
-                            "../../include/aunit/framework/nativememory";
-
-      when "cert" | "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs &
-                            "../../include/aunit/framework/staticmemory";
-   end case;
+   for Source_Dirs use
+     ("../../include/aunit/framework",
+      "../../include/aunit/containers",
+      "../../include/aunit/reporters",
+      "../../include/aunit/framework/" & AUnit_Shared.Except,
+      "../../include/aunit/framework/" & AUnit_Shared.Calend,
+      "../../include/aunit/framework/" & AUnit_Shared.Memory);
 
 end AUnit;

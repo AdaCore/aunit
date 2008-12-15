@@ -2,16 +2,18 @@
 --  Copyright (C) 2008, AdaCore
 --
 
-with Ada.Command_Line; use Ada.Command_Line;
+with Ada.Command_Line;      use Ada.Command_Line;
+with Ada.Strings.Unbounded;
 with Ada.Text_IO;
-with GNAT.Expect;      use GNAT.Expect;
-with System.OS_Lib;    use System.OS_Lib;
-pragma Warnings (Off);
-with System.Regpat;    use System.Regpat;
-pragma Warnings (On);
 
-with Gprconfig_Finder; use Gprconfig_Finder;
-with String_Utils;     use String_Utils;
+with System.OS_Lib;         use System.OS_Lib;
+pragma Warnings (Off);
+with System.Regpat;         use System.Regpat;
+pragma Warnings (On);
+with GNAT.Expect;           use GNAT.Expect;
+
+with Gprconfig_Finder;      use Gprconfig_Finder;
+with String_Utils;          use String_Utils;
 
 -------------------
 -- Setup_Utility --
@@ -262,19 +264,59 @@ begin
    declare
       Target : Build_Target_Access := Build_Targets;
       File   : Ada.Text_IO.File_Type;
+      Prj    : Ada.Text_IO.File_Type;
+      Tmpl   : Ada.Strings.Unbounded.Unbounded_String;
+      Tgts   : Ada.Strings.Unbounded.Unbounded_String;
+      Idx    : Natural;
       Num    : Natural := 0;
+      Native : Boolean := False;
 
    begin
-      if Ada.Command_Line.Argument_Count > 0 then
-         Ada.Text_IO.Create (File, Name => Ada.Command_Line.Argument (1));
-      else
-         Ada.Text_IO.Create (File, Name => "aunit.ini");
-      end if;
+      --  First read the aunit.gpr template
+      Ada.Text_IO.Open
+        (Prj, Mode => Ada.Text_IO.In_File, Name => "aunit_shared.gpr.in");
+      begin
+         loop
+            Ada.Strings.Unbounded.Append
+              (Tmpl, Ada.Text_IO.Get_Line (Prj) & ASCII.LF);
+         end loop;
+      exception
+         when others =>
+            Ada.Text_IO.Close (Prj);
+      end;
+
+      --  Get the actual list of all possible targets
+      Target := Build_Targets;
+      Tgts := Ada.Strings.Unbounded.To_Unbounded_String ("""native""");
+
+      while Target /= null loop
+         if Target.Target.all /= "pentium-mingw32msv"
+           and then Target.Target.all /= "i686-pc-mingw32"
+         then
+            Ada.Strings.Unbounded.Append (Tgts, ", ");
+            Ada.Strings.Unbounded.Append
+              (Tgts, """" & Target.Target.all & """");
+         end if;
+
+         Target := Target.Next;
+      end loop;
+
+      --  And create the actual project
+      Idx := Ada.Strings.Unbounded.Index (Tmpl, "@TARGETS@");
+      Ada.Strings.Unbounded.Replace_Slice
+        (Tmpl, Idx, Idx + 8, Ada.Strings.Unbounded.To_String (Tgts));
+      Ada.Text_IO.Create (Prj, Name => "aunit_shared.gpr");
+      Ada.Text_IO.Put (Prj, Ada.Strings.Unbounded.To_String (Tmpl));
+      Ada.Text_IO.Close (Prj);
+
+      --  Now create the config file for the NSIS installer
+      Ada.Text_IO.Create (File, Name => "aunit.ini");
       Ada.Text_IO.Put_Line (File, "[Settings]");
       Ada.Text_IO.Put_Line (File, "NumFields=" & Int_Image (Num_Targets));
       Ada.Text_IO.Put_Line (File, "Install=" & Gprconfig_Root);
       Ada.Text_IO.New_Line (File);
 
+      Target := Build_Targets;
       while Target /= null loop
          Num := Num + 1;
          Ada.Text_IO.Put_Line (File, "[Field " & Int_Image (Num) & "]");

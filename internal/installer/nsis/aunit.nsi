@@ -94,10 +94,10 @@ Function CopyCb
    StrCmp $R6 '' 0 +3
    CreateDirectory '$R1$1\$R7'
    goto endCopyFile
-   
+
    CreateDirectory '$R1$1'
    CopyFiles '$R9' '$R1$1'
-   
+
    endCopyFile:
    Push $0
 FunctionEnd
@@ -238,6 +238,7 @@ Section "-installbin"
   StrCpy $R1 "$INSTDIR\lib\aunit"
   StrLen $R2 $R0
   ${Locate} "$R0" "/L=FDE" "CopyCb"
+  CopyFiles "$PLUGINSDIR\aunit_shared.gpr" "$INSTDIR\lib\gnat"
 
   ; copy also README and COPYING
   SetOutPath "$INSTDIR\share\doc\aunit"
@@ -303,7 +304,7 @@ SectionEnd
 ;---------------------------------------------------------------
 ; This function is called after the user accepted the license
 ; it is in charge of running the external setup utility that
-; determines available configurations, and place them into 
+; determines available configurations, and place them into
 ; the aunit.ini file.
 Function onLicenseLeave
   !verbose push
@@ -354,8 +355,10 @@ Function .onInit
   ;Extract InstallOptions INI files
   InitPluginsDir
   File /oname=$PLUGINSDIR\setup_utility.exe "${UTILITY}"
+  File /oname=$PLUGINSDIR\aunit_shared.gpr.in ${PRJ}support\aunit_shared.gpr.in
   SetOutPath "$PLUGINSDIR"
   File /r /x .svn "${PRJ}aunit"
+  File /r /x .svn "${PRJ}support"
 FunctionEnd
 
 ;--------------------------------
@@ -368,6 +371,7 @@ Section "Uninstall"
   RMDir "$INSTDIR\include"
   RMDir /r "$INSTDIR\lib\aunit"
   Delete "$INSTDIR\lib\gnat\aunit.gpr"
+  Delete "$INSTDIR\lib\gnat\aunit_shared.gpr"
   RMDir "$INSTDIR\lib\gnat"
   RMDir "$INSTDIR\lib"
   RMDir /r "$INSTDIR\share\doc\aunit"
@@ -384,7 +388,7 @@ Section "Uninstall"
   ; Delete other shortcuts
   DeleteRegKey HKEY_LOCAL_MACHINE "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}-${VERSION}"
   DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ada Core Technologies\AUnit"
-        
+
 SectionEnd
 
 ; eof

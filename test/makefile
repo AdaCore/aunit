@@ -1,7 +1,14 @@
+.PHONY: all test
+
+all: test
+
+-include Makefile.zfp
+
 RTS =
 TARGET =
 
 ifeq ($(RTS),)
+   RTS = full
    RTS_CONF =
    RTS_ARG = -XRUNTIME=full
 else
@@ -10,18 +17,19 @@ else
 endif
 
 ifeq ($(TARGET),)
+   TARGET = native
    TARGET_CONF =
    TARGET_ARG = -XPLATFORM=native
 else
    TARGET_CONF = --target=$(TARGET)
-ifneq ($(filter %-wrs-vxworksae,$(TARGET)),)
-   TARGET_ARG = -XPLATFORM=vxworksae
-else
    TARGET_ARG = -XPLATFORM=$(TARGET)
 endif
-endif
 
+ifeq ($(SUPPORTLIB),)
 GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
+else
+GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
+endif
 
 GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
@@ -33,14 +41,14 @@ else
    RUN =
 endif
 
-all:
-	echo $(TARGET_ARG)
+test: $(SUPPORTLIB)
 	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch
-	$(GPRBUILD) $(TARGET_CONF) -Paunit_tests -p $(GPRBUILD_FLAGS)
-	-$(RUN) ./aunit_harness
+	$(GPRBUILD) -p $(TARGET_CONF) -Paunit_tests $(GPRBUILD_FLAGS) $(LARGS)
+	-$(RUN) $(TARGET)-$(RTS)/aunit_harness
 
-clean:
-	-$(GPRCLEAN) -f -r -Paunit_tests $(GPRBUILD_FLAGS)
+clean: $(CLEANSUPPORTLIB)
+	-$(GPRCLEAN) $(TARGET_CONF) -f -r -Paunit_tests $(GPRBUILD_FLAGS)
+	$(RM) -rf obj support/obj support/lib $(TARGET)-$(RTS)
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
