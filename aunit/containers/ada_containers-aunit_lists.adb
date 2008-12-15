@@ -129,8 +129,7 @@ package body Ada_Containers.AUnit_Lists is
       pragma Assert (Container.Last.Next = null);
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       while Container.Length > 1 loop
@@ -180,13 +179,11 @@ package body Ada_Containers.AUnit_Lists is
 
    begin
       if Position.Node = null then
-         raise Constraint_Error with
-           "Position cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if Position.Container /= Container'Unrestricted_Access then
-         raise Program_Error with
-           "Position cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (Position), "bad cursor in Delete");
@@ -203,8 +200,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       for Index in 1 .. Count loop
@@ -253,8 +249,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       for I in 1 .. Count loop
@@ -291,8 +286,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       for I in 1 .. Count loop
@@ -315,8 +309,7 @@ package body Ada_Containers.AUnit_Lists is
    function Element (Position : Cursor) return Element_Type is
    begin
       if Position.Node = null then
-         raise Constraint_Error with
-           "Position cursor has no element";
+         raise Constraint_Error;
       end if;
 
       pragma Assert (Vet (Position), "bad cursor in Element");
@@ -341,8 +334,7 @@ package body Ada_Containers.AUnit_Lists is
 
       else
          if Position.Container /= Container'Unrestricted_Access then
-            raise Program_Error with
-              "Position cursor designates wrong container";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Position), "bad cursor in Find");
@@ -379,7 +371,7 @@ package body Ada_Containers.AUnit_Lists is
    function First_Element (Container : List) return Element_Type is
    begin
       if Container.First = null then
-         raise Constraint_Error with "list is empty";
+         raise Constraint_Error;
       end if;
 
       return Container.First.Element;
@@ -426,13 +418,11 @@ package body Ada_Containers.AUnit_Lists is
          end if;
 
          if Target.Busy > 0 then
-            raise Program_Error with
-              "attempt to tamper with elements of Target (list is busy)";
+            raise Program_Error;
          end if;
 
          if Source.Busy > 0 then
-            raise Program_Error with
-              "attempt to tamper with elements of Source (list is busy)";
+            raise Program_Error;
          end if;
 
          LI := First (Target);
@@ -551,8 +541,7 @@ package body Ada_Containers.AUnit_Lists is
          pragma Assert (Container.Last.Next = null);
 
          if Container.Busy > 0 then
-            raise Program_Error with
-              "attempt to tamper with elements (list is busy)";
+            raise Program_Error;
          end if;
 
          Sort (Front => null, Back => null);
@@ -589,8 +578,7 @@ package body Ada_Containers.AUnit_Lists is
    begin
       if Before.Container /= null then
          if Before.Container /= Container'Unrestricted_Access then
-            raise Program_Error with
-              "attempt to tamper with elements (list is busy)";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Before), "bad cursor in Insert");
@@ -602,12 +590,11 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Length > Count_Type'Last - Count then
-         raise Constraint_Error with "new length exceeds maximum";
+         raise Constraint_Error;
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       New_Node := New_Node_Type (New_Item, null, null);
@@ -644,8 +631,7 @@ package body Ada_Containers.AUnit_Lists is
    begin
       if Before.Container /= null then
          if Before.Container /= Container'Unrestricted_Access then
-            raise Program_Error with
-              "Before cursor designates wrong list";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Before), "bad cursor in Insert");
@@ -657,12 +643,11 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Length > Count_Type'Last - Count then
-         raise Constraint_Error with "new length exceeds maximum";
+         raise Constraint_Error;
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       New_Node := New_Node_Type;
@@ -779,7 +764,7 @@ package body Ada_Containers.AUnit_Lists is
    function Last_Element (Container : List) return Element_Type is
    begin
       if Container.Last = null then
-         raise Constraint_Error with "list is empty";
+         raise Constraint_Error;
       end if;
 
       return Container.Last.Element;
@@ -808,8 +793,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Source.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements of Source (list is busy)";
+         raise Program_Error;
       end if;
 
       Clear (Target);
@@ -904,17 +888,15 @@ package body Ada_Containers.AUnit_Lists is
    is
    begin
       if Position.Container = null then
-         raise Constraint_Error with "Position cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if Position.Container /= Container'Unchecked_Access then
-         raise Program_Error with
-           "Position cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       if Container.Lock > 0 then
-         raise Program_Error with
-           "attempt to tamper with cursors (list is locked)";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (Position), "bad cursor in Replace_Element");
@@ -981,8 +963,7 @@ package body Ada_Containers.AUnit_Lists is
       pragma Assert (Container.Last.Next = null);
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       Container.First := J;
@@ -1026,8 +1007,7 @@ package body Ada_Containers.AUnit_Lists is
 
       else
          if Position.Container /= Container'Unrestricted_Access then
-            raise Program_Error with
-              "Position cursor designates wrong container";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Position), "bad cursor in Reverse_Find");
@@ -1056,8 +1036,7 @@ package body Ada_Containers.AUnit_Lists is
    begin
       if Before.Container /= null then
          if Before.Container /= Target'Unrestricted_Access then
-            raise Program_Error with
-              "Before cursor designates wrong container";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Before), "bad cursor in Splice");
@@ -1073,17 +1052,15 @@ package body Ada_Containers.AUnit_Lists is
       pragma Assert (Source.Last.Next = null);
 
       if Target.Length > Count_Type'Last - Source.Length then
-         raise Constraint_Error with "new length exceeds maximum";
+         raise Constraint_Error;
       end if;
 
       if Target.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements of Target (list is busy)";
+         raise Program_Error;
       end if;
 
       if Source.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements of Source (list is busy)";
+         raise Program_Error;
       end if;
 
       if Target.Length = 0 then
@@ -1135,20 +1112,18 @@ package body Ada_Containers.AUnit_Lists is
    begin
       if Before.Container /= null then
          if Before.Container /= Container'Unchecked_Access then
-            raise Program_Error with
-              "Before cursor designates wrong container";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Before), "bad Before cursor in Splice");
       end if;
 
       if Position.Node = null then
-         raise Constraint_Error with "Position cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if Position.Container /= Container'Unrestricted_Access then
-         raise Program_Error with
-           "Position cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (Position), "bad Position cursor in Splice");
@@ -1162,8 +1137,7 @@ package body Ada_Containers.AUnit_Lists is
       pragma Assert (Container.Length >= 2);
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       if Before.Node = null then
@@ -1243,36 +1217,32 @@ package body Ada_Containers.AUnit_Lists is
 
       if Before.Container /= null then
          if Before.Container /= Target'Unrestricted_Access then
-            raise Program_Error with
-              "Before cursor designates wrong container";
+            raise Program_Error;
          end if;
 
          pragma Assert (Vet (Before), "bad Before cursor in Splice");
       end if;
 
       if Position.Node = null then
-         raise Constraint_Error with "Position cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if Position.Container /= Source'Unrestricted_Access then
-         raise Program_Error with
-           "Position cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (Position), "bad Position cursor in Splice");
 
       if Target.Length = Count_Type'Last then
-         raise Constraint_Error with "Target is full";
+         raise Constraint_Error;
       end if;
 
       if Target.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements of Target (list is busy)";
+         raise Program_Error;
       end if;
 
       if Source.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements of Source (list is busy)";
+         raise Program_Error;
       end if;
 
       if Position.Node = Source.First then
@@ -1350,19 +1320,19 @@ package body Ada_Containers.AUnit_Lists is
    is
    begin
       if I.Node = null then
-         raise Constraint_Error with "I cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if J.Node = null then
-         raise Constraint_Error with "J cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if I.Container /= Container'Unchecked_Access then
-         raise Program_Error with "I cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       if J.Container /= Container'Unchecked_Access then
-         raise Program_Error with "J cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       if I.Node = J.Node then
@@ -1370,8 +1340,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Lock > 0 then
-         raise Program_Error with
-           "attempt to tamper with cursors (list is locked)";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (I), "bad I cursor in Swap");
@@ -1399,19 +1368,19 @@ package body Ada_Containers.AUnit_Lists is
    is
    begin
       if I.Node = null then
-         raise Constraint_Error with "I cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if J.Node = null then
-         raise Constraint_Error with "J cursor has no element";
+         raise Constraint_Error;
       end if;
 
       if I.Container /= Container'Unrestricted_Access then
-         raise Program_Error with "I cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       if J.Container /= Container'Unrestricted_Access then
-         raise Program_Error with "J cursor designates wrong container";
+         raise Program_Error;
       end if;
 
       if I.Node = J.Node then
@@ -1419,8 +1388,7 @@ package body Ada_Containers.AUnit_Lists is
       end if;
 
       if Container.Busy > 0 then
-         raise Program_Error with
-           "attempt to tamper with elements (list is busy)";
+         raise Program_Error;
       end if;
 
       pragma Assert (Vet (I), "bad I cursor in Swap_Links");
