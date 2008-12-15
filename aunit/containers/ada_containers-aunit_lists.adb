@@ -129,7 +129,7 @@ package body Ada_Containers.AUnit_Lists is
       pragma Assert (Container.Last.Next = null);
 
       if Container.Busy > 0 then
-         raise Program_Error with "toto";
+         raise Program_Error;
       end if;
 
       while Container.Length > 1 loop
