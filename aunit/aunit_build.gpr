@@ -1,45 +1,26 @@
+with "../support/aunit_shared";
+
 project AUnit_Build is
 
-   type Runtime_Type is ("full", "cert", "kernel", "zfp", "hi", "ravenscar");
-   type Target_Type is
-     ("native", 
-      "powerpc-elf", "erc32-elf", "leon-elf", 
-      "powerpc-wrs-vxworksae", "powerpc-wrs-vxworks", "i586-wrs-vxworksae");
-
-   Runtime : Runtime_Type := external ("RUNTIME", "full");
-   Target  : Target_Type  := external ("PLATFORM", "native");
-
    for Languages use ("Ada");
-   for Object_Dir use "obj/" & Target & "-" & Runtime;
-   for Library_Dir use "lib/" & Target & "-" & Runtime;
+   for Object_Dir use 
+     "obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
+   for Library_Dir use
+     "lib/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
 
-   for Source_Dirs use ("framework", "containers", "reporters");
+   for Source_Dirs use
+     ("framework", "containers", "reporters",
+      "framework/" & AUnit_Shared.Except,
+      "framework/" & AUnit_Shared.Calend,
+      "framework/" & AUnit_Shared.Memory);
 
-   case Runtime is
-      when "full" | "cert" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & "framework/exception";
-      when "zfp" | "hi" | "ravenscar" =>
+   case AUnit_Shared.Except is
+      when "sjljexception" =>
          for Languages use project'Languages & "C";
-         for Source_Dirs use project'Source_Dirs & "framework/sjljexception";
          for Library_Options use ("sjlj.o");
-   end case;
-
-   case Runtime is
-      when "full" | "cert" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & "framework/calendar";
-
-      when "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs & "framework/nocalendar";
-   end case;
-
-   case Runtime is
-      when "full" | "kernel" =>
-         for Source_Dirs use project'Source_Dirs & "framework/nativememory";
-
-      when "cert" | "zfp" | "hi" | "ravenscar" =>
-         for Source_Dirs use project'Source_Dirs & "framework/staticmemory";
+      when others =>
    end case;
 
    package Compiler is

@@ -1,0 +1,35 @@
+project AUnit_Shared is
+
+   type Target_Type is (@TARGETS@);
+   Target  : Target_Type  := external ("PLATFORM", "native");
+
+   type Runtime_Type is
+     ("full", "kernel", "kernel-smp", "rtp", "rtp-smp",
+      "cert", "ravenscar", "ravenscar-full", "ravenscar-cert",
+      "hi", "ravenscar-sfp", "zfp");
+   Runtime : Runtime_Type := external ("RUNTIME", "full");
+
+   for Source_Dirs use ();
+
+   type Exception_Type is ("exception", "sjljexception", "noexception");
+   type Calendar_Type is ("calendar", "nocalendar");
+   type Memory_type is ("nativememory", "staticmemory");
+
+   Except : Exception_Type := "exception";
+   Calend : Calendar_Type := "calendar";
+   Memory : Memory_Type := "nativememory";
+
+   case Runtime is
+      when "hi" | "ravenscar-sfp" | "zfp" =>
+         Except := "sjljexception";
+         Calend := "nocalendar";
+         Memory := "staticmemory";
+      when "ravenscar" | "ravenscar-full" | "ravenscar-cert" =>
+         Except := "sjljexception";
+         Calend := "nocalendar";
+      when "cert" =>
+         Memory := "staticmemory";
+      when others =>
+   end case;
+
+end AUnit_Shared;
