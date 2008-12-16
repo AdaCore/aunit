@@ -1,3 +1,7 @@
+GPRCONFIG = gprconfig
+GPRBUILD  = gprbuild
+GPRCLEAN  = gprclean
+
 .PHONY: all test
 
 all: test
@@ -10,30 +14,18 @@ TARGET =
 ifeq ($(RTS),)
    RTS = full
    RTS_CONF =
-   RTS_ARG = -XRUNTIME=full
 else
    RTS_CONF = ,,$(RTS)
-   RTS_ARG = -XRUNTIME=$(RTS)
 endif
 
 ifeq ($(TARGET),)
    TARGET = native
-   TARGET_CONF =
-   TARGET_ARG = -XPLATFORM=native
+   CONF_ARGS =
 else
-   TARGET_CONF = --target=$(TARGET)
-   TARGET_ARG = -XPLATFORM=$(TARGET)
+   CONF_ARGS = --target=$(TARGET)
 endif
 
-ifeq ($(SUPPORTLIB),)
-GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
-else
-GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
-endif
-
-GPRCONFIG = gprconfig
-GPRBUILD  = gprbuild
-GPRCLEAN  = gprclean
+CONF_FILE = $(TARGET)-$(RTS).cgpr
 
 ifeq ($(TARGET),powerpc-elf)
    RUN = ./support/run-ppc-elf
@@ -42,12 +34,11 @@ else
 endif
 
 test: $(SUPPORTLIB)
-	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch
-	$(GPRBUILD) -p $(TARGET_CONF) -Paunit_tests $(GPRBUILD_FLAGS) $(LARGS)
+	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch $(CONF_ARGS) -o $(CONF_FILE)
+	$(GPRBUILD) -p -Paunit_tests -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE) $(LARGS)
 	-$(RUN) $(TARGET)-$(RTS)/aunit_harness
 
-clean: $(CLEANSUPPORTLIB)
-	-$(GPRCLEAN) $(TARGET_CONF) -f -r -Paunit_tests $(GPRBUILD_FLAGS)
+clean:
 	$(RM) -rf obj support/obj support/lib $(TARGET)-$(RTS)
 
 RMDIR	= rmdir
