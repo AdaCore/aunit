@@ -201,13 +201,13 @@ Section "-installbin"
   ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XPLATFORM"
 
   ; We first create a config file for the target/runtime
-  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch'
+  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o $R4-$R5.cgpr'
   Pop $0
   ; if exit code is not 0, we abort
   StrCmp $0 "0" 0 abortcompile
 
   ; Actual compilation
-  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" --target=$R0 -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5'
+  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5 --config=$R4-$R5.cgpr'
   Pop $0
   ; if exit code is not 0, we abort
   StrCmp $0 "0" 0 abortcompile

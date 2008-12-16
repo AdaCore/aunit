@@ -9,24 +9,18 @@ INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//
 ifeq ($(RTS),)
    RTS=full
    RTS_CONF =
-   RTS_ARG = -XRUNTIME=full
 else
    RTS_CONF = ,,$(RTS)
-   RTS_ARG = -XRUNTIME=$(RTS)
 endif
 
 ifeq ($(TARGET),)
    TARGET=native
-   TARGET_CONF =
-   TARGET_ARG = -XPLATFORM=native
+   CONF_ARGS =
 else
-   TARGET_CONF = --target=$(TARGET)
-   TARGET_ARG = --target=$(TARGET) -XPLATFORM=$(TARGET)
+   CONF_ARGS = --target=$(TARGET)
 endif
 
-SUBDIR=$(TARGET)-$(RTS)
-
-GPRBUILD_FLAGS = $(TARGET_ARG) $(RTS_ARG)
+CONF_FILE = $(TARGET)-$(RTS).cgpr
 
 # Install directories
 
@@ -40,8 +34,8 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 .PHONY: all clean targets installed-targets install_clean install
 
 all: support/aunit_shared.gpr
-	$(GPRCONFIG) $(TARGET_CONF) --config=Ada$(RTS_CONF) --config=C --batch
-	$(GPRBUILD) -Paunit/aunit_build -p $(GPRBUILD_FLAGS)
+	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --batch $(CONF_ARGS) -o $(CONF_FILE)
+	$(GPRBUILD) -Paunit/aunit_build -p -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE)
 
 installed-targets:
 	@echo $(TARGET) >> installed-targets
