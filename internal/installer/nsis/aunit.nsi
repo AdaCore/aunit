@@ -238,7 +238,7 @@ Section "-installbin"
   StrCpy $R1 "$INSTDIR\lib\aunit"
   StrLen $R2 $R0
   ${Locate} "$R0" "/L=FDE" "CopyCb"
-  CopyFiles "$PLUGINSDIR\aunit_shared.gpr" "$INSTDIR\lib\gnat"
+  CopyFiles "$PLUGINSDIR\support\aunit_shared.gpr" "$INSTDIR\lib\gnat"
 
   ; copy also README and COPYING
   SetOutPath "$INSTDIR\share\doc\aunit"
@@ -355,7 +355,6 @@ Function .onInit
   ;Extract InstallOptions INI files
   InitPluginsDir
   File /oname=$PLUGINSDIR\setup_utility.exe "${UTILITY}"
-  File /oname=$PLUGINSDIR\aunit_shared.gpr.in ${PRJ}support\aunit_shared.gpr.in
   SetOutPath "$PLUGINSDIR"
   File /r /x .svn "${PRJ}aunit"
   File /r /x .svn "${PRJ}support"

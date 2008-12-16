@@ -274,7 +274,8 @@ begin
    begin
       --  First read the aunit.gpr template
       Ada.Text_IO.Open
-        (Prj, Mode => Ada.Text_IO.In_File, Name => "aunit_shared.gpr.in");
+        (Prj, Mode => Ada.Text_IO.In_File,
+         Name => "support/aunit_shared.gpr.in");
       begin
          loop
             Ada.Strings.Unbounded.Append
@@ -305,7 +306,7 @@ begin
       Idx := Ada.Strings.Unbounded.Index (Tmpl, "@TARGETS@");
       Ada.Strings.Unbounded.Replace_Slice
         (Tmpl, Idx, Idx + 8, Ada.Strings.Unbounded.To_String (Tgts));
-      Ada.Text_IO.Create (Prj, Name => "aunit_shared.gpr");
+      Ada.Text_IO.Create (Prj, Name => "support/aunit_shared.gpr");
       Ada.Text_IO.Put (Prj, Ada.Strings.Unbounded.To_String (Tmpl));
       Ada.Text_IO.Close (Prj);
 
