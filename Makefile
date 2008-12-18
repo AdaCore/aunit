@@ -38,15 +38,15 @@ all: support/aunit_shared.gpr
 	$(GPRBUILD) -Paunit/aunit_build -p -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE)
 
 installed-targets:
-	@echo $(TARGET) >> installed-targets
-	@echo native >> installed-targets
+	@printf "$(TARGET)\n" >> installed-targets
+	@printf "native\n" >> installed-targets
 
 targets: installed-targets
 # make sure that "native" is in the targets list, as it is the default in 
 # the project template
 	@$(RM) -f targets
 	for f in $(shell cat installed-targets | sort -u); \
-	  do echo -n ", \"$$f\"" >> targets; \
+	  do printf ", \"$$f\"" >> targets; \
 	done
 
 support/aunit_shared.gpr: support/aunit_shared.gpr.in targets
