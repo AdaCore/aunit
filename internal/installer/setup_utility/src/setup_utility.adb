@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2008, AdaCore
+--  Copyright (C) 2008-2009, AdaCore
 --
 
 with Ada.Command_Line;      use Ada.Command_Line;
@@ -26,18 +26,26 @@ procedure Setup_Utility is
 
    Status         : aliased Integer;
 
+   type Compiler_Path;
+   type Compiler_Path_Access is access all Compiler_Path;
+
    type Build_Target;
    type Build_Target_Access is access all Build_Target;
 
-   type Build_Target is record
-      Target  : String_Access;
-      Path    : String_Access;
-      Runtime : String_Access;
-      Version : String_Access;
-      Next    : Build_Target_Access;
+   type Compiler_Path is record
+      Path     : String_Access;
+      Targets  : Build_Target_Access;
+      Next     : Compiler_Path_Access := null;
    end record;
 
-   Build_Targets  : Build_Target_Access := null;
+   type Build_Target is record
+      Target  : String_Access;
+      Runtime : String_Access;
+      Version : String_Access;
+      Next    : Build_Target_Access := null;
+   end record;
+
+   Compilers : Compiler_Path_Access := null;
 
    ----------------
    -- Add_Target --
@@ -49,8 +57,9 @@ procedure Setup_Utility is
       Runtime : String;
       Version : String)
    is
-      Cur  : Build_Target_Access := Build_Targets;
-      Last : Build_Target_Access := null;
+      Comp : Compiler_Path_Access := Compilers;
+      Tgt  : Build_Target_Access;
+      Last : Build_Target_Access;
 
       function Same_Target (T1, T2 : String) return Boolean is
       begin
@@ -65,28 +74,52 @@ procedure Setup_Utility is
       end Same_Target;
 
    begin
-      if Build_Targets = null then
-         Build_Targets := new Build_Target'
-           (Target  => new String'(Target),
-            Path    => new String'(Path),
-            Runtime => new String'(Runtime),
-            Version => new String'(Version),
+      if Compilers = null then
+         Compilers := new Compiler_Path'
+           (Path => new String'(Path),
+            Targets => new Build_Target'
+              (Target  => new String'(Target),
+               Runtime => new String'(Runtime),
+               Version => new String'(Version),
+               Next    => null),
             Next    => null);
+
+         return;
+
       else
-         while Cur /= null loop
-            if Same_Target (Cur.Target.all, Target)
-              and then Cur.Runtime.all = Runtime
+         while Comp.Next /= null
+           and then Comp.Path.all /= Path
+         loop
+            Comp := Comp.Next;
+         end loop;
+
+         if Comp.Path.all /= Path then
+            Comp.Next := new Compiler_Path'
+              (Path => new String'(Path),
+               Targets => new Build_Target'
+                 (Target  => new String'(Target),
+                  Runtime => new String'(Runtime),
+                  Version => new String'(Version),
+                  Next    => null),
+               Next    => null);
+
+            return;
+         end if;
+
+         Tgt := Comp.Targets;
+         while Tgt /= null loop
+            if Same_Target (Tgt.Target.all, Target)
+              and then Tgt.Runtime.all = Runtime
             then
                return;
             end if;
 
-            Last := Cur;
-            Cur := Cur.Next;
+            Last := Tgt;
+            Tgt := Tgt.Next;
          end loop;
 
          Last.Next := new Build_Target'
            (Target  => new String'(Target),
-            Path    => new String'(Path),
             Runtime => new String'(Runtime),
             Version => new String'(Version),
             Next    => null);
@@ -111,9 +144,25 @@ procedure Setup_Utility is
    -- Num_Targets --
    -----------------
 
-   function Num_Targets return Natural is
-      Cur  : Build_Target_Access := Build_Targets;
+   function Num_Comp_Paths return Natural is
+      Cur  : Compiler_Path_Access := Compilers;
       Num  : Natural := 0;
+   begin
+      while Cur /= null loop
+         Num := Num + 1;
+         Cur := Cur.Next;
+      end loop;
+
+      return Num;
+   end Num_Comp_Paths;
+
+   -------------------
+   -- Num_Compilers --
+   -------------------
+
+   function Num_Targets (Path : Compiler_Path_Access) return Natural is
+      Cur : Build_Target_Access := Path.Targets;
+      Num : Natural := 0;
    begin
       while Cur /= null loop
          Num := Num + 1;
@@ -262,13 +311,15 @@ begin
    end loop;
 
    declare
-      Target : Build_Target_Access := Build_Targets;
+      Path   : Compiler_Path_Access := Compilers;
+      Tgt    : Build_Target_Access;
       File   : Ada.Text_IO.File_Type;
       Prj    : Ada.Text_IO.File_Type;
       Tmpl   : Ada.Strings.Unbounded.Unbounded_String;
       Tgts   : Ada.Strings.Unbounded.Unbounded_String;
       Idx    : Natural;
       Num    : Natural := 0;
+      NTgt   : Natural;
       Native : Boolean := False;
 
    begin
@@ -276,30 +327,37 @@ begin
       Ada.Text_IO.Open
         (Prj, Mode => Ada.Text_IO.In_File,
          Name => "support/aunit_shared.gpr.in");
+
       begin
          loop
             Ada.Strings.Unbounded.Append
               (Tmpl, Ada.Text_IO.Get_Line (Prj) & ASCII.LF);
          end loop;
+
       exception
          when others =>
             Ada.Text_IO.Close (Prj);
       end;
 
       --  Get the actual list of all possible targets
-      Target := Build_Targets;
+      Path := Compilers;
       Tgts := Ada.Strings.Unbounded.To_Unbounded_String ("""native""");
 
-      while Target /= null loop
-         if Target.Target.all /= "pentium-mingw32msv"
-           and then Target.Target.all /= "i686-pc-mingw32"
-         then
-            Ada.Strings.Unbounded.Append (Tgts, ", ");
-            Ada.Strings.Unbounded.Append
-              (Tgts, """" & Target.Target.all & """");
-         end if;
+      while Path /= null loop
+         Tgt := Path.Targets;
+         while Tgt /= null loop
+            if Tgt.Target.all /= "pentium-mingw32msv"
+              and then Tgt.Target.all /= "i686-pc-mingw32"
+            then
+               Ada.Strings.Unbounded.Append (Tgts, ", ");
+               Ada.Strings.Unbounded.Append
+                 (Tgts, """" & Tgt.Target.all & """");
+            end if;
 
-         Target := Target.Next;
+            Tgt := Tgt.Next;
+         end loop;
+
+         Path := Path.Next;
       end loop;
 
       --  And create the actual project
@@ -313,40 +371,61 @@ begin
       --  Now create the config file for the NSIS installer
       Ada.Text_IO.Create (File, Name => "aunit.ini");
       Ada.Text_IO.Put_Line (File, "[Settings]");
-      Ada.Text_IO.Put_Line (File, "NumFields=" & Int_Image (Num_Targets));
+      Ada.Text_IO.Put_Line
+        (File, "NumCompilerPaths=" & Int_Image (Num_Comp_Paths));
       Ada.Text_IO.Put_Line (File, "Install=" & Gprconfig_Root);
       Ada.Text_IO.New_Line (File);
 
-      Target := Build_Targets;
-      while Target /= null loop
+      Path := Compilers;
+
+      while Path /= null loop
          Num := Num + 1;
-         Ada.Text_IO.Put_Line (File, "[Field " & Int_Image (Num) & "]");
-         Ada.Text_IO.Put_Line (File, "Name=" & Target.Target.all & " (" &
-                               Target.Runtime.all & ")");
-         Ada.Text_IO.Put_Line (File, "Target=" & Target.Target.all);
-         Ada.Text_IO.Put_Line (File, "Runtime=" & Target.Runtime.all);
-         Ada.Text_IO.Put_Line (File, "Version=" & Target.Version.all);
-         --  We remove the trailing '\' as it is not understood by gprconfig
+         Ada.Text_IO.Put_Line (File, "[Compiler " & Int_Image (Num) & "]");
+         --  Remove trailing '/'
+         Ada.Text_IO.Put_Line
+           (File, "Path=" & Path.Path (Path.Path'First .. Path.Path'Last - 1));
+         --  Print path whithout the trailing '/bin/'
          Ada.Text_IO.Put_Line
            (File,
-            "Path=" & Target.Path (Target.Path'First .. Target.Path'Last - 1));
+            "BasePath=" & Path.Path (Path.Path'First .. Path.Path'Last - 5));
+         Ada.Text_IO.Put_Line
+           (File, "NumTargets=" & Int_Image (Num_Targets (Path)));
+         Ada.Text_IO.New_Line;
 
-         if Target.Runtime.all = "default" then
-            Ada.Text_IO.Put_Line (File, "XRUNTIME=full");
-         else
-            Ada.Text_IO.Put_Line (File, "XRUNTIME=" & Target.Runtime.all);
-         end if;
+         Tgt := Path.Targets;
+         NTgt := 0;
 
-         if Target.Target.all = "pentium-mingw32msv"
-           or else Target.Target.all = "i686-pc-mingw32"
-         then
-            Ada.Text_IO.Put_Line (File, "XPLATFORM=native");
-         else
-            Ada.Text_IO.Put_Line (File, "XPLATFORM=" & Target.Target.all);
-         end if;
+         while Tgt /= null loop
+            NTgt := NTgt + 1;
+            Ada.Text_IO.Put_Line
+              (File, "[Target" & Int_Image (Num) & NTgt'Img & "]");
+            Ada.Text_IO.Put_Line
+              (File, "Target=" & Tgt.Target.all);
 
-         Ada.Text_IO.New_Line (File);
-         Target := Target.Next;
+            if Tgt.Target.all = "pentium-mingw32msv"
+              or else Tgt.Target.all = "i686-pc-mingw32"
+            then
+               Ada.Text_IO.Put_Line (File, "XPLATFORM=native");
+            else
+               Ada.Text_IO.Put_Line (File, "XPLATFORM=" & Tgt.Target.all);
+            end if;
+
+            Ada.Text_IO.Put_Line (File, "Runtime=" & Tgt.Runtime.all);
+
+            if Tgt.Runtime.all = "default" then
+               Ada.Text_IO.Put_Line (File, "XRUNTIME=full");
+            else
+               Ada.Text_IO.Put_Line (File, "XRUNTIME=" & Tgt.Runtime.all);
+            end if;
+
+            Ada.Text_IO.Put_Line (File, "Version=" & Tgt.Version.all);
+            Ada.Text_IO.New_Line (File);
+
+            Tgt := Tgt.Next;
+         end loop;
+
+         Path := Path.Next;
       end loop;
    end;
+
 end Setup_Utility;

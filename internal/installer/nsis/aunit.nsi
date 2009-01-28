@@ -15,6 +15,7 @@
 ;--------------------------------
 ;Modern UI
 !include "MUI2.nsh"
+!include "logiclib.nsh"
 !include "Sections.nsh"
 !include "InstallOptions.nsh"
 !include "FileFunc.nsh"
@@ -26,7 +27,7 @@ ReserveFile "${UTILITY}"
 RequestExecutionLevel admin
 
 Name "${APPNAMEANDVERSION}"
-Caption "${APPNAME} ${VERSION} Setup"
+Caption "${APPNAMEANDVERSION} Setup"
 
 ;--------------------------------
 ; Interface Settings
@@ -55,11 +56,12 @@ VIProductVersion "${PVERSION}"
 !insertmacro Locate
 !insertmacro MUI_PAGE_WELCOME
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE onLicenseLeave
-  !insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
-!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE onDirectoryPageLeave
 !insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_FINISH
+;!insertmacro MUI_PAGE_FINISH
 
 ;Uninstall properties
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -77,16 +79,18 @@ BrandingText "©2008 AdaCore"
 Icon "${RES}11_installer.ico"
 UninstallIcon "${RES}11_installer.ico"
 OutFile "${SHORTNAME}-${VERSION}.exe"
-InstallDir "C:\AUnit"
+InstallDir "C:\"
 InstallDirRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ada Core Technologies\AUnit" ROOT
 
 ;--------------------------------
 ; variables
 
-Var NUM ;the target section
-Var MAX ;max target section
-Var FNUM ;field number as returnrd by .ini file
+Var FNUM ;field number as returned by .ini file
+Var SECNUM ;current section
+Var COMP
 Var GPRBUILDROOT ;root directory of gprbuild
+Var COMPPATHNB ;compiler path used, corresponding to aunit.ini
+
 
 Function CopyCb
    StrCpy $1 $R8 '' $R2
@@ -106,7 +110,7 @@ FunctionEnd
 ;Installer Sections
 
 SectionGroup /e "Compiled library" SecGrp
-Section "-" BaseSecNum
+Section "-" BaseGrpNum
 SectionEnd
 Section /o "-"
 SectionEnd
@@ -168,57 +172,70 @@ Section /o "-"
 SectionEnd
 Section /o "-"
 SectionEnd
-SectionGroupEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-"
+SectionEnd
+Section /o "-" LastGrpNum
+SectionEnd
+SectionGroupEnd 
 
 ;-------------------------------------------------------------
 ; this section is in charge of installing the compiled library.
 
 Section "-installbin"
   ; NUM is the section number
-  StrCpy $NUM "${BaseSecNum}"
-  ; FNUM is the Field number, as set in aunit.ini
-  StrCpy $FNUM "1"
+  StrCpy $SECNUM "${BaseGrpNum}"
+  ReadINIStr $R6 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "NumTargets"
 
-  ; start of loop for compilations
-  compilesections:
+  ${For} $COMP 1 $R6
+    ${If} ${SectionIsSelected} $SECNUM
+      ; Get the values needed for the compilation process
+      ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
+      ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Version"
+      ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
+      ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "Path"
+      ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "XRUNTIME"
+      ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "XPLATFORM"
+      
+      ; We first create a config file for the target/runtime
+      nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o $R4-$R5.cgpr'
+      Pop $0
+      ; if exit code is not 0, we abort
+      StrCmp $0 "0" 0 abortcompile
 
-  ; if NUM is MAX, we finished the compilation process.
-  StrCmp $MAX $NUM compileend
-
-  ; We get the flags from section $NUM
-  SectionGetFlags $NUM $R1
-  ; And see if the flag SF_SELECTED is set
-  IntOp $R1 $R1 & ${SF_SELECTED}
-  ; $R1==0 => not selected, we skip compilation for this section
-  StrCmp "0" $R1 continuecompile
-
-  ; Get the values needed for the compilation process
-  ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Target"
-  ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Version"
-  ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Runtime"
-  ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Path"
-  ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XRUNTIME"
-  ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "XPLATFORM"
-
-  ; We first create a config file for the target/runtime
-  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o $R4-$R5.cgpr'
-  Pop $0
-  ; if exit code is not 0, we abort
-  StrCmp $0 "0" 0 abortcompile
-
-  ; Actual compilation
-  nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5 --config=$R4-$R5.cgpr'
-  Pop $0
-  ; if exit code is not 0, we abort
-  StrCmp $0 "0" 0 abortcompile
-
-  continuecompile:
-
-  ; $NUM := $NUM + 1; $FNUM := $FNUM + 1
-  IntOp $NUM $NUM + 1
-  IntOp $FNUM $FNUM + 1
-  ; and we return to the begining of the loop
-  Goto compilesections
+      ; Actual compilation
+      nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" -f -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5 --config=$R4-$R5.cgpr'
+      Pop $0
+      ; if exit code is not 0, we abort
+      StrCmp $0 "0" 0 abortcompile
+    ${EndIf}
+    IntOp $SECNUM $SECNUM + 1
+  ${Next}
+  
+  Goto compileend
 
   ; compilation error occured: we abort installation
   abortcompile:
@@ -257,7 +274,6 @@ Section "-installbin"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}-${VERSION}" "NoModify" "1"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}-${VERSION}" "NoRepair" "1"
   WriteUninstaller "$INSTDIR\uninstall-${SHORTNAME}.exe"
-
 SectionEnd
 
 Section "Documentation" SecDoc
@@ -287,17 +303,15 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecSrc} "The AUnit source package"
   !insertmacro MUI_DESCRIPTION_TEXT ${SecGrp} "The AUnit library"
   !verbose push
-  ${elseif} $0 >= ${BaseSecNum}
-    IntOp $NUM $0 - ${BaseSecNum}
-    IntOp $NUM $NUM + 1
-    ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Target"
-    ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Version"
-    ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Runtime"
-    ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Field $NUM" "Path"
+  ${elseif} $0 >= ${BaseGrpNum}
+    IntOp $COMP $0 - ${BaseGrpNum}
+    IntOp $COMP $COMP + 1
+    ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
+    ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
     ; Clear previous page
     SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:"
     EnableWindow $mui.ComponentsPage.DescriptionText 1
-    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT $R2 for $R1 ($R3 runtime) found in $R4"
+    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT for $R1 ($R2 runtime)"
   !verbose pop
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -313,41 +327,55 @@ Function onLicenseLeave
 
   nsExec::Exec '"$PLUGINSDIR\setup_utility.exe"'
   Pop $0
-  StrCmp "0" $0 0 abortinstall
 
   Banner::Destroy
 
+  ; Verify that setup_utility did not return an error code
+  ${If} $0 != 0
+    MessageBox MB_OK|MB_ICONSTOP "Installation wizard could not find gprconfig. Make sure this is installed before executing this setup."
+    abort "Can't install"
+  ${EndIf}
+
   ; Now that the tool is run, we initialize some global variable:
   ; $INSTDIR: default installation path (gprbuild root dir)
-  ; $MAX: last compilation section containing actual data
   ReadINIStr $GPRBUILDROOT "$PLUGINSDIR\aunit.ini" "Settings" "Install"
   StrCpy $INSTDIR $GPRBUILDROOT
-  ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Settings" "NumFields"
-  StrCpy $MAX $0
-  IntOp $MAX $MAX + ${BaseSecNum}
 
-  ; Now we are initializing the Sec number (NUM) and Field number (FNum)
-  StrCpy $NUM "${BaseSecNum}"
-  StrCpy $FNUM "1"
+  !verbose pop
+FunctionEnd
 
-  fillsections:
-  StrCmp $MAX $NUM endoninit
+Function onDirectoryPageLeave
+  !verbose push
 
-  ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Field $FNUM" "Name"
-  ; Set the text for section NUM to 'Field FNUM->Name'
-  SectionSetText $NUM "$R1"
+  ; Now we are initializing the Field number (FNum)
+  StrCpy $SECNUM ${BaseGrpNum}
+  StrCpy $COMPPATHNB 1
 
-  IntOp $NUM $NUM + 1
-  IntOp $FNUM $FNUM + 1
-  Goto fillsections
+  ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Settings" "NumCompilerPaths"
+  ${For} $FNUM 1 $R1
+    ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Compiler $FNUM" "BasePath"
 
-  goto endoninit
+    ${If} $0 == $INSTDIR
+      StrCpy $COMPPATHNB $FNUM
+    ${EndIf}
+  ${Next}
 
-  abortinstall:
-  MessageBox MB_OK|MB_ICONSTOP "Installation wizard could not find gprconfig. Make sure this is installed before executing this setup."
-  abort "Can't install"
+  ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "NumTargets"
 
-  endoninit:
+  ${For} $COMP 1 $R2
+    ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
+    ReadINIStr $1 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Version"
+    ReadINIStr $2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
+
+    ${If} $0 == "i686-pc-mingw32"
+    ${OrIf} $0 == "pentium-mingw32msv"
+      SectionSetText $SECNUM "GNAT $1 ($2 runtime)"
+    ${Else}
+      SectionSetText $SECNUM "GNAT $1 for $0 ($2 runtime)"
+    ${EndIf}
+    IntOp $SECNUM $SECNUM + 1
+  ${Next}
+
   !verbose pop
 FunctionEnd
 
