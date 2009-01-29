@@ -19,7 +19,7 @@
 !include "Sections.nsh"
 !include "InstallOptions.nsh"
 !include "FileFunc.nsh"
-
+!include "WinMessages.nsh"
 SetCompressor /SOLID lzma
 
 ReserveFile "${UTILITY}"
@@ -53,11 +53,20 @@ VIProductVersion "${PVERSION}"
 ;--------------------------------
 ;Pages
 
+Var ALTERNATIVE_GUI_TITLE
+Var ALTERNATIVE_TEXT
+!define MUI_DIRECTORYPAGE_VARIABLE          $INSTDIR   ;selected by user
+!define MUI_DIRECTORYPAGE_TEXT_DESTINATION  $ALTERNATIVE_GUI_TITLE  ;caption above path
+!define MUI_DIRECTORYPAGE_TEXT_TOP          $ALTERNATIVE_TEXT  ;descriptive text
+
 !insertmacro Locate
 !insertmacro MUI_PAGE_WELCOME
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE onLicenseLeave
 !insertmacro MUI_PAGE_LICENSE "${RES}license.txt"
-!define MUI_PAGE_CUSTOMFUNCTION_LEAVE onDirectoryPageLeave
+!define MUI_PAGE_CUSTOMFUNCTION_PRE GnatDirectoryPre
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW GnatDirectoryShow
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE GnatDirectoryLeave
+!insertmacro MUI_PAGE_DIRECTORY
+!define MUI_PAGE_CUSTOMFUNCTION_PRE InstallDirectoryPre
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
@@ -74,8 +83,8 @@ VIProductVersion "${PVERSION}"
 
 ;Show install details.
 ShowInstDetails show
-
-BrandingText "©2008 AdaCore"
+SpaceTexts 'none'
+BrandingText "©2008-2009 AdaCore"
 Icon "${RES}11_installer.ico"
 UninstallIcon "${RES}11_installer.ico"
 OutFile "${SHORTNAME}-${VERSION}.exe"
@@ -85,11 +94,9 @@ InstallDirRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Ada Core Technologies\AUnit" ROOT
 ;--------------------------------
 ; variables
 
-Var FNUM ;field number as returned by .ini file
 Var SECNUM ;current section
-Var COMP
+Var COMP ;compiler id
 Var GPRBUILDROOT ;root directory of gprbuild
-Var COMPPATHNB ;compiler path used, corresponding to aunit.ini
 
 
 Function CopyCb
@@ -208,54 +215,56 @@ SectionGroupEnd
 Section "-installbin"
   ; NUM is the section number
   StrCpy $SECNUM "${BaseGrpNum}"
-  ReadINIStr $R6 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "NumTargets"
+  ReadINIStr $R6 "$PLUGINSDIR\aunit.ini" "Settings" "NumCompilers"
 
+  ; install all selected sections
   ${For} $COMP 1 $R6
     ${If} ${SectionIsSelected} $SECNUM
       ; Get the values needed for the compilation process
-      ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
-      ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Version"
-      ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
-      ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "Path"
-      ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "XRUNTIME"
-      ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "XPLATFORM"
+      ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Target"
+      ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Version"
+      ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Runtime"
+      ReadINIStr $R3 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Path"
+      ReadINIStr $R4 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "XRUNTIME"
+      ReadINIStr $R5 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "XPLATFORM"
       
       ; We first create a config file for the target/runtime
       nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprconfig" --target=$R0 --config=Ada,$R1,$R2,"$R3" --config=C --batch -o $R4-$R5.cgpr'
       Pop $0
       ; if exit code is not 0, we abort
-      StrCmp $0 "0" 0 abortcompile
+      ${If} $0 != 0
+        MessageBox MB_OK|MB_ICONSTOP "The compilation failed. Aborting the installation."
+        abort
+      ${EndIf}
 
       ; Actual compilation
       nsExec::ExecToLog '"$GPRBUILDROOT\bin\gprbuild" -f -p -P $PLUGINSDIR\aunit\aunit_build -XRUNTIME=$R4 -XPLATFORM=$R5 --config=$R4-$R5.cgpr'
       Pop $0
       ; if exit code is not 0, we abort
-      StrCmp $0 "0" 0 abortcompile
+      ${If} $0 != 0
+        MessageBox MB_OK|MB_ICONSTOP "The compilation failed. Aborting the installation."
+        abort
+      ${EndIf}
     ${EndIf}
+    
     IntOp $SECNUM $SECNUM + 1
   ${Next}
   
-  Goto compileend
-
-  ; compilation error occured: we abort installation
-  abortcompile:
-  MessageBox MB_OK|MB_ICONSTOP "The compilation failed. Aborting the installation."
-  abort
-
   ; Now that everything is compiled, we install the files
-  compileend:
-
+  
+  ; install aunit.gpr and aunit_shared.gpr
   SetOutPath "$INSTDIR\lib\gnat"
   File "${PRJ}support\aunit.gpr"
+  ; install the aunit_shared.gpr file created by this installer
+  CopyFiles "$PLUGINSDIR\support\aunit_shared.gpr" "$INSTDIR\lib\gnat"
+  ; install sources
   SetOutPath "$INSTDIR\include\aunit"
   File /r /x *.gpr /x *.cgpr /x *~ /x *.adc /x .svn "${PRJ}aunit\*.*"
-  SetOutPath "$INSTDIR\lib\aunit"
   ; next 4 lines: recursive copy of aunit\lib to INSTDIR\lib\aunit
   StrCpy $R0 "$PLUGINSDIR\aunit\lib"
   StrCpy $R1 "$INSTDIR\lib\aunit"
   StrLen $R2 $R0
   ${Locate} "$R0" "/L=FDE" "CopyCb"
-  CopyFiles "$PLUGINSDIR\support\aunit_shared.gpr" "$INSTDIR\lib\gnat"
 
   ; copy also README and COPYING
   SetOutPath "$INSTDIR\share\doc\aunit"
@@ -306,66 +315,59 @@ SectionEnd
   ${elseif} $0 >= ${BaseGrpNum}
     IntOp $COMP $0 - ${BaseGrpNum}
     IntOp $COMP $COMP + 1
-    ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
-    ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
+    ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Target"
+    ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Version"
+    ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Runtime"
     ; Clear previous page
     SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:"
     EnableWindow $mui.ComponentsPage.DescriptionText 1
-    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT for $R1 ($R2 runtime)"
+    SendMessage $mui.ComponentsPage.DescriptionText ${WM_SETTEXT} 0 "STR:Compile using GNAT $R1 for $R0 ($R2 runtime)"
   !verbose pop
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
-;---------------------------------------------------------------
-; This function is called after the user accepted the license
-; it is in charge of running the external setup utility that
-; determines available configurations, and place them into
-; the aunit.ini file.
-Function onLicenseLeave
-  !verbose push
-
-  Banner::show /NOUNLOAD "Analyzing installed software"
-
-  nsExec::Exec '"$PLUGINSDIR\setup_utility.exe"'
+; DirectoryPre: determine what we need to show in the directory page.
+Function GnatDirectoryPre
+  ; GNAT compiler selection. Let's initialize INSTDIR to the gprbuild directory
+  nsExec::Exec '"$PLUGINSDIR\setup_utility.exe" -findgprbuild'
   Pop $0
-
-  Banner::Destroy
-
-  ; Verify that setup_utility did not return an error code
   ${If} $0 != 0
     MessageBox MB_OK|MB_ICONSTOP "Installation wizard could not find gprconfig. Make sure this is installed before executing this setup."
-    abort "Can't install"
+    Abort
   ${EndIf}
-
+  
   ; Now that the tool is run, we initialize some global variable:
   ; $INSTDIR: default installation path (gprbuild root dir)
-  ReadINIStr $GPRBUILDROOT "$PLUGINSDIR\aunit.ini" "Settings" "Install"
+  ReadINIStr $GPRBUILDROOT "$PLUGINSDIR\aunit-pre.ini" "Settings" "Install"
   StrCpy $INSTDIR $GPRBUILDROOT
 
-  !verbose pop
+  StrCpy $ALTERNATIVE_GUI_TITLE "GNAT Compiler location"
+  StrCpy $ALTERNATIVE_TEXT "The following GNAT compiler will be used to compile ${APPNAME}.$\r$\n$\r$\nTo use another compiler, click Browse and select its installation folder. Click Next to continue."
 FunctionEnd
 
-Function onDirectoryPageLeave
-  !verbose push
+Function GnatDirectoryShow
+  !insertmacro MUI_HEADER_TEXT "Compiler Selection" "GNAT Compiler toolchain selection"
+FunctionEnd
 
-  ; Now we are initializing the Field number (FNum)
+; DirectoryLeave: initialize the sections to show the available compilation targets.
+Function GnatDirectoryLeave
+  ; Retrieve all GNAT compilers in the selected path
+  Banner::show /NOUNLOAD "Analyzing installed software"
+  nsExec::Exec '"$PLUGINSDIR\setup_utility.exe" -path "$INSTDIR"'
+  Banner::Destroy
+
+  Pop $0
+  ${If} $0 != 0
+    MessageBox MB_OK|MB_ICONSTOP "Installation wizard could not find a GNAT compiler in the selected path. Please make sure to select a GNAT compiler installation path."
+    Abort
+  ${EndIf}
+
   StrCpy $SECNUM ${BaseGrpNum}
-  StrCpy $COMPPATHNB 1
+  ReadINIStr $R0 "$PLUGINSDIR\aunit.ini" "Settings" "NumCompilers"
 
-  ReadINIStr $R1 "$PLUGINSDIR\aunit.ini" "Settings" "NumCompilerPaths"
-  ${For} $FNUM 1 $R1
-    ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Compiler $FNUM" "BasePath"
-
-    ${If} $0 == $INSTDIR
-      StrCpy $COMPPATHNB $FNUM
-    ${EndIf}
-  ${Next}
-
-  ReadINIStr $R2 "$PLUGINSDIR\aunit.ini" "Compiler $COMPPATHNB" "NumTargets"
-
-  ${For} $COMP 1 $R2
-    ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Target"
-    ReadINIStr $1 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Version"
-    ReadINIStr $2 "$PLUGINSDIR\aunit.ini" "Target$COMPPATHNB $COMP" "Runtime"
+  ${For} $COMP 1 $R0
+    ReadINIStr $0 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Target"
+    ReadINIStr $1 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Version"
+    ReadINIStr $2 "$PLUGINSDIR\aunit.ini" "Compiler $COMP" "Runtime"
 
     ${If} $0 == "i686-pc-mingw32"
     ${OrIf} $0 == "pentium-mingw32msv"
@@ -375,8 +377,11 @@ Function onDirectoryPageLeave
     ${EndIf}
     IntOp $SECNUM $SECNUM + 1
   ${Next}
+FunctionEnd
 
-  !verbose pop
+Function InstallDirectoryPre
+  StrCpy $ALTERNATIVE_GUI_TITLE "Destination Folder"
+  StrCpy $ALTERNATIVE_TEXT "Setup will install ${APPNAME} in the following folder.$\r$\n$\r$\nTo install in a different folder, click Browse and select another folder. Click Next to continue."
 FunctionEnd
 
 Function .onInit
