@@ -309,13 +309,15 @@ begin
    end if;
 
    declare
-      Comp   : Compiler_Path_Access := Compilers;
-      Prj    : Ada.Text_IO.File_Type;
-      Tmpl   : Ada.Strings.Unbounded.Unbounded_String;
-      Tgts   : Ada.Strings.Unbounded.Unbounded_String;
-      Idx    : Natural;
-      Num    : Natural := 0;
-      Native : Boolean := False;
+      Comp       : Compiler_Path_Access := Compilers;
+      Tmp        : Compiler_Path_Access;
+      Prj        : Ada.Text_IO.File_Type;
+      Tmpl       : Ada.Strings.Unbounded.Unbounded_String;
+      Tgts       : Ada.Strings.Unbounded.Unbounded_String;
+      Idx        : Natural;
+      Num        : Natural := 0;
+      Native     : Boolean := False;
+      Duplicated : Boolean;
 
    begin
       --  First read the aunit.gpr template
@@ -342,9 +344,22 @@ begin
          if Comp.Target.all /= "pentium-mingw32msv"
            and then Comp.Target.all /= "i686-pc-mingw32"
          then
-            Ada.Strings.Unbounded.Append (Tgts, ", ");
-            Ada.Strings.Unbounded.Append
-              (Tgts, """" & Comp.Target.all & """");
+            Tmp := Compilers;
+            Duplicated := False;
+
+            while Tmp /= Comp loop
+               if Tmp.Target.all = Comp.Target.all then
+                  Duplicated := True;
+                  exit;
+               end if;
+               Tmp := Tmp.Next;
+            end loop;
+
+            if not Duplicated then
+               Ada.Strings.Unbounded.Append (Tgts, ", ");
+               Ada.Strings.Unbounded.Append
+                 (Tgts, """" & Comp.Target.all & """");
+            end if;
          end if;
 
          Comp := Comp.Next;
