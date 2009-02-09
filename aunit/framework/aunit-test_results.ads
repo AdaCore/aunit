@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,6 +23,8 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+pragma Ada_2005;
 
 with Ada_Containers;
 with Ada_Containers.AUnit_Lists;

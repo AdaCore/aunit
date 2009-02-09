@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,6 +23,9 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+--  Ada 2005 unit as it uses the Container.Iterate method
+pragma Ada_2005;
 
 with AUnit.Memory.Utils;
 

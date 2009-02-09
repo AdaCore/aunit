@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
---                      Copyright (C) 2008, AdaCore                         --
+--                   Copyright (C) 2008-2009, AdaCore                       --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -22,6 +22,8 @@
 --                                                                          --
 -- This unit was originally developed by Matthew J Heaney.                  --
 ------------------------------------------------------------------------------
+
+pragma Ada_2005;
 
 with System;  use type System.Address;
 
