@@ -1,12 +1,14 @@
 AUnit 3.1.0w README
-April 1st, 2008
+March 2nd, 2009
 
-This is a major update release of the Ada unit test framework AUnit, derived
+This is a minor update release of the Ada unit test framework AUnit, derived
 from the JUnit/CPPUnit frameworks for Java/C++. Read docs/aunit.html for
 installation and usage.
 
 Changes:
 --------
+
+3.1: Add support for tests expecting exceptions to be raised.
 
 3.00: Major rewrite:
       - Removal of the genericity of the AUnit framework.
