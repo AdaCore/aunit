@@ -16,13 +16,6 @@ project AUnit_Build is
       "framework/" & AUnit_Shared.Calend,
       "framework/" & AUnit_Shared.Memory);
 
-   case AUnit_Shared.Except is
-      when "sjljexception" =>
-         for Languages use project'Languages & "C";
-         for Library_Options use ("sjlj.o");
-      when others =>
-   end case;
-
    package Compiler is
       for Default_Switches ("ada") use 
         ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");

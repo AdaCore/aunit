@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -56,5 +56,24 @@ package body AUnit.Assertions is
       end if;
       return Condition;
    end Assert;
+
+   ----------------------
+   -- Assert_Exception --
+   ----------------------
+
+   procedure Assert_Exception
+     (Message : String;
+      Source  : String := GNAT.Source_Info.File;
+      Line    : Natural := GNAT.Source_Info.Line)
+   is
+   begin
+      Proc;
+      --  No exception raised: register the failure message
+      Register_Failure (Message, Source, Line);
+
+   exception
+      when others =>
+         null;
+   end Assert_Exception;
 
 end AUnit.Assertions;

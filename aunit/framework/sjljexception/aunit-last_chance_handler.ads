@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                      Copyright (C) 2008, AdaCore                         --
+--                       Copyright (C) 2008-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -28,22 +28,24 @@
 --  builtin to allow exception simulation on platforms where the run-time does
 --  not allow exception propagation.
 
-with System;
-with AUnit; use AUnit;
-with AUnit.Simple_Test_Cases;
+pragma Ada_2005;
 
-package Last_Chance_Handler is
+with System;
+
+package AUnit.Last_Chance_Handler is
 
    function Get_Last_Msg return Message_String;
    function Get_Source return Message_String;
    function Get_Line return Natural;
    --  Return the last exception message
 
-   function Setjmp (Test : AUnit.Simple_Test_Cases.Test_Case_Access)
-                    return Integer;
+   generic
+      with procedure Proc;
+   function Gen_Setjmp return Integer;
+   --  Setjmp: init the handler, and call Proc.
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer);
    pragma Export (C, Last_Chance_Handler, "__gnat_last_chance_handler");
    pragma No_Return (Last_Chance_Handler);
 
-end Last_Chance_Handler;
+end AUnit.Last_Chance_Handler;

@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                      Copyright (C) 2008, AdaCore                         --
+--                       Copyright (C) 2008-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,27 +23,34 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+pragma Ada_2005;
+
 with System;
 with System.Storage_Elements; use System.Storage_Elements;
 with Interfaces.C;
 with Ada.Unchecked_Conversion;
 
-package body Last_Chance_Handler is
+package body AUnit.Last_Chance_Handler is
 
    Exception_Msg    : Message_String := null;
    Exception_Source : Message_String := null;
    Exception_Line   : Natural := 0;
 
-   The_Test : AUnit.Simple_Test_Cases.Test_Case_Access := null;
+   type Jmp_Buff is array (1 .. 5) of System.Address;
+   type Jmp_Buff_Address is access all Jmp_Buff;
+   --  type expected by setjmp call
 
-   procedure Test_Runner;
-   --  Wrapper called by the C setjmp that runs the test case
+   function Builtin_Setjmp (Buff : Jmp_Buff_Address) return Integer;
+   pragma Import (Intrinsic, Builtin_Setjmp, "__builtin_setjmp");
 
-   function C_Setjmp (Acc : System.Address) return Integer;
-   pragma Import (C, C_Setjmp, "mysetjmp");
-   procedure C_Longjmp;
-   pragma Import (C, C_Longjmp, "mylongjmp");
-   pragma No_Return (C_Longjmp);
+   procedure Builtin_Longjmp (Buff : Jmp_Buff_Address; Flag : Integer);
+   pragma Import (Intrinsic, Builtin_Longjmp, "__builtin_longjmp");
+   pragma No_Return (Builtin_Longjmp);
+
+   --  handle at most 5 handlers at the same time
+   Jmp_Buffer   : array (1 .. 5) of aliased Jmp_Buff;
+   Jmp_Buff_Idx : Integer := Jmp_Buffer'First;
 
    ---------------------------
    --  C Strings management --
@@ -60,25 +67,24 @@ package body Last_Chance_Handler is
 
    function To_Ada (Item : chars_ptr) return Message_String;
 
-   -----------------
-   -- Test_Runner --
-   -----------------
+   ----------------
+   -- Gen_Setjmp --
+   ----------------
 
-   procedure Test_Runner is
+   function Gen_Setjmp return Integer
+   is
+      Ret : Integer;
    begin
-      AUnit.Simple_Test_Cases.Run_Test (The_Test.all);
-   end Test_Runner;
+      Ret := Builtin_Setjmp (Jmp_Buffer (Jmp_Buff_Idx)'Access);
 
-   ------------
-   -- Setjmp --
-   ------------
+      if Ret = 0 then
+         Jmp_Buff_Idx := Jmp_Buff_Idx + 1;
+         Proc;
+         Jmp_Buff_Idx := Jmp_Buff_Idx - 1;
+      end if;
 
-   function Setjmp (Test : AUnit.Simple_Test_Cases.Test_Case_Access)
-                    return Integer is
-   begin
-      The_Test := Test;
-      return C_Setjmp (Test_Runner'Address);
-   end Setjmp;
+      return Ret;
+   end Gen_Setjmp;
 
    ------------------
    -- Get_Last_Msg --
@@ -170,13 +176,24 @@ package body Last_Chance_Handler is
    -------------------------
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
+      procedure C_Abort;
+      pragma Import (C, C_Abort, "abort");
+      pragma No_Return (C_Abort);
+
    begin
       --  Save the exception message before performing the longjmp
       Exception_Msg    := Format ("Unexpected exception in zfp profile");
       Exception_Source := To_Ada (To_chars_ptr (Msg));
       Exception_Line   := Line;
-      --  No return procedure.
-      C_Longjmp;
+
+      Jmp_Buff_Idx := Jmp_Buff_Idx - 1;
+
+      if Jmp_Buff_Idx >= Jmp_Buffer'First then
+         --  No return procedure.
+         Builtin_Longjmp (Jmp_Buffer (Jmp_Buff_Idx)'Access, 1);
+      else
+         C_Abort;
+      end if;
    end Last_Chance_Handler;
 
-end Last_Chance_Handler;
+end AUnit.Last_Chance_Handler;

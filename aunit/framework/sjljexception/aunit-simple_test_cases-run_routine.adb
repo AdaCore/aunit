@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,7 +24,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Last_Chance_Handler;
+with AUnit.Last_Chance_Handler;
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for run-time libraries that support exception handling via gcc
@@ -38,6 +38,15 @@ procedure Run_Routine
    Unexpected_Exception : Boolean := False;
 
    function String_Compare (Str1, Str2 : String) return Boolean;
+   --  Compares two strings.
+
+   procedure Internal_Run_Test;
+   --  Wrapper for running the test case
+
+   --------------------
+   -- String_Compare --
+   --------------------
+
    function String_Compare (Str1, Str2 : String) return Boolean is
    begin
       if Str1'Length /= Str2'Length then
@@ -51,6 +60,18 @@ procedure Run_Routine
       return True;
    end String_Compare;
 
+   -----------------------
+   -- Internal_Run_Test --
+   -----------------------
+
+   procedure Internal_Run_Test is
+   begin
+      AUnit.Simple_Test_Cases.Run_Test (Test.all);
+   end Internal_Run_Test;
+
+   function Internal_Setjmp is new AUnit.Last_Chance_Handler.Gen_Setjmp
+     (Internal_Run_Test);
+
    Res : Integer;
 
    use Failure_Lists;
@@ -62,22 +83,22 @@ begin
    Clear (Test.Failures);
 
    begin
-      Res := Last_Chance_Handler.Setjmp (Test_Case_Access (Test));
+      Res := Internal_Setjmp;
 
       if Res /= 0 then
          declare
             Src : constant Message_String :=
-                    Last_Chance_Handler.Get_Source;
+                    AUnit.Last_Chance_Handler.Get_Source;
          begin
-            if not String_Compare (Src.all, "aunit-assertions.adb:44") then
+            if not String_Compare (Src.all, "aunit-assertions.adb:47") then
                Unexpected_Exception := True;
                Add_Error
                  (R.all,
                   Name (Test.all),
                   Routine_Name (Test.all),
-                  (Last_Chance_Handler.Get_Last_Msg,
-                   Last_Chance_Handler.Get_Source,
-                   Last_Chance_Handler.Get_Line));
+                  (AUnit.Last_Chance_Handler.Get_Last_Msg,
+                   AUnit.Last_Chance_Handler.Get_Source,
+                   AUnit.Last_Chance_Handler.Get_Line));
             end if;
          end;
       end if;

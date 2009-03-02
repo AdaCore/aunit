@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -50,5 +50,15 @@ package AUnit.Assertions is
       Line      : Natural := GNAT.Source_Info.Line) return Boolean;
    --  Functional version to allow the calling routine to decide whether to
    --  continue or abandon the execution.
+
+   type Throwing_Exception_Proc is access procedure;
+
+   generic
+      with procedure Proc;
+   procedure Assert_Exception
+     (Message : String;
+      Source  : String := GNAT.Source_Info.File;
+      Line    : Natural := GNAT.Source_Info.Line);
+   --  Test that Proc throws an exception and record "Message" if not.
 
 end AUnit.Assertions;

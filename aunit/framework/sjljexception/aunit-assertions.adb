@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,8 +24,11 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  Version for run-time libraries that support exception handling
-with AUnit.Simple_Test_Cases; use AUnit.Simple_Test_Cases;
+--  Version for run-time libraries that support exception handling via
+--  gcc builtin setjmp/longjmp
+
+with AUnit.Last_Chance_Handler;
+with AUnit.Simple_Test_Cases;   use AUnit.Simple_Test_Cases;
 
 package body AUnit.Assertions is
 
@@ -60,5 +63,18 @@ package body AUnit.Assertions is
       end if;
       return Condition;
    end Assert;
+
+   procedure Assert_Exception
+     (Message : String;
+      Source  : String := GNAT.Source_Info.File;
+      Line    : Natural := GNAT.Source_Info.Line)
+   is
+      function My_Setjmp is new AUnit.Last_Chance_Handler.Gen_Setjmp (Proc);
+   begin
+      if My_Setjmp = 0 then
+         --  Result is 0 when no exception has been raised.
+         Register_Failure (Message, Source, Line);
+      end if;
+   end Assert_Exception;
 
 end AUnit.Assertions;
