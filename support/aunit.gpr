@@ -1,4 +1,4 @@
-with "AUnit_Shared";
+with "aunit_shared";
 
 project AUnit is
 
