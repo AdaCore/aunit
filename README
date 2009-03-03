@@ -1,4 +1,4 @@
-AUnit 3.1.0w README
+AUnit 3.2.0w README
 March 2nd, 2009
 
 This is a minor update release of the Ada unit test framework AUnit, derived
@@ -8,7 +8,11 @@ installation and usage.
 Changes:
 --------
 
-3.1: Add support for tests expecting exceptions to be raised.
+3.2.0: Add support for tests expecting exceptions to be raised.
+
+3.1.0 Support for missing run-time libraries.
+      Update of the template directory, according to AUnit 3 API.
+      Update installation scripts.
 
 3.00: Major rewrite:
       - Removal of the genericity of the AUnit framework.

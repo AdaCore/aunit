@@ -53,7 +53,7 @@
 
 @page
 
-Copyright @copyright{} 2000-2008, AdaCore
+Copyright @copyright{} 2000-2009, AdaCore
 
 @*
 
@@ -256,6 +256,24 @@ or:
 @AEXP{if not AUnit.Assertions.Assert (@b{Boolean_Expression}, @b{String_Description}) then
    return;
 end if;}
+
+In case you need to test that a method raises an expected exception, there also
+exists a generic Assert procedure that you can use for this purpose:
+
+@AEXP{declare
+   procedure Test_Raising_Exception is
+   begin
+      call_to_the_tested_method (some_args);
+   end Test_Raising_Exception;
+
+   procedure Assert_Exception_Raised is new AUnit.Assertions.Assert_Exception
+     (Test_Raising_Exception);
+begin
+   Assert_Exception_Raised (@b{String_Description});
+end;}
+
+This procedure can handle exceptions with all run-time profiles (including
+zfp).
 
 @item Create a suite function inside a package to gather together test cases
 and sub-suites@footnote{If using the ZFP or the 'cert' run-time profiles, test
