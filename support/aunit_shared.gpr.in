@@ -4,7 +4,7 @@ project AUnit_Shared is
    Target  : Target_Type  := external ("PLATFORM", "native");
 
    type Runtime_Type is
-     ("full", "kernel", "kernel-smp", "rtp", "rtp-smp",
+     ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
       "cert", "ravenscar", "ravenscar-full", "ravenscar-cert",
       "hi", "ravenscar-sfp", "zfp");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
