@@ -1,6 +1,10 @@
 include ../../version_information
-VERSION=${MAJOR_VERSION}.${MINOR_VERSION}
-PVERSION=$(shell echo ${VERSION} | sed -e 's/\([^a-zA-Z]*\).*/\1.0/')
+VERSION=${MAJOR_VERSION}${MINOR_VERSION}
+ifneq (${MINOR_VERSION},)
+  PVERSION=$(shell echo ${VERSION} | sed -e 's/\([^a-zA-Z]*\).*/\1.0/')
+else
+  PVERSION=$(shell echo ${VERSION} | sed -e 's/\([^a-zA-Z]*\).*/\1.0.0.0/')
+endif
 
 all:
 	cat nsis\\aunit.nsi | \
