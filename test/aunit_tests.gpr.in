@@ -1,5 +1,5 @@
-with "../aunit/aunit_build";
-with "../support/aunit_shared";
+with "aunit";
+with "aunit_shared";
 
 project Aunit_Tests is
 
