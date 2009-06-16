@@ -41,14 +41,14 @@ package AUnit.Test_Results is
    --  top-level test suite.
 
    type Test_Failure is record
-      Message      : Message_String;
-      Source_Name  : Message_String;
-      Line         : Natural;
+      Message     : Message_String;
+      Source_Name : Message_String;
+      Line        : Natural;
    end record;
    type Test_Failure_Access is access all Test_Failure;
    --  Description of a test routine failures and unexpected exceptions
    --  Unexpected exceptions are only logged when exception handling is
-   --  available in the run-time library
+   --  available in the run-time library.
 
    type Test_Result is record
       Test_Name    : Message_String;
@@ -64,28 +64,27 @@ package AUnit.Test_Results is
    --  Containers for all test results
 
    procedure Add_Error
-     (R                       : in out Result;
-      Test_Name               : Message_String;
-      Routine_Name            : Message_String;
-      Failure                 : Test_Failure);
+     (R            : in out Result;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
+      Failure      : Test_Failure);
    --  Record an unexpected exception
 
    procedure Add_Failure
-     (R                       : in out Result;
-      Test_Name               : Message_String;
-      Routine_Name            : Message_String;
-      Failure                 : Test_Failure);
+     (R            : in out Result;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String;
+      Failure      : Test_Failure);
    --  Record a test routine failure
 
    procedure Add_Success
-     (R                       : in out Result;
-      Test_Name               : Message_String;
-      Routine_Name            : Message_String);
+     (R            : in out Result;
+      Test_Name    : Message_String;
+      Routine_Name : Message_String);
    --  Record a test routine success
 
-   procedure Set_Elapsed (R : in out Result;
-                          T : Time_Measure.Time);
-   --  Set Elapsed time for reporter:
+   procedure Set_Elapsed (R : in out Result; T : Time_Measure.Time);
+   --  Set Elapsed time for reporter
 
    function Error_Count (R : Result) return Count_Type;
    --  Number of routines with unexpected exceptions
@@ -97,12 +96,11 @@ package AUnit.Test_Results is
    function Failure_Count (R : Result) return Count_Type;
    --  Number of failed routines
 
-   procedure Failures (R : in out Result;
-                       F : in out Result_Lists.List);
+   procedure Failures (R : in out Result; F : in out Result_Lists.List);
    --  List of failed routines
 
    function Elapsed (R : Result) return Time_Measure.Time;
-   --  Elapsed time for test execution:
+   --  Elapsed time for test execution
 
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
    --  Set count for a test run
@@ -110,8 +108,7 @@ package AUnit.Test_Results is
    function Success_Count (R : Result) return Count_Type;
    --  Number of successful routines
 
-   procedure Successes (R : in out Result;
-                        S : in out Result_Lists.List);
+   procedure Successes (R : in out Result; S : in out Result_Lists.List);
    --  List of successful routines
 
    function Successful (R : Result) return Boolean;
@@ -128,9 +125,9 @@ private
    pragma Inline (Errors, Failures, Successes);
 
    type Result is limited record
-      Tests_Run      : Count_Type := 0;
-      Result_List    : Result_Lists.List;
-      Elapsed_Time   : Time_Measure.Time := Time_Measure.Null_Time;
+      Tests_Run    : Count_Type := 0;
+      Result_List  : Result_Lists.List;
+      Elapsed_Time : Time_Measure.Time := Time_Measure.Null_Time;
    end record;
 
 end AUnit.Test_Results;
