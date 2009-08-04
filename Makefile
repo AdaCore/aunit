@@ -50,7 +50,7 @@ targets: installed-targets
 	done
 
 support/aunit_shared.gpr: support/aunit_shared.gpr.in targets
-	cat $< | sed -e 's/@TARGETS@/$(shell cat targets | sed -e 's/^, //')/' > $@
+	cat $< | sed -e 's/@TARGETS@/$(shell cut -c3- targets)/' > $@
 
 clean:
 	$(RM) -fr aunit/obj
