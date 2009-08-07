@@ -288,6 +288,7 @@ SectionEnd
 Section "Documentation" SecDoc
   SetOutPath "$INSTDIR\share\doc\aunit"
   File /r /x .svn /x *.texi /x makefile "${PRJ}docs\*.*"
+  File /r /x .svn /x *.texi /x makefile "${PRJ}known-problems*" "${PRJ}features*"
   SetOutPath "$INSTDIR\share\gps\plug-ins"
   File "/oname=$INSTDIR\share\gps\plug-ins\aunit.xml" "${PRJ}support\aunit.xml"
 SectionEnd
