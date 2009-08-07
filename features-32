@@ -12,3 +12,8 @@ This date shows the implementation date of the feature. Any 3.2.0w wavefront
 subsequent to this date will contain the indicated feature, as will any
 subsequent 3.2 or later releases.
 
+NF-32-I302-012 Add support for expected exceptions (2009-03-02)
+
+   A new procedure Assert_Exception has been added to the AUnit.Assertions
+   package to handle expected exceptions.
+

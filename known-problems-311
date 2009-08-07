@@ -11,3 +11,12 @@ wavefront issued subsequent to the date specified (in ISO format YYYY-MM-DD)
 in the status line. This can be used to determine if a given wavefront has
 the fix identified in the entry.
 
+KP-311-I803-020 Installation failure on Solaris
+
+  Problem:    On Solaris, 'make install' fails to install AUnit. This is due
+              to 'sed' not being able to work on files not terminated by a
+              trailing LF character.
+
+  Status:     This was fixed in 3.2 on 2009-08-04
+
+  Workaround: Use GNU sed for Solaris and retry installing.
