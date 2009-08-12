@@ -42,15 +42,19 @@ installed-targets:
 	@printf "native\n" >> installed-targets
 
 targets: installed-targets
-# make sure that "native" is in the targets list, as it is the default in 
+# make sure that "native" is in the targets list, as it is the default in
 # the project template
 	@$(RM) -f targets
 	for f in $(shell cat installed-targets | sort -u); \
-	  do printf ", \"$$f\"" >> targets; \
+	  do if [ -f targets ]; then \
+	       printf ", \"$$f\"" >> targets; \
+	     else  \
+	       printf "\"$$f\"" >> targets; \
+	     fi; \
 	done
 
 support/aunit_shared.gpr: support/aunit_shared.gpr.in targets
-	cat $< | sed -e 's/@TARGETS@/$(shell cut -c3- targets)/' > $@
+	cat $< | sed -e 's/@TARGETS@/$(shell cat targets)/' > $@
 
 clean:
 	$(RM) -fr aunit/obj
