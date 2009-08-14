@@ -11,6 +11,15 @@ wavefront issued subsequent to the date specified (in ISO format YYYY-MM-DD)
 in the status line. This can be used to determine if a given wavefront has
 the fix identified in the entry.
 
+KP-311-I814-014 AUnit fails to install for LynxOS
+
+  Problem:    The pthread run-time library was not included as an option in
+              the AUnit shared project file template.
+
+  Status:     This was fixed in 3.2 on 2009-08-14
+
+  Workaround: Manual build of AUnit from sources
+
 KP-311-I803-020 Installation failure on Solaris
 
   Problem:    On Solaris, 'make install' fails to install AUnit. This is due

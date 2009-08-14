@@ -6,7 +6,7 @@ project AUnit_Shared is
    type Runtime_Type is
      ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
       "cert", "ravenscar", "ravenscar-full", "ravenscar-cert",
-      "hi", "ravenscar-sfp", "zfp");
+      "hi", "ravenscar-sfp", "zfp", "default", "pthread");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
 
    for Source_Dirs use ();
