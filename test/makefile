@@ -33,9 +33,11 @@ else
    RUN =
 endif
 
-test: $(SUPPORTLIB) aunit_tests.gpr
+build: $(SUPPORTLIB) aunit_tests.gpr
 	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch $(CONF_ARGS) -o $(CONF_FILE)
 	$(GPRBUILD) -p -Paunit_tests -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE) $(LARGS)
+
+test: build
 	-$(RUN) $(TARGET)-$(RTS)/aunit_harness
 
 aunit_tests.gpr: aunit_tests.gpr.in force
