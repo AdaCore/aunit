@@ -1,5 +1,5 @@
-AUnit 3.2.0w README
-March 2nd, 2009
+AUnit 3.2.1 README
+September 08, 2009
 
 This is a minor update release of the Ada unit test framework AUnit, derived
 from the JUnit/CPPUnit frameworks for Java/C++. Read docs/aunit.html for
