@@ -8,7 +8,7 @@ installation and usage.
 Changes:
 --------
 
-3.2.0: Add support for tests expecting exceptions to be raised.
+3.2.1: Add support for tests expecting exceptions to be raised.
 
 3.1.0 Support for missing run-time libraries.
       Update of the template directory, according to AUnit 3 API.
