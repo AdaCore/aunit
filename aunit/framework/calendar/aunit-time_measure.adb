@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -48,7 +48,7 @@ package body AUnit.Time_Measure is
    -- Get_Measure --
    -----------------
 
-   function Get_Measure (T : in Time) return AUnit_Duration is
+   function Get_Measure (T : Time) return AUnit_Duration is
       use type Ada.Calendar.Time;
    begin
       return AUnit_Duration (T.Stop - T.Start);
