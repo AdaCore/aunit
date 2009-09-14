@@ -24,9 +24,12 @@ project AUnit_Shared is
          Except := "sjljexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
-      when "ravenscar" | "ravenscar-full" | "ravenscar-cert" =>
+      when "ravenscar" | "ravenscar-full" =>
          Except := "sjljexception";
          Calend := "nocalendar";
+      when "ravenscar-cert" =>
+         Calend := "nocalendar";
+         Memory := "staticmemory";
       when "cert" =>
          Memory := "staticmemory";
       when others =>
