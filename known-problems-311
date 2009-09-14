@@ -11,6 +11,18 @@ wavefront issued subsequent to the date specified (in ISO format YYYY-MM-DD)
 in the status line. This can be used to determine if a given wavefront has
 the fix identified in the entry.
 
+KP-311-I914-019 AUnit built incorrectly for ravenscar-cert
+
+  Problem:    Build selected "sjljexception" rather than "exception". This
+              causes an incompatible last chance handler to be used. The build
+              also caused OS malloc to be used, which can be unavailable if
+              the user disables allocation in a partition.
+
+  Status:     This was fixed in 3.2 on 2009-09-14
+
+  Workaround: Manual build from sources with modified version of
+              aunit_shared.gpr
+
 KP-311-I814-014 AUnit fails to install for LynxOS
 
   Problem:    The pthread run-time library was not included as an option in
