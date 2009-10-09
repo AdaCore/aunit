@@ -46,15 +46,21 @@ package AUnit.Test_Results is
       Line        : Natural;
    end record;
    type Test_Failure_Access is access all Test_Failure;
-   --  Description of a test routine failures and unexpected exceptions
-   --  Unexpected exceptions are only logged when exception handling is
-   --  available in the run-time library.
+   --  Description of a test routine failure
+
+   type Test_Error is record
+      Exception_Name    : Message_String;
+      Exception_Message : Message_String;
+      Traceback         : Message_String;
+   end record;
+   type Test_Error_Access is access all Test_Error;
+   --  Description of unexpected exceptions
 
    type Test_Result is record
       Test_Name    : Message_String;
       Routine_Name : Message_String;
       Failure      : Test_Failure_Access;
-      Error        : Test_Failure_Access;
+      Error        : Test_Error_Access;
    end record;
    --  Decription of a test routine result
 
@@ -67,7 +73,7 @@ package AUnit.Test_Results is
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Failure      : Test_Failure);
+      Error        : Test_Error);
    --  Record an unexpected exception
 
    procedure Add_Failure

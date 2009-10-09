@@ -4,11 +4,9 @@
 with AUnit.Reporter.Text;
 with Harness;
 
---  with Last_Chance_Handler, Dummy_SS_Get;
---  For ZFP only
-
 procedure AUnit_Harness is
    Reporter : AUnit.Reporter.Text.Text_Reporter;
 begin
+   AUnit.Reporter.Text.Set_Use_ANSI_Colors (Reporter, True);
    Harness (Reporter, Timed => False);
 end AUnit_Harness;

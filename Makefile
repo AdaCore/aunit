@@ -63,6 +63,7 @@ clean:
 	$(RM) -f installed-targets
 	$(RM) -f targets
 	$(RM) -f support/aunit_shared.gpr
+	$(RM) -f *.cgpr
 
 install_clean:
 ifeq ($(INSTALL),)

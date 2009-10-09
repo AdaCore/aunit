@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,8 +24,10 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions;   use Ada.Exceptions;
-with AUnit.Assertions; use AUnit.Assertions;
+with Ada.Exceptions;          use Ada.Exceptions;
+with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
+
+with AUnit.Assertions;        use AUnit.Assertions;
 
 separate (AUnit.Simple_Test_Cases)
 
@@ -56,7 +58,9 @@ begin
            (R.all,
             Name (Test.all),
             Routine_Name (Test.all),
-            (Format (Exception_Name (E)), null, 0));
+            Error => (Exception_Name    => Format (Exception_Name (E)),
+                      Exception_Message => Format (Exception_Message (E)),
+                      Traceback         => Format (Symbolic_Traceback (E))));
    end;
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then

@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -129,7 +129,6 @@ package body AUnit.Reporter.XML is
    ------------------
 
    procedure Report_Test (Test : Test_Result) is
-      Error     : Test_Failure_Access;
       Is_Assert : Boolean;
    begin
       Put_Line ("    <Test>");
@@ -146,10 +145,8 @@ package body AUnit.Reporter.XML is
       if Test.Failure /= null or else Test.Error /= null then
          if Test.Failure /= null then
             Is_Assert := True;
-            Error := Test.Failure;
          else
             Is_Assert := False;
-            Error := Test.Error;
          end if;
 
          Put      ("      <FailureType>");
@@ -162,18 +159,36 @@ package body AUnit.Reporter.XML is
 
          Put_Line ("</FailureType>");
          Put      ("      <Message>");
-         Put      (Error.Message.all);
+         if Is_Assert then
+            Put   (Test.Failure.Message.all);
+         else
+            Put   (Test.Error.Exception_Name.all);
+         end if;
          Put_Line ("</Message>");
 
-         if Error.Source_Name /= null then
+         if Is_Assert then
             Put_Line ("      <Location>");
             Put      ("        <File>");
-            Put      (Error.Source_Name.all);
+            Put      (Test.Failure.Source_Name.all);
             Put_Line ("</File>");
             Put      ("        <Line>");
-            Put      (Error.Line);
+            Put      (Test.Failure.Line);
             Put_Line ("</Line>");
             Put_Line ("      </Location>");
+
+         else
+            Put_Line ("      <Exception>");
+            Put      ("      <Message>");
+            Put      (Test.Error.Exception_Message.all);
+            Put_Line ("</Message>");
+
+            if Test.Error.Traceback /= null then
+               Put      ("      <Traceback>");
+               Put      (Test.Error.Traceback.all);
+               Put_Line ("</Traceback>");
+            end if;
+
+            Put_Line ("      </Exception>");
          end if;
       end if;
 

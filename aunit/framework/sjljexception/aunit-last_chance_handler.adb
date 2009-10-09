@@ -33,9 +33,8 @@ with Ada.Unchecked_Conversion;
 
 package body AUnit.Last_Chance_Handler is
 
-   Exception_Msg    : Message_String := null;
-   Exception_Source : Message_String := null;
-   Exception_Line   : Natural := 0;
+   Exception_Name    : Message_String := null;
+   Exception_Message : Message_String := null;
 
    type Jmp_Buff is array (1 .. 5) of System.Address;
    type Jmp_Buff_Address is access all Jmp_Buff;
@@ -65,7 +64,8 @@ package body AUnit.Last_Chance_Handler is
    function To_Address is
       new Ada.Unchecked_Conversion (chars_ptr, System.Address);
 
-   function To_Ada (Item : chars_ptr) return Message_String;
+   function To_Ada
+     (Item : chars_ptr; Line : Integer := 0) return Message_String;
 
    ----------------
    -- Gen_Setjmp --
@@ -86,74 +86,87 @@ package body AUnit.Last_Chance_Handler is
       return Ret;
    end Gen_Setjmp;
 
-   ------------------
-   -- Get_Last_Msg --
-   ------------------
+   ------------------------
+   -- Get_Exception_Name --
+   ------------------------
 
-   function Get_Last_Msg return Message_String is
+   function Get_Exception_Name return Message_String is
    begin
-      if Exception_Msg = null then
+      if Exception_Message = null then
          return AUnit.Message_Alloc (0);
       else
-         return Exception_Msg;
+         return Exception_Name;
       end if;
-   end Get_Last_Msg;
+   end Get_Exception_Name;
 
-   ----------------
-   -- Get_Source --
-   ----------------
+   ---------------------------
+   -- Get_Exception_Message --
+   ---------------------------
 
-   function Get_Source return Message_String is
+   function Get_Exception_Message return Message_String is
    begin
-      if Exception_Msg = null then
+      if Exception_Message = null then
          return AUnit.Message_Alloc (0);
       else
-         return Exception_Source;
+         return Exception_Message;
       end if;
-   end Get_Source;
-
-   --------------
-   -- Get_Line --
-   --------------
-
-   function Get_Line return Natural is
-   begin
-      if Exception_Msg = null then
-         return 0;
-      else
-         return Exception_Line;
-      end if;
-   end Get_Line;
+   end Get_Exception_Message;
 
    ------------
    -- To_Ada --
    ------------
 
-   function To_Ada (Item : chars_ptr) return Message_String is
+   function To_Ada
+     (Item : chars_ptr; Line : Integer := 0) return Message_String
+   is
       use Interfaces.C;
-      Result : Message_String;
-      Length : size_t := 0;
+      Result   : Message_String;
+      Length   : size_t := 0;
+      Line_Img : String (1 .. Integer'Width);
+      First    : Natural := Line_Img'Last + 1;
 
       function "+" (Left : chars_ptr; Right : size_t) return chars_ptr;
+      --  Return the address Right character right of address Left.
+
       function Peek (From : chars_ptr) return char;
+      --  Return the character at address From
+
       function To_Ada (Item : char) return Character;
+      --  Translate char to an Ada Character
+
+      ---------
+      -- "+" --
+      ---------
+
       function "+" (Left : chars_ptr; Right : size_t) return chars_ptr is
       begin
          return To_chars_ptr (To_Address (Left) + Storage_Offset (Right));
       end "+";
+
+      ----------
+      -- Peek --
+      ----------
+
       function Peek (From : chars_ptr) return char is
       begin
          return char (From.all);
       end Peek;
+
+      ------------
+      -- To_Ada --
+      ------------
+
       function To_Ada (Item : char) return Character is
       begin
          return Character'Val (char'Pos (Item));
       end To_Ada;
+
    begin
       if Item = null then
          return null;
       end if;
 
+      --  Compute the Length of "Item"
       loop
          if Peek (Item + Length) = nul then
             exit;
@@ -162,11 +175,42 @@ package body AUnit.Last_Chance_Handler is
          Length := Length + 1;
       end loop;
 
-      Result := AUnit.Message_Alloc (Natural (Length));
+      --  Compute the image of Line
+      if Line /= 0 then
+         declare
+            Int   : Integer;
+            Val   : Natural;
 
-      for J in Result'Range loop
+         begin
+            Int := Line;
+
+            loop
+               Val := Int mod 10;
+               Int := (Int - Val) / 10;
+               First := First - 1;
+               Line_Img (First) := Character'Val (Val + Character'Pos ('0'));
+               exit when Int = 0;
+            end loop;
+         end;
+      end if;
+
+      if Line /= 0 then
+         Result := AUnit.Message_Alloc
+           (Natural (Length) +  Line_Img'Last - First + 2);
+      else
+         Result := AUnit.Message_Alloc (Natural (Length));
+      end if;
+
+      for J in 1 .. Integer (Length) loop
          Result (J) := To_Ada (Peek (Item + size_t (J - 1)));
       end loop;
+
+      if Line /= 0 then
+         Result (Integer (Length + 1)) := ':';
+         for J in First .. Line_Img'Last loop
+            Result (Integer (Length + 2) + J - First) := Line_Img (J);
+         end loop;
+      end if;
 
       return Result;
    end To_Ada;
@@ -182,9 +226,12 @@ package body AUnit.Last_Chance_Handler is
 
    begin
       --  Save the exception message before performing the longjmp
-      Exception_Msg    := Format ("Unexpected exception in zfp profile");
-      Exception_Source := To_Ada (To_chars_ptr (Msg));
-      Exception_Line   := Line;
+      Exception_Name   := Format ("Unexpected exception in zfp profile");
+      if Line = 0 then
+         Exception_Message := To_Ada (To_chars_ptr (Msg));
+      else
+         Exception_Message := To_Ada (To_chars_ptr (Msg), Line);
+      end if;
 
       Jmp_Buff_Idx := Jmp_Buff_Idx - 1;
 

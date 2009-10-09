@@ -24,28 +24,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  Very simple reporter to console
 package AUnit.Reporter.Text is
 
-   type Text_Reporter is new Reporter with null record;
-   --  A very simple reporter to console
-   --  All results are printed on the console
+   type Text_Reporter is new Reporter with private;
 
-   procedure Report (Self : Text_Reporter; R : in out Result);
+   procedure Set_Use_ANSI_Colors
+     (Engine : in out Text_Reporter;
+      Value  : Boolean);
+   --  Setting this value will enable colors output on an ANSI compatible
+   --  terminal.
+   --  By default, no color is used.
 
-   type Result_Type is (Success, Failure, Error);
-   procedure Put_Result_List
-      (Self : Text_Reporter; List : Result_Lists.List; Kind : Result_Type);
-   --  Report the list of tests that where run, along with their types
+   procedure Report (Engine : Text_Reporter;
+                     R      : in out Result);
 
-   type Text_Color_Reporter is new Text_Reporter with null record;
-   --  A text reporter that highlights results in color (green for success,
-   --  red for failure or error).
-   --  This should only be used if your console supports color, since
-   --  otherwise the control characters will make the output confusing
+private
 
-   procedure Put_Result_List
-      (Self : Text_Color_Reporter;
-       List : Result_Lists.List;
-       Kind : Result_Type);
+   type Text_Reporter is new Reporter with record
+      Use_ANSI : Boolean := False;
+   end record;
 
 end AUnit.Reporter.Text;

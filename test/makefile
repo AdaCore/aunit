@@ -25,6 +25,12 @@ else
    CONF_ARGS = --target=$(TARGET)
 endif
 
+ifeq ($(OS),Windows_NT)
+ifeq ($(TARGET),native)
+exeext=.exe
+endif
+endif
+
 CONF_FILE = $(TARGET)-$(RTS).cgpr
 
 ifeq ($(TARGET),powerpc-elf)
@@ -37,8 +43,14 @@ build: $(SUPPORTLIB) aunit_tests.gpr
 	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch $(CONF_ARGS) -o $(CONF_FILE)
 	$(GPRBUILD) -p -Paunit_tests -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE) $(LARGS)
 
+run: build
+	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext)
+
 test: build
-	-$(RUN) $(TARGET)-$(RTS)/aunit_harness
+	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext) | grep "^   [TSFU]" > test.out
+	diff -b test.out expected.out
+	@echo
+	@echo "[OK] AUNIT TEST IS SUCCESSFUL"
 
 aunit_tests.gpr: aunit_tests.gpr.in force
 ifeq ($(shell ls ../aunit/aunit_build.gpr 2> /dev/null),../aunit/aunit_build.gpr)
@@ -48,7 +60,7 @@ else
 endif
 
 clean:
-	$(RM) -rf obj support/obj support/lib $(TARGET)-$(RTS)
+	$(RM) -rf obj support/obj support/lib $(TARGET)-$(RTS) *.cgpr test.out
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p

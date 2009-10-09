@@ -34,9 +34,8 @@ with System;
 
 package AUnit.Last_Chance_Handler is
 
-   function Get_Last_Msg return Message_String;
-   function Get_Source return Message_String;
-   function Get_Line return Natural;
+   function Get_Exception_Name return Message_String;
+   function Get_Exception_Message return Message_String;
    --  Return the last exception message
 
    generic

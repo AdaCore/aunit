@@ -40,6 +40,9 @@ package body AUnit.Test_Results is
    function Alloc_Failure is new AUnit.Memory.Utils.Gen_Alloc
      (Test_Failure, Test_Failure_Access);
 
+   function Alloc_Error is new AUnit.Memory.Utils.Gen_Alloc
+     (Test_Error, Test_Error_Access);
+
    E_Count : Count_Type;
    F_Count : Count_Type;
    S_Count : Count_Type;
@@ -161,15 +164,15 @@ package body AUnit.Test_Results is
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Failure      : Test_Failure)
+      Error        : Test_Error)
    is
       Val : constant Test_Result := (Test_Name, Routine_Name,
                                      Failure => null,
-                                     Error   => Alloc_Failure);
+                                     Error   => Alloc_Error);
       use Result_Lists;
    begin
 
-      Val.Error.all := Failure;
+      Val.Error.all := Error;
       Append (R.Result_List, Val);
    end Add_Error;
 

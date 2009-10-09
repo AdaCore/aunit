@@ -24,7 +24,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Last_Chance_Handler;
+with AUnit.Last_Chance_Handler; use AUnit.Last_Chance_Handler;
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for run-time libraries that support exception handling via gcc
@@ -87,8 +87,8 @@ begin
 
       if Res /= 0 then
          declare
-            Src : constant Message_String :=
-                    AUnit.Last_Chance_Handler.Get_Source;
+            Src     : constant Message_String :=
+                        AUnit.Last_Chance_Handler.Get_Exception_Message;
          begin
             if not String_Compare (Src.all, "aunit-assertions.adb:47") then
                Unexpected_Exception := True;
@@ -96,9 +96,10 @@ begin
                  (R.all,
                   Name (Test.all),
                   Routine_Name (Test.all),
-                  (AUnit.Last_Chance_Handler.Get_Last_Msg,
-                   AUnit.Last_Chance_Handler.Get_Source,
-                   AUnit.Last_Chance_Handler.Get_Line));
+                  Error =>
+                    (Exception_Name    => Get_Exception_Name,
+                     Exception_Message => Src,
+                     Traceback         => null));
             end if;
          end;
       end if;

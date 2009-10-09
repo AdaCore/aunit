@@ -27,22 +27,56 @@
 with GNAT.IO;            use GNAT.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
+--  Very simple reporter to console
 package body AUnit.Reporter.Text is
+
+   procedure Indent (N : Natural);
+   --  Print N indentations to output
+
+   procedure Dump_Result_List (L : Result_Lists.List);
+   --  Dump a result list
 
    procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
-   ---------------------
-   -- Put_Result_List --
-   ---------------------
+   ANSI_Def    : constant String := ASCII.ESC & "[0m";
+   ANSI_Green  : constant String := ASCII.ESC & "[32m";
+   ANSI_Purple : constant String := ASCII.ESC & "[35m";
+   ANSI_Red    : constant String := ASCII.ESC & "[31m";
 
-   procedure Put_Result_List
-      (Self : Text_Reporter; List : Result_Lists.List; Kind : Result_Type)
-   is
-      use Result_Lists;
-      pragma Unreferenced (Self, Kind);
-      C : Cursor := First (List);
+   -------------------------
+   -- Set_Use_ANSI_Colors --
+   -------------------------
+
+   procedure Set_Use_ANSI_Colors
+     (Engine : in out Text_Reporter;
+      Value  : Boolean) is
    begin
+      Engine.Use_ANSI := Value;
+   end Set_Use_ANSI_Colors;
+
+   ------------
+   -- Indent --
+   ------------
+
+   procedure Indent (N : Natural) is
+   begin
+      for J in 1 .. N loop
+         Put ("      ");
+      end loop;
+   end Indent;
+
+   ----------------------
+   -- Dump_Result_List --
+   ----------------------
+
+   procedure Dump_Result_List (L : Result_Lists.List) is
+
+      use Result_Lists;
+
+      C : Cursor := First (L);
+   begin
+
       --  Note: can't use Iterate because it violates restriction
       --  No_Implicit_Dynamic_Code
 
@@ -50,43 +84,19 @@ package body AUnit.Reporter.Text is
          Report_Test (Element (C));
          Next (C);
       end loop;
-   end Put_Result_List;
-
-   procedure Put_Result_List
-      (Self : Text_Color_Reporter;
-       List : Result_Lists.List;
-       Kind : Result_Type)
-   is
-   begin
-      case Kind is
-         when Success =>
-            Put (ASCII.ESC);
-            Put ("[32m");
-
-         when Failure =>
-            Put (ASCII.ESC);
-            Put ("[35m");
-
-         when Error =>
-            Put (ASCII.ESC);
-            Put ("[31m");
-      end case;
-
-      Put_Result_List (Text_Reporter (Self), List, Kind);
-
-      Put (ASCII.ESC);
-      Put ("[0m");
-   end Put_Result_List;
+   end Dump_Result_List;
 
    ------------
    -- Report --
    ------------
 
-   procedure Report (Self : Text_Reporter;
-                     R    : in out Result)
+   procedure Report
+     (Engine : Text_Reporter;
+      R      : in out Result)
    is
       T   : AUnit_Duration;
       procedure Put_Measure is new Gen_Put_Measure;
+
    begin
       Put_Line ("--------------------");
       New_Line;
@@ -102,8 +112,16 @@ package body AUnit.Reporter.Text is
          Put (Integer (Success_Count (R)));
          New_Line;
 
+         if Engine.Use_ANSI then
+            Put (ANSI_Green);
+         end if;
+
          Successes (R, S);
-         Put_Result_List (Text_Reporter'Class (Self), S, Kind => Success);
+         Dump_Result_List (S);
+
+         if Engine.Use_ANSI then
+            Put (ANSI_Def);
+         end if;
       end;
 
       declare
@@ -114,9 +132,17 @@ package body AUnit.Reporter.Text is
          Put (Integer (Failure_Count (R)));
          New_Line;
 
+         if Engine.Use_ANSI then
+            Put (ANSI_Purple);
+         end if;
+
          Failures (R, F);
-         Put_Result_List (Text_Reporter'Class (Self), F, Kind => Failure);
+         Dump_Result_List (F);
          New_Line;
+
+         if Engine.Use_ANSI then
+            Put (ANSI_Def);
+         end if;
       end;
 
       declare
@@ -127,9 +153,17 @@ package body AUnit.Reporter.Text is
          Put (Integer (Error_Count (R)));
          New_Line;
 
+         if Engine.Use_ANSI then
+            Put (ANSI_Red);
+         end if;
+
          Errors (R, E);
-         Put_Result_List (Text_Reporter'Class (Self), E, Kind => Error);
+         Dump_Result_List (E);
          New_Line;
+
+         if Engine.Use_ANSI then
+            Put (ANSI_Def);
+         end if;
       end;
 
       if Elapsed  (R) /= Time_Measure.Null_Time then
@@ -147,13 +181,12 @@ package body AUnit.Reporter.Text is
    -----------------
 
    procedure Report_Test (Test : Test_Result) is
-      Error : Test_Failure_Access;
    begin
       if Test.Error /= null or else Test.Failure /= null then
          New_Line;
       end if;
 
-      Put ("      ");
+      Indent (1);
       Put (Test.Test_Name.all);
 
       if Test.Routine_Name /= null then
@@ -163,27 +196,26 @@ package body AUnit.Reporter.Text is
          New_Line;
       end if;
 
-      if Test.Error /= null or else Test.Failure /= null then
-         if Test.Error /= null then
-            Error := Test.Error;
-         else
-            Error := Test.Failure;
-         end if;
+      if Test.Failure /= null then
+         Indent (2);
+         Put_Line (Test.Failure.Message.all);
+         Indent (2);
+         Put ("at ");
+         Put (Test.Failure.Source_Name.all);
+         Put (":");
+         Put (Test.Failure.Line);
+         New_Line;
 
-         Put ("      ");
-         Put ("      ");
-         Put_Line (Error.Message.all);
-
-         if Error.Source_Name /= null then
-            Put ("      ");
-            Put ("      ");
-            Put ("at ");
-            Put (Error.Source_Name.all);
-            Put (":");
-            Put (Error.Line);
-            New_Line;
-         else
-            New_Line;
+      elsif Test.Error /= null then
+         Indent (2);
+         Put_Line (Test.Error.Exception_Name.all);
+         Indent (2);
+         Put      ("Exception Message: ");
+         Put_Line (Test.Error.Exception_Message.all);
+         if Test.Error.Traceback /= null then
+            Indent (2);
+            Put_Line ("Traceback:");
+            Put_Line (Test.Error.Traceback.all);
          end if;
       end if;
    end Report_Test;

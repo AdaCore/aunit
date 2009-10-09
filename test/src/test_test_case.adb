@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2008, AdaCore
+--  Copyright (C) 2008-2009, AdaCore
 --
 with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
@@ -102,12 +102,13 @@ package body Test_Test_Case is
       Dummy := Assert (False, "expected failure 1");
       Assert (False, "expected failure 2");
       Assert (False,
-              "* UNEXPECTED FAILURE * except in 'no exception' run-time case");
+              "* UNEXPECTED FAILURE: We should have never reached this point");
    end Test_Multiple_Failures;
 
-   --  Exclude when run-time library does not support exception handling
-   procedure Test_Exceptions (T : in out Test_Cases.Test_Case'Class)
-   is separate;
+   procedure Test_Exceptions (T : in out Test_Cases.Test_Case'Class) is
+   begin
+      raise Constraint_Error;
+   end Test_Exceptions;
 
    --  Register test routines to call:
    use AUnit.Test_Cases.Registration;
