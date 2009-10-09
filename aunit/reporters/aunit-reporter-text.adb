@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -27,26 +27,22 @@
 with GNAT.IO;            use GNAT.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
---  Very simple reporter to console
 package body AUnit.Reporter.Text is
-
-   procedure Dump_Result_List (L : Result_Lists.List);
-   --  Dump a result list
 
    procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
-   ----------------------
-   -- Dump_Result_List --
-   ----------------------
+   ---------------------
+   -- Put_Result_List --
+   ---------------------
 
-   procedure Dump_Result_List (L : Result_Lists.List) is
-
+   procedure Put_Result_List
+      (Self : Text_Reporter; List : Result_Lists.List; Kind : Result_Type)
+   is
       use Result_Lists;
-
-      C : Cursor := First (L);
+      pragma Unreferenced (Self, Kind);
+      C : Cursor := First (List);
    begin
-
       --  Note: can't use Iterate because it violates restriction
       --  No_Implicit_Dynamic_Code
 
@@ -54,16 +50,41 @@ package body AUnit.Reporter.Text is
          Report_Test (Element (C));
          Next (C);
       end loop;
-   end Dump_Result_List;
+   end Put_Result_List;
+
+   procedure Put_Result_List
+      (Self : Text_Color_Reporter;
+       List : Result_Lists.List;
+       Kind : Result_Type)
+   is
+   begin
+      case Kind is
+         when Success =>
+            Put (ASCII.ESC);
+            Put ("[32m");
+
+         when Failure =>
+            Put (ASCII.ESC);
+            Put ("[35m");
+
+         when Error =>
+            Put (ASCII.ESC);
+            Put ("[31m");
+      end case;
+
+      Put_Result_List (Text_Reporter (Self), List, Kind);
+
+      Put (ASCII.ESC);
+      Put ("[0m");
+   end Put_Result_List;
 
    ------------
    -- Report --
    ------------
 
-   procedure Report (Engine : Text_Reporter;
-                     R      : in out Result)
+   procedure Report (Self : Text_Reporter;
+                     R    : in out Result)
    is
-      pragma Unreferenced (Engine);
       T   : AUnit_Duration;
       procedure Put_Measure is new Gen_Put_Measure;
    begin
@@ -82,7 +103,7 @@ package body AUnit.Reporter.Text is
          New_Line;
 
          Successes (R, S);
-         Dump_Result_List (S);
+         Put_Result_List (Text_Reporter'Class (Self), S, Kind => Success);
       end;
 
       declare
@@ -94,7 +115,7 @@ package body AUnit.Reporter.Text is
          New_Line;
 
          Failures (R, F);
-         Dump_Result_List (F);
+         Put_Result_List (Text_Reporter'Class (Self), F, Kind => Failure);
          New_Line;
       end;
 
@@ -107,7 +128,7 @@ package body AUnit.Reporter.Text is
          New_Line;
 
          Errors (R, E);
-         Dump_Result_List (E);
+         Put_Result_List (Text_Reporter'Class (Self), E, Kind => Error);
          New_Line;
       end;
 
