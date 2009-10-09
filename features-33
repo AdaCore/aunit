@@ -12,6 +12,9 @@ This date shows the implementation date of the feature. Any 3.3.0w wavefront
 subsequent to this date will contain the indicated feature, as will any
 subsequent 3.3 or later releases.
 
-NF-33-IA08-009 New reporter: Text_Color_Reporter (2009-10-09)
+NF-33-IA08-009 General AUnit improvements (2009-10-09)
 
-  This reporter is based on Text_Reporter, but provides colored output.
+  Some new functionalities have been implemented in AUnit:
+  * The Text reporter now allows colored output on ANSI terminals.
+  * Unexpected exceptions are now reported with their message and symbolic
+    traceback when available.
