@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                        Copyright (C) 2008, AdaCore                       --
+--                        Copyright (C) 2008-2009, AdaCore                  --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,6 +23,8 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+with AUnit.Assertions;  use AUnit.Assertions;
 
 package body AUnit.Simple_Test_Cases is
 
@@ -104,5 +106,60 @@ package body AUnit.Simple_Test_Cases is
       Run_Routine (Test, R, Outcome);
       Tear_Down (Test_Case'Class (Test.all));
    end Run;
+
+   ------------
+   -- Assert --
+   ------------
+
+   procedure Assert
+     (Test      : in out Test_Case;
+      Condition : Boolean;
+      Message   : String;
+      Source    : String  := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line)
+   is
+      pragma Unreferenced (Test);
+   begin
+      Assert (Condition, Message, Source, Line);
+   end Assert;
+
+   ------------
+   -- Assert --
+   ------------
+
+   procedure Assert
+     (Test      : in out Test_Case;
+      Actual    : String;
+      Expected  : String;
+      Message   : String;
+      Source    : String  := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line)
+   is
+      Full_Message : String
+         (1 .. Message'Length + 22 + Expected'Length + Actual'Length);
+      First : Natural;
+   begin
+      --  In ZFP, we cannot use string concatenation directly
+      Full_Message (1 .. Message'Length) := Message;
+      First := Message'Length + 1;
+      Full_Message (First) := ASCII.LF;
+      First := First + 1;
+      Full_Message (First .. First + 9) := "Expected: ";
+      First := First + 10;
+      Full_Message (First .. First + Expected'Length - 1) := Expected;
+      First := First + Expected'Length;
+      Full_Message (First) := ASCII.LF;
+      First := First + 1;
+      Full_Message (First .. First + 9) := "Received: ";
+      First := First + 10;
+      Full_Message (First .. Full_Message'Last) := Actual;
+
+      Assert
+         (Test,
+          Condition => Expected = Actual,
+          Message   => Full_Message,
+          Source    => Source,
+          Line      => Line);
+   end Assert;
 
 end AUnit.Simple_Test_Cases;

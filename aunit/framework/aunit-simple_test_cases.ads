@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                        Copyright (C) 2008, AdaCore                       --
+--                        Copyright (C) 2008-2009, AdaCore                  --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,6 +33,7 @@
 with Ada_Containers.AUnit_Lists;
 with AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
+with GNAT.Source_Info;
 
 package AUnit.Simple_Test_Cases is
 
@@ -53,6 +54,35 @@ package AUnit.Simple_Test_Cases is
 
    procedure Tear_Down (Test : in out Test_Case);
    --  Tear down performed after each test
+
+   -----------------------
+   -- Simple assertions --
+   -----------------------
+   --  The following subprograms provide wrapper around AUnit.Assertions
+   --  to compare simple types. In case of failure, the error message will
+   --  contain both the expected and actual values.
+   --  These are primitive operations so that you can override them in your
+   --  own types, possibly to have Source and Line point somewhere else than
+   --  in the code (in the case the test code is automatically generated for
+   --  instance). For such a behavior, it is enough to override the general
+   --  version that takes a Condition parameter.
+
+   procedure Assert
+     (Test      : in out Test_Case;
+      Condition : Boolean;
+      Message   : String;
+      Source    : String  := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line);
+
+   procedure Assert
+     (Test      : in out Test_Case;
+      Actual    : String;
+      Expected  : String;
+      Message   : String;
+      Source    : String  := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line);
+   --  Specialized versions of Assert, they call the general version that
+   --  takes a Condition as a parameter
 
    ----------------------------------------------
    --  Below are internal routines. Do not use --

@@ -27,8 +27,6 @@
 with Ada.Exceptions;          use Ada.Exceptions;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
-with AUnit.Assertions;        use AUnit.Assertions;
-
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for run-time libraries that support exception handling
