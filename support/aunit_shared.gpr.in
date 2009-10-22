@@ -34,8 +34,6 @@ project AUnit_Shared is
       when "cert" =>
          Except := "sjljexception";
          Memory := "staticmemory";
-      when "full" =>
-         Except := "sjljexception";
       when others =>
    end case;
 
