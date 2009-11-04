@@ -27,8 +27,6 @@
 with Ada.Exceptions;          use Ada.Exceptions;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
-with AUnit.Assertions;        use AUnit.Assertions;
-
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for run-time libraries that support exception handling
@@ -59,8 +57,8 @@ begin
             Name (Test.all),
             Routine_Name (Test.all),
             Error => (Exception_Name    => Format (Exception_Name (E)),
-                      Exception_Message => null,
-                      Traceback         => null));
+                      Exception_Message => Format (Exception_Message (E)),
+                      Traceback         => Format (Symbolic_Traceback (E))));
    end;
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
