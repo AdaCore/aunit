@@ -179,8 +179,14 @@ package body AUnit.Reporter.XML is
          else
             Put_Line ("      <Exception>");
             Put      ("      <Message>");
-            Put      (Test.Error.Exception_Message.all);
+            Put      (Test.Error.Exception_Name.all);
             Put_Line ("</Message>");
+
+            if Test.Error.Exception_Message /= null then
+               Put      ("      <Information>");
+               Put      (Test.Error.Exception_Message.all);
+               Put_Line ("</Information>");
+            end if;
 
             if Test.Error.Traceback /= null then
                Put      ("      <Traceback>");

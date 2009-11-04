@@ -209,9 +209,13 @@ package body AUnit.Reporter.Text is
       elsif Test.Error /= null then
          Indent (2);
          Put_Line (Test.Error.Exception_Name.all);
-         Indent (2);
-         Put      ("Exception Message: ");
-         Put_Line (Test.Error.Exception_Message.all);
+
+         if Test.Error.Exception_Message /= null then
+            Indent (2);
+            Put      ("Exception Message: ");
+            Put_Line (Test.Error.Exception_Message.all);
+         end if;
+
          if Test.Error.Traceback /= null then
             Indent (2);
             Put_Line ("Traceback:");
