@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---          A U N I T . T E S T _ C A S E S . R U N _ R O U T I N E         --
+--                     A U N I T . A S S E R T I O N S                      --
 --                                                                          --
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,59 +24,50 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions;          use Ada.Exceptions;
-with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
+with AUnit.Simple_Test_Cases; use AUnit.Simple_Test_Cases;
 
-separate (AUnit.Simple_Test_Cases)
+package body AUnit.Assertions is
 
---  Version for run-time libraries that support exception handling
-procedure Run_Routine
-  (Test    : access Test_Case'Class;
-   R       : access Result;
-   Outcome : out Status) is
+   ------------
+   -- Assert --
+   ------------
 
-   Unexpected_Exception : Boolean := False;
-
-   use Failure_Lists;
-
-begin
-
-   --  Reset failure list to capture failed assertions for one routine
-
-   Clear (Test.Failures);
-
+   procedure Assert
+     (Condition : Boolean;
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) is
    begin
-      Run_Test (Test.all);
-   exception
-      when Assertion_Error =>
-         null;
-      when E : others =>
-         Unexpected_Exception := True;
-         Add_Error
-           (R.all,
-            Name (Test.all),
-            Routine_Name (Test.all),
-            Error => (Exception_Name    => Format (Exception_Name (E)),
-                      Exception_Message => Format (Exception_Message (E)),
-                      Traceback         => Format (Symbolic_Traceback (E))));
-   end;
+      if not Condition then
+         Register_Failure (Message, Source, Line);
+         raise Assertion_Error;
+      end if;
+   end Assert;
 
-   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
-      Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
-   else
-      Outcome := Failure;
-      declare
-         C : Cursor := First (Test.Failures);
-      begin
-         while Has_Element (C) loop
-            Add_Failure (R.all,
-                         Name (Test.all),
-                         Routine_Name (Test.all),
-                         Element (C));
-            Next (C);
-         end loop;
-      end;
-   end if;
+   ------------
+   -- Assert --
+   ------------
 
-end Run_Routine;
+   function Assert
+     (Condition : Boolean;
+      Message   : String;
+      Source    : String := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) return Boolean is
+   begin
+      if not Condition then
+         Register_Failure (Message, Source, Line);
+      end if;
+      return Condition;
+   end Assert;
+
+   ----------------------
+   -- Assert_Exception --
+   ----------------------
+
+   procedure Assert_Exception
+     (Message : String;
+      Source  : String := GNAT.Source_Info.File;
+      Line    : Natural := GNAT.Source_Info.Line)
+   is separate;
+
+end AUnit.Assertions;

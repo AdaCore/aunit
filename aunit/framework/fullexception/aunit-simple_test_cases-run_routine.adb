@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,14 +24,20 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-separate (AUnit.Test_Cases)
+with Ada.Exceptions;          use Ada.Exceptions;
+with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
---  Version for run-time libraries that do not support exception handling
+with AUnit.Assertions;        use AUnit.Assertions;
+
+separate (AUnit.Simple_Test_Cases)
+
+--  Version for run-time libraries that support exception handling
 procedure Run_Routine
   (Test    : access Test_Case'Class;
-   Subtest : Routine_Spec;
    R       : access Result;
    Outcome : out Status) is
+
+   Unexpected_Exception : Boolean := False;
 
    use Failure_Lists;
 
@@ -41,15 +47,25 @@ begin
 
    Clear (Test.Failures);
 
-   --  Run test routine
+   begin
+      Run_Test (Test.all);
+   exception
+      when Assertion_Error =>
+         null;
+      when E : others =>
+         Unexpected_Exception := True;
+         Add_Error
+           (R.all,
+            Name (Test.all),
+            Routine_Name (Test.all),
+            Error => (Exception_Name    => Format (Exception_Name (E)),
+                      Exception_Message => Format (Exception_Message (E)),
+                      Traceback         => Format (Symbolic_Traceback (E))));
+   end;
 
-   Set_Up (Test.all);
-   Subtest.Routine.all (Test.all);
-   Tear_Down (Test.all);
-
-   if Is_Empty (Test.Failures) then
+   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Subtest.Routine_Name);
+      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
    else
       Outcome := Failure;
       declare
@@ -58,10 +74,11 @@ begin
          while Has_Element (C) loop
             Add_Failure (R.all,
                          Name (Test.all),
-                         Subtest.Routine_Name,
+                         Routine_Name (Test.all),
                          Element (C));
             Next (C);
          end loop;
       end;
    end if;
+
 end Run_Routine;
