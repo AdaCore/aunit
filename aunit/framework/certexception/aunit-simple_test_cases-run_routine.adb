@@ -25,11 +25,10 @@
 ------------------------------------------------------------------------------
 
 with Ada.Exceptions;          use Ada.Exceptions;
-with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
 separate (AUnit.Simple_Test_Cases)
 
---  Version for run-time libraries that support exception handling
+--  Version for cert run-time libraries
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    R       : access Result;
@@ -57,8 +56,8 @@ begin
             Name (Test.all),
             Routine_Name (Test.all),
             Error => (Exception_Name    => Format (Exception_Name (E)),
-                      Exception_Message => Format (Exception_Message (E)),
-                      Traceback         => Format (Symbolic_Traceback (E))));
+                      Exception_Message => null,
+                      Traceback         => null));
    end;
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
