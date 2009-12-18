@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2000-2008, AdaCore                     --
+--                     Copyright (C) 2000-2009, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -35,9 +35,10 @@ package AUnit.Tests is
    type Test is abstract tagged limited private;
    type Test_Access is access all Test'Class;
 
-   procedure Run (T : access Test;
-                  R : Result_Access;
-                  S : out Status) is abstract;
+   procedure Run (T             : access Test;
+                  R             :        Result_Access;
+                  S             :    out Status;
+                  Time_Routines :        Boolean := False) is abstract;
    --  Run a test case or suite
 
 private

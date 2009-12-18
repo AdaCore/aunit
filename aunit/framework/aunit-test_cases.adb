@@ -53,9 +53,10 @@ package body AUnit.Test_Cases is
    ---------
 
    procedure Run
-     (Test    : access Test_Case;
-      R       : Result_Access;
-      Outcome : out Status)
+     (Test          : access Test_Case;
+      R             :        Result_Access;
+      Outcome       :    out Status;
+      Time_Routines :        Boolean := False)
    is
       use Routine_Lists;
       Result : Status;
@@ -71,7 +72,8 @@ package body AUnit.Test_Cases is
       while Has_Element (C) loop
          Test.Routine := Element (C);
          AUnit.Simple_Test_Cases.Run
-           (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access, R, Result);
+           (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
+            R, Result, Time_Routines);
 
          if Result = Failure then
             Outcome := Failure;

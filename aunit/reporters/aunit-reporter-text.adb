@@ -36,6 +36,9 @@ package body AUnit.Reporter.Text is
    procedure Dump_Result_List (L : Result_Lists.List);
    --  Dump a result list
 
+   procedure Put_Measure is new Gen_Put_Measure;
+   --  Output elapsed time
+
    procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
@@ -95,7 +98,6 @@ package body AUnit.Reporter.Text is
       R      : in out Result)
    is
       T   : AUnit_Duration;
-      procedure Put_Measure is new Gen_Put_Measure;
 
    begin
       Put_Line ("--------------------");
@@ -170,7 +172,7 @@ package body AUnit.Reporter.Text is
          New_Line;
          T := Get_Measure (Elapsed (R));
 
-         Put ("Time: ");
+         Put ("Cumulative Time: ");
          Put_Measure (T);
          Put_Line (" seconds");
       end if;
@@ -181,6 +183,7 @@ package body AUnit.Reporter.Text is
    -----------------
 
    procedure Report_Test (Test : Test_Result) is
+      T : AUnit_Duration;
    begin
       if Test.Error /= null or else Test.Failure /= null then
          New_Line;
@@ -222,6 +225,14 @@ package body AUnit.Reporter.Text is
             Put_Line (Test.Error.Traceback.all);
          end if;
       end if;
+
+      if Test.Elapsed /= Time_Measure.Null_Time then
+         T := Get_Measure (Test.Elapsed);
+         Put_Measure (T);
+         Put_Line (" seconds");
+         New_Line;
+      end if;
+
    end Report_Test;
 
 end AUnit.Reporter.Text;

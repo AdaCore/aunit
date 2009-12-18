@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -37,9 +37,10 @@ package AUnit.Test_Suites is
    procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class);
    --  Add a test case or suite to this suite
 
-   procedure Run (Suite      : access Test_Suite;
-                  R          : Result_Access;
-                  Outcome    : out Status);
+   procedure Run (Suite         : access Test_Suite;
+                  R             :        Result_Access;
+                  Outcome       :    out Status;
+                  Time_Routines :        Boolean := False);
    --  Run all tests collected into this suite
 
    function New_Suite return Access_Test_Suite;

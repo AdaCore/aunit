@@ -25,17 +25,25 @@
 ------------------------------------------------------------------------------
 
 with AUnit.Last_Chance_Handler; use AUnit.Last_Chance_Handler;
+with AUnit.Time_Measure;
+
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for run-time libraries that support exception handling via gcc
 --  builtin setjmp/longjmp mechanism.
 
 procedure Run_Routine
-  (Test    : access Test_Case'Class;
-   R       : access Result;
-   Outcome : out Status) is
+  (Test          : access Test_Case'Class;
+   R             : access Result;
+   Outcome       :    out Status;
+   Time_Routines :        Boolean := False) is
 
    Unexpected_Exception : Boolean := False;
+   Time : Time_Measure.Time := Time_Measure.Null_Time;
+   Res : Integer;
+
+   use Time_Measure;
+   use Failure_Lists;
 
    function String_Compare (Str1, Str2 : String) return Boolean;
    --  Compares two strings.
@@ -66,26 +74,34 @@ procedure Run_Routine
 
    procedure Internal_Run_Test is
    begin
+      if Time_Routines then
+         Start_Measure (Time);
+      end if;
+
       AUnit.Simple_Test_Cases.Run_Test (Test.all);
+
+      if Time_Routines then
+         Stop_Measure (Time);
+      end if;
    end Internal_Run_Test;
 
    function Internal_Setjmp is new AUnit.Last_Chance_Handler.Gen_Setjmp
      (Internal_Run_Test);
-
-   Res : Integer;
-
-   use Failure_Lists;
 
 begin
 
    --  Reset failure list to capture failed assertions for one routine
 
    Clear (Test.Failures);
-
+   declare
    begin
       Res := Internal_Setjmp;
 
       if Res /= 0 then
+         if Time_Routines then
+            Stop_Measure (Time);
+         end if;
+
          declare
             Src     : constant Message_String :=
                         AUnit.Last_Chance_Handler.Get_Exception_Message;
@@ -96,10 +112,11 @@ begin
                  (R.all,
                   Name (Test.all),
                   Routine_Name (Test.all),
-                  Error =>
+                  Error   =>
                     (Exception_Name    => Get_Exception_Name,
                      Exception_Message => Src,
-                     Traceback         => null));
+                     Traceback         => null),
+                  Elapsed => Time);
             end if;
          end;
       end if;
@@ -107,7 +124,7 @@ begin
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
+      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
@@ -115,7 +132,11 @@ begin
       begin
          while Has_Element (C) loop
             Add_Failure
-              (R.all, Name (Test.all), Routine_Name (Test.all), Element (C));
+              (R.all,
+               Name (Test.all),
+               Routine_Name (Test.all),
+               Element (C),
+               Time);
             Next (C);
          end loop;
       end;

@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Exceptions;          use Ada.Exceptions;
+with AUnit.Time_Measure;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
 separate (AUnit.Simple_Test_Cases)
@@ -33,11 +34,14 @@ separate (AUnit.Simple_Test_Cases)
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    R       : access Result;
-   Outcome : out Status) is
+   Outcome :    out Status;
+   Time_Routines :        Boolean := False) is
 
    Unexpected_Exception : Boolean := False;
+   Time : Time_Measure.Time := Time_Measure.Null_Time;
 
    use Failure_Lists;
+   use Time_Measure;
 
 begin
 
@@ -46,11 +50,27 @@ begin
    Clear (Test.Failures);
 
    begin
+      if Time_Routines then
+         Start_Measure (Time);
+      end if;
+
       Run_Test (Test.all);
+
+      if Time_Routines then
+         Stop_Measure (Time);
+      end if;
+
    exception
       when Assertion_Error =>
-         null;
+         if Time_Routines then
+            Stop_Measure (Time);
+         end if;
+
       when E : others =>
+         if Time_Routines then
+            Stop_Measure (Time);
+         end if;
+
          Unexpected_Exception := True;
          Add_Error
            (R.all,
@@ -58,12 +78,13 @@ begin
             Routine_Name (Test.all),
             Error => (Exception_Name    => Format (Exception_Name (E)),
                       Exception_Message => Format (Exception_Message (E)),
-                      Traceback         => Format (Symbolic_Traceback (E))));
+                      Traceback         => Format (Symbolic_Traceback (E))),
+            Elapsed => Time);
    end;
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all));
+      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
@@ -73,7 +94,8 @@ begin
             Add_Failure (R.all,
                          Name (Test.all),
                          Routine_Name (Test.all),
-                         Element (C));
+                         Element (C),
+                         Time);
             Next (C);
          end loop;
       end;

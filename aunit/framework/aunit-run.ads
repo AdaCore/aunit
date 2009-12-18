@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,13 +32,15 @@ package AUnit.Run is
 
    generic
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
-   procedure Test_Runner (Reporter : AUnit.Reporter.Reporter'Class;
-                          Timed    : Boolean := True);
+   procedure Test_Runner (Reporter      : AUnit.Reporter.Reporter'Class;
+                          Timed         : Boolean := True;
+                          Time_Routines : Boolean := False);
 
    generic
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
    function Test_Runner_With_Status
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Timed    : Boolean := True) return Status;
+     (Reporter      : AUnit.Reporter.Reporter'Class;
+      Timed         : Boolean := True;
+      Time_Routines : Boolean := False) return Status;
 
 end AUnit.Run;

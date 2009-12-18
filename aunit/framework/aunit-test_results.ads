@@ -26,10 +26,9 @@
 
 pragma Ada_2005;
 
-with Ada_Containers;
 with Ada_Containers.AUnit_Lists;
 
-with AUnit.Time_Measure;
+with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Test reporting.
 --
@@ -61,6 +60,7 @@ package AUnit.Test_Results is
       Routine_Name : Message_String;
       Failure      : Test_Failure_Access;
       Error        : Test_Error_Access;
+      Elapsed      : Time := Null_Time;
    end record;
    --  Decription of a test routine result
 
@@ -73,23 +73,26 @@ package AUnit.Test_Results is
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Error        : Test_Error);
+      Error        : Test_Error;
+      Elapsed      : Time);
    --  Record an unexpected exception
 
    procedure Add_Failure
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Failure      : Test_Failure);
+      Failure      : Test_Failure;
+      Elapsed      : Time);
    --  Record a test routine failure
 
    procedure Add_Success
      (R            : in out Result;
       Test_Name    : Message_String;
-      Routine_Name : Message_String);
+      Routine_Name : Message_String;
+      Elapsed      : Time);
    --  Record a test routine success
 
-   procedure Set_Elapsed (R : in out Result; T : Time_Measure.Time);
+   procedure Set_Elapsed (R : in out Result; T : Time);
    --  Set Elapsed time for reporter
 
    function Error_Count (R : Result) return Count_Type;
@@ -105,7 +108,7 @@ package AUnit.Test_Results is
    procedure Failures (R : in out Result; F : in out Result_Lists.List);
    --  List of failed routines
 
-   function Elapsed (R : Result) return Time_Measure.Time;
+   function Elapsed (R : Result) return Time;
    --  Elapsed time for test execution
 
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
@@ -133,7 +136,7 @@ private
    type Result is limited record
       Tests_Run    : Count_Type := 0;
       Result_List  : Result_Lists.List;
-      Elapsed_Time : Time_Measure.Time := Time_Measure.Null_Time;
+      Elapsed_Time : Time := Null_Time;
    end record;
 
 end AUnit.Test_Results;

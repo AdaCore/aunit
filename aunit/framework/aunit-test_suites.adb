@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2008, AdaCore                   --
+--                       Copyright (C) 2000-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -43,15 +43,16 @@ package body AUnit.Test_Suites is
    -- Run --
    ---------
 
-   procedure Run (Suite : access Test_Suite;
-                  R       : Result_Access;
-                  Outcome : out Status) is
+   procedure Run (Suite         : access Test_Suite;
+                  R             :        Result_Access;
+                  Outcome       :    out Status;
+                  Time_Routines :        Boolean := False) is
       C : Cursor := First (Suite.Tests);
       Result : Status := Success;
    begin
       Outcome := Success;
       while Has_Element (C) loop
-         Run (Element (C), R, Result);
+         Run (Element (C), R, Result, Time_Routines);
          if Result = Failure then
             Outcome := Failure;
          end if;

@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2008, AdaCore                      --
+--                    Copyright (C) 2006-2009, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,15 +33,17 @@ package body AUnit.Run is
    Results : aliased Test_Results.Result;
    --  Test results for one harness run
 
-   procedure Run (Suite   : Access_Test_Suite;
-                  Timed   : Boolean;
-                  Engine  : AUnit.Reporter.Reporter'Class;
-                  Outcome : out Status);
+   procedure Run (Suite         :        Access_Test_Suite;
+                  Timed         :        Boolean;
+                  Time_Routines :        Boolean;
+                  Engine        :        AUnit.Reporter.Reporter'Class;
+                  Outcome       :    out Status);
 
-   procedure Run (Suite   : Access_Test_Suite;
-                  Timed   : Boolean;
-                  Engine  : AUnit.Reporter.Reporter'Class;
-                  Outcome : out Status) is
+   procedure Run (Suite         :        Access_Test_Suite;
+                  Timed         :        Boolean;
+                  Time_Routines :        Boolean;
+                  Engine        :        AUnit.Reporter.Reporter'Class;
+                  Outcome       :    out Status) is
       Time : Time_Measure.Time;
    begin
       Test_Results.Clear (Results);
@@ -51,7 +53,7 @@ package body AUnit.Run is
       end if;
 
       pragma Warnings (Off);
-      AUnit.Test_Suites.Run (Suite, Results'Access, Outcome);
+      AUnit.Test_Suites.Run (Suite, Results'Access, Outcome, Time_Routines);
       pragma Warnings (On);
 
       if Timed then
@@ -63,22 +65,24 @@ package body AUnit.Run is
    end Run;
 
    procedure Test_Runner
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Timed    : Boolean := True)
+     (Reporter      : AUnit.Reporter.Reporter'Class;
+      Timed         : Boolean := True;
+      Time_Routines : Boolean := False)
    is
       Outcome : Status;
       pragma Unreferenced (Outcome);
    begin
-      Run (Suite, Timed, Reporter, Outcome);
+      Run (Suite, Timed, Time_Routines, Reporter, Outcome);
    end Test_Runner;
 
    function Test_Runner_With_Status
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Timed    : Boolean := True) return Status
+     (Reporter      : AUnit.Reporter.Reporter'Class;
+      Timed         : Boolean := True;
+      Time_Routines : Boolean := False) return Status
    is
       Result : Status;
    begin
-      Run (Suite, Timed, Reporter, Result);
+      Run (Suite, Timed, Time_Routines, Reporter, Result);
       return Result;
    end Test_Runner_With_Status;
 

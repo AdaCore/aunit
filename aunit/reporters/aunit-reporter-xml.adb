@@ -33,6 +33,9 @@ package body AUnit.Reporter.XML is
    procedure Dump_Result_List (L : Result_Lists.List);
    --  List failed assertions
 
+   procedure Put_Measure is new Gen_Put_Measure;
+   --  Output elapsed time
+
    procedure Report_Test (Test : Test_Result);
    --  Report a single assertion failure or unexpected exception
 
@@ -66,7 +69,6 @@ package body AUnit.Reporter.XML is
    is
       pragma Unreferenced (Engine);
       T   : AUnit_Duration;
-      procedure Put_Measure is new Gen_Put_Measure;
    begin
       Put_Line ("<?xml version='1.0' encoding='utf-8' ?>");
       Put      ("<TestRun");
@@ -130,6 +132,7 @@ package body AUnit.Reporter.XML is
 
    procedure Report_Test (Test : Test_Result) is
       Is_Assert : Boolean;
+      T : AUnit_Duration;
    begin
       Put_Line ("    <Test>");
       Put      ("      <Name>");
@@ -198,6 +201,15 @@ package body AUnit.Reporter.XML is
          end if;
       end if;
 
+      if Test.Elapsed /= Time_Measure.Null_Time then
+         T := Get_Measure (Test.Elapsed);
+
+         Put (" elapsed='");
+         Put_Measure (T);
+         Put_Line ("'>");
+      else
+         Put_Line (">");
+      end if;
       Put_Line ("    </Test>");
    end Report_Test;
 

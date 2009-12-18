@@ -164,11 +164,13 @@ package body AUnit.Test_Results is
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Error        : Test_Error)
+      Error        : Test_Error;
+      Elapsed      : Time)
    is
       Val : constant Test_Result := (Test_Name, Routine_Name,
                                      Failure => null,
-                                     Error   => Alloc_Error);
+                                     Error   => Alloc_Error,
+                                     Elapsed => Elapsed);
       use Result_Lists;
    begin
 
@@ -184,11 +186,13 @@ package body AUnit.Test_Results is
      (R            : in out Result;
       Test_Name    : Message_String;
       Routine_Name : Message_String;
-      Failure      : Test_Failure) is
+      Failure      : Test_Failure;
+      Elapsed      : Time) is
 
       Val : constant Test_Result := (Test_Name, Routine_Name,
                                      Failure => Alloc_Failure,
-                                     Error   => null);
+                                     Error   => null,
+                                     Elapsed => Elapsed);
       use Result_Lists;
    begin
 
@@ -203,9 +207,11 @@ package body AUnit.Test_Results is
    procedure Add_Success
      (R                       : in out Result;
       Test_Name               : Message_String;
-      Routine_Name            : Message_String) is
+      Routine_Name            : Message_String;
+      Elapsed                 : Time) is
 
-      Val : constant Test_Result := (Test_Name, Routine_Name, null, null);
+      Val : constant Test_Result :=
+              (Test_Name, Routine_Name, null, null, Elapsed);
       use Result_Lists;
 
    begin
