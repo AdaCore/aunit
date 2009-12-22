@@ -30,59 +30,57 @@ with AUnit.Test_Suites; use AUnit.Test_Suites;
 
 package body AUnit.Run is
 
-   Results : aliased Test_Results.Result;
-   --  Test results for one harness run
+   procedure Run
+     (Suite    : Access_Test_Suite;
+      Options  : AUnit.AUnit_Options;
+      Reporter : AUnit.Reporter.Reporter'Class;
+      Outcome  : out Status);
 
-   procedure Run (Suite         :        Access_Test_Suite;
-                  Timed         :        Boolean;
-                  Time_Routines :        Boolean;
-                  Engine        :        AUnit.Reporter.Reporter'Class;
-                  Outcome       :    out Status);
+   procedure Run
+     (Suite    : Access_Test_Suite;
+      Options  : AUnit.AUnit_Options;
+      Reporter : AUnit.Reporter.Reporter'Class;
+      Outcome  : out Status)
+   is
+      Time    : Time_Measure.Time;
+      Results : Test_Results.Result;
 
-   procedure Run (Suite         :        Access_Test_Suite;
-                  Timed         :        Boolean;
-                  Time_Routines :        Boolean;
-                  Engine        :        AUnit.Reporter.Reporter'Class;
-                  Outcome       :    out Status) is
-      Time : Time_Measure.Time;
    begin
       Test_Results.Clear (Results);
 
-      if Timed then
+      if Options.Global_Timer then
          Time_Measure.Start_Measure (Time);
       end if;
 
       pragma Warnings (Off);
-      AUnit.Test_Suites.Run (Suite, Results'Access, Outcome, Time_Routines);
+      AUnit.Test_Suites.Run (Suite, Options, Results, Outcome);
       pragma Warnings (On);
 
-      if Timed then
+      if Options.Global_Timer then
          Time_Measure.Stop_Measure (Time);
          Test_Results.Set_Elapsed (Results, Time);
       end if;
 
-      AUnit.Reporter.Report (Engine, Results);
+      AUnit.Reporter.Report (Reporter, Results);
    end Run;
 
    procedure Test_Runner
-     (Reporter      : AUnit.Reporter.Reporter'Class;
-      Timed         : Boolean := True;
-      Time_Routines : Boolean := False)
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Options  : AUnit.AUnit_Options := Default_Options)
    is
       Outcome : Status;
       pragma Unreferenced (Outcome);
    begin
-      Run (Suite, Timed, Time_Routines, Reporter, Outcome);
+      Run (Suite, Options, Reporter, Outcome);
    end Test_Runner;
 
    function Test_Runner_With_Status
-     (Reporter      : AUnit.Reporter.Reporter'Class;
-      Timed         : Boolean := True;
-      Time_Routines : Boolean := False) return Status
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Options  : AUnit.AUnit_Options := Default_Options) return Status
    is
       Result : Status;
    begin
-      Run (Suite, Timed, Time_Routines, Reporter, Result);
+      Run (Suite, Options, Reporter, Result);
       return Result;
    end Test_Runner_With_Status;
 

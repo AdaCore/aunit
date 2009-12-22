@@ -34,9 +34,9 @@ separate (AUnit.Simple_Test_Cases)
 
 procedure Run_Routine
   (Test          : access Test_Case'Class;
-   R             : access Result;
-   Outcome       :    out Status;
-   Time_Routines :        Boolean := False) is
+   Options       :        AUnit.AUnit_Options;
+   R             : in out Result;
+   Outcome       :    out Status) is
 
    Unexpected_Exception : Boolean := False;
    Time : Time_Measure.Time := Time_Measure.Null_Time;
@@ -74,13 +74,13 @@ procedure Run_Routine
 
    procedure Internal_Run_Test is
    begin
-      if Time_Routines then
+      if Options.Test_Case_Timer then
          Start_Measure (Time);
       end if;
 
       AUnit.Simple_Test_Cases.Run_Test (Test.all);
 
-      if Time_Routines then
+      if Options.Test_Case_Timer then
          Stop_Measure (Time);
       end if;
    end Internal_Run_Test;
@@ -98,7 +98,7 @@ begin
       Res := Internal_Setjmp;
 
       if Res /= 0 then
-         if Time_Routines then
+         if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
@@ -109,7 +109,7 @@ begin
             if not String_Compare (Src.all, "aunit-assertions.adb:43") then
                Unexpected_Exception := True;
                Add_Error
-                 (R.all,
+                 (R,
                   Name (Test.all),
                   Routine_Name (Test.all),
                   Error   =>
@@ -124,7 +124,7 @@ begin
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all), Time);
+      Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
@@ -132,7 +132,7 @@ begin
       begin
          while Has_Element (C) loop
             Add_Failure
-              (R.all,
+              (R,
                Name (Test.all),
                Routine_Name (Test.all),
                Element (C),

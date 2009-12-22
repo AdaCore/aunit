@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2006-2008, AdaCore                   --
+--                       Copyright (C) 2006-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,6 +32,16 @@ package AUnit is
    subtype Test_String is Message_String;
 
    type Status is (Success, Failure);
+
+   type AUnit_Options is record
+      Global_Timer    : Boolean := False;
+      Test_Case_Timer : Boolean := False;
+   end record;
+   --  Options used to determine how a test should be run.
+
+   Default_Options : constant AUnit_Options :=
+     (Global_Timer    => False,
+      Test_Case_Timer => False);
 
    --  String manipulation functions.
 

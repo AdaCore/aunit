@@ -43,16 +43,17 @@ package body AUnit.Test_Suites is
    -- Run --
    ---------
 
-   procedure Run (Suite         : access Test_Suite;
-                  R             :        Result_Access;
-                  Outcome       :    out Status;
-                  Time_Routines :        Boolean := False) is
+   procedure Run (Suite   : access Test_Suite;
+                  Options :        AUnit_Options;
+                  R       : in out Result;
+                  Outcome :    out Status)
+   is
       C : Cursor := First (Suite.Tests);
       Result : Status := Success;
    begin
       Outcome := Success;
       while Has_Element (C) loop
-         Run (Element (C), R, Result, Time_Routines);
+         Run (Element (C), Options, R, Result);
          if Result = Failure then
             Outcome := Failure;
          end if;

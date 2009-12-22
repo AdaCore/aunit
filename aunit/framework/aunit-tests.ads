@@ -35,10 +35,10 @@ package AUnit.Tests is
    type Test is abstract tagged limited private;
    type Test_Access is access all Test'Class;
 
-   procedure Run (T             : access Test;
-                  R             :        Result_Access;
-                  S             :    out Status;
-                  Time_Routines :        Boolean := False) is abstract;
+   procedure Run (T : access Test;
+                  O :        AUnit_Options;
+                  R : in out Result;
+                  S :    out Status) is abstract;
    --  Run a test case or suite
 
 private

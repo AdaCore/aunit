@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2008, AdaCore
+--  Copyright (C) 2008-2009, AdaCore
 --
 with Empty_Test_Case;
 with One_Test_Case;
@@ -23,7 +23,7 @@ package body Test_Test_Suite is
       pragma Unreferenced (T);
       Outcome : AUnit.Status;
    begin
-      Run (S'Access, R'Access, Outcome);
+      Run (S'Access, AUnit.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -35,7 +35,7 @@ package body Test_Test_Suite is
       Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, E'Access);
-      Run (S'Access, R'Access, Outcome);
+      Run (S'Access, AUnit.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -47,7 +47,7 @@ package body Test_Test_Suite is
       Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, O'Access);
-      Run (S'Access, R'Access, Outcome);
+      Run (S'Access, AUnit.Default_Options, R, Outcome);
 
       Assert (Test_Count (R) = 1, "Wrong number of tests run");
       Assert (Failure_Count (R) = 0, "Wrong number of failures");
@@ -62,7 +62,7 @@ package body Test_Test_Suite is
 
    begin
       Add_Test (S'Access, I'Access);
-      Run (S'Access, R'Access, Outcome);
+      Run (S'Access, AUnit.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = Old_Count + 4,

@@ -32,15 +32,14 @@ package AUnit.Run is
 
    generic
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
-   procedure Test_Runner (Reporter      : AUnit.Reporter.Reporter'Class;
-                          Timed         : Boolean := True;
-                          Time_Routines : Boolean := False);
+   procedure Test_Runner
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Options  : AUnit.AUnit_Options := Default_Options);
 
    generic
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
    function Test_Runner_With_Status
-     (Reporter      : AUnit.Reporter.Reporter'Class;
-      Timed         : Boolean := True;
-      Time_Routines : Boolean := False) return Status;
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Options  : AUnit.AUnit_Options := Default_Options) return Status;
 
 end AUnit.Run;

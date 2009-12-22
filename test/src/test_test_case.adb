@@ -63,7 +63,7 @@ package body Test_Test_Case is
       Outcome   : AUnit.Status;
 
    begin
-      Run (Simple'Access, R'Access, Outcome);
+      Run (Simple'Access, AUnit.Default_Options, R, Outcome);
 
       Assert
         (Count  = 3,

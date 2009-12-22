@@ -8,5 +8,5 @@ procedure AUnit_Harness is
    Reporter : AUnit.Reporter.Text.Text_Reporter;
 begin
    AUnit.Reporter.Text.Set_Use_ANSI_Colors (Reporter, True);
-   Harness (Reporter, Timed => False, Time_Routines => False);
+   Harness (Reporter);
 end AUnit_Harness;

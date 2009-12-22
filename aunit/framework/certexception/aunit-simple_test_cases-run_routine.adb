@@ -32,10 +32,10 @@ separate (AUnit.Simple_Test_Cases)
 --  Version for cert run-time libraries
 procedure Run_Routine
   (Test          : access Test_Case'Class;
-   R             : access Result;
-   Outcome       :    out Status;
-   Time_Routines :        Boolean := False) is
-
+   Options       :        AUnit.AUnit_Options;
+   R             : in out Result;
+   Outcome       :    out Status)
+is
    Unexpected_Exception : Boolean := False;
    Time : Time_Measure.Time := Time_Measure.Null_Time;
 
@@ -43,36 +43,35 @@ procedure Run_Routine
    use Time_Measure;
 
 begin
-
    --  Reset failure list to capture failed assertions for one routine
 
    Clear (Test.Failures);
 
    begin
-      if Time_Routines then
+      if Options.Test_Case_Timer then
          Start_Measure (Time);
       end if;
 
       Run_Test (Test.all);
 
-      if Time_Routines then
+      if Options.Test_Case_Timer then
          Stop_Measure (Time);
       end if;
 
    exception
       when Assertion_Error =>
-         if Time_Routines then
+         if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
       when E : others =>
-         if Time_Routines then
+         if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
          Unexpected_Exception := True;
          Add_Error
-           (R.all,
+           (R,
             Name (Test.all),
             Routine_Name (Test.all),
             Error   => (Exception_Name    => Format (Exception_Name (E)),
@@ -83,14 +82,14 @@ begin
 
    if not Unexpected_Exception and then Is_Empty (Test.Failures) then
       Outcome := Success;
-      Add_Success (R.all, Name (Test.all), Routine_Name (Test.all), Time);
+      Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
          C : Cursor := First (Test.Failures);
       begin
          while Has_Element (C) loop
-            Add_Failure (R.all,
+            Add_Failure (R,
                          Name (Test.all),
                          Routine_Name (Test.all),
                          Element (C),

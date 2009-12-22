@@ -83,10 +83,10 @@ package AUnit.Test_Cases is
    end Specific_Test_Case_Registration;
 
    procedure Run
-     (Test          : access Test_Case;
-      R             :        Result_Access;
-      Outcome       :    out Status;
-      Time_Routines :        Boolean := False);
+     (Test    : access Test_Case;
+      Options :        AUnit_Options;
+      R       : in out Result;
+      Outcome :    out Status);
    --  Run test case. Do not override.
 
    procedure Run_Test (Test : in out Test_Case);

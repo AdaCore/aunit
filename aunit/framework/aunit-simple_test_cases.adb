@@ -31,10 +31,10 @@ package body AUnit.Simple_Test_Cases is
    The_Current_Test_Case : Test_Case_Access := null;
 
    procedure Run_Routine
-     (Test          : access Test_Case'Class;
-      R             : access Result;
-      Outcome       :    out Status;
-      Time_Routines :        Boolean := False);
+     (Test    : access Test_Case'Class;
+      Options :        AUnit_Options;
+      R       : in out Result;
+      Outcome :    out Status);
    --  Run one test routine
 
    -----------------
@@ -42,10 +42,10 @@ package body AUnit.Simple_Test_Cases is
    -----------------
 
    procedure Run_Routine
-     (Test          : access Test_Case'Class;
-      R             : access Result;
-      Outcome       :    out Status;
-      Time_Routines :        Boolean := False) is separate;
+     (Test    : access Test_Case'Class;
+      Options :        AUnit_Options;
+      R       : in out Result;
+      Outcome :    out Status) is separate;
 
    ------------------
    -- Routine_Name --
@@ -96,18 +96,22 @@ package body AUnit.Simple_Test_Cases is
    -- Run --
    ---------
 
-   procedure Run (Test          : access Test_Case;
-                  R             :        Result_Access;
-                  Outcome       :    out Status;
-                  Time_Routines :        Boolean := False) is
+   procedure Run
+     (Test    : access Test_Case;
+      Options :        AUnit_Options;
+      R       : in out Result;
+      Outcome :    out Status)
+   is
+      Old : constant Test_Case_Access := The_Current_Test_Case;
    begin
       The_Current_Test_Case := Test_Case_Access (Test);
-      Start_Test (R.all, 1);
+      Start_Test (R, 1);
 
       --  Run test routine
       Set_Up (Test_Case'Class (Test.all));
-      Run_Routine (Test, R, Outcome, Time_Routines);
+      Run_Routine (Test, Options, R, Outcome);
       Tear_Down (Test_Case'Class (Test.all));
+      The_Current_Test_Case := Old;
    end Run;
 
    ------------

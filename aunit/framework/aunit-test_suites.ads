@@ -37,10 +37,10 @@ package AUnit.Test_Suites is
    procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class);
    --  Add a test case or suite to this suite
 
-   procedure Run (Suite         : access Test_Suite;
-                  R             :        Result_Access;
-                  Outcome       :    out Status;
-                  Time_Routines :        Boolean := False);
+   procedure Run (Suite   : access Test_Suite;
+                  Options :        AUnit_Options;
+                  R       : in out Result;
+                  Outcome :    out Status);
    --  Run all tests collected into this suite
 
    function New_Suite return Access_Test_Suite;
