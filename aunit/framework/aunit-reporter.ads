@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008, AdaCore                        --
+--                       Copyright (C) 2008-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,6 +23,7 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 package AUnit.Reporter is
@@ -31,6 +32,8 @@ package AUnit.Reporter is
 
    procedure Report
      (Engine : Reporter;
-      R      : in out Result) is abstract;
+      R      : in out Result'Class) is abstract;
+   --  This procedure is called by AUnit.Run to report the result after running
+   --  the whole testsuite (or the selected subset of tests).
 
 end AUnit.Reporter;
