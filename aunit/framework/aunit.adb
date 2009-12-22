@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008, AdaCore                        --
+--                       Copyright (C) 2008-2009, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -70,8 +70,10 @@ package body AUnit is
 
    procedure Message_Free (Msg : in out Message_String) is
    begin
-      AUnit.Memory.AUnit_Free (Msg.all'Address);
-      Msg := null;
+      if Msg /= null then
+         AUnit.Memory.AUnit_Free (Msg.all'Address);
+         Msg := null;
+      end if;
    end Message_Free;
 
    ------------
