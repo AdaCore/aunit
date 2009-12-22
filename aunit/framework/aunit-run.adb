@@ -25,25 +25,29 @@
 ------------------------------------------------------------------------------
 
 with AUnit.Time_Measure;
-with AUnit.Test_Results;
 with AUnit.Test_Suites; use AUnit.Test_Suites;
 
 package body AUnit.Run is
 
    procedure Run
      (Suite    : Access_Test_Suite;
+      Results  : in out Test_Results.Result'Class;
       Options  : AUnit.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status);
 
+   ---------
+   -- Run --
+   ---------
+
    procedure Run
      (Suite    : Access_Test_Suite;
+      Results  : in out Test_Results.Result'Class;
       Options  : AUnit.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status)
    is
       Time    : Time_Measure.Time;
-      Results : Test_Results.Result;
 
    begin
       Test_Results.Clear (Results);
@@ -64,24 +68,50 @@ package body AUnit.Run is
       AUnit.Reporter.Report (Reporter, Results);
    end Run;
 
+   -----------------
+   -- Test_Runner --
+   -----------------
+
    procedure Test_Runner
      (Reporter : AUnit.Reporter.Reporter'Class;
       Options  : AUnit.AUnit_Options := Default_Options)
    is
+      Results : aliased Test_Results.Result;
       Outcome : Status;
       pragma Unreferenced (Outcome);
    begin
-      Run (Suite, Options, Reporter, Outcome);
+      Test_Results.Clear (Results);
+      Run (Suite, Results, Options, Reporter, Outcome);
    end Test_Runner;
+
+   -----------------------------
+   -- Test_Runner_With_Status --
+   -----------------------------
 
    function Test_Runner_With_Status
      (Reporter : AUnit.Reporter.Reporter'Class;
       Options  : AUnit.AUnit_Options := Default_Options) return Status
    is
-      Result : Status;
+      Results : aliased Test_Results.Result;
+      Outcome  : Status;
    begin
-      Run (Suite, Options, Reporter, Result);
-      return Result;
+      Test_Results.Clear (Results);
+      Run (Suite, Results, Options, Reporter, Outcome);
    end Test_Runner_With_Status;
+
+   ------------------------------
+   -- Test_Runner_With_Results --
+   ------------------------------
+
+   procedure Test_Runner_With_Results
+     (Reporter : AUnit.Reporter.Reporter'Class;
+      Results  : in out AUnit.Test_Results.Result'Class;
+      Options  : AUnit.AUnit_Options := Default_Options)
+   is
+      Outcome : Status;
+      pragma Unreferenced (Outcome);
+   begin
+      Run (Suite, Results, Options, Reporter, Outcome);
+   end Test_Runner_With_Results;
 
 end AUnit.Run;

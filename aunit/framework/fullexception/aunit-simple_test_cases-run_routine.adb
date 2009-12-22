@@ -34,9 +34,9 @@ separate (AUnit.Simple_Test_Cases)
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    Options :        AUnit_Options;
-   R       : in out Result;
-   Outcome :    out Status) is
-
+   R       : in out Result'Class;
+   Outcome :    out Status)
+is
    Unexpected_Exception : Boolean := False;
    Time : Time_Measure.Time := Time_Measure.Null_Time;
 

@@ -37,7 +37,7 @@ package AUnit.Tests is
 
    procedure Run (T : access Test;
                   O :        AUnit_Options;
-                  R : in out Result;
+                  R : in out Result'Class;
                   S :    out Status) is abstract;
    --  Run a test case or suite
 

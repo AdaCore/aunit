@@ -30,5 +30,5 @@ package AUnit.Reporter.XML is
    type XML_Reporter is new Reporter with null record;
 
    procedure Report (Engine : XML_Reporter;
-                     R      : in out Result);
+                     R      : in out Result'Class);
 end AUnit.Reporter.XML;

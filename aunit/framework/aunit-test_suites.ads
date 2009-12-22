@@ -39,7 +39,7 @@ package AUnit.Test_Suites is
 
    procedure Run (Suite   : access Test_Suite;
                   Options :        AUnit_Options;
-                  R       : in out Result;
+                  R       : in out Result'Class;
                   Outcome :    out Status);
    --  Run all tests collected into this suite
 

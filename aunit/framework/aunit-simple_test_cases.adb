@@ -33,7 +33,7 @@ package body AUnit.Simple_Test_Cases is
    procedure Run_Routine
      (Test    : access Test_Case'Class;
       Options :        AUnit_Options;
-      R       : in out Result;
+      R       : in out Result'Class;
       Outcome :    out Status);
    --  Run one test routine
 
@@ -44,7 +44,7 @@ package body AUnit.Simple_Test_Cases is
    procedure Run_Routine
      (Test    : access Test_Case'Class;
       Options :        AUnit_Options;
-      R       : in out Result;
+      R       : in out Result'Class;
       Outcome :    out Status) is separate;
 
    ------------------
@@ -99,7 +99,7 @@ package body AUnit.Simple_Test_Cases is
    procedure Run
      (Test    : access Test_Case;
       Options :        AUnit_Options;
-      R       : in out Result;
+      R       : in out Result'Class;
       Outcome :    out Status)
    is
       Old : constant Test_Case_Access := The_Current_Test_Case;

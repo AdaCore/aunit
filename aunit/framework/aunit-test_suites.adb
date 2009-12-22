@@ -45,7 +45,7 @@ package body AUnit.Test_Suites is
 
    procedure Run (Suite   : access Test_Suite;
                   Options :        AUnit_Options;
-                  R       : in out Result;
+                  R       : in out Result'Class;
                   Outcome :    out Status)
    is
       C : Cursor := First (Suite.Tests);

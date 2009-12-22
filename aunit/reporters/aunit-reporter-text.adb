@@ -95,7 +95,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report
      (Engine : Text_Reporter;
-      R      : in out Result)
+      R      : in out Result'Class)
    is
       T   : AUnit_Duration;
 

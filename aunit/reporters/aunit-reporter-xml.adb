@@ -65,7 +65,7 @@ package body AUnit.Reporter.XML is
    ------------
 
    procedure Report (Engine : XML_Reporter;
-                     R      : in out Result)
+                     R      : in out Result'Class)
    is
       pragma Unreferenced (Engine);
       T   : AUnit_Duration;

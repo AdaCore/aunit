@@ -34,8 +34,8 @@ with AUnit.Time_Measure; use AUnit.Time_Measure;
 --
 package AUnit.Test_Results is
 
-   type Result is limited private;
-   type Result_Access is access all Result;
+   type Result is tagged limited private;
+   type Result_Access is access all Result'Class;
    --  Record result. A result object is associated with the execution of a
    --  top-level test suite.
 
@@ -133,7 +133,7 @@ private
 
    pragma Inline (Errors, Failures, Successes);
 
-   type Result is limited record
+   type Result is tagged limited record
       Tests_Run    : Count_Type := 0;
       Result_List  : Result_Lists.List;
       Elapsed_Time : Time := Null_Time;
