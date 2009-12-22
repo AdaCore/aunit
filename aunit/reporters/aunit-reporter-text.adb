@@ -33,13 +33,13 @@ package body AUnit.Reporter.Text is
    procedure Indent (N : Natural);
    --  Print N indentations to output
 
-   procedure Dump_Result_List (L : Result_Lists.List);
+   procedure Dump_Result_List (L : Result_Lists.List; Prefix : String);
    --  Dump a result list
 
    procedure Put_Measure is new Gen_Put_Measure;
    --  Output elapsed time
 
-   procedure Report_Test (Test : Test_Result);
+   procedure Report_Test (Test : Test_Result; Prefix : String);
    --  Report a single assertion failure or unexpected exception
 
    ANSI_Def    : constant String := ASCII.ESC & "[0m";
@@ -65,7 +65,7 @@ package body AUnit.Reporter.Text is
    procedure Indent (N : Natural) is
    begin
       for J in 1 .. N loop
-         Put ("      ");
+         Put ("    ");
       end loop;
    end Indent;
 
@@ -73,18 +73,21 @@ package body AUnit.Reporter.Text is
    -- Dump_Result_List --
    ----------------------
 
-   procedure Dump_Result_List (L : Result_Lists.List) is
+   procedure Dump_Result_List (L : Result_Lists.List; Prefix : String) is
 
       use Result_Lists;
 
       C : Cursor := First (L);
    begin
+      if Has_Element (C) then
+         New_Line;
+      end if;
 
       --  Note: can't use Iterate because it violates restriction
       --  No_Implicit_Dynamic_Code
 
       while Has_Element (C) loop
-         Report_Test (Element (C));
+         Report_Test (Element (C), Prefix);
          Next (C);
       end loop;
    end Dump_Result_List;
@@ -97,79 +100,60 @@ package body AUnit.Reporter.Text is
      (Engine : Text_Reporter;
       R      : in out Result'Class)
    is
-      T   : AUnit_Duration;
-
+      T : AUnit_Duration;
+      S : Result_Lists.List;
+      F : Result_Lists.List;
+      E : Result_Lists.List;
    begin
-      Put_Line ("--------------------");
+      Successes (R, S);
+      Failures (R, F);
+      Errors (R, E);
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Green);
+      end if;
+
+      Dump_Result_List (S, "OK");
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Def);
+      end if;
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Purple);
+      end if;
+
+      Dump_Result_List (F, "FAIL");
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Def);
+      end if;
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Red);
+      end if;
+
+      Dump_Result_List (E, "ERROR");
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Def);
+      end if;
+
+      New_Line;
+      Put ("Total Tests Run:   ");
+      Put (Integer (Test_Count (R)));
+      New_Line;
+      Put ("Successful Tests:  ");
+      Put (Integer (Result_Lists.Length (S)));
+      New_Line;
+      Put ("Failed Assertions: ");
+      Put (Integer (Result_Lists.Length (F)));
+      New_Line;
+      Put ("Unexpected Errors: ");
+      Put (Integer (Result_Lists.Length (E)));
       New_Line;
 
-      Put ("   Total Tests Run: ");
-      Put (Integer (Test_Count (R)));
-      New_Line; New_Line;
-
-      declare
-         S : Result_Lists.List;
-      begin
-         Put ("   Successful Tests: ");
-         Put (Integer (Success_Count (R)));
-         New_Line;
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Green);
-         end if;
-
-         Successes (R, S);
-         Dump_Result_List (S);
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Def);
-         end if;
-      end;
-
-      declare
-         F : Result_Lists.List;
-      begin
-         New_Line;
-         Put ("   Failed Assertions: ");
-         Put (Integer (Failure_Count (R)));
-         New_Line;
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Purple);
-         end if;
-
-         Failures (R, F);
-         Dump_Result_List (F);
-         New_Line;
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Def);
-         end if;
-      end;
-
-      declare
-         E : Result_Lists.List;
-      begin
-         New_Line;
-         Put ("   Unexpected Errors: ");
-         Put (Integer (Error_Count (R)));
-         New_Line;
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Red);
-         end if;
-
-         Errors (R, E);
-         Dump_Result_List (E);
-         New_Line;
-
-         if Engine.Use_ANSI then
-            Put (ANSI_Def);
-         end if;
-      end;
-
       if Elapsed  (R) /= Time_Measure.Null_Time then
-         New_Line;
          T := Get_Measure (Elapsed (R));
 
          Put ("Cumulative Time: ");
@@ -182,27 +166,31 @@ package body AUnit.Reporter.Text is
    -- Report_Test --
    -----------------
 
-   procedure Report_Test (Test : Test_Result) is
+   procedure Report_Test (Test : Test_Result; Prefix : String) is
       T : AUnit_Duration;
    begin
-      if Test.Error /= null or else Test.Failure /= null then
-         New_Line;
-      end if;
-
-      Indent (1);
+      Put (Prefix);
+      Put (" ");
       Put (Test.Test_Name.all);
 
       if Test.Routine_Name /= null then
          Put (" : ");
-         Put_Line (Test.Routine_Name.all);
-      else
-         New_Line;
+         Put (Test.Routine_Name.all);
       end if;
 
+      if Test.Elapsed /= Time_Measure.Null_Time then
+         Put (" (in ");
+         T := Get_Measure (Test.Elapsed);
+         Put_Measure (T);
+         Put ("s)");
+      end if;
+
+      New_Line;
+
       if Test.Failure /= null then
-         Indent (2);
+         Indent (1);
          Put_Line (Test.Failure.Message.all);
-         Indent (2);
+         Indent (1);
          Put ("at ");
          Put (Test.Failure.Source_Name.all);
          Put (":");
@@ -210,29 +198,39 @@ package body AUnit.Reporter.Text is
          New_Line;
 
       elsif Test.Error /= null then
-         Indent (2);
+         Indent (1);
          Put_Line (Test.Error.Exception_Name.all);
 
          if Test.Error.Exception_Message /= null then
-            Indent (2);
+            Indent (1);
             Put      ("Exception Message: ");
             Put_Line (Test.Error.Exception_Message.all);
          end if;
 
          if Test.Error.Traceback /= null then
-            Indent (2);
+            Indent (1);
             Put_Line ("Traceback:");
-            Put_Line (Test.Error.Traceback.all);
-         end if;
-      end if;
 
-      if Test.Elapsed /= Time_Measure.Null_Time then
-         T := Get_Measure (Test.Elapsed);
-         Put_Measure (T);
-         Put_Line (" seconds");
+            declare
+               From, To : Natural := Test.Error.Traceback'First;
+            begin
+               while From <= Test.Error.Traceback'Last loop
+                  To := From;
+                  while To <= Test.Error.Traceback'Last
+                    and then Test.Error.Traceback (To) /= ASCII.LF
+                  loop
+                     To := To + 1;
+                  end loop;
+
+                  Indent (2);
+                  Put_Line (Test.Error.Traceback (From .. To - 1));
+                  From := To + 1;
+               end loop;
+            end;
+         end if;
+
          New_Line;
       end if;
-
    end Report_Test;
 
 end AUnit.Reporter.Text;

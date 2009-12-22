@@ -139,7 +139,7 @@ package body Test_Test_Case is
 
       --  Exclude when run-time library does not support exception handling
       Register_Routine
-        (T, Test_Exceptions'Access, "Test Exceptions - * Error Expected *");
+        (T, Test_Exceptions'Access, "Test Exceptions - Error Expected");
    end Register_Tests;
 
    --  Identifier of test case:

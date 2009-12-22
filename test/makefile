@@ -47,7 +47,7 @@ run: build
 	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext)
 
 test: build
-	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext) | grep "^   [TSFU]" > test.out
+	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext) | grep "^[TSFU]" > test.out
 	diff -b test.out expected.out
 	@echo
 	@echo "[OK] AUNIT TEST IS SUCCESSFUL"

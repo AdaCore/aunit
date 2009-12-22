@@ -100,13 +100,13 @@ package AUnit.Test_Results is
 
    procedure Errors (R : in out Result;
                      E : in out Result_Lists.List);
-   --  List of routines with unexpected exceptions
+   --  List of routines with unexpected exceptions. This resets the list.
 
    function Failure_Count (R : Result) return Count_Type;
    --  Number of failed routines
 
    procedure Failures (R : in out Result; F : in out Result_Lists.List);
-   --  List of failed routines
+   --  List of failed routines. This resets the list.
 
    function Elapsed (R : Result) return Time;
    --  Elapsed time for test execution
@@ -118,7 +118,7 @@ package AUnit.Test_Results is
    --  Number of successful routines
 
    procedure Successes (R : in out Result; S : in out Result_Lists.List);
-   --  List of successful routines
+   --  List of successful routines. This resets the list.
 
    function Successful (R : Result) return Boolean;
    --  All routines successful?
