@@ -18,3 +18,8 @@ NF-33-IA08-009 General AUnit improvements (2009-10-09)
   * The Text reporter now allows colored output on ANSI terminals.
   * Unexpected exceptions are now reported with their message and symbolic
     traceback when available.
+  * It is now possible to run a subset of the tests
+    This requires initializing and passing a Test_Filter object
+  * Test_Result is now extensible by the user
+    In particular, this means you can do postprocessing after each test has
+    been run, like synchronous output for instance.

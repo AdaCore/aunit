@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2000-2009, AdaCore                     --
+--                     Copyright (C) 2009, AdaCore                          --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,47 +23,68 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Test_Results; use AUnit.Test_Results;
+with AUnit.Simple_Test_Cases;  use AUnit.Simple_Test_Cases;
 
---  Base Test Case or Test Suite
---
---  This base type allows composition of both test cases and sub-suites into a
---  test suite (Composite pattern)
+package body AUnit.Test_Filters is
 
-package AUnit.Tests is
+   function Starts_With (Str : String; Prefix : String) return Boolean;
+   --  Whether Str starts with Prefix
 
-   type Test is abstract tagged limited private;
-   type Test_Access is access all Test'Class;
+   -----------------
+   -- Starts_With --
+   -----------------
 
-   type Test_Filter is abstract tagged limited private;
-   type Test_Filter_Access is access all Test_Filter'Class;
+   function Starts_With (Str : String; Prefix : String) return Boolean is
+   begin
+      if Str'Length < Prefix'Length then
+         return False;
+      end if;
+
+      return Str (Str'First .. Str'First + Prefix'Length - 1) = Prefix;
+   end Starts_With;
+
+   --------------
+   -- Set_Name --
+   --------------
+
+   procedure Set_Name (Filter : in out Name_Filter; Name : String) is
+   begin
+      Message_Free (Filter.Name);
+      Filter.Name := Format (Name);
+   end Set_Name;
+
+   ---------------
+   -- Is_Active --
+   ---------------
+
    function Is_Active
-     (Filter : Test_Filter;
-      T      : Test'Class) return Boolean is abstract;
-   --  Whether we should run the given test. If this function returns False,
-   --  the test is not run.
+     (Filter : Name_Filter;
+      T      : AUnit.Tests.Test'Class) return Boolean is
+   begin
+      if Filter.Name = null
+        or else Filter.Name.all = ""
+      then
+         return True;
+      end if;
 
-   type AUnit_Options is record
-      Global_Timer    : Boolean := False;
-      Test_Case_Timer : Boolean := False;
-      Filter          : Test_Filter_Access := null;
-   end record;
-   --  Options used to determine how a test should be run.
+      if T not in AUnit.Simple_Test_Cases.Test_Case'Class
+        or else Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null
+      then
+         --  There is no name, so it doesn't match the filter
+         return False;
+      end if;
 
-   Default_Options : constant AUnit_Options :=
-     (Global_Timer    => False,
-      Test_Case_Timer => False,
-      Filter          => null);
+      if Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null then
+         return Starts_With
+           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+            Filter.Name.all);
+      else
+         return Starts_With
+           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+            & " : "
+            & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+            Filter.Name.all);
+      end if;
+   end Is_Active;
 
-   procedure Run (T : access Test;
-                  O :        AUnit_Options;
-                  R : in out Result'Class;
-                  S :    out Status) is abstract;
-   --  Run a test case or suite
-
-private
-
-   type Test is abstract tagged limited null record;
-   type Test_Filter is abstract tagged limited null record;
-
-end AUnit.Tests;
+end AUnit.Test_Filters;

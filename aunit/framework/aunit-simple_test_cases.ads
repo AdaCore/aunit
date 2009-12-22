@@ -96,7 +96,7 @@ package AUnit.Simple_Test_Cases is
    --  Record test routine failure message
 
    procedure Run (Test    : access Test_Case;
-                  Options :        AUnit_Options;
+                  Options :        AUnit.Tests.AUnit_Options;
                   R       : in out Result'Class;
                   Outcome :    out Status);
    --  Run test case. Do not override

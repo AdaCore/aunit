@@ -27,7 +27,6 @@
 with Ada.Unchecked_Conversion;
 with AUnit.Memory.Utils;
 
---  A collection of test cases
 package body AUnit.Test_Suites is
 
    --------------
@@ -60,6 +59,10 @@ package body AUnit.Test_Suites is
          Next (C);
       end loop;
    end Run;
+
+   ---------------
+   -- New_Suite --
+   ---------------
 
    function New_Suite return Access_Test_Suite is
       type Access_Type is access all Test_Suite;

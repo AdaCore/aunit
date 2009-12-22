@@ -27,6 +27,7 @@
 with Ada_Containers; use Ada_Containers;
 with Ada_Containers.AUnit_Lists;
 with AUnit.Simple_Test_Cases;
+with AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case: a collection of test routines
@@ -84,7 +85,7 @@ package AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit_Options;
+      Options :        AUnit.Tests.AUnit_Options;
       R       : in out Result'Class;
       Outcome :    out Status);
    --  Run test case. Do not override.

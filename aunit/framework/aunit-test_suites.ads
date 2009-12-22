@@ -24,11 +24,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  A collection of test cases.
+
 with Ada_Containers;
 with Ada_Containers.AUnit_Lists;
 with AUnit.Tests;        use AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
---  A collection of test cases.
+
 package AUnit.Test_Suites is
 
    type Test_Suite is new AUnit.Tests.Test with private;

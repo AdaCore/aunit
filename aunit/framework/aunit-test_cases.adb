@@ -23,9 +23,10 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
-with Ada.Unchecked_Conversion;
 
---  Test cases
+with Ada.Unchecked_Conversion;
+with AUnit.Tests;              use AUnit.Tests;
+
 package body AUnit.Test_Cases is
 
    package body Registration is separate;
@@ -54,7 +55,7 @@ package body AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit_Options;
+      Options :        AUnit.Tests.AUnit_Options;
       R       : in out Result'Class;
       Outcome :    out Status)
    is
@@ -71,12 +72,16 @@ package body AUnit.Test_Cases is
 
       while Has_Element (C) loop
          Test.Routine := Element (C);
-         AUnit.Simple_Test_Cases.Run
-           (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
-            Options, R, Result);
+         if Options.Filter = null
+           or else Is_Active (Options.Filter.all, Test.all)
+         then
+            AUnit.Simple_Test_Cases.Run
+              (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
+               Options, R, Result);
 
-         if Result = Failure then
-            Outcome := Failure;
+            if Result = Failure then
+               Outcome := Failure;
+            end if;
          end if;
 
          Next (C);

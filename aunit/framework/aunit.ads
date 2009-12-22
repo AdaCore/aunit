@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 --  Test Suite Framework
+
 package AUnit is
 
    type Message_String is access String;
@@ -32,16 +33,6 @@ package AUnit is
    subtype Test_String is Message_String;
 
    type Status is (Success, Failure);
-
-   type AUnit_Options is record
-      Global_Timer    : Boolean := False;
-      Test_Case_Timer : Boolean := False;
-   end record;
-   --  Options used to determine how a test should be run.
-
-   Default_Options : constant AUnit_Options :=
-     (Global_Timer    => False,
-      Test_Case_Timer => False);
 
    --  String manipulation functions.
 

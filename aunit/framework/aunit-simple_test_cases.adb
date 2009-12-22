@@ -25,6 +25,7 @@
 ------------------------------------------------------------------------------
 
 with AUnit.Assertions;  use AUnit.Assertions;
+with AUnit.Tests;       use AUnit.Tests;
 
 package body AUnit.Simple_Test_Cases is
 
@@ -104,14 +105,18 @@ package body AUnit.Simple_Test_Cases is
    is
       Old : constant Test_Case_Access := The_Current_Test_Case;
    begin
-      The_Current_Test_Case := Test_Case_Access (Test);
-      Start_Test (R, 1);
+      if Options.Filter = null
+        or else Is_Active (Options.Filter.all, Test.all)
+      then
+         The_Current_Test_Case := Test_Case_Access (Test);
+         Start_Test (R, 1);
 
-      --  Run test routine
-      Set_Up (Test_Case'Class (Test.all));
-      Run_Routine (Test, Options, R, Outcome);
-      Tear_Down (Test_Case'Class (Test.all));
-      The_Current_Test_Case := Old;
+         --  Run test routine
+         Set_Up (Test_Case'Class (Test.all));
+         Run_Routine (Test, Options, R, Outcome);
+         Tear_Down (Test_Case'Class (Test.all));
+         The_Current_Test_Case := Old;
+      end if;
    end Run;
 
    ------------

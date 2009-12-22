@@ -2,12 +2,11 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                            A U N I T . R U N                             --
+--                          A U N I T . T E S T S                           --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                     Copyright (C) 2009, AdaCore                          --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -20,41 +19,43 @@
 -- to  the  Free Software Foundation,  51  Franklin  Street,  Fifth  Floor, --
 -- Boston, MA 02110-1301, USA.                                              --
 --                                                                          --
--- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
+-- GNAT is maintained by AdaCore (http://www.adacore.com).                  --
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Reporter;
+--  An instance of a test filter.
+--  This can be created from command line arguments, for instance, so that
+--  users can decide to run specific tests only, as opposed to the whole
+--  test suite.
+
 with AUnit.Tests;
-with AUnit.Test_Results;
-with AUnit.Test_Suites;
 
---  Framework using text reporter
-package AUnit.Run is
+package AUnit.Test_Filters is
 
-   generic
-      with function Suite return AUnit.Test_Suites.Access_Test_Suite;
-   procedure Test_Runner
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options);
+   type Name_Filter is new AUnit.Tests.Test_Filter with private;
+   --  A filter based on the name of the test and/or routine.
 
-   generic
-      with function Suite return AUnit.Test_Suites.Access_Test_Suite;
-   procedure Test_Runner_With_Results
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Results  : in out AUnit.Test_Results.Result'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options);
-   --  In this version, you can pass your own Result class. In particular, this
-   --  can be used to extend the Result type so that for instance you can
-   --  output information every time a test passed or fails.
-   --  Results is not cleared before running the tests, this is your
-   --  responsibility, so that you can for instance cumulate results as needed.
+   procedure Set_Name
+     (Filter : in out Name_Filter; Name : String);
+   --  Set the name of the test(s) to run.
+   --  The name can take several forms:
+   --     * Either the fully qualified name of the test (including routine).
+   --       For instance, if you have an instance of
+   --       AUnit.Test_Cases.Test_Case, the name could be:
+   --          Name (Test) & " : " & Routine_Name (Test)
+   --     * Or a partial name, that matches the start of the test_name. With
+   --       the example above, you could chose to omit the routine_name to run
+   --       all routines for instance
+   --  If the name is the empty string, all tests will be run
 
-   generic
-      with function Suite return AUnit.Test_Suites.Access_Test_Suite;
-   function Test_Runner_With_Status
-     (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
-      return Status;
+   function Is_Active
+     (Filter : Name_Filter;
+      T      : AUnit.Tests.Test'Class) return Boolean;
+   --  See inherited documentation
 
-end AUnit.Run;
+private
+   type Name_Filter is new AUnit.Tests.Test_Filter with record
+      Name : Message_String;
+   end record;
+
+end AUnit.Test_Filters;

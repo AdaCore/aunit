@@ -81,7 +81,7 @@ unmodified in any copy.
 
 @page
 
-<p>Copyright @copyright{} 2000-2008, AdaCore
+<p>Copyright @copyright{} 2000-2009, AdaCore
 
 <p>This document may be copied, in whole or in part, in any form or by any
 means, as is or with alterations, provided that (1) alterations are clearly
@@ -291,6 +291,15 @@ to tests developed for AUnit 1. Note that only one instance of @code{@b{Run}}
 can execute at a time.  This is a tradeoff made to reduce the stack requirement
 of the framework by allocating test result reporting data structures
 statically.
+
+It is possible to pass a filter to a @code{Test_Runner}, so that only a
+subset of the tests is run. In particular, this filter could be initialized from
+a command line parameter. See the package @code{AUnit.Test_Filters} for an
+example of such a filter. AUnit does not automatically initialize this filter
+from the command line both because it would not be supported with some of the
+limited runtimes (zero footprint for instance), and because you might want to
+pass the argument through different ways (as a parameter to switch, or a stand
+along command line argument for instance).
 
 @item Build the code that calls the harness @code{@b{Run}} routine using
 gnatmake or gprbuild. The GNAT project file @i{aunit.gpr} contains all
@@ -811,6 +820,11 @@ begin
    Run (@b{Reporter});
 end My_Tests;}
 
+The final report is output once all tests have been run, so that they can be
+grouped depending on their status (passed or fail). If you need to output the
+tests as they are run, you should consider extending the @code{Test_Result}
+type and do some output every time a success or failure is registered.
+
 @section Text output
 
 Here is an example where the test harness runs 4 tests, one reporting an
@@ -841,6 +855,11 @@ assertion failure, one reporting an unexpected error (exception):
 
 Time: 2.902E-4 seconds
 @end smallexample
+
+@cindex colors
+This reporter can optionally use colors (green to report success, red to report
+errors). Since not all consoles support it, this is off by default, but you can
+call @code{Set_Use_ANSI_Colors} to activate support for colors.
 
 @section XML output
 

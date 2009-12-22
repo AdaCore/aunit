@@ -7,6 +7,7 @@ with One_Test_Case.Inherited_Test_Case;
 with Ada_Containers; use Ada_Containers;
 
 with AUnit.Test_Suites;  use AUnit.Test_Suites;
+with AUnit.Tests;
 with AUnit.Assertions;   use AUnit.Assertions;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
@@ -23,7 +24,7 @@ package body Test_Test_Suite is
       pragma Unreferenced (T);
       Outcome : AUnit.Status;
    begin
-      Run (S'Access, AUnit.Default_Options, R, Outcome);
+      Run (S'Access, AUnit.Tests.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -35,7 +36,7 @@ package body Test_Test_Suite is
       Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, E'Access);
-      Run (S'Access, AUnit.Default_Options, R, Outcome);
+      Run (S'Access, AUnit.Tests.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = 0, "Wrong number of tests recorded");
@@ -47,7 +48,7 @@ package body Test_Test_Suite is
       Outcome : AUnit.Status;
    begin
       Add_Test (S'Access, O'Access);
-      Run (S'Access, AUnit.Default_Options, R, Outcome);
+      Run (S'Access, AUnit.Tests.Default_Options, R, Outcome);
 
       Assert (Test_Count (R) = 1, "Wrong number of tests run");
       Assert (Failure_Count (R) = 0, "Wrong number of failures");
@@ -62,7 +63,7 @@ package body Test_Test_Suite is
 
    begin
       Add_Test (S'Access, I'Access);
-      Run (S'Access, AUnit.Default_Options, R, Outcome);
+      Run (S'Access, AUnit.Tests.Default_Options, R, Outcome);
 
       Assert (Successful (R), "Suite did not run successfully");
       Assert (Test_Count (R) = Old_Count + 4,

@@ -5,6 +5,7 @@ with Simple_Test_Case;
 with Ada_Containers; use Ada_Containers;
 
 with AUnit.Assertions; use AUnit.Assertions;
+with AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Unit tests for AUnit.Test_Cases.
@@ -63,7 +64,7 @@ package body Test_Test_Case is
       Outcome   : AUnit.Status;
 
    begin
-      Run (Simple'Access, AUnit.Default_Options, R, Outcome);
+      Run (Simple'Access, AUnit.Tests.Default_Options, R, Outcome);
 
       Assert
         (Count  = 3,

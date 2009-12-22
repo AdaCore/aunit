@@ -32,9 +32,10 @@ package body AUnit.Run is
    procedure Run
      (Suite    : Access_Test_Suite;
       Results  : in out Test_Results.Result'Class;
-      Options  : AUnit.AUnit_Options;
+      Options  : AUnit.Tests.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status);
+   --  Run a specific testsuite and return its status
 
    ---------
    -- Run --
@@ -43,15 +44,13 @@ package body AUnit.Run is
    procedure Run
      (Suite    : Access_Test_Suite;
       Results  : in out Test_Results.Result'Class;
-      Options  : AUnit.AUnit_Options;
+      Options  : AUnit.Tests.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status)
    is
       Time    : Time_Measure.Time;
 
    begin
-      Test_Results.Clear (Results);
-
       if Options.Global_Timer then
          Time_Measure.Start_Measure (Time);
       end if;
@@ -74,9 +73,9 @@ package body AUnit.Run is
 
    procedure Test_Runner
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.AUnit_Options := Default_Options)
+      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
    is
-      Results : aliased Test_Results.Result;
+      Results : Test_Results.Result;
       Outcome : Status;
       pragma Unreferenced (Outcome);
    begin
@@ -90,10 +89,11 @@ package body AUnit.Run is
 
    function Test_Runner_With_Status
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.AUnit_Options := Default_Options) return Status
+      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
+      return Status
    is
-      Results : aliased Test_Results.Result;
-      Outcome  : Status;
+      Results : Test_Results.Result;
+      Outcome : Status;
    begin
       Test_Results.Clear (Results);
       Run (Suite, Results, Options, Reporter, Outcome);
@@ -106,7 +106,7 @@ package body AUnit.Run is
    procedure Test_Runner_With_Results
      (Reporter : AUnit.Reporter.Reporter'Class;
       Results  : in out AUnit.Test_Results.Result'Class;
-      Options  : AUnit.AUnit_Options := Default_Options)
+      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
    is
       Outcome : Status;
       pragma Unreferenced (Outcome);
