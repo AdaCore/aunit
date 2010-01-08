@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -182,7 +182,7 @@ package body AUnit.Reporter.Text is
          Put (" (in ");
          T := Get_Measure (Test.Elapsed);
          Put_Measure (T);
-         Put ("s)");
+         Put (")");
       end if;
 
       New_Line;

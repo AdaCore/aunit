@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                    Copyright (C) 2006-2010, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -34,8 +34,8 @@ separate (AUnit.Simple_Test_Cases)
 
 procedure Run_Routine
   (Test          : access Test_Case'Class;
-   Options       :        AUnit.AUnit_Options;
-   R             : in out Result;
+   Options       :        AUnit.Options.AUnit_Options;
+   R             : in out Result'Class;
    Outcome       :    out Status) is
 
    Unexpected_Exception : Boolean := False;
@@ -43,7 +43,6 @@ procedure Run_Routine
    Res : Integer;
 
    use Time_Measure;
-   use Failure_Lists;
 
    function String_Compare (Str1, Str2 : String) return Boolean;
    --  Compares two strings.
@@ -92,8 +91,8 @@ begin
 
    --  Reset failure list to capture failed assertions for one routine
 
-   Clear (Test.Failures);
-   declare
+   Clear_Failures (Test.all);
+
    begin
       Res := Internal_Setjmp;
 
@@ -106,7 +105,7 @@ begin
             Src     : constant Message_String :=
                         AUnit.Last_Chance_Handler.Get_Exception_Message;
          begin
-            if not String_Compare (Src.all, "aunit-assertions.adb:43") then
+            if not String_Compare (Src.all, "aunit-assertions.adb:56") then
                Unexpected_Exception := True;
                Add_Error
                  (R,
@@ -122,20 +121,20 @@ begin
       end if;
    end;
 
-   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
+   if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
       Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
-         C : Cursor := First (Test.Failures);
+         C : Failure_Iter := First_Failure (Test.all);
       begin
-         while Has_Element (C) loop
+         while Has_Failure (C) loop
             Add_Failure
               (R,
                Name (Test.all),
                Routine_Name (Test.all),
-               Element (C),
+               Get_Failure (C),
                Time);
             Next (C);
          end loop;

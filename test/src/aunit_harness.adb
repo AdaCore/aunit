@@ -1,17 +1,23 @@
 --
---  Copyright (C) 2009, AdaCore
+--  Copyright (C) 2009-2010, AdaCore
 --
 
+with AUnit.Options;
 with AUnit.Reporter.Text;
-with AUnit.Tests;          use AUnit.Tests;
+with AUnit.Run;
 with AUnit.Test_Filters;   use AUnit.Test_Filters;
-with Harness;
+
+with AUnit_Suite; use AUnit_Suite;
 
 procedure AUnit_Harness is
+
+   procedure Harness is new AUnit.Run.Test_Runner (Suite);
+   --  The full test harness
+
    Reporter : AUnit.Reporter.Text.Text_Reporter;
    Filter   : aliased AUnit.Test_Filters.Name_Filter;
-   Options  : AUnit_Options :=
-      (Global_Timer => False, Test_Case_Timer => False, Filter => null);
+   Options  : AUnit.Options.AUnit_Options :=
+      (Global_Timer => False, Test_Case_Timer => True, Filter => null);
 begin
    AUnit.Reporter.Text.Set_Use_ANSI_Colors (Reporter, True);
    Harness (Reporter, Options);
@@ -22,7 +28,7 @@ begin
    --  for Ada.Command_Line
 
    Options.Filter := Filter'Unchecked_Access;
-   Set_Name (Filter, "Test AUnit.Test_Cases : Test Routine Registration");
+   Set_Name (Filter, "(test_case) Test routines registration");
    Harness (Reporter, Options);
 
 end AUnit_Harness;

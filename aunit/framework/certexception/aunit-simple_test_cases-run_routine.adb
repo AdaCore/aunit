@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                    Copyright (C) 2006-2010, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,7 +32,7 @@ separate (AUnit.Simple_Test_Cases)
 --  Version for cert run-time libraries
 procedure Run_Routine
   (Test          : access Test_Case'Class;
-   Options       :        AUnit.AUnit_Options;
+   Options       :        AUnit.Options.AUnit_Options;
    R             : in out Result;
    Outcome       :    out Status)
 is
@@ -45,7 +45,7 @@ is
 begin
    --  Reset failure list to capture failed assertions for one routine
 
-   Clear (Test.Failures);
+   Clear_Failures (Test.all);
 
    begin
       if Options.Test_Case_Timer then
@@ -80,19 +80,19 @@ begin
             Elapsed => Time);
    end;
 
-   if not Unexpected_Exception and then Is_Empty (Test.Failures) then
+   if not Unexpected_Exception and then Has_Failures (Test.all) then
       Outcome := Success;
       Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
-         C : Cursor := First (Test.Failures);
+         C : Failure_Iter := First_Failure (Test.all);
       begin
-         while Has_Element (C) loop
+         while Has_Failure (C) loop
             Add_Failure (R,
                          Name (Test.all),
                          Routine_Name (Test.all),
-                         Element (C),
+                         Get_Failure (C),
                          Time);
             Next (C);
          end loop;

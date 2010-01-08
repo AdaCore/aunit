@@ -1,4 +1,3 @@
-GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
 GPRCLEAN  = gprclean
 
@@ -15,23 +14,23 @@ ifeq ($(RTS),)
    RTS = full
    RTS_CONF =
 else
-   RTS_CONF = ,,$(RTS)
+   RTS_CONF = --RTS=$(RTS)
 endif
 
 ifeq ($(TARGET),)
    TARGET = native
-   CONF_ARGS =
+   TARGET_CONF =
 else
-   CONF_ARGS = --target=$(TARGET)
+   TARGET_CONF = --target=$(TARGET)
 endif
+
+CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
 ifeq ($(OS),Windows_NT)
 ifeq ($(TARGET),native)
 exeext=.exe
 endif
 endif
-
-CONF_FILE = $(TARGET)-$(RTS).cgpr
 
 ifeq ($(TARGET),powerpc-elf)
    RUN = ./support/run-ppc-elf
@@ -40,14 +39,13 @@ else
 endif
 
 build: $(SUPPORTLIB) aunit_tests.gpr
-	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --config=ASM --batch $(CONF_ARGS) -o $(CONF_FILE)
-	$(GPRBUILD) -p -Paunit_tests -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE) $(LARGS)
+	$(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(LARGS)
 
 run: build
-	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext)
+	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)
 
 test: build
-	-$(RUN) $(TARGET)-$(RTS)/aunit_harness$(exeext) | grep "^[TSFU]" > test.out
+	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext) | grep "^[TSFU]" > test.out
 	diff -b test.out expected.out
 	@echo
 	@echo "[OK] AUNIT TEST IS SUCCESSFUL"
@@ -60,7 +58,7 @@ else
 endif
 
 clean:
-	$(RM) -rf obj support/obj support/lib $(TARGET)-$(RTS) *.cgpr test.out
+	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p

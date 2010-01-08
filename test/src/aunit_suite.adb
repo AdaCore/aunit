@@ -1,27 +1,26 @@
---  Unit tests for AUnit:
-with Test_Test_Case;
-with Test_Test_Case_Registration;
-with Test_Test_Suite;
+--
+--  Copyright (C) 2008-2010, AdaCore
+--
+
+with AUnit.Test_Suites.Tests.Suite;
+with AUnit.Test_Cases.Tests.Suite;
+with AUnit.Test_Fixtures.Tests.Suite;
 
 package body AUnit_Suite is
    use Test_Suites;
 
-   Result : aliased Test_Suite;
-   Initialized : Boolean := False;
-
-   Test_Case : aliased Test_Test_Case.The_Test_Case;
-   Test_Case_Registration : aliased Test_Test_Case_Registration.The_Test_Case;
-   Test_Suite : aliased Test_Test_Suite.The_Test_Case;
-
    function Suite return Access_Test_Suite is
+      S : constant AUnit.Test_Suites.Access_Test_Suite :=
+            AUnit.Test_Suites.New_Suite;
    begin
-      if not Initialized then
-         Add_Test (Result'Access, Test_Case'Access);
-         Add_Test (Result'Access, Test_Case_Registration'Access);
-         Add_Test (Result'Access, Test_Suite'Access);
-         Initialized := True;
-      end if;
+      Add_Test
+        (S, AUnit.Test_Suites.Tests.Suite.Test_Suite);
+      Add_Test
+        (S, AUnit.Test_Cases.Tests.Suite.Test_Suite);
+      Add_Test
+        (S, AUnit.Test_Fixtures.Tests.Suite.Test_Suite);
 
-      return Result'Access;
+      return S;
    end Suite;
+
 end AUnit_Suite;

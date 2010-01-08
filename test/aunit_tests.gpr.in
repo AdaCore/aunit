@@ -6,7 +6,7 @@ project Aunit_Tests is
    for Languages use ("Ada");
    for Main use ("aunit_harness.adb");
    for Source_Dirs use ("src");
-   for Exec_Dir use AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
+   for Exec_Dir use "exe/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
    for Object_Dir use
      "obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
 

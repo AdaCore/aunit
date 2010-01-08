@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -28,16 +28,21 @@
 
 separate (AUnit.Assertions)
 procedure Assert_Exception
-  (Message : String;
+  (T       : Test;
+   Proc    : Throwing_Exception_Proc;
+   Message : String;
    Source  : String := GNAT.Source_Info.File;
    Line    : Natural := GNAT.Source_Info.Line)
 is
+   Raised : Boolean := False;
 begin
-   Proc;
+   begin
+      Proc.all;
+   exception
+      when others =>
+         Raised := True;
+   end;
    --  No exception raised: register the failure message
-   Register_Failure (Message, Source, Line);
+   Assert (T, Raised, Message, Source, Line);
 
-exception
-   when others =>
-      null;
 end Assert_Exception;

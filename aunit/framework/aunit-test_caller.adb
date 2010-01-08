@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2009, AdaCore                   --
+--                       Copyright (C) 2008-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -25,9 +25,15 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
+with AUnit.Assertions;
 with AUnit.Memory.Utils;
 
 package body AUnit.Test_Caller is
+
+   function New_Fixture is new AUnit.Memory.Utils.Gen_Alloc
+     (Test_Fixture, Fixture_Access);
+
+   The_Fixture_Object : constant Fixture_Access := New_Fixture;
 
    ------------
    -- Create --
@@ -39,8 +45,9 @@ package body AUnit.Test_Caller is
       Test : Test_Method)
    is
    begin
-      TC.Name   := Format (Name);
-      TC.Method := Test;
+      TC.Name    := Format (Name);
+      TC.Method  := Test;
+      TC.Fixture := The_Fixture_Object;
    end Create;
 
    ------------
@@ -58,8 +65,7 @@ package body AUnit.Test_Caller is
         (Access_Type, Test_Case_Access);
       Ret : constant Test_Case_Access := Convert (Alloc);
    begin
-      Ret.Name    := Format (Name);
-      Ret.Method  := Test;
+      Create (Ret.all, Name, Test);
       return Ret;
    end Create;
 
@@ -78,7 +84,11 @@ package body AUnit.Test_Caller is
 
    procedure Run_Test (Test : in out Test_Case) is
    begin
-      Test.Method (Test_Fixture (Test.Fixture));
+      --  Before running the fixture's method, we need to make sure that
+      --  the test Ids correspond so that a failure reported via Fixture is
+      --  correctly understood as being part of Test.
+      AUnit.Assertions.Copy_Id (Test, Test.Fixture.all);
+      Test.Method (Test_Fixture (Test.Fixture.all));
    end Run_Test;
 
    ------------
@@ -87,7 +97,7 @@ package body AUnit.Test_Caller is
 
    procedure Set_Up (Test : in out Test_Case) is
    begin
-      Set_Up (Test.Fixture);
+      Set_Up (Test.Fixture.all);
    end Set_Up;
 
    ---------------
@@ -96,7 +106,7 @@ package body AUnit.Test_Caller is
 
    procedure Tear_Down (Test : in out Test_Case) is
    begin
-      Tear_Down (Test.Fixture);
+      Tear_Down (Test.Fixture.all);
    end Tear_Down;
 
 end AUnit.Test_Caller;

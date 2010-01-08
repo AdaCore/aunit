@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008, AdaCore                        --
+--                     Copyright (C) 2008-2010, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,6 +23,8 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+with AUnit.Assertions;
 
 --  A Test_Fixture is used to provide a common environment for a set of test
 --  cases.
@@ -64,7 +66,7 @@
 
 package AUnit.Test_Fixtures is
 
-   type Test_Fixture is abstract tagged private;
+   type Test_Fixture is new AUnit.Assertions.Test with private;
 
    procedure Set_Up (Test : in out Test_Fixture);
    --  Set up performed before each test case
@@ -74,6 +76,6 @@ package AUnit.Test_Fixtures is
 
 private
 
-   type Test_Fixture is abstract tagged null record;
+   type Test_Fixture is new AUnit.Assertions.Test with null record;
 
 end AUnit.Test_Fixtures;

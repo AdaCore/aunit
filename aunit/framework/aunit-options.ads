@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                A U N I T . S I M P L E _ T E S T _ C A S E S             --
+--                         A U N I T . O P T I O N S                        --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                        Copyright (C) 2008-2010, AdaCore                  --
+--                       Copyright (C) 2009-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,49 +24,20 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  This type is used to implement a simple test case: define a derived type
---  that overrides the Run_Test and Name methods.
---
---  You don't usually need to use that type, but Test_Fixture/Test_Caller
---  or Test_Case instead.
+with AUnit.Test_Filters;
 
-with AUnit.Assertions;
-with AUnit.Options;
-with AUnit.Test_Results; use AUnit.Test_Results;
+package AUnit.Options is
 
-package AUnit.Simple_Test_Cases is
+   type AUnit_Options is record
+      Global_Timer    : Boolean := False;
+      Test_Case_Timer : Boolean := False;
+      Filter          : AUnit.Test_Filters.Test_Filter_Access := null;
+   end record;
+   --  Options used to determine how a test should be run.
 
-   type Test_Case is abstract new AUnit.Assertions.Test with private;
-   type Test_Case_Access is access all Test_Case'Class;
+   Default_Options : constant AUnit_Options :=
+     (Global_Timer    => False,
+      Test_Case_Timer => False,
+      Filter          => null);
 
-   function Name (Test : Test_Case) return Message_String is abstract;
-   --  Test case name
-
-   function Routine_Name (Test : Test_Case) return Message_String;
-   --  Routine name. By default return a null Message_String
-
-   procedure Run_Test
-     (Test          : in out Test_Case) is abstract;
-   --  Perform the test.
-
-   procedure Set_Up (Test : in out Test_Case);
-   --  Set up performed before each test
-
-   procedure Tear_Down (Test : in out Test_Case);
-   --  Tear down performed after each test
-
-   ----------------------------------------------
-   --  Below are internal routines. Do not use --
-   ----------------------------------------------
-
-   procedure Run (Test    : access Test_Case;
-                  Options :        AUnit.Options.AUnit_Options;
-                  R       : in out Result'Class;
-                  Outcome :    out Status);
-   --  Run test case. Do not override
-
-private
-
-   type Test_Case is abstract new AUnit.Assertions.Test with null record;
-
-end AUnit.Simple_Test_Cases;
+end AUnit.Options;

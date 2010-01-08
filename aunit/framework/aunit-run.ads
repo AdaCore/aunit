@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                    Copyright (C) 2006-2010, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -24,8 +24,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with AUnit.Options;
 with AUnit.Reporter;
-with AUnit.Tests;
 with AUnit.Test_Results;
 with AUnit.Test_Suites;
 
@@ -36,14 +36,14 @@ package AUnit.Run is
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
    procedure Test_Runner
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options);
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options);
 
    generic
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
    procedure Test_Runner_With_Results
      (Reporter : AUnit.Reporter.Reporter'Class;
       Results  : in out AUnit.Test_Results.Result'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options);
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options);
    --  In this version, you can pass your own Result class. In particular, this
    --  can be used to extend the Result type so that for instance you can
    --  output information every time a test passed or fails.
@@ -54,7 +54,7 @@ package AUnit.Run is
       with function Suite return AUnit.Test_Suites.Access_Test_Suite;
    function Test_Runner_With_Status
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options)
       return Status;
 
 end AUnit.Run;

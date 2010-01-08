@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -26,8 +26,8 @@
 
 with Ada_Containers; use Ada_Containers;
 with Ada_Containers.AUnit_Lists;
+with AUnit.Options;
 with AUnit.Simple_Test_Cases;
-with AUnit.Tests;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case: a collection of test routines
@@ -85,7 +85,7 @@ package AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit.Tests.AUnit_Options;
+      Options :        AUnit.Options.AUnit_Options;
       R       : in out Result'Class;
       Outcome :    out Status);
    --  Run test case. Do not override.

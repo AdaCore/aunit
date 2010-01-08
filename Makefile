@@ -1,6 +1,5 @@
 RTS =
 TARGET =
-GPRCONFIG = gprconfig
 GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 
@@ -10,17 +9,17 @@ ifeq ($(RTS),)
    RTS=full
    RTS_CONF =
 else
-   RTS_CONF = ,,$(RTS)
+   RTS_CONF = --RTS=$(RTS)
 endif
 
 ifeq ($(TARGET),)
    TARGET=native
-   CONF_ARGS =
+   TARGET_CONF =
 else
-   CONF_ARGS = --target=$(TARGET)
+   TARGET_CONF = --target=$(TARGET)
 endif
 
-CONF_FILE = $(TARGET)-$(RTS).cgpr
+CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
 # Install directories
 
@@ -34,8 +33,7 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 .PHONY: all clean targets installed-targets install_clean install
 
 all: support/aunit_shared.gpr
-	$(GPRCONFIG) --config=Ada$(RTS_CONF) --config=C --batch $(CONF_ARGS) -o $(CONF_FILE)
-	$(GPRBUILD) -Paunit/aunit_build -p -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) --config=$(CONF_FILE)
+	$(GPRBUILD) -Paunit/aunit_build -p -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
 
 installed-targets:
 	@printf "$(TARGET)\n" >> installed-targets

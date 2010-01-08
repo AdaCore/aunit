@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -25,7 +25,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
-with AUnit.Tests;              use AUnit.Tests;
+with AUnit.Options;              use AUnit.Options;
+with AUnit.Test_Filters;         use AUnit.Test_Filters;
 
 package body AUnit.Test_Cases is
 
@@ -55,7 +56,7 @@ package body AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit.Tests.AUnit_Options;
+      Options :        AUnit.Options.AUnit_Options;
       R       : in out Result'Class;
       Outcome :    out Status)
    is

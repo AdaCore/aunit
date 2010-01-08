@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2009, AdaCore                   --
+--                       Copyright (C) 2008-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -100,8 +100,10 @@ package AUnit.Test_Caller is
 
 private
 
+   type Fixture_Access is access all Test_Fixture;
+
    type Test_Case is new AUnit.Simple_Test_Cases.Test_Case with record
-      Fixture : Test_Fixture;
+      Fixture : Fixture_Access;
       Name    : Message_String;
       Method  : Test_Method;
    end record;

@@ -6,7 +6,7 @@
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2000-2009, AdaCore                     --
+--                     Copyright (C) 2000-2010, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,8 +23,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Test_Results; use AUnit.Test_Results;
-
 --  Base Test Case or Test Suite
 --
 --  This base type allows composition of both test cases and sub-suites into a
@@ -35,35 +33,8 @@ package AUnit.Tests is
    type Test is abstract tagged limited private;
    type Test_Access is access all Test'Class;
 
-   type Test_Filter is abstract tagged limited private;
-   type Test_Filter_Access is access all Test_Filter'Class;
-   function Is_Active
-     (Filter : Test_Filter;
-      T      : Test'Class) return Boolean is abstract;
-   --  Whether we should run the given test. If this function returns False,
-   --  the test is not run.
-
-   type AUnit_Options is record
-      Global_Timer    : Boolean := False;
-      Test_Case_Timer : Boolean := False;
-      Filter          : Test_Filter_Access := null;
-   end record;
-   --  Options used to determine how a test should be run.
-
-   Default_Options : constant AUnit_Options :=
-     (Global_Timer    => False,
-      Test_Case_Timer => False,
-      Filter          => null);
-
-   procedure Run (T : access Test;
-                  O :        AUnit_Options;
-                  R : in out Result'Class;
-                  S :    out Status) is abstract;
-   --  Run a test case or suite
-
 private
 
    type Test is abstract tagged limited null record;
-   type Test_Filter is abstract tagged limited null record;
 
 end AUnit.Tests;

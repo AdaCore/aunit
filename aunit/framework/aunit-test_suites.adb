@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,9 +33,30 @@ package body AUnit.Test_Suites is
    -- Add_Test --
    --------------
 
-   procedure Add_Test (S : access Test_Suite'Class; T : access Test'Class) is
+   procedure Add_Test
+     (S : access Test_Suite'Class;
+      T : access Test_Suite'Class)
+   is
    begin
-      Append (S.Tests, Test_Access'(T.all'Unchecked_Access));
+      Append
+        (S.Tests,
+         (Kind => TS_Elt,
+          TS   => Access_Test_Suite'(T.all'Unchecked_Access)));
+   end Add_Test;
+
+   --------------
+   -- Add_Test --
+   --------------
+
+   procedure Add_Test
+     (S : access Test_Suite'Class;
+      T : access Test_Case'Class)
+   is
+   begin
+      Append
+        (S.Tests,
+         (Kind => TC_Elt,
+          TC   => Test_Case_Access'(T.all'Unchecked_Access)));
    end Add_Test;
 
    ---------
@@ -52,7 +73,13 @@ package body AUnit.Test_Suites is
    begin
       Outcome := Success;
       while Has_Element (C) loop
-         Run (Element (C), Options, R, Result);
+         case Element (C).Kind is
+            when TC_Elt =>
+               Run (Element (C).TC, Options, R, Result);
+            when TS_Elt =>
+               Run (Element (C).TS, Options, R, Result);
+         end case;
+
          if Result = Failure then
             Outcome := Failure;
          end if;

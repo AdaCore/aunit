@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2009, AdaCore                      --
+--                    Copyright (C) 2006-2010, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,7 +32,7 @@ package body AUnit.Run is
    procedure Run
      (Suite    : Access_Test_Suite;
       Results  : in out Test_Results.Result'Class;
-      Options  : AUnit.Tests.AUnit_Options;
+      Options  : AUnit.Options.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status);
    --  Run a specific testsuite and return its status
@@ -44,7 +44,7 @@ package body AUnit.Run is
    procedure Run
      (Suite    : Access_Test_Suite;
       Results  : in out Test_Results.Result'Class;
-      Options  : AUnit.Tests.AUnit_Options;
+      Options  : AUnit.Options.AUnit_Options;
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status)
    is
@@ -73,7 +73,7 @@ package body AUnit.Run is
 
    procedure Test_Runner
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options)
    is
       Results : Test_Results.Result;
       Outcome : Status;
@@ -89,7 +89,7 @@ package body AUnit.Run is
 
    function Test_Runner_With_Status
      (Reporter : AUnit.Reporter.Reporter'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options)
       return Status
    is
       Results : Test_Results.Result;
@@ -106,7 +106,7 @@ package body AUnit.Run is
    procedure Test_Runner_With_Results
      (Reporter : AUnit.Reporter.Reporter'Class;
       Results  : in out AUnit.Test_Results.Result'Class;
-      Options  : AUnit.Tests.AUnit_Options := AUnit.Tests.Default_Options)
+      Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options)
    is
       Outcome : Status;
       pragma Unreferenced (Outcome);

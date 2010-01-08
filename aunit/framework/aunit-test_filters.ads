@@ -2,11 +2,11 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                          A U N I T . T E S T S                           --
+--                   A U N I T . T E S T _ F I L T E R S                    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
---                     Copyright (C) 2009, AdaCore                          --
+--                     Copyright (C) 2009-2010, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,7 +32,15 @@ with AUnit.Tests;
 
 package AUnit.Test_Filters is
 
-   type Name_Filter is new AUnit.Tests.Test_Filter with private;
+   type Test_Filter is abstract tagged limited private;
+   type Test_Filter_Access is access all Test_Filter'Class;
+   function Is_Active
+     (Filter : Test_Filter;
+      T      : AUnit.Tests.Test'Class) return Boolean is abstract;
+   --  Whether we should run the given test. If this function returns False,
+   --  the test is not run.
+
+   type Name_Filter is new Test_Filter with private;
    --  A filter based on the name of the test and/or routine.
 
    procedure Set_Name
@@ -54,7 +62,9 @@ package AUnit.Test_Filters is
    --  See inherited documentation
 
 private
-   type Name_Filter is new AUnit.Tests.Test_Filter with record
+   type Test_Filter is abstract tagged limited null record;
+
+   type Name_Filter is new Test_Filter with record
       Name : Message_String;
    end record;
 
