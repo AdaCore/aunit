@@ -195,7 +195,7 @@ private
    type Failure_Iter is new Failure_Lists.Cursor;
 
    type Test is abstract new AUnit.Tests.Test with record
-      Id : Test_Id;
+      Id : Test_Id := Null_Id;
    end record;
 
 end AUnit.Assertions;
