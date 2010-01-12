@@ -31,18 +31,18 @@ separate (AUnit.Simple_Test_Cases)
 
 --  Version for cert run-time libraries
 procedure Run_Routine
-  (Test          : access Test_Case'Class;
-   Options       :        AUnit.Options.AUnit_Options;
-   R             : in out Result;
-   Outcome       :    out Status)
+  (Test    : access Test_Case'Class;
+   Options :        AUnit.Options.AUnit_Options;
+   R       : in out Result'Class;
+   Outcome :    out Status)
 is
    Unexpected_Exception : Boolean := False;
    Time : Time_Measure.Time := Time_Measure.Null_Time;
 
-   use Failure_Lists;
    use Time_Measure;
 
 begin
+
    --  Reset failure list to capture failed assertions for one routine
 
    Clear_Failures (Test.all);
@@ -80,7 +80,7 @@ begin
             Elapsed => Time);
    end;
 
-   if not Unexpected_Exception and then Has_Failures (Test.all) then
+   if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
       Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else

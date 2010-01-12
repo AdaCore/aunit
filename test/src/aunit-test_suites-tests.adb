@@ -242,9 +242,11 @@ package body AUnit.Test_Suites.Tests is
                    "Unexpected exception in zfp profile",
                  "Exeption name is incorrect in error: '" &
                  Elem.Error.Exception_Name.all & "'");
-         Assert (T, Elem.Error.Exception_Message.all = "A message",
-                 "Exeption message not correctly set: " &
-                 Elem.Error.Exception_Message.all);
+
+         --  Incompatible with certexceptions
+         --  Assert (T, Elem.Error.Exception_Message.all = "A message",
+         --  "Exception message not correctly set: " &
+         --  Elem.Error.Exception_Message.all);
       end;
    end Test_Run_With_All;
 
