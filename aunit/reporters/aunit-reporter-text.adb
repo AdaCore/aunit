@@ -42,6 +42,15 @@ package body AUnit.Reporter.Text is
    procedure Report_Test (Test : Test_Result; Prefix : String);
    --  Report a single assertion failure or unexpected exception
 
+   generic
+      with procedure Get (R : in out Result; L : in out Result_Lists.List);
+      Label : String;
+      Color : String;
+   procedure Report_Tests
+      (Engine : Text_Reporter;
+       R      : in out Result'Class);
+   --  Report a series of tests
+
    ANSI_Def    : constant String := ASCII.ESC & "[0m";
    ANSI_Green  : constant String := ASCII.ESC & "[32m";
    ANSI_Purple : constant String := ASCII.ESC & "[35m";
@@ -92,6 +101,59 @@ package body AUnit.Reporter.Text is
       end loop;
    end Dump_Result_List;
 
+   ---------
+   -- Get --
+   ---------
+
+   procedure Report_Tests
+      (Engine : Text_Reporter;
+       R      : in out Result'Class)
+   is
+      S : Result_Lists.List;
+   begin
+      Get (Result (R), S);
+      if Engine.Use_ANSI then
+         Put (Color);
+      end if;
+
+      Dump_Result_List (S, Label);
+
+      if Engine.Use_ANSI then
+         Put (ANSI_Def);
+      end if;
+   end Report_Tests;
+
+   ---------------------
+   -- Report_OK_Tests --
+   ---------------------
+
+   procedure Report_OK_Tests
+      (Engine : Text_Reporter;
+       R      : in out Result'Class)
+   is
+      procedure Internal is new Report_Tests (Successes, "OK", ANSI_Green);
+   begin
+      Internal (Engine, R);
+   end Report_OK_Tests;
+
+   procedure Report_Fail_Tests
+      (Engine : Text_Reporter;
+       R      : in out Result'Class)
+   is
+      procedure Internal is new Report_Tests (Failures, "FAIL", ANSI_Purple);
+   begin
+      Internal (Engine, R);
+   end Report_Fail_Tests;
+
+   procedure Report_Error_Tests
+      (Engine : Text_Reporter;
+       R      : in out Result'Class)
+   is
+      procedure Internal is new Report_Tests (Errors, "ERROR", ANSI_Red);
+   begin
+      Internal (Engine, R);
+   end Report_Error_Tests;
+
    ------------
    -- Report --
    ------------
@@ -100,60 +162,30 @@ package body AUnit.Reporter.Text is
      (Engine : Text_Reporter;
       R      : in out Result'Class)
    is
+      S_Count : constant Integer := Integer (Success_Count (R));
+      F_Count : constant Integer := Integer (Failure_Count (R));
+      E_Count : constant Integer := Integer (Error_Count (R));
       T : AUnit_Duration;
-      S : Result_Lists.List;
-      F : Result_Lists.List;
-      E : Result_Lists.List;
    begin
-      Successes (R, S);
-      Failures (R, F);
-      Errors (R, E);
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Green);
-      end if;
-
-      Dump_Result_List (S, "OK");
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Def);
-      end if;
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Purple);
-      end if;
-
-      Dump_Result_List (F, "FAIL");
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Def);
-      end if;
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Red);
-      end if;
-
-      Dump_Result_List (E, "ERROR");
-
-      if Engine.Use_ANSI then
-         Put (ANSI_Def);
-      end if;
+      Report_OK_Tests    (Text_Reporter'Class (Engine), R);
+      Report_Fail_Tests  (Text_Reporter'Class (Engine), R);
+      Report_Error_Tests (Text_Reporter'Class (Engine), R);
 
       New_Line;
       Put ("Total Tests Run:   ");
       Put (Integer (Test_Count (R)));
       New_Line;
       Put ("Successful Tests:  ");
-      Put (Integer (Result_Lists.Length (S)));
+      Put (S_Count);
       New_Line;
       Put ("Failed Assertions: ");
-      Put (Integer (Result_Lists.Length (F)));
+      Put (F_Count);
       New_Line;
       Put ("Unexpected Errors: ");
-      Put (Integer (Result_Lists.Length (E)));
+      Put (E_Count);
       New_Line;
 
-      if Elapsed  (R) /= Time_Measure.Null_Time then
+      if Elapsed (R) /= Time_Measure.Null_Time then
          T := Get_Measure (Elapsed (R));
 
          Put ("Cumulative Time: ");
