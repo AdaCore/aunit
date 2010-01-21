@@ -32,6 +32,10 @@ exeext=.exe
 endif
 endif
 
+ifeq ($(findstring vxworks,$(TARGET)),vxworks)
+exeext=.out
+endif
+
 ifeq ($(TARGET),powerpc-elf)
    RUN = ./support/run-ppc-elf
 else
