@@ -28,6 +28,7 @@ package body AUnit.Test_Suites.Tests is
 --        --  ??? incompatible with zfp. Should we remove it ?
 --        procedure Free is new Ada.Unchecked_Deallocation
 --          (Access_Test_Suite, Test_Suite);
+      pragma Unreferenced (Test);
    begin
       null;
 --        Free (Test.Suite);
