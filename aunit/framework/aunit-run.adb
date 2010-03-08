@@ -97,6 +97,7 @@ package body AUnit.Run is
    begin
       Test_Results.Clear (Results);
       Run (Suite, Results, Options, Reporter, Outcome);
+      return Outcome;
    end Test_Runner_With_Status;
 
    ------------------------------
