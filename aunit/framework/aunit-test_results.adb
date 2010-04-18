@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -327,7 +327,7 @@ package body AUnit.Test_Results is
 
    function Test_Count (R : Result) return Ada_Containers.Count_Type is
    begin
-      return Ada_Containers.Count_Type (R.Tests_Run);
+      return R.Tests_Run;
    end Test_Count;
 
    -----------
