@@ -28,8 +28,6 @@
 --  builtin to allow exception simulation on platforms where the run-time does
 --  not allow exception propagation.
 
-pragma Ada_2005;
-
 with System;
 
 package AUnit.Last_Chance_Handler is

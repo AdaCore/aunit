@@ -24,9 +24,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  Ada 2005 unit as it uses the Container.Iterate method
-pragma Ada_2005;
-
 with AUnit.Memory.Utils;
 
 --  Record test results.
@@ -233,9 +230,10 @@ package body AUnit.Test_Results is
    -----------------
 
    function Error_Count (R : Result) return Count_Type is
+      use Result_Lists;
    begin
       E_Count := 0;
-      R.Result_List.Iterate (Iterate_Error'Access);
+      Iterate (R.Result_List, Iterate_Error'Access);
       return E_Count;
    end Error_Count;
 
@@ -255,9 +253,10 @@ package body AUnit.Test_Results is
    -------------------
 
    function Failure_Count (R : Result) return Count_Type is
+      use Result_Lists;
    begin
       F_Count := 0;
-      R.Result_List.Iterate (Iterate_Failure'Access);
+      Iterate (R.Result_List, Iterate_Failure'Access);
       return F_Count;
    end Failure_Count;
 
@@ -297,7 +296,7 @@ package body AUnit.Test_Results is
    function Success_Count (R : Result)  return Count_Type is
    begin
       S_Count := 0;
-      R.Result_List.Iterate (Iterate_Success'Access);
+      Result_Lists.Iterate (R.Result_List, Iterate_Success'Access);
       return S_Count;
    end Success_Count;
 

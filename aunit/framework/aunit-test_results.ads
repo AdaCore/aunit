@@ -24,8 +24,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2005;
-
 with Ada_Containers.AUnit_Lists;
 
 with AUnit.Time_Measure; use AUnit.Time_Measure;

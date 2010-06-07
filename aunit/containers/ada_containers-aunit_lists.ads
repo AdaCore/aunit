@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --          Copyright (C) 2004-2008, Free Software Foundation, Inc.         --
---                      Copyright (C) 2008, AdaCore                         --
+--                   Copyright (C) 2008-2010, AdaCore                       --
 --                                                                          --
 -- This specification is derived from the Ada Reference Manual for use with --
 -- GNAT. The copyright notice above, and the license provisions that follow --
@@ -34,8 +34,6 @@
 
 --  Some Ada2005 constructs have also been removed so that user tests can be
 --  compiled in Ada95.
-
-pragma Ada_2005;
 
 generic
    type Element_Type is private;
@@ -181,9 +179,11 @@ package Ada_Containers.AUnit_Lists is
 
    function Has_Element (Position : Cursor) return Boolean;
 
+   type Iterator is access procedure (Position : Cursor);
+
    procedure Iterate
      (Container : List;
-      Process   : not null access procedure (Position : Cursor));
+      Process   : Iterator);
 
 --     procedure Reverse_Iterate
 --       (Container : List;

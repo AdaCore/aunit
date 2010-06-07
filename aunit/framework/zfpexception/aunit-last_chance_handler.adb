@@ -24,8 +24,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-pragma Ada_2005;
-
 with System;
 with System.Storage_Elements; use System.Storage_Elements;
 with Interfaces.C;
