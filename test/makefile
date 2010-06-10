@@ -48,7 +48,7 @@ run: build
 	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)
 
 test: build
-	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext) >& test.out.full
+	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext) > test.out.full 2>&1
 	cat test.out.full | grep "^[TSFU]" > test.out
 	diff -b test.out expected.out
 	@echo
