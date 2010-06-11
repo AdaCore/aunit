@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2009, AdaCore                   --
+--                       Copyright (C) 2008-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -218,9 +218,9 @@ package body AUnit.Last_Chance_Handler is
    -------------------------
 
    procedure Last_Chance_Handler (Msg : System.Address; Line : Integer) is
-      procedure C_Abort;
-      pragma Import (C, C_Abort, "abort");
-      pragma No_Return (C_Abort);
+      procedure OS_Exit (Status : Integer);
+      pragma Import (C, OS_Exit, "exit");
+      pragma No_Return (OS_Exit);
 
    begin
       --  Save the exception message before performing the longjmp
@@ -237,7 +237,7 @@ package body AUnit.Last_Chance_Handler is
          --  No return procedure.
          Builtin_Longjmp (Jmp_Buffer (Jmp_Buff_Idx)'Access, 1);
       else
-         C_Abort;
+         OS_Exit (1);
       end if;
    end Last_Chance_Handler;
 
