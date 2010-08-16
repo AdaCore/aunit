@@ -39,13 +39,8 @@ package AUnit.Assertions is
       Source    : String := GNAT.Source_Info.File;
       Line      : Natural := GNAT.Source_Info.Line);
    --  Test "Condition" and record "Message" if false.
-   --  If the Ada run-time library supports exception handling, a failed
-   --  condition passed to this routine causes the calling routine to be
-   --  abandoned. Otherwise, a failed assertion returns and continues the
-   --  caller.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-   --  Please use the dispatching call below, using Test as dispatching
-   --  argument
+   --  If the condition is false, an exception is then raised and the running
+   --   test is aborted.
 
    function Assert
      (Condition : Boolean;
@@ -54,9 +49,6 @@ package AUnit.Assertions is
       Line      : Natural := GNAT.Source_Info.Line) return Boolean;
    --  Functional version to allow the calling routine to decide whether to
    --  continue or abandon the execution.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-   --  Please use the dispatching call below, using Test as dispatching
-   --  argument
 
    -----------------------
    -- Simple assertions --
@@ -80,9 +72,6 @@ package AUnit.Assertions is
       Source  : String := GNAT.Source_Info.File;
       Line    : Natural := GNAT.Source_Info.Line);
    --  Test that Proc throws an exception and record "Message" if not.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-   --  Please use the dispatching call below, using Test as dispatching
-   --  argument
 
    ------------------------------------------------------------
    --  The following declarations are for internal use only  --
