@@ -2,6 +2,8 @@
 --  Copyright (C) 2009-2010, AdaCore
 --
 
+with AUnit.Assertions; use AUnit.Assertions;
+
 package body AUnit.Test_Fixtures.Tests_Fixtures is
 
    Nb_Set_Up_Called : Natural := 0;
@@ -42,8 +44,9 @@ package body AUnit.Test_Fixtures.Tests_Fixtures is
    ------------------
 
    procedure Test_Failure (T : in out Fix) is
+      pragma Unreferenced (T);
    begin
-      Assert (T, False, "Failure");
+      Assert (False, "Failure");
    end Test_Failure;
 
    ----------------
@@ -51,6 +54,7 @@ package body AUnit.Test_Fixtures.Tests_Fixtures is
    ----------------
 
    procedure Test_Error (T : in out Fix) is
+      pragma Unreferenced (T);
    begin
       raise Constraint_Error;
    end Test_Error;

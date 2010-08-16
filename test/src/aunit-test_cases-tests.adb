@@ -2,6 +2,8 @@
 --  Copyright (C) 2009-2010, AdaCore
 --
 
+with AUnit.Assertions; use AUnit.Assertions;
+
 package body AUnit.Test_Cases.Tests is
 
    -------------------------
@@ -17,7 +19,7 @@ package body AUnit.Test_Cases.Tests is
       Register_Tests (T.TC);
 
       Assert
-        (T, Test_Cases.Registration.Routine_Count (T.TC) =
+        (Test_Cases.Registration.Routine_Count (T.TC) =
            Old_Count + Routines_In_Simple,
          "Routine not properly registered");
    end Test_Register_Tests;
@@ -32,8 +34,7 @@ package body AUnit.Test_Cases.Tests is
       Set_Up (T.TC);
 
       Assert
-        (T,
-         Was_Reset and Is_Set_Up (T.TC),
+        (Was_Reset and Is_Set_Up (T.TC),
          "Not set up correctly");
    end Test_Set_Up;
 
@@ -47,7 +48,7 @@ package body AUnit.Test_Cases.Tests is
       Tear_Down (T.TC);
 
       Assert
-        (T, Was_Reset and Is_Torn_Down (T.TC),
+        (Was_Reset and Is_Torn_Down (T.TC),
          "Not torn down correctly");
    end Test_Torn_Down;
 
@@ -65,25 +66,25 @@ package body AUnit.Test_Cases.Tests is
       Run (T.TC'Access, AUnit.Options.Default_Options, R, Outcome);
 
       Assert
-        (T, Count = 4,
+        (Count = 4,
          "Not enough routines in simple test case");
 
       Assert
-        (T, Test_Count (R) = Count,
+        (Test_Count (R) = Count,
          "Not all requested routines were run");
 
       --  There are supposed to be two failed assertions for one routine
       --  in R, so we expect Count + Old_Count + 1:
       Assert
-        (T, Success_Count (R) + Failure_Count (R) + Error_Count (R)
+        (Success_Count (R) + Failure_Count (R) + Error_Count (R)
          = Count + 1,
          "Not all requested routines are recorded");
 
-      Assert (T, Is_Torn_Down (T.TC), "Not torn down correctly");
-      Assert (T, Success_Count (R) = 1, "Wrong success count");
-      Assert (T, Failure_Count (R) = 3, "Wrong failures count");
-      Assert (T, Error_Count (R) = 1, "Wrong errors count");
-      Assert (T, Outcome = Failure, "Result flag incorrect");
+      Assert (Is_Torn_Down (T.TC), "Not torn down correctly");
+      Assert (Success_Count (R) = 1, "Wrong success count");
+      Assert (Failure_Count (R) = 3, "Wrong failures count");
+      Assert (Error_Count (R) = 1, "Wrong errors count");
+      Assert (Outcome = Failure, "Result flag incorrect");
    end Test_Run;
 
 end AUnit.Test_Cases.Tests;

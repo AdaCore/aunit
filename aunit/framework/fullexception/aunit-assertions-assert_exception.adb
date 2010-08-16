@@ -28,8 +28,7 @@
 
 separate (AUnit.Assertions)
 procedure Assert_Exception
-  (T       : Test;
-   Proc    : Throwing_Exception_Proc;
+  (Proc    : Throwing_Exception_Proc;
    Message : String;
    Source  : String := GNAT.Source_Info.File;
    Line    : Natural := GNAT.Source_Info.Line)
@@ -43,6 +42,6 @@ begin
          Raised := True;
    end;
    --  No exception raised: register the failure message
-   Assert (T, Raised, Message, Source, Line);
+   Assert (Raised, Message, Source, Line);
 
 end Assert_Exception;

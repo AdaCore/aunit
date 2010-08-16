@@ -3,6 +3,7 @@
 --
 
 with Ada_Containers;          use Ada_Containers;
+with AUnit.Assertions;    use AUnit.Assertions;
 with AUnit.Options;
 with AUnit.Test_Results;
 
@@ -21,10 +22,12 @@ package body AUnit.Test_Fixtures.Tests is
       R       : AUnit.Test_Results.Result;
       Outcome : AUnit.Status;
       Old     : constant Natural := Get_Nb_Set_Up_Called;
+      pragma Unreferenced (T);
+
    begin
       Run (TC_Success, AUnit.Options.Default_Options, R, Outcome);
       Run (TC_Failure, AUnit.Options.Default_Options, R, Outcome);
-      Assert (T, Get_Nb_Set_Up_Called = Old + 2,
+      Assert (Get_Nb_Set_Up_Called = Old + 2,
               "Incorrect number of calls to set_up");
    end Test_Set_Up;
 
@@ -36,17 +39,19 @@ package body AUnit.Test_Fixtures.Tests is
       R       : AUnit.Test_Results.Result;
       Outcome : AUnit.Status;
       Old     : constant Natural := Get_Nb_Tear_Down_Called;
+      pragma Unreferenced (T);
+
    begin
       Run (TC_Success, AUnit.Options.Default_Options, R, Outcome);
-      Assert (T, Get_Nb_Tear_Down_Called = Old + 1,
+      Assert (Get_Nb_Tear_Down_Called = Old + 1,
               "Incorrect number of calls to tear_down");
-      Assert (T, Outcome = Success,
+      Assert (Outcome = Success,
               "Outcome value is incorrect");
-      Assert (T, AUnit.Test_Results.Test_Count (R) = 1,
+      Assert (AUnit.Test_Results.Test_Count (R) = 1,
               "Incorrect number of tests reported");
-      Assert (T, AUnit.Test_Results.Failure_Count (R) = 0,
+      Assert (AUnit.Test_Results.Failure_Count (R) = 0,
               "Incorrect number of failures reported");
-      Assert (T, AUnit.Test_Results.Error_Count (R) = 0,
+      Assert (AUnit.Test_Results.Error_Count (R) = 0,
               "Incorrect number of errors reported");
    end Test_Tear_Down_Success;
 
@@ -58,17 +63,19 @@ package body AUnit.Test_Fixtures.Tests is
       R       : AUnit.Test_Results.Result;
       Outcome : AUnit.Status;
       Old     : constant Natural := Get_Nb_Tear_Down_Called;
+      pragma Unreferenced (T);
+
    begin
       Run (TC_Failure, AUnit.Options.Default_Options, R, Outcome);
-      Assert (T, Get_Nb_Tear_Down_Called = Old + 1,
+      Assert (Get_Nb_Tear_Down_Called = Old + 1,
               "Incorrect number of calls to tear_down");
-      Assert (T, Outcome = Failure,
+      Assert (Outcome = Failure,
               "Outcome value is incorrect");
-      Assert (T, AUnit.Test_Results.Test_Count (R) = 1,
+      Assert (AUnit.Test_Results.Test_Count (R) = 1,
               "Incorrect number of tests reported");
-      Assert (T, AUnit.Test_Results.Failure_Count (R) = 1,
+      Assert (AUnit.Test_Results.Failure_Count (R) = 1,
               "Incorrect number of failures reported");
-      Assert (T, AUnit.Test_Results.Error_Count (R) = 0,
+      Assert (AUnit.Test_Results.Error_Count (R) = 0,
               "Incorrect number of errors reported");
    end Test_Tear_Down_Failure;
 
@@ -80,17 +87,19 @@ package body AUnit.Test_Fixtures.Tests is
       R       : AUnit.Test_Results.Result;
       Outcome : AUnit.Status;
       Old     : constant Natural := Get_Nb_Tear_Down_Called;
+      pragma Unreferenced (T);
+
    begin
       Run (TC_Error, AUnit.Options.Default_Options, R, Outcome);
-      Assert (T, Get_Nb_Tear_Down_Called = Old + 1,
+      Assert (Get_Nb_Tear_Down_Called = Old + 1,
               "Incorrect number of calls to tear_down");
-      Assert (T, Outcome = Failure,
+      Assert (Outcome = Failure,
               "Outcome value is incorrect");
-      Assert (T, AUnit.Test_Results.Test_Count (R) = 1,
+      Assert (AUnit.Test_Results.Test_Count (R) = 1,
               "Incorrect number of tests reported");
-      Assert (T, AUnit.Test_Results.Failure_Count (R) = 0,
+      Assert (AUnit.Test_Results.Failure_Count (R) = 0,
               "Incorrect number of failures reported");
-      Assert (T, AUnit.Test_Results.Error_Count (R) = 1,
+      Assert (AUnit.Test_Results.Error_Count (R) = 1,
               "Incorrect number of errors reported");
    end Test_Tear_Down_Error;
 

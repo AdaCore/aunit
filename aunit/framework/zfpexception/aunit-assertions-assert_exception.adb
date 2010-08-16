@@ -31,8 +31,7 @@ with AUnit.Last_Chance_Handler;
 
 separate (AUnit.Assertions)
 procedure Assert_Exception
-  (T       : Test;
-   Proc    : Throwing_Exception_Proc;
+  (Proc    : Throwing_Exception_Proc;
    Message : String;
    Source  : String := GNAT.Source_Info.File;
    Line    : Natural := GNAT.Source_Info.Line)

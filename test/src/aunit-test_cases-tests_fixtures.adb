@@ -2,6 +2,8 @@
 --  Copyright (C) 2009-2010, AdaCore
 --
 
+with AUnit.Assertions; use AUnit.Assertions;
+
 package body AUnit.Test_Cases.Tests_Fixtures is
 
    procedure Double_Failure_Wrapper (T : in out The_Test_Case'Class);
@@ -41,8 +43,9 @@ package body AUnit.Test_Cases.Tests_Fixtures is
    ----------
 
    procedure Fail (T : in out Test_Cases.Test_Case'Class) is
+      pragma Unreferenced (T);
    begin
-      Assert (T, False, "Failure test failed");
+      Assert (False, "Failure test failed");
    end Fail;
 
    ----------------------------
@@ -60,11 +63,11 @@ package body AUnit.Test_Cases.Tests_Fixtures is
 
    procedure Double_Failure (T : in out The_Test_Case) is
       Dummy : Boolean;
-      pragma Unreferenced (Dummy);
+      pragma Unreferenced (T, Dummy);
    begin
       --  Fail two assertions. Will be checked in Test_Test_Case.Test_Run
-      Dummy := Assert (T, False, "first failure");
-      Assert (T, False, "second failure");
+      Dummy := Assert (False, "first failure");
+      Assert (False, "second failure");
    end Double_Failure;
 
    ------------

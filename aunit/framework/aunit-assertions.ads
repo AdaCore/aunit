@@ -31,21 +31,10 @@ with Ada_Containers.AUnit_Lists;
 
 package AUnit.Assertions is
 
-   Assertion_Error : exception;
-   --  For run-time libraries that support exception handling, raised when an
-   --  assertion fails in order to abandon execution of a test routine.
-
-   type Test is abstract new AUnit.Tests.Test with private;
-   --  Test is used as root type for all Test cases, but also for Test fixtures
-   --  This allows easy access to all Assert procedures from user tests.
-   type Test_Access is access all Test'Class;
-
-   procedure Init_Test (T : in out Test);
-   --  Init a new test
+   type Throwing_Exception_Proc is access procedure;
 
    procedure Assert
-     (T         : Test;
-      Condition : Boolean;
+     (Condition : Boolean;
       Message   : String;
       Source    : String := GNAT.Source_Info.File;
       Line      : Natural := GNAT.Source_Info.Line);
@@ -54,31 +43,17 @@ package AUnit.Assertions is
    --  condition passed to this routine causes the calling routine to be
    --  abandoned. Otherwise, a failed assertion returns and continues the
    --  caller.
-   --  These are primitive operations so that you can override them in your
-   --  own types, possibly to have Source and Line point somewhere else than
-   --  in the code (in the case the test code is automatically generated for
-   --  instance). For such a behavior, it is enough to override the general
-   --  version that takes a Condition parameter.
+   --  This is now obsolete and will be removed in later versions of AUnit.
+   --  Please use the dispatching call below, using Test as dispatching
+   --  argument
 
    function Assert
-     (T         : Test;
-      Condition : Boolean;
+     (Condition : Boolean;
       Message   : String;
       Source    : String := GNAT.Source_Info.File;
       Line      : Natural := GNAT.Source_Info.Line) return Boolean;
    --  Functional version to allow the calling routine to decide whether to
    --  continue or abandon the execution.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-
-   type Throwing_Exception_Proc is access procedure;
-
-   procedure Assert_Exception
-     (T       : Test;
-      Proc    : Throwing_Exception_Proc;
-      Message : String;
-      Source  : String := GNAT.Source_Info.File;
-      Line    : Natural := GNAT.Source_Info.Line);
-   --  Test that Proc throws an exception and record "Message" if not.
    --  This is now obsolete and will be removed in later versions of AUnit.
    --  Please use the dispatching call below, using Test as dispatching
    --  argument
@@ -91,8 +66,7 @@ package AUnit.Assertions is
    --  contain both the expected and actual values.
 
    procedure Assert
-     (T         : Test;
-      Actual    : String;
+     (Actual    : String;
       Expected  : String;
       Message   : String;
       Source    : String  := GNAT.Source_Info.File;
@@ -100,49 +74,11 @@ package AUnit.Assertions is
    --  Specialized versions of Assert, they call the general version that
    --  takes a Condition as a parameter
 
-   -----------------------------
-   -- OBSELESCENT SUBPROGRAMS --
-   -----------------------------
-
-   --  The following Assert subprograms are now obsolescent.
-   --  The reason behind this decision is that the following Assert methods
-   --  rely on global variables (Replacing the missing 'Test' parameter).
-   --  Such global variable is of course incompatible with any multitasking
-   --  use, so should not be used in a multitasking environment.
-
-   procedure Assert
-     (Condition : Boolean;
-      Message   : String;
-      Source    : String := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line);
-   pragma Obsolescent;
-   --  Test "Condition" and record "Message" if false.
-   --  If the Ada run-time library supports exception handling, a failed
-   --  condition passed to this routine causes the calling routine to be
-   --  abandoned. Otherwise, a failed assertion returns and continues the
-   --  caller.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-   --  Please use the dispatching call below, using Test as dispatching
-   --  argument
-
-   function Assert
-     (Condition : Boolean;
-      Message   : String;
-      Source    : String := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line) return Boolean;
-   pragma Obsolescent;
-   --  Functional version to allow the calling routine to decide whether to
-   --  continue or abandon the execution.
-   --  This is now obsolete and will be removed in later versions of AUnit.
-   --  Please use the dispatching call below, using Test as dispatching
-   --  argument
-
    procedure Assert_Exception
      (Proc    : Throwing_Exception_Proc;
       Message : String;
       Source  : String := GNAT.Source_Info.File;
       Line    : Natural := GNAT.Source_Info.Line);
-   pragma Obsolescent;
    --  Test that Proc throws an exception and record "Message" if not.
    --  This is now obsolete and will be removed in later versions of AUnit.
    --  Please use the dispatching call below, using Test as dispatching
@@ -151,6 +87,18 @@ package AUnit.Assertions is
    ------------------------------------------------------------
    --  The following declarations are for internal use only  --
    ------------------------------------------------------------
+
+   Assertion_Error : exception;
+   --  For run-time libraries that support exception handling, raised when an
+   --  assertion fails in order to abandon execution of a test routine.
+
+   type Test is abstract new AUnit.Tests.Test with private;
+   --  Test is used as root type for all Test cases, but also for Test fixtures
+   --  This allows easy access to all Assert procedures from user tests.
+   type Test_Access is access all Test'Class;
+
+   procedure Init_Test (T : in out Test);
+   --  Init a new test
 
    procedure Clear_Failures (T : Test);
    --  Clear all failures related to T

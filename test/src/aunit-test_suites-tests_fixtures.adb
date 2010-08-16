@@ -3,6 +3,7 @@
 --
 
 with Ada.Exceptions;
+with AUnit.Assertions; use AUnit.Assertions;
 
 package body AUnit.Test_Suites.Tests_Fixtures is
 
@@ -37,8 +38,9 @@ package body AUnit.Test_Suites.Tests_Fixtures is
    --------------
 
    procedure Run_Test (Test : in out TC_With_Failure) is
+      pragma Unreferenced (Test);
    begin
-      Assert (Test, False, "A failed assertion");
+      Assert (False, "A failed assertion");
    end Run_Test;
 
    ----------
@@ -56,10 +58,11 @@ package body AUnit.Test_Suites.Tests_Fixtures is
    --------------
 
    procedure Run_Test (Test : in out TC_With_Two_Failures) is
+      pragma Unreferenced (Test);
    begin
-      if not Assert (Test, False, "A first failure") then
-         Assert (Test, False, "A second failure");
-         Assert (Test, False, "Third failure, should not appear");
+      if not Assert (False, "A first failure") then
+         Assert (False, "A second failure");
+         Assert (False, "Third failure, should not appear");
       end if;
    end Run_Test;
 
@@ -126,7 +129,7 @@ package body AUnit.Test_Suites.Tests_Fixtures is
 
    procedure Run_Test (Test : in out TC_With_Setup) is
    begin
-      Assert (Test, Test.Setup, "Set up not done correctly");
+      Assert (Test.Setup, "Set up not done correctly");
    end Run_Test;
 
 end AUnit.Test_Suites.Tests_Fixtures;

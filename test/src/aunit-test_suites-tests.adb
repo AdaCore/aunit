@@ -3,6 +3,7 @@
 --
 
 with AUnit.Options;      use AUnit.Options;
+with AUnit.Assertions;   use AUnit.Assertions;
 with AUnit.Test_Results; use AUnit.Test_Results;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
@@ -40,10 +41,10 @@ package body AUnit.Test_Suites.Tests is
 
    procedure Test_Add_Test_Case (T : in out Fixture) is
    begin
-      Assert (T, Test_Lists.Is_Empty (T.Suite.Tests),
+      Assert (Test_Lists.Is_Empty (T.Suite.Tests),
               "Suite is not empty when initialized");
       AUnit.Test_Suites.Add_Test (T.Suite, A_Simple_Test_Case'Access);
-      Assert (T, Test_Lists.Length (T.Suite.Tests) = 1,
+      Assert (Test_Lists.Length (T.Suite.Tests) = 1,
               "Suite length after inserting a test case is not 1");
    end Test_Add_Test_Case;
 
@@ -57,11 +58,9 @@ package body AUnit.Test_Suites.Tests is
    begin
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, Successful (T.Res),
-         "Suite did not report success correctly");
-      Assert (T, Test_Count (T.Res) = 0, "Wrong number of tests recorded");
-      Assert (T, Outcome = Success, "Result flag incorrect");
+      Assert (Successful (T.Res), "Suite did not report success correctly");
+      Assert (Test_Count (T.Res) = 0, "Wrong number of tests recorded");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_Run_Empty;
 
    ---------------------------
@@ -75,20 +74,15 @@ package body AUnit.Test_Suites.Tests is
       AUnit.Test_Suites.Add_Test (T.Suite, A_Simple_Test_Case'Access);
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, Successful (T.Res),
-         "Suite did not report success correctly");
-      Assert
-        (T, Success_Count (T.Res) = 1,
-         "Number of reported successes is wrong");
-      Assert
-        (T, Failure_Count (T.Res) = 0,
-         "Number of reported failures is wrong");
-      Assert
-        (T, Error_Count (T.Res) = 0,
-         "Number of reported errors is wrong");
-      Assert (T, Test_Count (T.Res) = 1, "Wrong number of tests recorded");
-      Assert (T, Outcome = Success, "Result flag incorrect");
+      Assert (Successful (T.Res), "Suite did not report success correctly");
+      Assert (Success_Count (T.Res) = 1,
+              "Number of reported successes is wrong");
+      Assert (Failure_Count (T.Res) = 0,
+              "Number of reported failures is wrong");
+      Assert (Error_Count (T.Res) = 0,
+              "Number of reported errors is wrong");
+      Assert (Test_Count (T.Res) = 1, "Wrong number of tests recorded");
+      Assert (Outcome = Success, "Result flag incorrect");
    end Test_Run_With_Success;
 
    ---------------------------
@@ -102,20 +96,16 @@ package body AUnit.Test_Suites.Tests is
       AUnit.Test_Suites.Add_Test (T.Suite, A_TC_With_Failure'Access);
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, not Successful (T.Res),
-         "Suite did not report success correctly");
-      Assert
-        (T, Success_Count (T.Res) = 0,
-         "Number of reported successes is wrong");
-      Assert
-        (T, Failure_Count (T.Res) = 1,
-         "Number of reported failures is wrong");
-      Assert
-        (T, Error_Count (T.Res) = 0,
-         "Number of reported errors is wrong");
-      Assert (T, Test_Count (T.Res) = 1, "Wrong number of tests recorded");
-      Assert (T, Outcome = Failure, "Result flag incorrect");
+      Assert (not Successful (T.Res),
+              "Suite did not report success correctly");
+      Assert (Success_Count (T.Res) = 0,
+              "Number of reported successes is wrong");
+      Assert (Failure_Count (T.Res) = 1,
+              "Number of reported failures is wrong");
+      Assert (Error_Count (T.Res) = 0,
+              "Number of reported errors is wrong");
+      Assert (Test_Count (T.Res) = 1, "Wrong number of tests recorded");
+      Assert (Outcome = Failure, "Result flag incorrect");
    end Test_Run_With_Failure;
 
    -----------------------------
@@ -129,20 +119,16 @@ package body AUnit.Test_Suites.Tests is
       AUnit.Test_Suites.Add_Test (T.Suite, A_TC_With_Exception'Access);
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, not Successful (T.Res),
-         "Suite did not report success correctly");
-      Assert
-        (T, Success_Count (T.Res) = 0,
-         "Number of reported successes is wrong");
-      Assert
-        (T, Failure_Count (T.Res) = 0,
-         "Number of reported failures is wrong");
-      Assert
-        (T, Error_Count (T.Res) = 1,
-         "Number of reported errors is wrong");
-      Assert (T, Test_Count (T.Res) = 1, "Wrong number of tests recorded");
-      Assert (T, Outcome = Failure, "Result flag incorrect");
+      Assert (not Successful (T.Res),
+              "Suite did not report success correctly");
+      Assert (Success_Count (T.Res) = 0,
+              "Number of reported successes is wrong");
+      Assert (Failure_Count (T.Res) = 0,
+              "Number of reported failures is wrong");
+      Assert (Error_Count (T.Res) = 1,
+              "Number of reported errors is wrong");
+      Assert (Test_Count (T.Res) = 1, "Wrong number of tests recorded");
+      Assert (Outcome = Failure, "Result flag incorrect");
    end Test_Run_With_Exception;
 
    -----------------------------
@@ -158,30 +144,26 @@ package body AUnit.Test_Suites.Tests is
       AUnit.Test_Suites.Add_Test (T.Suite, A_TC_With_Exception'Access);
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, not Successful (T.Res),
-         "Suite did not report success correctly");
-      Assert
-        (T, Success_Count (T.Res) = 1,
-         "Number of reported successes is wrong");
-      Assert
-        (T, Failure_Count (T.Res) = 2,
-         "Number of reported failures is wrong");
-      Assert
-        (T, Error_Count (T.Res) = 1,
-         "Number of reported errors is wrong");
-      Assert (T, Test_Count (T.Res) = 3, "Wrong number of tests recorded");
-      Assert (T, Outcome = Failure, "Result flag incorrect");
+      Assert (not Successful (T.Res),
+              "Suite did not report success correctly");
+      Assert (Success_Count (T.Res) = 1,
+              "Number of reported successes is wrong");
+      Assert (Failure_Count (T.Res) = 2,
+              "Number of reported failures is wrong");
+      Assert (Error_Count (T.Res) = 1,
+              "Number of reported errors is wrong");
+      Assert (Test_Count (T.Res) = 3, "Wrong number of tests recorded");
+      Assert (Outcome = Failure, "Result flag incorrect");
 
       declare
          List : Result_Lists.List;
          Elem : Test_Result;
       begin
          Successes (T.Res, List);
-         Assert (T, Result_Lists.Length (List) = 1,
+         Assert (Result_Lists.Length (List) = 1,
                  "Unexpected number of successful results");
          Elem := Result_Lists.First_Element (List);
-         Assert (T, Elem.Test_Name.all = "Simple test case",
+         Assert (Elem.Test_Name.all = "Simple test case",
                  "Incorrect test name in result: '" &
                  Elem.Test_Name.all & "'");
 
@@ -189,55 +171,54 @@ package body AUnit.Test_Suites.Tests is
          --  would be elaborated even in the normal case where null is
          --  expected.
 
-         Assert (T, Elem.Routine_Name = null,
+         Assert (Elem.Routine_Name = null,
                  "Incorrect routine name for result: expected null");
-         Assert (T, Elem.Failure = null,
+         Assert (Elem.Failure = null,
                  "Unexpected failure value for a successful run");
-         Assert (T, Elem.Error = null,
+         Assert (Elem.Error = null,
                  "Unexpected error value for a successful run");
-         Assert (T, Elem.Elapsed = Null_Time,
+         Assert (Elem.Elapsed = Null_Time,
                  "Unexpected elapsed value with run option set to No_Time");
          Result_Lists.Clear (List);
 
          Failures (T.Res, List);
-         Assert (T, Result_Lists.Length (List) = 2,
+         Assert (Result_Lists.Length (List) = 2,
                  "Unexpected number of failure results");
          Elem := Result_Lists.First_Element (List);
-         Assert (T, Elem.Test_Name.all = "Test case with 2 failures",
+         Assert (Elem.Test_Name.all = "Test case with 2 failures",
                  "Incorrect test name for result: '" &
                  Elem.Test_Name.all & "'");
-         Assert (T, Elem.Routine_Name = null,
+         Assert (Elem.Routine_Name = null,
                  "Incorrect routine name for result: expected null");
-         Assert (T, Elem.Failure /= null,
+         Assert (Elem.Failure /= null,
                  "Unexpected failure value for a failed run");
-         Assert (T, Elem.Error = null,
+         Assert (Elem.Error = null,
                  "Unexpected error value for a failed run");
-         Assert (T, Elem.Elapsed = Null_Time,
+         Assert (Elem.Elapsed = Null_Time,
                  "Unexpected elapsed value with run option set to No_Time");
-         Assert (T, Elem.Failure.Message.all = "A first failure",
+         Assert (Elem.Failure.Message.all = "A first failure",
                  "Incorrect message reported in Failure");
-         Assert (T,
-                 Elem.Failure.Source_Name.all,
+         Assert (Elem.Failure.Source_Name.all,
                  "aunit-test_suites-tests_fixtures.adb",
                  "Incorrect filename reported in Failure");
          Result_Lists.Clear (List);
 
          Errors (T.Res, List);
-         Assert (T, Result_Lists.Length (List) = 1,
+         Assert (Result_Lists.Length (List) = 1,
                  "Unexpected number of error results");
          Elem := Result_Lists.First_Element (List);
-         Assert (T, Elem.Test_Name.all = "Test case with exception",
+         Assert (Elem.Test_Name.all = "Test case with exception",
                  "Incorrect test name for result: '" &
                  Elem.Test_Name.all & "'");
-         Assert (T, Elem.Routine_Name = null,
+         Assert (Elem.Routine_Name = null,
                  "Incorrect routine name for result: expected null");
-         Assert (T, Elem.Failure = null,
+         Assert (Elem.Failure = null,
                  "Unexpected failure value for a run with exception raised");
-         Assert (T, Elem.Error /= null,
+         Assert (Elem.Error /= null,
                  "Unexpected error value for a run with exception raised");
-         Assert (T, Elem.Elapsed = Null_Time,
+         Assert (Elem.Elapsed = Null_Time,
                  "Unexpected elapsed value with run option set to No_Time");
-         Assert (T, Elem.Error.Exception_Name.all =
+         Assert (Elem.Error.Exception_Name.all =
                    "AUNIT.TEST_SUITES.TESTS_FIXTURES.MY_EXCEPTION"
                  or else Elem.Error.Exception_Name.all =
                    "Unexpected exception in zfp profile",
@@ -245,7 +226,7 @@ package body AUnit.Test_Suites.Tests is
                  Elem.Error.Exception_Name.all & "'");
 
          --  Incompatible with certexceptions
-         --  Assert (T, Elem.Error.Exception_Message.all = "A message",
+         --  Assert (Elem.Error.Exception_Message.all = "A message",
          --  "Exception message not correctly set: " &
          --  Elem.Error.Exception_Message.all);
       end;
@@ -262,15 +243,12 @@ package body AUnit.Test_Suites.Tests is
       AUnit.Test_Suites.Add_Test (T.Suite, A_TC_With_Setup'Access);
       Run (T.Suite, Option, T.Res, Outcome);
 
-      Assert
-        (T, Successful (T.Res),
-         "Suite did not run successfully: setup not called");
-      Assert
-        (T, A_TC_With_Setup.Setup = False,
-         "Tear down not called");
-      Assert
-        (T, A_TC_With_Setup.Error = False,
-         "Tear down did not receive the expected value");
+      Assert (Successful (T.Res),
+              "Suite did not run successfully: setup not called");
+      Assert (A_TC_With_Setup.Setup = False,
+              "Tear down not called");
+      Assert (A_TC_With_Setup.Error = False,
+              "Tear down did not receive the expected value");
    end Test_Run_With_Setup;
 
 end AUnit.Test_Suites.Tests;
