@@ -58,7 +58,9 @@ aunit_tests.gpr: aunit_tests.gpr.in force
 	rm -f $@
 	touch $@
 ifneq ($(RTS),full)
+ifneq ($(RTS),xenomai)
 	echo "with \"zfp_support\";" >> $@
+endif
 endif
 ifeq ($(shell ls ../aunit/aunit_build.gpr 2> /dev/null),../aunit/aunit_build.gpr)
 	@cat $< | sed -e 's%with "aunit"%with "../aunit/aunit_build"%' -e 's%with "aunit_shared"%with "../support/aunit_shared"%' >> $@
