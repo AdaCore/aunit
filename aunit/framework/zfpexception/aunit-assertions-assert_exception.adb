@@ -47,6 +47,6 @@ is
 begin
    if My_Setjmp = 0 then
       --  Result is 0 when no exception has been raised.
-      Assert (Raised, Message, Source, Line);
+      Assert (False, Message, Source, Line);
    end if;
 end Assert_Exception;

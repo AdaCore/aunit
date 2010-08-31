@@ -33,15 +33,15 @@ procedure Assert_Exception
    Source  : String := GNAT.Source_Info.File;
    Line    : Natural := GNAT.Source_Info.Line)
 is
-   Raised : Boolean := False;
 begin
    begin
       Proc.all;
    exception
       when others =>
-         Raised := True;
+         return;
    end;
+
    --  No exception raised: register the failure message
-   Assert (Raised, Message, Source, Line);
+   Assert (False, Message, Source, Line);
 
 end Assert_Exception;
