@@ -6,7 +6,8 @@ project AUnit_Shared is
    type Runtime_Type is
      ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
       "cert", "ravenscar", "ravenscar-full", "ravenscar-cert",
-      "hi", "ravenscar-sfp", "zfp", "default", "pthread", "xenomai");
+      "ravenscar-cert-rtp", "hi", "ravenscar-sfp", "zfp", "default", "pthread",
+      "xenomai");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
 
    for Source_Dirs use ();
@@ -27,7 +28,7 @@ project AUnit_Shared is
       when "ravenscar" | "ravenscar-full" =>
          Except := "zfpexception";
          Calend := "nocalendar";
-      when "ravenscar-cert" =>
+      when "ravenscar-cert" | "ravenscar-cert-rtp" =>
          Except := "certexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
