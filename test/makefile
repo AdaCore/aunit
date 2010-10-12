@@ -59,7 +59,9 @@ aunit_tests.gpr: aunit_tests.gpr.in force
 	touch $@
 ifneq ($(RTS),full)
 ifneq ($(RTS),xenomai)
+ifneq ($(RTS),kernel)
 	echo "with \"zfp_support\";" >> $@
+endif
 endif
 endif
 ifeq ($(shell ls ../aunit/aunit_build.gpr 2> /dev/null),../aunit/aunit_build.gpr)
