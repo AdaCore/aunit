@@ -4,10 +4,10 @@ project AUnit_Shared is
    Target  : Target_Type  := external ("PLATFORM", "native");
 
    type Runtime_Type is
-     ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
-      "cert", "ravenscar", "ravenscar-full", "ravenscar-cert",
-      "ravenscar-cert-rtp", "hi", "ravenscar-sfp", "zfp", "default", "pthread",
-      "xenomai");
+     ("cert", "default", "full", "hi", "kernel", "kernel-sjlj", "kernel-smp",
+      "pthread", "ravenscar", "ravenscar-apex", "ravenscar-full",
+      "ravenscar-cert", "ravenscar-cert-rtp", "ravenscar-sfp", "rtp",
+      "rtp-smp", "soft-float", "xenomai", "zcx", "zfp");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
 
    for Source_Dirs use ();

@@ -35,7 +35,7 @@ is
 begin
    Proc.all;
    --  No exception raised: register the failure message
-   Assert (T, False, Message, Source, Line);
+   Assert (False, Message, Source, Line);
 
 exception
    when others =>
