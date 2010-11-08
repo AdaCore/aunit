@@ -2,28 +2,42 @@ with "../support/aunit_shared";
 
 project AUnit_Build is
 
-   for Languages use ("Ada");
-   for Object_Dir use
-     "obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
-   for Library_Dir use
-     "lib/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
+   type Compilation_Mode_Type is ("Devel", "Install");
+   Mode : Compilation_Mode_Type := External ("MODE", "Install");
+
+   for Object_Dir use "obj/" & Aunit_Shared.Target & "-" & Aunit_Shared.Runtime;
+   for Library_Dir use "lib/" & Aunit_Shared.Target & "-" & Aunit_Shared.Runtime;
    for Library_Name use "aunit";
    for Library_Kind use "static";
+   for Source_Dirs use ("framework", "containers", "reporters",
+                        "framework/" & Aunit_Shared.Except,
+                        "framework/" & Aunit_Shared.Calend,
+                        "framework/" & Aunit_Shared.Memory);
 
-   for Source_Dirs use
-     ("framework", "containers", "reporters",
-      "framework/" & AUnit_Shared.Except,
-      "framework/" & AUnit_Shared.Calend,
-      "framework/" & AUnit_Shared.Memory);
+   type Runtime_Type is
+     ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
+      "cert", "ravenscar", "ravenscar-full", "ravenscar-cert", "hi",
+      "ravenscar-sfp", "zfp", "default", "pthread", "xenomai");
+   Runtime : Runtime_Type := external ("RUNTIME");
+
+   type Target_Type is
+      ("native");
+   Platform : Target_Type := external ("PLATFORM");
 
    package Compiler is
-      for Default_Switches ("ada") use 
-        ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+      case Mode is
+      when "Devel" =>
+         for Default_Switches ("ada") use
+           ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+      when "Install" =>
+         for Default_Switches ("ada") use
+           ("-O2", "-fno-strict-aliasing", "-gnatp", "-gnatn", "-gnatwa.X");
+      end case;
    end Compiler;
 
-   package IDE is
-      for VCS_Kind use "Subversion";
-   end IDE;
+   package Ide is
+      for Vcs_Kind use "Subversion";
+   end Ide;
 
 end AUnit_Build;
 
