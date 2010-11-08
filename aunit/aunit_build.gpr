@@ -2,9 +2,9 @@ with "../support/aunit_shared";
 
 project AUnit_Build is
 
-   type Compilation_Mode_Type is ("Devel", "Install");
-   Mode : Compilation_Mode_Type := External ("MODE", "Install");
-
+   type Compilation_Mode_Type is
+      ("Devel", "Install");
+   Mode : Compilation_Mode_Type := external ("MODE", "Install");
    for Object_Dir use "obj/" & Aunit_Shared.Target & "-" & Aunit_Shared.Runtime;
    for Library_Dir use "lib/" & Aunit_Shared.Target & "-" & Aunit_Shared.Runtime;
    for Library_Name use "aunit";
@@ -15,9 +15,9 @@ project AUnit_Build is
                         "framework/" & Aunit_Shared.Memory);
 
    type Runtime_Type is
-     ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp",
-      "cert", "ravenscar", "ravenscar-full", "ravenscar-cert", "hi",
-      "ravenscar-sfp", "zfp", "default", "pthread", "xenomai");
+     ("full", "kernel", "kernel-smp", "kernel-sjlj", "rtp", "rtp-smp", "cert",
+      "ravenscar", "ravenscar-full", "ravenscar-cert", "hi", "ravenscar-sfp",
+      "zfp", "default", "pthread", "xenomai");
    Runtime : Runtime_Type := external ("RUNTIME");
 
    type Target_Type is
@@ -29,15 +29,19 @@ project AUnit_Build is
       when "Devel" =>
          for Default_Switches ("ada") use
            ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+
       when "Install" =>
          for Default_Switches ("ada") use
-           ("-O2", "-fno-strict-aliasing", "-gnatp", "-gnatn", "-gnatwa.X");
+           ("-O2", "-gnatp", "-gnatn", "-gnatwa.X");
       end case;
+
+      for Switches ("aunit.adb") use
+        Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");
    end Compiler;
 
    package Ide is
       for Vcs_Kind use "Subversion";
-   end Ide;
+  end Ide;
 
 end AUnit_Build;
 

@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2009, AdaCore                   --
+--                       Copyright (C) 2000-2010, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -33,7 +33,6 @@ with AUnit.Time_Measure; use AUnit.Time_Measure;
 package AUnit.Test_Results is
 
    type Result is tagged limited private;
-   type Result_Access is access all Result'Class;
    --  Record result. A result object is associated with the execution of a
    --  top-level test suite.
 
@@ -43,6 +42,7 @@ package AUnit.Test_Results is
       Line        : Natural;
    end record;
    type Test_Failure_Access is access all Test_Failure;
+   pragma No_Strict_Aliasing (Test_Failure_Access);
    --  Description of a test routine failure
 
    type Test_Error is record
@@ -51,6 +51,7 @@ package AUnit.Test_Results is
       Traceback         : Message_String;
    end record;
    type Test_Error_Access is access all Test_Error;
+   pragma No_Strict_Aliasing (Test_Error_Access);
    --  Description of unexpected exceptions
 
    type Test_Result is record

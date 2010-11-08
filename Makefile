@@ -19,6 +19,8 @@ else
    TARGET_CONF = --target=$(TARGET)
 endif
 
+MODE = Install
+
 CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
 # Install directories
@@ -33,7 +35,7 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 .PHONY: all clean targets installed-targets install_clean install
 
 all: support/aunit_shared.gpr
-	$(GPRBUILD) -Paunit/aunit_build -p -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
+	$(GPRBUILD) -Paunit/aunit_build -p -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
 
 installed-targets:
 	@printf "$(TARGET)\n" >> installed-targets
