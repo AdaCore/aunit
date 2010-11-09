@@ -24,14 +24,16 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  <description>
 --  A Test caller provides access to a test case type based on a test fixture.
 --  Test callers are useful when you want to run individual test or add it to
 --  a suite.
 --  Test callers invoke only one Test (i.e. test method) on one Fixture of a
---  Test_Fixture.
+--  AUnit.Test_Fixtures.Test_Fixture.
 --
 --  Here is an example:
 --
+--  <code>
 --  package Math_Test is
 --     Type Test is new AUnit.Test_Fixtures.Test_Fixture with record
 --        M_Value1 : Integer;
@@ -58,6 +60,8 @@
 --                      Math_Test.Test_Subtraction'Access));
 --     return The_Suite;
 --  end Suite;
+--  </code>
+--  </description>
 
 with AUnit.Simple_Test_Cases;
 with AUnit.Test_Fixtures;
@@ -101,6 +105,7 @@ package AUnit.Test_Caller is
 private
 
    type Fixture_Access is access all Test_Fixture;
+   pragma No_Strict_Aliasing (Fixture_Access);
 
    type Test_Case is new AUnit.Simple_Test_Cases.Test_Case with record
       Fixture : Fixture_Access;

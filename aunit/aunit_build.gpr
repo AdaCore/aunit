@@ -2,11 +2,16 @@ with "../support/aunit_shared";
 
 project AUnit_Build is
 
+   type Compilation_Mode_Type is
+      ("Devel", "Install");
+   Mode : Compilation_Mode_Type := external ("MODE", "Install");
+
    for Languages use ("Ada");
    for Object_Dir use
      "obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
    for Library_Dir use
      "lib/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
+
    for Library_Name use "aunit";
    for Library_Kind use "static";
 
@@ -17,8 +22,19 @@ project AUnit_Build is
       "framework/" & AUnit_Shared.Memory);
 
    package Compiler is
-      for Default_Switches ("ada") use 
-        ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+      case Mode is
+         when "Devel" =>
+            for Default_Switches ("ada") use
+              ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", 
+               "-gnatwa.Xe", "-gnaty");
+
+         when "Install" =>
+            for Default_Switches ("ada") use
+              ("-O2", "-gnatp", "-gnatn", "-gnatwa.X");
+      end case;
+
+      for Switches ("aunit.adb") use
+        Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");
    end Compiler;
 
    package IDE is

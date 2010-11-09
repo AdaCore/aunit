@@ -68,8 +68,9 @@ package body AUnit.Test_Suites is
                   R       : in out Result'Class;
                   Outcome :    out Status)
    is
-      C : Cursor := First (Suite.Tests);
+      C      : Cursor := First (Suite.Tests);
       Result : Status := Success;
+
    begin
       Outcome := Success;
       while Has_Element (C) loop
@@ -83,6 +84,7 @@ package body AUnit.Test_Suites is
          if Result = Failure then
             Outcome := Failure;
          end if;
+
          Next (C);
       end loop;
    end Run;
@@ -93,6 +95,7 @@ package body AUnit.Test_Suites is
 
    function New_Suite return Access_Test_Suite is
       type Access_Type is access all Test_Suite;
+      pragma No_Strict_Aliasing (Access_Type);
       function Alloc is new AUnit.Memory.Utils.Gen_Alloc
         (Test_Suite, Access_Type);
       function Convert is new Ada.Unchecked_Conversion

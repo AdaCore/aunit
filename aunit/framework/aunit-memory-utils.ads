@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008, AdaCore                        --
+--                     Copyright (C) 2008-2010, AdaCore                     --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -23,11 +23,15 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+--  Provides Gen_Alloc, easing the allocation of objects within AUnit.
+
 package AUnit.Memory.Utils is
 
    generic
       type Object is limited private;
       type Name is access Object;
+      pragma No_Strict_Aliasing (Name);
    function Gen_Alloc return Name;
 
 end AUnit.Memory.Utils;
