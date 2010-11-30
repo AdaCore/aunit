@@ -208,6 +208,7 @@ private
 
    type Node_Type;
    type Node_Access is access Node_Type;
+   pragma No_Strict_Aliasing (Node_Access);
 
    type Node_Type is limited record
       Element : Element_Type;
