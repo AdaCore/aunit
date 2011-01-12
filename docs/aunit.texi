@@ -1001,7 +1001,7 @@ overrides @code{P2} and adds @code{P3}. Its test will override
 @code{Test_P2} when we override @code{P2} (not necessary, but certainly
 possible).
 
-@subsection Using AUnit.Text_Fixtures
+@subsection Using AUnit.Test_Fixtures
 
 @noindent
 Using @code{Test_Fixture} type, we first test @code{Parent} using the
