@@ -3,7 +3,7 @@ TARGET =
 GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 
-INSTALL = $(shell which $(GPRBUILD) 2> /dev/null | sed -e 's/\/bin\/gprbuild.*//')
+INSTALL:=$(shell exec=`which gprbuild`;if [ ! -x "$$exec" ]; then unset exec;fi;echo $$exec | sed -e 's/\/bin\/$(GPRBUILD).*//')
 
 ifeq ($(RTS),)
    RTS=full
