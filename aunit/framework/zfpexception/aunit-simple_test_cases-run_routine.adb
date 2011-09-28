@@ -110,7 +110,7 @@ begin
             Src     : constant Message_String :=
                         AUnit.Last_Chance_Handler.Get_Exception_Message;
          begin
-            if not String_Compare (Src.all, "aunit-assertions.adb:56") then
+            if not String_Compare (Src.all, "aunit-assertions.adb:61") then
                Unexpected_Exception := True;
                Add_Error
                  (R,
