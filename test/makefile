@@ -60,7 +60,9 @@ aunit_tests.gpr: aunit_tests.gpr.in force
 ifneq ($(RTS),full)
 ifneq ($(RTS),xenomai)
 ifneq ($(RTS),kernel)
+ifeq ($(NO_ZFP_SUPPORT),)
 	echo "with \"zfp_support\";" >> $@
+endif
 endif
 endif
 endif
