@@ -32,37 +32,15 @@ I_TPL   = $(INSTALL)/share/examples/aunit
 I_DOC   = $(INSTALL)/share/doc/aunit
 I_PLG   = $(INSTALL)/share/gps/plug-ins
 
-.PHONY: all clean targets installed-targets install_clean install
+.PHONY: all clean targets install_clean install
 
-all: support/aunit_shared.gpr
+all:
 	$(GPRBUILD) -Paunit/aunit_build -p -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
-
-installed-targets:
-	@printf "$(TARGET)\n" >> installed-targets
-	@printf "native\n" >> installed-targets
-
-targets: installed-targets
-# make sure that "native" is in the targets list, as it is the default in
-# the project template
-	@$(RM) -f targets
-	for f in $(shell cat installed-targets | sort -u); \
-	  do if [ -f targets ]; then \
-	       printf ", \"$$f\"" >> targets; \
-	     else  \
-	       printf "\"$$f\"" >> targets; \
-	     fi; \
-	done
-
-support/aunit_shared.gpr: support/aunit_shared.gpr.in targets
-	cat $< | sed -e 's/@TARGETS@/$(shell cat targets)/' > $@
 
 clean:
 	$(RM) -fr aunit/obj
 	$(RM) -fr aunit/lib
 	-${MAKE} -C docs clean
-	$(RM) -f installed-targets
-	$(RM) -f targets
-	$(RM) -f support/aunit_shared.gpr
 	$(RM) -f *.cgpr
 
 install_clean:

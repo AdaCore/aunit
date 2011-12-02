@@ -1,7 +1,6 @@
 project AUnit_Shared is
 
-   type Target_Type is (@TARGETS@);
-   Target  : Target_Type  := external ("PLATFORM", "native");
+   Target := external ("PLATFORM", "native");
 
    type Runtime_Type is
      ("cert", "default", "full", "hi", "kernel", "kernel-sjlj", "kernel-smp",
