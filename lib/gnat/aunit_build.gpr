@@ -1,4 +1,4 @@
-with "../support/aunit_shared";
+with "aunit_shared";
 
 project AUnit_Build is
 
@@ -6,20 +6,19 @@ project AUnit_Build is
       ("Devel", "Install");
    Mode : Compilation_Mode_Type := external ("MODE", "Install");
 
-   for Languages use ("Ada");
-   for Object_Dir use
-     "obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
-   for Library_Dir use
-     "lib/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime;
+   for Source_Dirs use
+     ("../../include/aunit/framework",
+      "../../include/aunit/containers",
+      "../../include/aunit/reporters",
+      "../../include/aunit/framework/" & AUnit_Shared.Except,
+      "../../include/aunit/framework/" & AUnit_Shared.Calend,
+      "../../include/aunit/framework/" & AUnit_Shared.Memory);
 
+   for Object_Dir use AUnit_Shared.Library_Dir & "/obj";
+
+   for Library_Dir use AUnit_Shared.Library_Dir;
    for Library_Name use "aunit";
    for Library_Kind use "static";
-
-   for Source_Dirs use
-     ("framework", "containers", "reporters",
-      "framework/" & AUnit_Shared.Except,
-      "framework/" & AUnit_Shared.Calend,
-      "framework/" & AUnit_Shared.Memory);
 
    package Compiler is
       case Mode is
@@ -36,10 +35,6 @@ project AUnit_Build is
       for Switches ("aunit.adb") use
         Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");
    end Compiler;
-
-   package IDE is
-      for VCS_Kind use "Subversion";
-   end IDE;
 
 end AUnit_Build;
 

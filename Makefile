@@ -35,13 +35,11 @@ I_PLG   = $(INSTALL)/share/gps/plug-ins
 .PHONY: all clean targets install_clean install
 
 all:
-	$(GPRBUILD) -Paunit/aunit_build -p -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
+	$(GPRBUILD) -Plib/gnat/aunit_build -p -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
 
 clean:
-	$(RM) -fr aunit/obj
-	$(RM) -fr aunit/lib
+	$(RM) -fr lib/aunit
 	-${MAKE} -C docs clean
-	$(RM) -f *.cgpr
 
 install_clean:
 ifeq ($(INSTALL),)
@@ -57,11 +55,12 @@ else
 	$(RM) -fr $(I_LIB)
 	-$(CHMOD) -R 777 $(I_INC)
 	$(RM) -fr $(I_INC)
+	$(RM) -f $(I_GPR)/aunit_build.gpr
 	$(RM) -f $(I_GPR)/aunit.gpr
 	$(RM) -f $(I_GPR)/aunit_shared.gpr
 endif
 
-install: install_clean support/aunit_shared.gpr
+install: install_clean
 ifneq ($(INSTALL),)
 	$(MKDIR) $(I_DOC)
 	$(MKDIR) $(I_TPL)
@@ -71,13 +70,7 @@ ifneq ($(INSTALL),)
 	$(MKDIR) $(I_INC)
 	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
 	-$(CP) support/aunit.xml $(I_PLG)
-	$(CP) support/*.gpr $(I_GPR)
-	$(CP) -r examples/* $(I_TPL)
-	-$(CP) -r aunit/lib/* $(I_LIB)
-	$(CP) -r aunit/framework $(I_INC)
-	$(CP) -r aunit/containers $(I_INC)
-	$(CP) -r aunit/reporters $(I_INC)
-	@echo $(SRC_LIST)
+	(tar --exclude obj --exclude .svn -cvf - lib include share) | (cd $(INSTALL) && tar -xf -)
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'
 	@echo '--  To be able to use the library, you may need to update your'

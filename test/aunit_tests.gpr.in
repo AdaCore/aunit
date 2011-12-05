@@ -1,5 +1,5 @@
-with "aunit";
-with "aunit_shared";
+with "../lib/gnat/aunit";
+with "../lib/gnat/aunit_shared";
 
 project Aunit_Tests is
 

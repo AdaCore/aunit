@@ -2,7 +2,7 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                   A U N I T . T E S T _ F I X T U R E S                  --
+--                         A U N I T . M E M O R Y                          --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
@@ -29,58 +29,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Assertions;
+--  Provides the memory handling mechanism used by AUnit. This allows in
+--  particular AUnit to use dynamic allocation even on limited run-times that
+--  do not provide memory management.
+--  See also AUnit.Memory.Utils that provides an easy to use allocator for
+--  complex objects.
 
---  A Test_Fixture is used to provide a common environment for a set of test
---  cases.
---
---  To define a test case from a test fixture, see AUnit.Test_Caller.
---
---  Each test runs in its own fixture so there can be no side effects among
---  test runs.
---
---  Here is an example:
---
---  package Math_Test is
---     Type Test is new AUnit.Test_Fixtures.Test_Fixture with record
---        M_Value1 : Integer;
---        M_Value2 : Integer;
---     end record;
---
---     procedure Set_Up (T : in out Test);
---
---     procedure Test_Addition (T : in out Test);
---
---  end Math_Test;
---
---  package body Math_Test is
---
---     procedure Set_Up (T : in out Test) is
---     begin
---        T.M_Value1 := 2;
---        T.M_Value2 := 3;
---     end Set_Up;
---
---     procedure Test_Addition (T : in out Test) is
---     begin
---        Assert (T.M_Value1 + T.M_Value2 = 5,
---                "Incorrect addition for integers");
---     end Test_Addition;
---
---  end Math_Test;
+with System;
 
-package AUnit.Test_Fixtures is
+package AUnit.Memory is
 
-   type Test_Fixture is new AUnit.Assertions.Test with private;
+   type size_t is mod 2 ** Standard'Address_Size;
 
-   procedure Set_Up (Test : in out Test_Fixture);
-   --  Set up performed before each test case
+   function AUnit_Alloc (Size : size_t) return System.Address;
 
-   procedure Tear_Down (Test : in out Test_Fixture);
-   --  Tear down performed after each test case
+   procedure AUnit_Free (Obj : System.Address);
 
 private
 
-   type Test_Fixture is new AUnit.Assertions.Test with null record;
+   pragma Inline (AUnit_Alloc);
+   pragma Inline (AUnit_Free);
 
-end AUnit.Test_Fixtures;
+end AUnit.Memory;

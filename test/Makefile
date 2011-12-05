@@ -66,11 +66,7 @@ endif
 endif
 endif
 endif
-ifeq ($(shell ls ../aunit/aunit_build.gpr 2> /dev/null),../aunit/aunit_build.gpr)
-	@cat $< | sed -e 's%with "aunit"%with "../aunit/aunit_build"%' -e 's%with "aunit_shared"%with "../support/aunit_shared"%' >> $@
-else
 	@cat $< >> $@
-endif
 
 clean:
 	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out
