@@ -14,9 +14,11 @@ project AUnit_Build is
       "../../include/aunit/framework/" & AUnit_Shared.Calend,
       "../../include/aunit/framework/" & AUnit_Shared.Memory);
 
-   for Object_Dir use AUnit_Shared.Library_Dir & "/obj";
-
    for Library_Dir use AUnit_Shared.Library_Dir;
+
+   Obj_Dir := external ("OBJDIR", "../aunit-obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
+   for Object_Dir use Obj_Dir;
+
    for Library_Name use "aunit";
    for Library_Kind use "static";
 

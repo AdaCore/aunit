@@ -70,7 +70,7 @@ ifneq ($(INSTALL),)
 	$(MKDIR) $(I_INC)
 	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
 	-$(CP) support/aunit.xml $(I_PLG)
-	(tar --exclude obj --exclude .svn -cvf - lib include share) | (cd $(INSTALL) && tar -xf -)
+	(tar --exclude aunit-obj --exclude .svn -cvf - lib include share) | (cd $(INSTALL) && tar -xf -)
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'
 	@echo '--  To be able to use the library, you may need to update your'
