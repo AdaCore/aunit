@@ -1,5 +1,8 @@
 \input texinfo   @c -*-texinfo-*-
 
+@c AUnit Cookbook
+@c Copyright (C) 2000-2011, AdaCore
+
 @c %**start of header
 @setfilename aunit.info
 @settitle AUnit Cookbook
@@ -12,7 +15,7 @@
 
 @c ----------------------------------------- MACRO
 
-@c Macro used for all AWS examples
+@c Macro used for all AUnit examples
 @c No cartouche on HTML as this is part of the css
 @macro AEXP{TXT}
 @ifhtml
@@ -53,7 +56,7 @@
 
 @page
 
-Copyright @copyright{} 2000-2009, AdaCore
+Copyright @copyright{} 2000-2011, AdaCore
 
 @*
 
@@ -124,7 +127,7 @@ unmodified in any copy.
 This is a short guide for using the AUnit test framework.
 AUnit is an adaptation of the Java JUnit (Kent Beck, Erich Gamma) and C++
 CppUnit (M. Feathers, J. Lacoste, E. Sommerlade, B. Lepilleur, B. Bakker,
-S. Robbins) unit test frameworks for Ada code. 
+S. Robbins) unit test frameworks for Ada code.
 
 @c ---------------------------
 @section What's new in AUnit 3
@@ -528,7 +531,7 @@ package body Money_Suite is
       Ret : AUnit.Test_Suites.Access_Test_Suite :=
               AUnit.Test_Suites.New_Suite;
    begin
-      Ret.Add_Test 
+      Ret.Add_Test
         (Money_Caller.Create
            (@b{"Money Test : Test Addition"},
             @b{Money_Tests.Test_Simple_Add}'Access));
@@ -1060,7 +1063,7 @@ package body @b{Root_Suite} is
    function Suite return AUnit.Test_Suites.Access_Test_Suite is
       @b{Ret} : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
    begin
-      AUnit.Test_Suites.Add_Test 
+      AUnit.Test_Suites.Add_Test
         (@b{Ret}, Caller.Create (@b{"Test Parent : P1"}, @b{Root.Tests.Test_P1'Access}));
       AUnit.Test_Suites.Add_Test
         (@b{Ret}, Caller.Create (@b{"Test Parent : P2"}, @b{Root.Tests.Test_P2'Access}));
@@ -1129,7 +1132,7 @@ package body @b{Branch_Suite} is
       --  We use the inherited Test_P1. Note that it is
       --  Branch.Tests.Set_Up that will be called, and so Test_P1 will be run
       --  against an object of type Child
-      @b{Ret}.Add_Test 
+      @b{Ret}.Add_Test
         (@b{Caller}.Create (@b{"Test Child : P1"}, @b{Branch.Tests.Test_P1'Access}));
       --  We use the overridden Test_P2
       @b{Ret}.Add_Test
@@ -1374,7 +1377,7 @@ dynamic allocation afterwards by allocating parts of this array upon request.
 Deallocation is not permitted.
 
 By default, the allocated array is a 100 KB array. This value can be changed
-by modifying its size in the file: 
+by modifying its size in the file:
 @file{aunit-@value{VERSION}-src/aunit/framework/staticmemory/aunit-memory.adb}
 
 To allocate a new object, you use @code{AUnit.Memory.Utils.Gen_Alloc}.
@@ -1382,7 +1385,7 @@ To allocate a new object, you use @code{AUnit.Memory.Utils.Gen_Alloc}.
 Additional restrictions relevant to the default ZFP profile include:
 @enumerate
 @item
-Normally the ZFP profile requires a user-defined 
+Normally the ZFP profile requires a user-defined
 @code{__gnat_last_chance_handler} routine
 to handle raised exceptions. However, AUnit now provides a mechanism to
 simulate exception propagation using gcc builtin setjmp/longjmp mechanism.
@@ -1410,12 +1413,22 @@ with the ZFP profile, and on profiles not supporting Ada.Calendar.
 @node Installation and Use
 @chapter Installation and Use
 
+@menu
+* Note on gprbuild::
+* aunit project file and support for other platforms/run-times::
+* Installing AUnit on UNIX systems::
+* Installing AUnit on Windows systems::
+* Installing AUnit for customized run-times::
+* Installed files::
+@end menu
+
 @noindent
 AUnit 3 contains support for limited run-times such as zero-foot-print
 (ZFP) and certified run-time (cert). It can now be installed simultaneously
 for several targets and run-times.
 
 @c --------------------------------------
+@node Note on gprbuild
 @section Note on gprbuild
 
 @noindent
@@ -1424,6 +1437,7 @@ cross-platforms gprbuild version 1.1 or later is required, while on native
 platforms any version can be used.
 
 @c ---------------------------------------------------------
+@node aunit project file and support for other platforms/run-times
 @section aunit project file and support for other platforms/run-times
 
 AUnit can be installed once for several targets and run-times.
@@ -1431,13 +1445,16 @@ To support this, the AUnit project includes scenario variables
 to select those targets and/or run-times. The scenario variables
 used are:
 @itemize
-@item @b{PLATFORM}: the supported values are "native" (default),
-"powerpc-elf", "vxworksae", "erc32-elf" and "leon-elf".
-@item @b{RUNTIME}: the supported values are "full" (default), "cert", "zfp",
-"hi" and "ravenscar".
+@item @b{PLATFORM}: a free-form value used to differenciate installed libraries.
+This value is set to "native" by default.
+@item @b{RUNTIME}: the runtime used to compile AUnit. Many values are defined
+there, you can have a look at the aunit_shared project for a comprehensive
+list. This scenario variable is used to adapt the AUnit to the run-time profile.
+Is set to "full" by default.
 @end itemize
 
 @c --------------------------------------
+@node Installing AUnit on UNIX systems
 @section Installing AUnit on UNIX systems
 
 @noindent
@@ -1477,17 +1494,19 @@ Specific installation:
    environment variables. The following options are defined:
 
 @itemize
-@item
-   INSTALL: defines the AUnit base installation directory, should always be
-    set.
+@item @b{INSTALL}: defines the AUnit base installation directory, set to
+gprbuild's base installation directory as found in the PATH.
 
-@item
-   TARGET: defines the gnat tools prefix to use. For example, to compile
-    AUnit for powerpc VxWorks, TARGET should be set to
-    powerpc-wrs-vxworks. If not set, the native compiler will be used.
+@item @b{TARGET}: defines the gnat tools prefix to use. For example, to compile
+AUnit for powerpc VxWorks, TARGET should be set to powerpc-wrs-vxworks. If not
+set, the native compiler will be used.
 
-@item
-   RTS: defines the run-time used to compile AUnit.
+@item @b{RTS}:  defines both the run-time used to compile AUnit and the value
+given to the AUnit project as RUNTIME scenario variable.
+
+@item @b{RTS_CONF}: defines the gprbuild Runtime config flag. The value is
+set to "--RTS=$(RTS)" by default. Can be used when compiling AUnit for a
+configurable run-time.
 @end itemize
 
 @item
@@ -1504,65 +1523,75 @@ To test AUnit:
 @end itemize
 
 @c -----------------------------------------
+@node Installing AUnit on Windows systems
 @section Installing AUnit on Windows systems
 
-On Windows, an InstallShield wizard is available to easily install AUnit. 
-If you are installing from the source package, you will first need a tool to
-uncompress the tar.gz file, then you can manually launch the 
-@file{doinstall.bat}
-script included in the source package.
+On Windows, an InstallShield wizard is available to easily install AUnit.
 
-Both methods need user responses during the installation:
+The InstallShield will go through the following steps:
 
 @itemize
 
 @item
-Selection of targets (optional): the InstallShield will try to detect all
-GNAT compilers available on your system. If only one compiler is found, then
-this compiler is automatically selected, and the script starts with the next
-step.
-If compilers for several targets are found, then the script will display a
-list of available targets. You can then select one or several targets,
-pressing enter to continue.
-
-@smallexample
-*** Select the targets you want AUnit to be compiled for.
-*(1) pentium-mingw32msv (full)
- (2) pentium-mingw32msv (zfp)
- (3) powerpc-elf (zfp)
-Enter a target number, or <enter> to continue the setup: 
-@end smallexample
-
-@item 
-At this stage, the AUnit library starts compiling. Once the compilation is
-done, the message
-@smallexample
-
-*** AUNIT COMPILED SUCCESSFULLY ***
-
-@end smallexample
-should be displayed.
+Selection of the GNAT compiler to consider: this page allows you to select
+which GNAT compiler to use to compile AUnit.
 
 @item
-Selection of the installation directory: by default, AUnit is installed in the
-same root directory as gprbuild. Enter another directory at this
-stage if you want to install AUnit in another directory.
+Selection of the directory used to install AUnit: by default the same directory
+as the GNAT compiler.
 
-@smallexample
-Please enter AUnit base installation directory
-** Press enter for installing in 'C:\GNATPRO\6.1.1':
-@end smallexample
+@item
+Selection of targets: the InstallShield will try to detect all GNAT compilers
+available on your system. You can then select the compilers/runtimes that you
+want AUnit installed for.
 
+@item
+At this stage, the AUnit library starts compiling. And is then installed in the
+destination directory.
 @end itemize
-
-After entering the information above, the InstallShield will install
-AUnit in the selected installation directory.
 
 Note that in contrast to the AUnit 2 installation procedures, support for
 exception handling, memory allocation and Ada.Calendar is automatically
-selected depending on the run-time used.
+selected depending on the run-times used.
+
+@c -----------------------------------------------
+@node Installing AUnit for customized run-times
+@section Installing AUnit for customized run-times
+
+@noindent
+The AUnit library can also be compiled for custom-built run-times. To do so,
+you can either use the Makefile (@pxref{Installing AUnit on UNIX systems}) or
+use directly the project aunit_build.gpr that is installed in <prefix>/lib/gnat.
+
+To use the Makefile, you will need to specify RTS_CONF so that the correct
+parameter is passed to gprbuild. For example, if your custom run-time is
+powerpc-elf/ravenscar-full-prep, then you need to use the command:
+
+@smallexample
+make TARGET=powerpc-elf RTS=ravenscar-full RTS_CONF=--RTS=powerpc-elf/ravenscar-full-prep
+@end smallexample
+
+If AUnit comes pre-installed or you can't use the Makefile, then you can also
+directly use the aunit_build.gpr project file to compile and use AUnit.
+
+@smallexample
+gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full
+@end smallexample
+
+The aunit_build project will install the AUnit library in <prefix>/lib/aunit/<TARGET>-<RUNTIME> and use the object directory <prefix>/lib/aunit-obj/<TARGET>-<RUNTIME>.
+
+If the AUnit installation directory is readonly, you can override those paths
+ by setting the LIBDIR and OBJDIR scenario variables:
+
+@smallexample
+gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib OBJDIR=/tmp
+@end smallexample
+
+Once built this way, the object directory can safely be removed, and you can
+use the regular aunit project to build your test suites.
 
 @c ---------------------
+@node Installed files
 @section Installed files
 
 @noindent
