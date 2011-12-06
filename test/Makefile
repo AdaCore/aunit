@@ -41,8 +41,12 @@ else
    RUN =
 endif
 
+ifneq ($(findstring aunit.gpr,$(wildcard ../lib/gnat/*.gpr)),)
+   PROJECT_PATH = ../lib/gnat
+endif
+
 build: $(SUPPORTLIB) aunit_tests.gpr
-	$(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(VARIANT) $(LARGS)
+	GPR_PROJECT_PATH=$(PROJECT_PATH) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(VARIANT) $(LARGS)
 
 run: build
 	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)

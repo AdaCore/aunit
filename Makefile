@@ -38,7 +38,7 @@ all:
 	$(GPRBUILD) -Plib/gnat/aunit_build -p -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(CONF_ARGS)
 
 clean:
-	$(RM) -fr lib/aunit
+	$(RM) -fr lib/aunit lib/aunit-obj
 	-${MAKE} -C docs clean
 
 install_clean:
