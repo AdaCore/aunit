@@ -1568,14 +1568,16 @@ parameter is passed to gprbuild. For example, if your custom run-time is
 powerpc-elf/ravenscar-full-prep, then you need to use the command:
 
 @smallexample
-make TARGET=powerpc-elf RTS=ravenscar-full RTS_CONF=--RTS=powerpc-elf/ravenscar-full-prep
+make TARGET=powerpc-elf RTS=ravenscar-full \
+  RTS_CONF=--RTS=powerpc-elf/ravenscar-full-prep
 @end smallexample
 
 If AUnit comes pre-installed or you can't use the Makefile, then you can also
 directly use the aunit_build.gpr project file to compile and use AUnit.
 
 @smallexample
-gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full
+gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
+  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full
 @end smallexample
 
 The aunit_build project will install the AUnit library in <prefix>/lib/aunit/<TARGET>-<RUNTIME> and use the object directory <prefix>/lib/aunit-obj/<TARGET>-<RUNTIME>.
@@ -1584,7 +1586,9 @@ If the AUnit installation directory is readonly, you can override those paths
  by setting the LIBDIR and OBJDIR scenario variables:
 
 @smallexample
-gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib OBJDIR=/tmp
+gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
+  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib \
+  OBJDIR=/tmp
 @end smallexample
 
 Once built this way, the object directory can safely be removed, and you can
