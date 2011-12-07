@@ -1577,18 +1577,19 @@ directly use the aunit_build.gpr project file to compile and use AUnit.
 
 @smallexample
 gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
-  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full
+  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full -Paunit_build -p
 @end smallexample
 
 The aunit_build project will install the AUnit library in <prefix>/lib/aunit/<TARGET>-<RUNTIME> and use the object directory <prefix>/lib/aunit-obj/<TARGET>-<RUNTIME>.
 
 If the AUnit installation directory is readonly, you can override those paths
- by setting the LIBDIR and OBJDIR scenario variables:
+ by setting the LIBDIR and OBJDIR scenario variables. Note that you still need
+ to provide the RUNTIME scenario variable in this case, but PLATFORM can be
+ omitted:
 
 @smallexample
 gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
-  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib \
-  OBJDIR=/tmp
+  -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib OBJDIR=/tmp -Paunit_build
 @end smallexample
 
 Once built this way, the object directory can safely be removed, and you can
