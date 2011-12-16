@@ -1,5 +1,6 @@
 all:
-	gprbuild -p -Pharness/harness
+	gprbuild -p -Pharness
 clean:
-	gprclean -Pharness/harness
-	gprclean -Ptested_lib/testlib
+	-gprclean -Pharness
+	-gprclean -Ptested_lib/testlib
+	rm -rf obj tested_lib/obj
