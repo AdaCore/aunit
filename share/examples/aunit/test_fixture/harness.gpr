@@ -1,12 +1,12 @@
 with "aunit";
-with "../tested_lib/testlib";
+with "tested_lib/testlib";
 
 project Harness is
 
    for Languages use ("Ada");
    for Main use ("test_math.adb");
-   for Source_Dirs use ("src");
-   for Exec_Dir use "..";
+   for Source_Dirs use ("tests");
+   for Exec_Dir use ".";
    for Object_Dir use "obj";
 
    package Linker is

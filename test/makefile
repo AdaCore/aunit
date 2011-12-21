@@ -41,8 +41,12 @@ else
    RUN =
 endif
 
+ifneq ($(findstring aunit.gpr,$(wildcard ../lib/gnat/*.gpr)),)
+   PROJECT_PATH_ARG = GPR_PROJECT_PATH=../lib/gnat
+endif
+
 build: $(SUPPORTLIB) aunit_tests.gpr
-	$(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(VARIANT) $(LARGS)
+	$(PROJECT_PATH_ARG) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET) $(VARIANT) $(LARGS)
 
 run: build
 	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)
@@ -55,23 +59,21 @@ test: build
 	@echo "[OK] AUNIT TEST IS SUCCESSFUL"
 
 aunit_tests.gpr: aunit_tests.gpr.in force
-	rm -f $@
-	touch $@
+	@rm -f $@
+	@touch $@
 ifneq ($(RTS),full)
 ifneq ($(RTS),xenomai)
 ifneq ($(RTS),kernel)
+ifeq ($(NO_ZFP_SUPPORT),)
 	echo "with \"zfp_support\";" >> $@
 endif
 endif
 endif
-ifeq ($(shell ls ../aunit/aunit_build.gpr 2> /dev/null),../aunit/aunit_build.gpr)
-	@cat $< | sed -e 's%with "aunit"%with "../aunit/aunit_build"%' -e 's%with "aunit_shared"%with "../support/aunit_shared"%' >> $@
-else
-	@cat $< >> $@
 endif
+	cat $< >> $@
 
 clean:
-	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out
+	$(RM) -rf obj exe support/obj support/lib *.cgpr aunit_tests.gpr test.out*
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p

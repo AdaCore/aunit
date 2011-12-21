@@ -29,6 +29,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+--  <description>
+--  This package provides the Assert methods used by the user to verify test
+--  results.
+--  Those methods are used to report errors within AUnit tests when a result
+--  does not match an expected value.
+--  </description>
+
 with GNAT.Source_Info;
 with AUnit.Tests;
 with AUnit.Test_Results;
@@ -121,6 +128,11 @@ package AUnit.Assertions is
 
 private
    use AUnit.Test_Results;
+
+   --  We can't set the results directly within the test as the result list is
+   --  limited and we don't want Test to be limited.
+   --  Instead, we initialize tests with a unique id that we use when putting
+   --  a new error in this global list.
 
    type Test_Id is new Natural;
    Null_Id : constant Test_Id := 0;

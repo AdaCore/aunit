@@ -1,7 +1,6 @@
 project AUnit_Shared is
 
-   type Target_Type is (@TARGETS@);
-   Target  : Target_Type  := external ("PLATFORM", "native");
+   Target := external ("PLATFORM", "native");
 
    type Runtime_Type is
      ("cert", "default", "full", "hi", "kernel", "kernel-sjlj", "kernel-smp",
@@ -9,6 +8,8 @@ project AUnit_Shared is
       "ravenscar-cert", "ravenscar-cert-rtp", "ravenscar-sfp", "rtp",
       "rtp-smp", "soft-float", "xenomai", "zcx", "zfp");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
+
+   Library_Dir := external ("LIBDIR", "../aunit/" & Target & "-" & Runtime);
 
    for Source_Dirs use ();
 
