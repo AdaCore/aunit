@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2011, AdaCore                   --
+--                       Copyright (C) 2000-2012, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -81,9 +81,9 @@ package body AUnit.Reporter.XML is
       if Elapsed  (R) /= Time_Measure.Null_Time then
          T := Get_Measure (Elapsed (R));
 
-         Put (" elapsed='");
+         Put (" elapsed=""");
          Put_Measure (T);
-         Put_Line ("'>");
+         Put_Line (""">");
       else
          Put_Line (">");
       end if;
@@ -139,7 +139,18 @@ package body AUnit.Reporter.XML is
       Is_Assert : Boolean;
       T : AUnit_Duration;
    begin
-      Put_Line ("    <Test>");
+      Put ("    <Test");
+
+      if Test.Elapsed /= Time_Measure.Null_Time then
+         T := Get_Measure (Test.Elapsed);
+
+         Put (" elapsed=""");
+         Put_Measure (T);
+         Put_Line (""">");
+      else
+         Put_Line (">");
+      end if;
+
       Put      ("      <Name>");
       Put      (Test.Test_Name.all);
 
@@ -206,15 +217,6 @@ package body AUnit.Reporter.XML is
          end if;
       end if;
 
-      if Test.Elapsed /= Time_Measure.Null_Time then
-         T := Get_Measure (Test.Elapsed);
-
-         Put (" elapsed='");
-         Put_Measure (T);
-         Put_Line ("'>");
-      else
-         Put_Line (">");
-      end if;
       Put_Line ("    </Test>");
    end Report_Test;
 
