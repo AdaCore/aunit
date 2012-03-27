@@ -11,7 +11,7 @@ wavefront issued subsequent to the date specified (in ISO format YYYY-MM-DD)
 in the status line. This can be used to determine if a given wavefront has
 the fix identified in the entry.
 
-L306-042 Installer issues on Windows
+KP-L306-042 Installer issues on Windows
 Fixed on 2012-03-12
 
 It happens on rare occasions that the Windows installer cannot find any
@@ -19,3 +19,10 @@ compiler on your system, even if the PATH environment variable is correctly
 set and gprbuild is present.
 
 Workaround: Use the source package and install AUnit using the Makefile.
+
+KP-341-L326-023 Incorrect XML generated
+Fixed 2012-03-27
+
+Workaround: Use 3.2, get wavefront 3.5.1 or rebuild AUnit library with
+aunit-reporter-xml.adb of 2012-03-27 or later. The last is easiest for non-
+Windows hosts.
