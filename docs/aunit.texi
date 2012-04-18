@@ -543,7 +543,7 @@ end Money_Suite;}
 Note that @code{New_Suite} and @code{Create} are fully compatible with
 limited run-times (in particular, those without dynamic allocation support).
 Note, however, that for non-native run-time libraries, you cannot extend
-@{Test_Fixture} with a controlled component.
+@code{Test_Fixture} with a controlled component.
 
 You can find a compilable example of
 @code{AUnit.Test_Caller} use in the AUnit installation
