@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 
 @c AUnit Cookbook
-@c Copyright (C) 2000-2011, AdaCore
+@c Copyright (C) 2000-2012, AdaCore
 
 @c %**start of header
 @setfilename aunit.info
