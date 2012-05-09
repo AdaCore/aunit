@@ -46,15 +46,11 @@ ifeq ($(INSTALL),)
 	@echo 'Error when installing: $$INSTALL is empty...'
 	@echo "Please set an installation path before installing !"
 else
-	-$(CHMOD) -R 777 $(I_DOC)
-	$(RM) -fr $(I_DOC)
-	-$(CHMOD) -R 777 $(I_TPL)
-	$(RM) -fr $(I_TPL)
+	$(RM) -rf $(I_DOC)
+	$(RM) -rf $(I_TPL)
 	$(RM) -f $(I_PLG)/aunit.xml
-	-$(CHMOD) -R 777 $(I_LIB)
-	$(RM) -fr $(I_LIB)
-	-$(CHMOD) -R 777 $(I_INC)
-	$(RM) -fr $(I_INC)
+	$(RM) -rf $(I_LIB)
+	$(RM) -rf $(I_INC)
 	$(RM) -f $(I_GPR)/aunit_build.gpr
 	$(RM) -f $(I_GPR)/aunit.gpr
 	$(RM) -f $(I_GPR)/aunit_shared.gpr
@@ -68,9 +64,17 @@ ifneq ($(INSTALL),)
 	$(MKDIR) $(I_GPR)
 	$(MKDIR) $(I_LIB)
 	$(MKDIR) $(I_INC)
-	-$(CP) docs/*.html docs/*.info docs/*.pdf docs/*.txt $(I_DOC)
+	@for doc in docs/*.html docs/*.info docs/*.pdf docs/*.txt ; do \
+	   if [ -f $$doc ]; then \
+	      echo $(CP) $$doc $(I_DOC) ; \
+	      $(CP) $$doc $(I_DOC) ; \
+           fi \
+        done
 	-$(CP) support/aunit.xml $(I_PLG)
-	(tar --exclude aunit-obj --exclude .svn -cvf - lib include share) | (cd $(INSTALL) && tar -xf -)
+
+	-$(CPR) lib/gnat lib/aunit $(INSTALL)/lib
+	-$(CPR) include/aunit $(INSTALL)/include
+	-$(CPR) share/examples $(INSTALL)/share
 	@echo '------------------------------------------------------------------'
 	@echo '--  AUnit has now been installed.'
 	@echo '--  To be able to use the library, you may need to update your'
@@ -86,4 +90,5 @@ RMDIR	= rmdir
 MKDIR	= mkdir -p
 RM	= rm
 CP	= cp
+CPR	= cp -r
 CHMOD	= chmod
