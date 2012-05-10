@@ -260,8 +260,22 @@ or:
    return;
 end if;}
 
-In case you need to test that a method raises an expected exception, there also
-exists a generic Assert procedure that you can use for this purpose:
+In case you need to test that a method that raises an expected exception, there
+is the procedure @code{Assert_Exception} that takes an access to the procedure
+to be tested as a parameter:
+
+@AEXP{
+   type Throwing_Exception_Proc is access procedure;
+
+   procedure Assert_Exception
+     (Proc    : Throwing_Exception_Proc;
+      Message : String;
+      Source  : String := GNAT.Source_Info.File;
+      Line    : Natural := GNAT.Source_Info.Line);
+   --  Test that Proc throws an exception and record "Message" if not.
+}
+
+Example:
 
 @AEXP{declare
    procedure Test_Raising_Exception is
@@ -269,10 +283,8 @@ exists a generic Assert procedure that you can use for this purpose:
       call_to_the_tested_method (some_args);
    end Test_Raising_Exception;
 
-   procedure Assert_Exception_Raised is new AUnit.Assertions.Assert_Exception
-     (Test_Raising_Exception);
 begin
-   Assert_Exception_Raised (@b{String_Description});
+   Assert_Exception (Test_Raising_Exception'Access, @b{String_Description});
 end;}
 
 This procedure can handle exceptions with all run-time profiles (including
