@@ -260,7 +260,7 @@ or:
    return;
 end if;}
 
-In case you need to test that a method that raises an expected exception, there
+If you need to test that a method that raises an expected exception, there
 is the procedure @code{Assert_Exception} that takes an access to the procedure
 to be tested as a parameter:
 
@@ -277,18 +277,38 @@ to be tested as a parameter:
 
 Example:
 
-@AEXP{declare
+@AEXP{
+   -- Declared at library level:
    procedure Test_Raising_Exception is
    begin
       call_to_the_tested_method (some_args);
    end Test_Raising_Exception;
 
+-- In test routine:
+procedure My_Routine (...) is
 begin
    Assert_Exception (Test_Raising_Exception'Access, @b{String_Description});
 end;}
 
 This procedure can handle exceptions with all run-time profiles (including
-zfp).
+zfp).  If you are using a run-time library capable of propagating exceptions,
+you can use the following idiom instead:
+
+@AEXP{
+   procedure My_Routine (...) is
+   begin
+      ...
+      -- Call subprogram expected to raise an exception:
+      Call_To_The_Tested_Method (some_args);
+      Assert (False, ``exception not raised'');
+   exception
+      when desired_exception =>
+         null;
+   end My_Procedure;}
+
+An unexpected exception will be recorded as such by the framework.  If you want
+your test routine to continue beyond verifying that an expected exception has
+been raised, you can nest the call and handler in a block.
 
 @item Create a suite function inside a package to gather together test cases
 and sub-suites@footnote{If using the ZFP or the 'cert' run-time profiles, test
