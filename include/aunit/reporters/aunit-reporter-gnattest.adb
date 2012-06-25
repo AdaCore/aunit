@@ -178,8 +178,8 @@ package body  AUnit.Reporter.GNATtest is
             Put      (Test.Error.Exception_Name.all);
 
             if Test.Error.Exception_Message /= null then
-               Put (" : ");
-               Put (Test.Error.Exception_Message.all);
+               Put      (" : ");
+               Put_Line (Test.Error.Exception_Message.all);
             end if;
 
          end if;
