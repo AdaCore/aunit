@@ -182,11 +182,6 @@ package body  AUnit.Reporter.GNATtest is
                Put (Test.Error.Exception_Message.all);
             end if;
 
-            if Test.Error.Traceback /= null then
-               New_Line;
-               Put      (Test.Error.Traceback.all);
-            end if;
-
          end if;
       else
          Put_Line (" corresponding test PASSED");
