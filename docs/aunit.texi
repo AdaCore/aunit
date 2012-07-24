@@ -1513,6 +1513,15 @@ Note that cross platforms require gprbuild version 1.1 or later}:
    $ make TARGET=powerpc-elf RTS=zfp
 @end smallexample
 
+For platforms providing a full Ravenscar run-time (eg. leon3-elf), add the
+parameter below that excludes extra ZFP support for builds using that library:
+@smallexample
+   $ cd aunit-@value{VERSION}-src
+   $ make TARGET=powerpc-elf RTS=ravenscar NO_ZFP_SUPPORT=1
+@end smallexample
+
+
+
 Once the above build procedure has been performed for all
 desired platforms, you can install AUnit:
 @smallexample
