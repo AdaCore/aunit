@@ -4,7 +4,7 @@ project AUnit_Shared is
 
    type Runtime_Type is
      ("cert", "default", "full", "hi", "kernel", "kernel-sjlj", "kernel-smp",
-      "pthread", "ravenscar", "ravenscar-apex", "ravenscar-full",
+      "pthread", "sjlj", "ravenscar", "ravenscar-apex", "ravenscar-full",
       "ravenscar-cert", "ravenscar-cert-rci", "ravenscar-cert-rtp",
       "ravenscar-sfp", "rtp",
       "rtp-smp", "soft-float", "xenomai", "zcx", "zfp");
