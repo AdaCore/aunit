@@ -7,7 +7,7 @@ project AUnit_Shared is
       "pthread", "sjlj", "ravenscar", "ravenscar-apex", "ravenscar-full",
       "ravenscar-cert", "ravenscar-cert-rci", "ravenscar-cert-rtp",
       "ravenscar-sfp", "rtp",
-      "rtp-smp", "soft-float", "xenomai", "zcx", "zfp");
+      "rtp-smp", "soft-float", "xenomai", "zcx", "zfp", "minimal");
    Runtime : Runtime_Type := external ("RUNTIME", "full");
 
    Library_Dir := external ("LIBDIR", "../aunit/" & Target & "-" & Runtime);
@@ -23,7 +23,7 @@ project AUnit_Shared is
    Memory : Memory_Type := "nativememory";
 
    case Runtime is
-      when "hi" | "ravenscar-sfp" | "zfp" =>
+      when "hi" | "ravenscar-sfp" | "zfp" | "minimal" =>
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
