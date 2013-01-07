@@ -27,8 +27,11 @@ project AUnit_Shared is
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
-      when "ravenscar" | "ravenscar-full" =>
+      when "ravenscar-full" =>
          Except := "zfpexception";
+         Calend := "nocalendar";
+      when "ravenscar" =>
+         Except := "certexception";
          Calend := "nocalendar";
       when "ravenscar-cert" | "ravenscar-cert-rtp" =>
          Except := "certexception";
