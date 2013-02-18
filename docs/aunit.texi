@@ -1665,10 +1665,9 @@ procedures above):
 @chapter GPS Support
 
 @noindent
-The GPS IDE has a menu @b{Edit -> Unit Testing} to
-generate template code for test cases, test suites and harnesses. The
-current templates are for AUnit 1.x, and AUnit 2.x. The next version of GPS
-will also include support for AUnit 3. In the meantime, the AUnit 1.x
-templates require only very minor modification for use with AUnit 3.
+GPS IDE relies on gnattest tool that creates unit-test skeletons as well as
+a test driver infrastructure (harness). Harness can be generated for project
+hierarchy, single project or a package. Generation process can be launched
+from @b{Tools -> GNATtest} menu or from contextual menu.
 
 @bye
