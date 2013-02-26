@@ -30,7 +30,7 @@ project AUnit_Shared is
       when "ravenscar-full" | "ravenscar" =>
          Except := "certexception";
          Calend := "nocalendar";
-      when "ravenscar-cert" | "ravenscar-cert-rtp" =>
+      when "ravenscar-cert" | "ravenscar-cert-rci" | "ravenscar-cert-rtp" =>
          Except := "certexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
