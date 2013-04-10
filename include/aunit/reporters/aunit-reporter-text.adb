@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2011, AdaCore                   --
+--                       Copyright (C) 2000-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -164,15 +164,20 @@ package body AUnit.Reporter.Text is
    ------------
 
    procedure Report
-     (Engine : Text_Reporter;
-      R      : in out Result'Class)
+     (Engine  : Text_Reporter;
+      R       : in out Result'Class;
+      Options : AUnit_Options := Default_Options)
    is
       S_Count : constant Integer := Integer (Success_Count (R));
       F_Count : constant Integer := Integer (Failure_Count (R));
       E_Count : constant Integer := Integer (Error_Count (R));
       T : AUnit_Duration;
    begin
-      Report_OK_Tests    (Text_Reporter'Class (Engine), R);
+
+      if Options.Report_Successes then
+         Report_OK_Tests    (Text_Reporter'Class (Engine), R);
+      end if;
+
       Report_Fail_Tests  (Text_Reporter'Class (Engine), R);
       Report_Error_Tests (Text_Reporter'Class (Engine), R);
 

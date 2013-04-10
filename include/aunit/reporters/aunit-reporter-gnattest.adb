@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                         Copyright (C) 2012, AdaCore                      --
+--                       Copyright (C) 2012-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -66,8 +66,9 @@ package body  AUnit.Reporter.GNATtest is
    -- Report --
    ------------
 
-   procedure Report (Engine : GNATtest_Reporter;
-                     R      : in out Result'Class)
+   procedure Report (Engine  : GNATtest_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options)
    is
       pragma Unreferenced (Engine);
 
@@ -82,14 +83,14 @@ package body  AUnit.Reporter.GNATtest is
       Crashes_Count := Integer (Error_Count (R));
       Passed_Count := Tests_Count - (Failures_Count + Crashes_Count);
 
-      declare
-         S : Result_Lists.List;
-      begin
-
-         Successes (R, S);
-         Dump_Result_List (S);
-
-      end;
+      if Options.Report_Successes then
+         declare
+            S : Result_Lists.List;
+         begin
+            Successes (R, S);
+            Dump_Result_List (S);
+         end;
+      end if;
 
       declare
          F : Result_Lists.List;

@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2009-2010, AdaCore
+--  Copyright (C) 2009-2013, AdaCore
 --
 
 with AUnit.Options;
@@ -17,7 +17,10 @@ procedure AUnit_Harness is
    Reporter : AUnit.Reporter.Text.Text_Reporter;
    Filter   : aliased AUnit.Test_Filters.Name_Filter;
    Options  : AUnit.Options.AUnit_Options :=
-      (Global_Timer => False, Test_Case_Timer => True, Filter => null);
+     (Global_Timer     => False,
+      Test_Case_Timer  => True,
+      Report_Successes => True,
+      Filter           => null);
 begin
    AUnit.Reporter.Text.Set_Use_ANSI_Colors (Reporter, True);
    Harness (Reporter, Options);

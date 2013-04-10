@@ -336,6 +336,10 @@ limited runtimes (zero footprint for instance), and because you might want to
 pass the argument through different ways (as a parameter to switch, or a stand
 along command line argument for instance).
 
+It is also possible to control the contents of the output report by passing an
+object of type @code{AUnit_Options} to the @code{Test_Runner}. See package
+@code{AUnit.Options} for details.
+
 @item Build the code that calls the harness @code{@b{Run}} routine using
 gnatmake or gprbuild. The GNAT project file @i{aunit.gpr} contains all
 necessary switches, and should be imported into your root project file.

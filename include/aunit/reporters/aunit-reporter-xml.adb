@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2012, AdaCore                   --
+--                       Copyright (C) 2000-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -69,8 +69,9 @@ package body AUnit.Reporter.XML is
    -- Report --
    ------------
 
-   procedure Report (Engine : XML_Reporter;
-                     R      : in out Result'Class)
+   procedure Report (Engine  : XML_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options)
    is
       pragma Unreferenced (Engine);
       T   : AUnit_Duration;
@@ -107,8 +108,10 @@ package body AUnit.Reporter.XML is
          S : Result_Lists.List;
       begin
          Put_Line ("  <SuccessfulTests>");
-         Successes (R, S);
-         Dump_Result_List (S);
+         if Options.Report_Successes then
+            Successes (R, S);
+            Dump_Result_List (S);
+         end if;
          Put_Line ("  </SuccessfulTests>");
       end;
 

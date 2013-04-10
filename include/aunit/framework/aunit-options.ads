@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2009-2011, AdaCore                   --
+--                       Copyright (C) 2009-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -34,15 +34,17 @@ with AUnit.Test_Filters;
 package AUnit.Options is
 
    type AUnit_Options is record
-      Global_Timer    : Boolean := False;
-      Test_Case_Timer : Boolean := False;
-      Filter          : AUnit.Test_Filters.Test_Filter_Access := null;
+      Global_Timer     : Boolean := False;
+      Test_Case_Timer  : Boolean := False;
+      Report_Successes : Boolean := True;
+      Filter           : AUnit.Test_Filters.Test_Filter_Access := null;
    end record;
    --  Options used to determine how a test should be run.
 
    Default_Options : constant AUnit_Options :=
-     (Global_Timer    => False,
-      Test_Case_Timer => False,
-      Filter          => null);
+     (Global_Timer     => False,
+      Test_Case_Timer  => False,
+      Report_Successes => True,
+      Filter           => null);
 
 end AUnit.Options;

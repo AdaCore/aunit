@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2011, AdaCore                   --
+--                      Copyright (C) 2000-2013, AdaCore                    --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -41,8 +41,9 @@ package AUnit.Reporter.Text is
    --  terminal.
    --  By default, no color is used.
 
-   procedure Report (Engine : Text_Reporter;
-                     R      : in out Result'Class);
+   procedure Report (Engine  : Text_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options);
 
    procedure Report_OK_Tests (Engine : Text_Reporter;
                               R      : in out Result'Class);

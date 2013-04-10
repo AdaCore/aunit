@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2011, AdaCore                      --
+--                       Copyright (C) 2006-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -69,7 +69,7 @@ package body AUnit.Run is
          Test_Results.Set_Elapsed (Results, Time);
       end if;
 
-      AUnit.Reporter.Report (Reporter, Results);
+      AUnit.Reporter.Report (Reporter, Results, Options);
    end Run;
 
    -----------------

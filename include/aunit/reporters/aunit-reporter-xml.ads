@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2011, AdaCore                   --
+--                       Copyright (C) 2000-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -34,6 +34,7 @@ package AUnit.Reporter.XML is
 
    type XML_Reporter is new Reporter with null record;
 
-   procedure Report (Engine : XML_Reporter;
-                     R      : in out Result'Class);
+   procedure Report (Engine  : XML_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options);
 end AUnit.Reporter.XML;
