@@ -3,7 +3,6 @@ AUnit 3.6 NEW FEATURES LIST
 ===========================
 
    Copyright (C) 2008-2013, AdaCore
-
 This file contains a complete list of new features in version 3.6 of AUnit. A
 full description of all AUnit features can be found in the AUnit Cookbook.
 
@@ -12,9 +11,3 @@ This date shows the implementation date of the feature. Any 3.6.0w wavefront
 subsequent to this date will contain the indicated feature, as will any
 subsequent 3.6 or later releases.
 
-NF-36-M410-029 Suppress detailed output for successful assertions (2013-04-10)
-
-  At some point, the original display format of only reporting failures and
-  unexpected exceptions disappeared. This fix allows the concise format as an
-  option controlled from the user harness via a new field in
-  AUnit.Options.AUnit_Options.
