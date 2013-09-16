@@ -61,15 +61,9 @@ test: build
 aunit_tests.gpr: aunit_tests.gpr.in force
 	rm -f $@
 	touch $@
-ifneq ($(RTS),full)
-ifneq ($(RTS),xenomai)
-ifneq ($(RTS),kernel)
-ifneq ($(RTS),default)
+ifneq ($(strip $(filter-out full pthread xenomail kernel default, $(RTS))),)
 ifeq ($(NO_ZFP_SUPPORT),)
 	echo "with \"zfp_support\";" >> $@
-endif
-endif
-endif
 endif
 endif
 	@cat $< >> $@
