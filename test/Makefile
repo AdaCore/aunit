@@ -53,7 +53,7 @@ run: build
 
 test: build
 	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext) > test.out.full 2>&1
-	cat test.out.full | grep "^[TSFU]" > test.out
+	egrep "^Total|^Success|^Fail|^Unexp" test.out.full > test.out
 	diff -b test.out expected.out
 	@echo
 	@echo "[OK] AUNIT TEST IS SUCCESSFUL"
