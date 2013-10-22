@@ -1,12 +1,12 @@
-AUnit 3.6.1 README
-October 22, 2013
+AUnit 3.7.1 README
+October xx, xxxx
 
 This is a minor update release of the Ada unit test framework AUnit, derived
 from the JUnit/CPPUnit frameworks for Java/C++. Read docs/aunit.html for
 installation and usage.
 
-See file known-problems-352 for problems fixed since the last release.
-See file features-36 for new features.
+See file known-problems-362 for problems fixed since the last release.
+See file features-37 for new features.
 
 Maintainer: AdaCore (sales@adacore.com)
 
