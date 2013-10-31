@@ -34,11 +34,17 @@ ifeq ($(findstring vxworks,$(TARGET)),vxworks)
    exeext=.out
 endif
 
+RUN=
 ifeq ($(TARGET),powerpc-elf)
-   RUN = ./support/run-ppc-elf
+   RUN=./support/run-ppc-elf
+endif
+
+VARIANT=
+ifeq ($(TARGET),powerpc-elf)
    VARIANT=-XVARIANT=powerpc-elf-psim
-else
-   RUN =
+endif
+ifeq ($(TARGET),lmp-elf)
+   VARIANT=-XVARIANT=lmp-elf
 endif
 
 ifneq ($(findstring aunit.gpr,$(wildcard ../lib/gnat/*.gpr)),)
