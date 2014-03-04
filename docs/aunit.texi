@@ -328,13 +328,13 @@ of the framework by allocating test result reporting data structures
 statically.
 
 It is possible to pass a filter to a @code{Test_Runner}, so that only a
-subset of the tests is run. In particular, this filter could be initialized from
+subset of the tests run. In particular, this filter could be initialized from
 a command line parameter. See the package @code{AUnit.Test_Filters} for an
 example of such a filter. AUnit does not automatically initialize this filter
 from the command line both because it would not be supported with some of the
 limited runtimes (zero footprint for instance), and because you might want to
-pass the argument through different ways (as a parameter to switch, or a stand
-along command line argument for instance).
+pass the argument through different ways (as a parameter to switch, or a stand-alone
+command line argument for instance).
 
 It is also possible to control the contents of the output report by passing an
 object of type @code{AUnit_Options} to the @code{Test_Runner}. See package
