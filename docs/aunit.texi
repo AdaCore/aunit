@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 
 @c AUnit Cookbook
-@c Copyright (C) 2000-2013, AdaCore
+@c Copyright (C) 2000-2014, AdaCore
 
 @c %**start of header
 @setfilename aunit.info
@@ -260,8 +260,8 @@ or:
    return;
 end if;}
 
-If you need to test that a method that raises an expected exception, there
-is the procedure @code{Assert_Exception} that takes an access to the procedure
+If you need to test that a method raises an expected exception, there
+is the procedure @code{Assert_Exception} that takes an access value designating the procedure
 to be tested as a parameter:
 
 @AEXP{
