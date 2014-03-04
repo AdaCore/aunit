@@ -391,7 +391,7 @@ overridden.
 This function returns the Test name. You can easily translate regular
 strings to Message_String using @code{AUnit.Format}. For example:
 
-@AEXP{function Name (@b{T} : @b{Money_Test}) is
+@AEXP{function Name (@b{T} : @b{Money_Test}) return Message_String is
 begin
    return Format (@b{"Money Tests"});
 end Name;}
