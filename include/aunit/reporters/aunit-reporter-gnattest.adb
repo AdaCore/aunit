@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2012-2013, AdaCore                   --
+--                       Copyright (C) 2012-2014, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -138,9 +138,9 @@ package body  AUnit.Reporter.GNATtest is
          end if;
 
          if Is_Assert then
-            Put   (" corresponding test FAILED: ");
+            Put   (" error: corresponding test FAILED: ");
          else
-            Put   (" corresponding test CRASHED: ");
+            Put   (" error: corresponding test CRASHED: ");
          end if;
 
          if Is_Assert then
@@ -185,7 +185,7 @@ package body  AUnit.Reporter.GNATtest is
 
          end if;
       else
-         Put_Line (" corresponding test PASSED");
+         Put_Line (" info: corresponding test PASSED");
       end if;
 
    end Report_Test;
