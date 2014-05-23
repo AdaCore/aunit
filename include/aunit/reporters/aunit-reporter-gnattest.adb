@@ -45,6 +45,9 @@ package body  AUnit.Reporter.GNATtest is
    procedure Put_Measure is new Gen_Put_Measure_In_Seconds;
    --  Output elapsed time
 
+   procedure Indent (N : Natural);
+   --  Print N indentations to output
+
    ------------------------
    --  Dump_Result_List  --
    ------------------------
@@ -65,6 +68,17 @@ package body  AUnit.Reporter.GNATtest is
          Next (C);
       end loop;
    end Dump_Result_List;
+
+   ------------
+   -- Indent --
+   ------------
+
+   procedure Indent (N : Natural) is
+   begin
+      for J in 1 .. N loop
+         Put ("    ");
+      end loop;
+   end Indent;
 
    ------------
    -- Report --
@@ -201,6 +215,27 @@ package body  AUnit.Reporter.GNATtest is
                Put (")");
             end if;
             New_Line;
+
+            if Test.Error.Traceback /= null then
+               Put_Line (" Traceback:");
+
+               declare
+                  From, To : Natural := Test.Error.Traceback'First;
+               begin
+                  while From <= Test.Error.Traceback'Last loop
+                     To := From;
+                     while To <= Test.Error.Traceback'Last
+                       and then Test.Error.Traceback (To) /= ASCII.LF
+                     loop
+                        To := To + 1;
+                     end loop;
+
+                     Indent (2);
+                     Put_Line (Test.Error.Traceback (From .. To - 1));
+                     From := To + 1;
+                  end loop;
+               end;
+            end if;
 
          end if;
       else
