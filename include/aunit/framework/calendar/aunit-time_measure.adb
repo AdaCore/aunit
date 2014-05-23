@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2011, AdaCore                      --
+--                    Copyright (C) 2006-2014, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -133,5 +133,43 @@ package body AUnit.Time_Measure is
       Put (Integer (T * 1_000_000.0), 6);
       Put (" sec.");
    end Gen_Put_Measure;
+
+   --------------------------------
+   -- Gen_Put_Measure_In_Seconds --
+   --------------------------------
+
+   procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration) is
+      S  : Integer := 0;
+      T  : Duration := Duration (Measure);
+
+      procedure Put (N : Integer; Length : Integer);
+      --  Put N using at least Length digits.
+
+      procedure Put (N : Integer; Length : Integer) is
+      begin
+         for Dig in reverse 1 .. Length - 1 loop
+            if N < 10**Dig then
+               Put ("0");
+            else
+               exit;
+            end if;
+         end loop;
+
+         Put (N);
+      end Put;
+
+   begin
+
+      while T >= 1.0 loop
+         S := S + 1;
+         T := T - 1.0;
+      end loop;
+
+      Put (S);
+
+      Put (".");
+      Put (Integer (T * 1_000_000.0), 9);
+      Put ("s");
+   end Gen_Put_Measure_In_Seconds;
 
 end AUnit.Time_Measure;
