@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2011, AdaCore                      --
+--                    Copyright (C) 2006-2014, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -70,5 +70,15 @@ package body AUnit.Time_Measure is
    begin
       null;
    end Gen_Put_Measure;
+
+   --------------------------------
+   -- Gen_Put_Measure_In_Seconds --
+   --------------------------------
+
+   procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration) is
+      pragma Unreferenced (Measure);
+   begin
+      null;
+   end Gen_Put_Measure_In_Seconds;
 
 end AUnit.Time_Measure;
