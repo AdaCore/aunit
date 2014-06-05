@@ -97,9 +97,9 @@ package body  AUnit.Reporter.GNATtest is
    begin
 
       Tests_Count := Integer (Test_Count (R));
-      Failures_Count := Integer (Failure_Count (R));
       Crashes_Count := Integer (Error_Count (R));
-      Passed_Count := Tests_Count - (Failures_Count + Crashes_Count);
+      Passed_Count := Integer (Success_Count (R));
+      Failures_Count := Tests_Count - (Passed_Count + Crashes_Count);
 
       if Options.Report_Successes then
          declare
