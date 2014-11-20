@@ -1,9 +1,9 @@
+
 with "aunit_shared";
 
 project AUnit is
 
-   type Compilation_Mode_Type is
-      ("Devel", "Install");
+   type Compilation_Mode_Type is ("Devel", "Install");
    Mode : Compilation_Mode_Type := external ("MODE", "Install");
 
    for Source_Dirs use
@@ -16,17 +16,22 @@ project AUnit is
 
    for Library_Dir use AUnit_Shared.Library_Dir;
 
-   Obj_Dir := external ("OBJDIR", "../aunit-obj/" & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
+   Obj_Dir := external ("OBJDIR", "../aunit-obj/"
+                        & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
    for Object_Dir use Obj_Dir;
 
    for Library_Name use "aunit";
    for Library_Kind use "static";
 
+   --------------
+   -- Compiler --
+   --------------
+
    package Compiler is
       case Mode is
          when "Devel" =>
             for Default_Switches ("ada") use
-              ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", 
+              ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato",
                "-gnatwa.Xe", "-gnaty");
 
          when "Install" =>
