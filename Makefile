@@ -24,12 +24,12 @@ MODE = Install
 
 CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
-GPROPTS = -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET)
+GPROPTS = $(CONF_ARGS) -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET)
 
 .PHONY: all clean targets install_clean install
 
 all:
-	$(GPRBUILD) -p $(CONF_ARGS) $(GPROPTS) lib/gnat/aunit.gpr
+	$(GPRBUILD) -p $(GPROPTS) lib/gnat/aunit.gpr
 
 clean:
 	$(RM) -fr lib/aunit lib/aunit-obj
