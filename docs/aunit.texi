@@ -56,7 +56,7 @@
 
 @page
 
-Copyright @copyright{} 2000-2011, AdaCore
+Copyright @copyright{} 2000-2014, AdaCore
 
 @*
 
@@ -84,7 +84,7 @@ unmodified in any copy.
 
 @page
 
-<p>Copyright @copyright{} 2000-2013, AdaCore
+<p>Copyright @copyright{} 2000-2014, AdaCore
 
 <p>This document may be copied, in whole or in part, in any form or by any
 means, as is or with alterations, provided that (1) alterations are clearly
@@ -1453,10 +1453,8 @@ with the ZFP profile, and on profiles not supporting Ada.Calendar.
 
 @menu
 * Note on gprbuild::
-* aunit project file and support for other platforms/run-times::
-* Installing AUnit on UNIX systems::
-* Installing AUnit on Windows systems::
-* Installing AUnit for customized run-times::
+* Support for other platforms/run-times::
+* Installing AUnit::
 * Installed files::
 @end menu
 
@@ -1470,32 +1468,33 @@ for several targets and run-times.
 @section Note on gprbuild
 
 @noindent
-In order to compile and install AUnit, you need gprbuild. On
-cross-platforms gprbuild version 1.1 or later is required, while on native
-platforms any version can be used.
+In order to compile, install and use AUnit, you need gprbuild and gprinstall
+version 2.2.0 or above.
 
 @c ---------------------------------------------------------
-@node aunit project file and support for other platforms/run-times
-@section aunit project file and support for other platforms/run-times
+@node Support for other platforms/run-times
+@section Support for other platforms/run-times
 
-AUnit can be installed once for several targets and run-times.
-To support this, the AUnit project includes scenario variables
-to select those targets and/or run-times. The scenario variables
-used are:
-@itemize
-@item @b{PLATFORM}: a free-form value used to differenciate installed libraries.
-This value is set to "native" by default.
-@item @b{RUNTIME}: the runtime used to compile AUnit. Many values are defined
-there, you can have a look at the aunit_shared project for a comprehensive
-list. This scenario variable is used to adapt the AUnit to the run-time profile.
-Is set to "full" by default.
-@end itemize
+AUnit should be built and installed separately for each target and run-time
+it is meant to be used with. The necessary customizations are performed at
+AUnit build time, so once the framework is installed, it is always referenced
+simply by adding the line
+
+@smallexample
+with "aunit";
+@end smallexample
+
+to your project.
 
 @c --------------------------------------
-@node Installing AUnit on UNIX systems
-@section Installing AUnit on UNIX systems
+@node Installing AUnit
+@section Installing AUnit
 
 @noindent
+Normally AUnit comes preinstalled and ready-to-use for all runtimes in
+your GNAT distribution. The following instructions are for rebuilding it from
+sources for the custom configuration that the user may have.
+
 @itemize
 @item
 Extract the archive:
@@ -1510,30 +1509,35 @@ To build AUnit for a full Ada run-time:
    $ make
 @end smallexample
 
-To build AUnit for a zfp run-time targeting powerpc-elf platform@footnote{
-Note that cross platforms require gprbuild version 1.1 or later}:
+To build AUnit for a zfp run-time targeting powerpc-elf platform:
 @smallexample
    $ cd aunit-@value{VERSION}-src
    $ make TARGET=powerpc-elf RTS=zfp
 @end smallexample
 
-For platforms providing a full Ravenscar run-time (eg. leon3-elf), or when
-using ZFP for a native target, add the parameter below that excludes extra
-ZFP support for builds using that library:
+To build AUnit for a reconfigurable runtime zfp-leon3 targeting leon3-elf
+platform:
 @smallexample
    $ cd aunit-@value{VERSION}-src
-   $ make TARGET=powerpc-elf RTS=ravenscar NO_ZFP_SUPPORT=1
+   $ make TARGET=leon3-elf RTS=zfp RTS_CONF="--RTS=zfp-leon3"
 @end smallexample
 
 
-
-Once the above build procedure has been performed for all
-desired platforms, you can install AUnit:
+Once the above build procedure has been performed for the desired platform, you
+can install AUnit:
 @smallexample
-   $ make install INSTALL=<gnat-root>
+   $ make install INSTALL=<install-root>
 @end smallexample
-   Where <gnat-root> is for example /opt/gnat/6.0.1. If INSTALL is not
-specified, then AUnit will use the root directory where gprbuild is installed.
+
+We recommend that you install AUnit into the standard location used by gprbuild
+to find the libraries for a given configuration. For example for the case above
+(runtime zfp-leon3 targeting leon3-elf), the default location is
+<gnat-root>/leon3-elf/zfp-leon3. If the runtime is located in a custom
+directory and specified by the full path, using this exact path also as
+<install_root> is a sensible choice.
+
+If INSTALL is not specified, then AUnit will use the root directory where
+gprbuild is installed.
 
 @item
 Specific installation:
@@ -1566,82 +1570,12 @@ To test AUnit:
    $ make
 @end smallexample
    The test suite's makefile supports the following variables:
-   * RTS
-   * TARGET
+   @itemize
+      @item @b{RTS}
+      @item @b{TARGET}
+   @end itemize
 @end itemize
 
-@c -----------------------------------------
-@node Installing AUnit on Windows systems
-@section Installing AUnit on Windows systems
-
-On Windows, an InstallShield wizard is available to easily install AUnit.
-
-The InstallShield will go through the following steps:
-
-@itemize
-
-@item
-Selection of the GNAT compiler to consider: this page allows you to select
-which GNAT compiler to use to compile AUnit.
-
-@item
-Selection of the directory used to install AUnit: by default the same directory
-as the GNAT compiler.
-
-@item
-Selection of targets: the InstallShield will try to detect all GNAT compilers
-available on your system. You can then select the compilers/runtimes that you
-want AUnit installed for.
-
-@item
-At this stage, the AUnit library starts compiling. And is then installed in the
-destination directory.
-@end itemize
-
-Note that in contrast to the AUnit 2 installation procedures, support for
-exception handling, memory allocation and Ada.Calendar is automatically
-selected depending on the run-times used.
-
-@c -----------------------------------------------
-@node Installing AUnit for customized run-times
-@section Installing AUnit for customized run-times
-
-@noindent
-The AUnit library can also be compiled for custom-built run-times. To do so,
-you can either use the Makefile (@pxref{Installing AUnit on UNIX systems}) or
-use directly the project aunit_build.gpr that is installed in <prefix>/lib/gnat.
-
-To use the Makefile, you will need to specify RTS_CONF so that the correct
-parameter is passed to gprbuild. For example, if your custom run-time is
-powerpc-elf/ravenscar-full-prep, then you need to use the command:
-
-@smallexample
-make TARGET=powerpc-elf RTS=ravenscar-full \
-  RTS_CONF=--RTS=powerpc-elf/ravenscar-full-prep
-@end smallexample
-
-If AUnit comes pre-installed or you can't use the Makefile, then you can also
-directly use the aunit_build.gpr project file to compile and use AUnit.
-
-@smallexample
-gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
-  -XPLATFORM=powerpc-elf -XRUNTIME=ravenscar-full -Paunit_build -p
-@end smallexample
-
-The aunit_build project will install the AUnit library in <prefix>/lib/aunit/<TARGET>-<RUNTIME> and use the object directory <prefix>/lib/aunit-obj/<TARGET>-<RUNTIME>.
-
-If the AUnit installation directory is readonly, you can override those paths
- by setting the LIBDIR and OBJDIR scenario variables. Note that you still need
- to provide the RUNTIME scenario variable in this case, but PLATFORM can be
- omitted:
-
-@smallexample
-gprbuild --target=powerpc-elf --RTS=powerpc-elf/ravenscar-full-prep \
-  -XRUNTIME=ravenscar-full LIBDIR=$HOME/aunit-lib OBJDIR=/tmp -Paunit_build
-@end smallexample
-
-Once built this way, the object directory can safely be removed, and you can
-use the regular aunit project to build your test suites.
 
 @c ---------------------
 @node Installed files
