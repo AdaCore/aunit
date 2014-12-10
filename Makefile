@@ -43,7 +43,7 @@ endif
 
 install: install-clean
 	$(GPRINSTALL) $(GPROPTS) -p -f --prefix=$(INSTALL) \
-		--project-subdir=lib/gnat lib/gnat/aunit.gpr
+		--no-build-var --project-subdir=lib/gnat lib/gnat/aunit.gpr
 
 doc:
 	${MAKE} -C docs
