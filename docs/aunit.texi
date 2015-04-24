@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 
 @c AUnit Cookbook
-@c Copyright (C) 2000-2014, AdaCore
+@c Copyright (C) 2000-2015, AdaCore
 
 @c %**start of header
 @setfilename aunit.info
@@ -1428,7 +1428,15 @@ Normally the ZFP profile requires a user-defined
 to handle raised exceptions. However, AUnit now provides a mechanism to
 simulate exception propagation using gcc builtin setjmp/longjmp mechanism.
 This mechanism defines the @code{__gnat_last_chance_handler} routine, so it
-should not be redefined elsewhere.
+should not be redefined elsewhere. In order to be compatible with this
+restriction, the user-defined last chance handler routine can be defined as a
+"weak" symbol; this way, it will still be linked into the standalone executable,
+but will be replaced by the AUnit implementation when linked with the harness.
+The pragma Weak_External can be used for that, e.g.:
+
+@smallexample
+pragma Weak_External (Last_Chance_Handler);
+@end smallexample
 
 @item
 AUnit requires @code{GNAT.IO} provided in @file{g-io.ad?} in the full or cert
