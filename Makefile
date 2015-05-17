@@ -31,8 +31,10 @@ GPROPTS = $(CONF_ARGS) -XMODE=$(MODE) -XRUNTIME=$(RTS) -XPLATFORM=$(TARGET)
 all:
 	$(GPRBUILD) -p $(GPROPTS) lib/gnat/aunit.gpr
 
-clean:
+clean-lib:
 	$(RM) -fr lib/aunit lib/aunit-obj
+
+clean: clean-lib
 	-${MAKE} -C docs clean
 
 install-clean:
