@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --          Copyright (C) 2004-2007, Free Software Foundation, Inc.         --
---                   Copyright (C) 2008-2011, AdaCore                       --
+--                   Copyright (C) 2008-2015, AdaCore                       --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -66,7 +66,7 @@ package body Ada_Containers.AUnit_Lists is
       Next    : Node_Access;
       Prev    : Node_Access) return Node_Access
    is
-      Res : Node_Access := New_Node_Type;
+      Res : constant Node_Access := New_Node_Type;
    begin
       Res.Element := Element;
       Res.Next    := Next;
