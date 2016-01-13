@@ -1,0 +1,12 @@
+fixture.rst::samp:`{<aunit-root>}/share/examples/aunit/test_fixture/` 
+installation_and_use.rst::samp:`{<gnat-root>}/leon3-elf/zfp-leon3`. If the runtime is located in a custom
+installation_and_use.rst:* the :file:`aunit.gpr` project is installed in :samp:`{<aunit-root>}/lib/gnat`
+installation_and_use.rst:* the AUnit source files are installed in :samp:`{<aunit-root>}/include/aunit`
+installation_and_use.rst:* the AUnit library files are installed in :samp:`{<aunit-root>}/lib/aunit`
+installation_and_use.rst:* the AUnit documentation is installed in :samp:`{<aunit-root>}/share/doc/aunit`
+installation_and_use.rst:* the AUnit examples are installed in :samp:`{<aunit-root>}/share/examples/aunit`
+overview.rst:     end My_Procedure;}
+test_case.rst:directory: :samp:`{<aunit-root>}/share/examples/aunit/simple_test/` or from the
+test_case.rst:directory: :samp:`{<aunit-root>}/share/examples/aunit/test_caller/` or from the
+test_organization.rst::samp:`{<AUnit-root>}/share/examples/aunit/calculator`, or
+using_aunit_with_restricted_run-time_libraries.rst:* AUnit requires ``GNAT.IO`` provided in :samp:`g-io.ad{?}` in the full or cert
