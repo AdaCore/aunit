@@ -44,6 +44,7 @@ Typographic conventions
 
 For notational convenience, `<version>` will be used throughout
 this document to stand for the AUnit product version number.
+For example, aunit-*<version>*-src expands to aunit-|version|-src.
 
 
 Examples
