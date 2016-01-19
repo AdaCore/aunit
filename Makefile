@@ -47,6 +47,7 @@ install: install-clean
 	$(GPRINSTALL) $(GPROPTS) -p -f --prefix=$(INSTALL) \
 		--no-build-var --project-subdir=lib/gnat lib/gnat/aunit.gpr
 
+.PHONY: doc
 doc:
 	${MAKE} -C docs
 
