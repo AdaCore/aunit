@@ -7,6 +7,7 @@ all: test
 
 RTS =
 TARGET =
+PROJECT_PATH_ARG =
 
 ifeq ($(RTS),)
    RTS = full
@@ -37,10 +38,6 @@ endif
 RUN=
 ifeq ($(TARGET),powerpc-elf)
    RUN=./support/run-ppc-elf
-endif
-
-ifneq ($(findstring aunit.gpr,$(wildcard ../lib/gnat/*.gpr)),)
-   PROJECT_PATH_ARG = GPR_PROJECT_PATH=../lib/gnat
 endif
 
 build:
