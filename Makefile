@@ -49,6 +49,6 @@ install: install-clean
 
 .PHONY: doc
 doc:
-	${MAKE} -C docs
+	${MAKE} -C doc
 
 RM	= rm

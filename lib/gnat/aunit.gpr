@@ -48,9 +48,15 @@ project AUnit is
    -------------
 
    package Install is
-      for Artifacts ("share/doc/aunit") use
-        ("../../docs/*.html", "../../docs/*.info",
-         "../../docs/*.pdf", "../../docs/*.txt");
+      for Artifacts ("share/doc/aunit/pdf")
+        use ("../../doc/pdf/**");
+      for Artifacts ("share/doc/aunit/txt")
+        use ("../../doc/txt/**");
+      for Artifacts ("share/doc/aunit/info")
+        use ("../../doc/info/**");
+      for Artifacts ("share/doc/aunit/html")
+        use ("../../doc/html/**");
+
       for Artifacts ("share/gps/plug-ins") use ("../../support/aunit.xml");
       for Artifacts ("share/examples/aunit") use ("../../examples/*");
    end Install;

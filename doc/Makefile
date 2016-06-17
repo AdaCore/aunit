@@ -17,7 +17,9 @@ ALLSPHINXOPTS   = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) \
 DOC_LIST=aunit_cb
 FMT_LIST=html pdf txt info
 
-.PHONY: help clean
+.PHONY: all help clean
+
+all: $(foreach doc, $(DOC_LIST), $(doc).all)
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -74,6 +76,3 @@ texinfo-all: $(foreach doc, $(DOC_LIST), $(doc).texinfo)
 
 %.all:
 	$(MAKE) $(foreach fmt, $(FMT_LIST), $*.$(fmt))
-
-all: $(foreach fmt, $(DOC_LIST), $(fmt).all)
-
