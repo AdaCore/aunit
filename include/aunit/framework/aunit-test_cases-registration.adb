@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2000-2011, AdaCore                   --
+--                       Copyright (C) 2000-2017, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -45,7 +45,6 @@ package body Registration is
 
       Formatted_Name : constant Message_String := Format (Name);
       Val : Routine_Spec;
-      use Routine_Lists;
 
    begin
       Val  := (Routine, Formatted_Name);
