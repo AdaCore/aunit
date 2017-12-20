@@ -37,15 +37,20 @@ clean-lib:
 clean: clean-lib
 	-${MAKE} -C docs clean
 
-install-clean:
+install-clean-legacy:
 ifneq (,$(wildcard $(INSTALL)/lib/gnat/manifests/aunit))
 	-$(GPRINSTALL) $(GPROPTS) --uninstall --prefix=$(INSTALL) \
 		--project-subdir=lib/gnat aunit
 endif
 
+install-clean: install-clean-legacy
+ifneq (,$(wildcard $(INSTALL)/share/gpr/manifests/aunit))
+	-$(GPRINSTALL) $(GPROPTS) --uninstall --prefix=$(INSTALL) aunit
+endif
+
 install: install-clean
 	$(GPRINSTALL) $(GPROPTS) -p -f --prefix=$(INSTALL) \
-		--no-build-var --project-subdir=lib/gnat lib/gnat/aunit.gpr
+		--no-build-var lib/gnat/aunit.gpr
 
 .PHONY: doc
 doc:
