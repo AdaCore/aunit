@@ -26,11 +26,11 @@ restricted run-time libraries provided with GNAT Pro.
 In general, dynamic allocation and deallocation must be used carefully in test
 code.  For the cert profile on VxWorks 653, all dynamic allocation must be
 done prior to setting the application partition into 'normal' mode.
-Deallocation is prohibited in this profile. For the default ZFP profile,
-dynamic memory management is not provided as part of the run-time, as it is
-not available on a bare board environment, and should not be used unless
-you have provided implementations as described in the GNAT User's Guide
-Supplement for GNAT Pro Safety-Critical and GNAT Pro High-Security.
+Deallocation is prohibited in this profile. For some restricted profiles,
+dynamic memory management is not provided as part of the run-time,
+and should not be used unless you have provided implementations as described
+in the GNAT User's Guide Supplement for GNAT Pro Safety-Critical and GNAT
+Pro High-Security.
 
 Starting with |AUnit 3|, a simple memory management mechanism has been
 included in the framework, using a kind of storage pool. This memory
@@ -38,9 +38,10 @@ management mechanism uses a static array allocated at startup, and simulates
 dynamic allocation afterwards by allocating parts of this array upon request.
 Deallocation is not permitted.
 
-By default, the allocated array is a 100 KB array. This value can be changed
-by modifying its size in the file
-:samp:`aunit-{<version>}-src/aunit/framework/staticmemory/aunit-memory.adb`.
+By default, an array of 100KB is allocated. The size can be changed
+by modifying the value in the file
+:samp:`aunit-{<version>}-src/aunit/framework/staticmemory/aunit-memory.adb`
+before building AUnit.
 
 .. index:: AUnit.Memory.Utils.Gen_Alloc
 

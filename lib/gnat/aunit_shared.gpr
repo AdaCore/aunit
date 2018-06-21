@@ -5,7 +5,8 @@ project AUnit_Shared is
    type Runtime_Type is
       (
        "full",           -- used for all full capability runtimes
-       "zfp",            -- used for all zfp/sfp/minimal runtimes
+       "zfp",            -- used for typical zfp/sfp/minimal runtimes
+       "zfp-cross",      -- used for zfp runtimes on some cross ports
        "ravenscar",      -- used for full ravenscar runtimes
        "ravenscar-cert", -- used for ravenscar-cert runtimes
        "cert"            -- used for cert runtimes
@@ -27,6 +28,9 @@ project AUnit_Shared is
 
    case Runtime is
       when "zfp" =>
+         Except := "zfpexception";
+         Calend := "nocalendar";
+      when "zfp-cross" =>
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
