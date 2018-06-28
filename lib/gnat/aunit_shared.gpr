@@ -20,7 +20,7 @@ project AUnit_Shared is
 
    type Exception_Type is ("fullexception", "certexception", "zfpexception");
    type Calendar_Type is ("calendar", "nocalendar");
-   type Memory_type is ("nativememory", "staticmemory");
+   type Memory_type is ("nativememory", "nodealloc", "staticmemory");
 
    Except : Exception_Type := "fullexception";
    Calend : Calendar_Type := "calendar";
@@ -30,6 +30,7 @@ project AUnit_Shared is
       when "zfp" =>
          Except := "zfpexception";
          Calend := "nocalendar";
+         Memory := "nodealloc";
       when "zfp-cross" =>
          Except := "zfpexception";
          Calend := "nocalendar";
