@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2011, AdaCore                   --
+--                       Copyright (C) 2008-2018, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -32,20 +32,33 @@
 with Ada.Unchecked_Conversion;
 with System.Storage_Elements;  use System.Storage_Elements;
 with AUnit.Memory;             use AUnit.Memory;
+with System;
 
 package body AUnit is
+
+   --  The allocation strategy below is based on a low-level trick that mimics
+   --  what GNAT would generate for a regular allocator. Therefore it needs to
+   --  be protected from changes of Default_Scalar_Storage_Order setting.
+
+   pragma Warnings (Off, "scalar storage order");
 
    type Bounds is record
       First : Natural;
       Last  : Natural;
-   end record;
+   end record
+   with Bit_Order => System.Default_Bit_Order,
+        Scalar_Storage_Order => System.Default_Bit_Order;
+
    type Bounds_Access is access all Bounds;
 
    type Fat_Pointer is record
       Address       : System.Address;
       Bound_Address : Bounds_Access;
-   end record;
-   pragma Pack (Fat_Pointer);
+   end record
+   with Bit_Order => System.Default_Bit_Order,
+        Scalar_Storage_Order => System.Default_Bit_Order;
+
+   pragma Warnings (On, "scalar storage order");
 
    -------------------
    -- Message_Alloc --
