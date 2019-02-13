@@ -32,6 +32,7 @@
 with Ada.Unchecked_Conversion;
 with AUnit.Options;              use AUnit.Options;
 with AUnit.Test_Filters;         use AUnit.Test_Filters;
+with AUnit.Time_Measure;
 
 package body AUnit.Test_Cases is
 
@@ -55,6 +56,13 @@ package body AUnit.Test_Cases is
       Test.Routine.Routine (Test);
    end Run_Test;
 
+   ----------------------
+   -- Call_Set_Up_Case --
+   ----------------------
+
+   function Call_Set_Up_Case
+     (Test : in out Test_Case'Class) return Test_Error_Access is separate;
+
    ---------
    -- Run --
    ---------
@@ -69,6 +77,7 @@ package body AUnit.Test_Cases is
       Result : Status;
       C      : Cursor;
       Set_Up_Case_Called : Boolean := False;
+      Error              : Test_Error_Access := null;
    begin
       Outcome := Success;
       Routine_Lists.Clear (Test.Routines);
@@ -83,15 +92,22 @@ package body AUnit.Test_Cases is
          then
             if not Set_Up_Case_Called then
                Set_Up_Case_Called := True;
-               Set_Up_Case (Test_Case'Class (Test.all));
+               Error := Call_Set_Up_Case (Test_Case'Class (Test.all));
             end if;
 
-            AUnit.Simple_Test_Cases.Run
-              (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
-               Options, R, Result);
+            if Error = null then
+               AUnit.Simple_Test_Cases.Run
+                 (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
+                  Options, R, Result);
 
-            if Result = Failure then
+               if Result = Failure then
+                  Outcome := Failure;
+               end if;
+            else
                Outcome := Failure;
+               Add_Error (R, Name (Test_Case'Class (Test.all)),
+                          Routine_Name (Test.all), Error.all,
+                          Time_Measure.Null_Time);
             end if;
          end if;
 
