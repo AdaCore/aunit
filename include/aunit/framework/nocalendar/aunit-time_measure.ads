@@ -53,6 +53,8 @@ package AUnit.Time_Measure is
    --  Put the image of the measure
 
    generic
+      with procedure Put_Integer (I : Integer) is <>;
+      with procedure Put_String (S : String) is <>;
    procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration);
    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
    --  9 digits after decimal point.

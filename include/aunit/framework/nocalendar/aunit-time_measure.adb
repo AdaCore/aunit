@@ -76,7 +76,7 @@ package body AUnit.Time_Measure is
    --------------------------------
 
    procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration) is
-      pragma Unreferenced (Measure);
+      pragma Unreferenced (Measure, Put_Integer, Put_String);
    begin
       null;
    end Gen_Put_Measure_In_Seconds;
