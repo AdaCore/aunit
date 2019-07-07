@@ -68,12 +68,12 @@ package body AUnit.Test_Cases is
       use Routine_Lists;
       Result : Status;
       C      : Cursor;
+      Set_Up_Case_Called : Boolean := False;
    begin
       Outcome := Success;
       Routine_Lists.Clear (Test.Routines);
       Register_Tests (Test_Case'Class (Test.all));
 
-      Set_Up_Case (Test_Case'Class (Test.all));
       C := First (Test.Routines);
 
       while Has_Element (C) loop
@@ -81,6 +81,11 @@ package body AUnit.Test_Cases is
          if Options.Filter = null
            or else Is_Active (Options.Filter.all, Test.all)
          then
+            if not Set_Up_Case_Called then
+               Set_Up_Case_Called := True;
+               Set_Up_Case (Test_Case'Class (Test.all));
+            end if;
+
             AUnit.Simple_Test_Cases.Run
               (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
                Options, R, Result);
@@ -93,7 +98,9 @@ package body AUnit.Test_Cases is
          Next (C);
       end loop;
 
-      Tear_Down_Case (Test_Case'Class (Test.all));
+      if Set_Up_Case_Called then
+         Tear_Down_Case (Test_Case'Class (Test.all));
+      end if;
    end Run;
 
    ------------------
