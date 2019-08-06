@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                        A U N I T . R E P O R T E R                       --
+--                   A U N I T . R E P O R T E R . T E X T                  --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2019, AdaCore                   --
+--                      Copyright (C) 2019, AdaCore                         --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -29,30 +29,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
-with AUnit.Options;      use AUnit.Options;
-with AUnit.Test_Results; use AUnit.Test_Results;
-
-package AUnit.Reporter is
-
-   type Reporter is abstract tagged private;
+package body AUnit.Reporter is
 
    procedure Set_File
      (Engine : in out Reporter;
-      Value  : Ada.Text_IO.File_Access);
-
-   procedure Report
-     (Engine  : Reporter;
-      R       : in out Result'Class;
-      Options : AUnit_Options := Default_Options) is abstract;
-   --  This procedure is called by AUnit.Run to report the result after running
-   --  the whole testsuite (or the selected subset of tests).
-
-private
-
-   type Reporter is abstract tagged
-      record
-         File : Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output;
-      end record;
+      Value  : Ada.Text_IO.File_Access) is
+   begin
+      Engine.File := Value;
+   end Set_File;
 
 end AUnit.Reporter;

@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2014, AdaCore                      --
+--                    Copyright (C) 2006-2019, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -30,6 +30,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Calendar;
+with Ada.Text_IO;
 
 package AUnit.Time_Measure is
 
@@ -53,15 +54,21 @@ package AUnit.Time_Measure is
    --  Get the measure
 
    generic
-      with procedure Put (I : Integer) is <>;
-      with procedure Put (S : String) is <>;
-   procedure Gen_Put_Measure (Measure : AUnit_Duration);
+      with procedure Put (F : Ada.Text_IO.File_Type;
+                          I : Integer;
+                          W : Ada.Text_IO.Field;
+                          B : Ada.Text_IO.Number_Base) is <>;
+      with procedure Put (F : Ada.Text_IO.File_Type; S : String) is <>;
+   procedure Gen_Put_Measure (File : Ada.Text_IO.File_Type; Measure : AUnit_Duration);
    --  Put the image of the measure
 
    generic
-      with procedure Put (I : Integer) is <>;
-      with procedure Put (S : String) is <>;
-   procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration);
+      with procedure Put (F : Ada.Text_IO.File_Type;
+                          I : Integer;
+                          W : Ada.Text_IO.Field;
+                          B : Ada.Text_IO.Number_Base) is <>;
+      with procedure Put (F : Ada.Text_IO.File_Type; S : String) is <>;
+   procedure Gen_Put_Measure_In_Seconds (File : Ada.Text_IO.File_Type; Measure : AUnit_Duration);
    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
    --  9 digits after decimal point.
 
