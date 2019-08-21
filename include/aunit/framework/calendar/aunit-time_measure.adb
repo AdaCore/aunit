@@ -29,7 +29,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Integer_Text_IO;
+with Ada.Strings;       use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
 package body AUnit.Time_Measure is
 
@@ -61,13 +62,12 @@ package body AUnit.Time_Measure is
       return AUnit_Duration (T.Stop - T.Start);
    end Get_Measure;
 
-   package ITIO renames Ada.Integer_Text_IO;
-
    ---------------------
    -- Gen_Put_Measure --
    ---------------------
 
-   procedure Gen_Put_Measure (File : Ada.Text_IO.File_Type; Measure : AUnit_Duration) is
+   procedure Gen_Put_Measure (File    : AUnit.IO.File_Type;
+                              Measure : AUnit_Duration) is
       H, M, S  : Integer := 0;
       T        : Duration := Duration (Measure);
       Force    : Boolean;
@@ -85,7 +85,7 @@ package body AUnit.Time_Measure is
             end if;
          end loop;
 
-         ITIO.Put (File, N, 0, ITIO.Default_Base);
+         Put (File, Trim (N'Img, Left));
       end Put;
 
    begin
@@ -109,14 +109,14 @@ package body AUnit.Time_Measure is
       Force := False;
 
       if H > 0 then
-         Put (File, H, 0, ITIO.Default_Base);
+         Put (File, Trim (H'Img, Left));
          Put (File, "h");
          Force := True;
       end if;
 
       if M > 0 or else Force then
          if not Force then
-            Put (File, M, 0, ITIO.Default_Base);
+            Put (File, Trim (M'Img, Left));
          else
             --  In case some output is already done, then we force a 2 digits
             --  output so that the output is normalized.
@@ -128,7 +128,7 @@ package body AUnit.Time_Measure is
       end if;
 
       if not Force then
-         Put (File, S, 0, ITIO.Default_Base);
+         Put (File, Trim (S'Img, Left));
       else
          Put (S, 2);
       end if;
@@ -142,7 +142,8 @@ package body AUnit.Time_Measure is
    -- Gen_Put_Measure_In_Seconds --
    --------------------------------
 
-   procedure Gen_Put_Measure_In_Seconds (File : Ada.Text_IO.File_Type; Measure : AUnit_Duration) is
+   procedure Gen_Put_Measure_In_Seconds (File    : AUnit.IO.File_Type;
+                                         Measure : AUnit_Duration) is
       S  : Integer := 0;
       T  : Duration := Duration (Measure);
 
@@ -159,7 +160,7 @@ package body AUnit.Time_Measure is
             end if;
          end loop;
 
-         Put (File, N, 0, ITIO.Default_Base);
+         Put (File, Trim (N'Img, Left));
       end Put;
 
    begin
@@ -169,7 +170,7 @@ package body AUnit.Time_Measure is
          T := T - 1.0;
       end loop;
 
-      Put (File, S, 0, ITIO.Default_Base);
+      Put (File, Trim (S'Img, Left));
 
       Put (File, ".");
       Put (Integer (T * 1_000_000.0), 9);

@@ -29,8 +29,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Integer_Text_IO;   use Ada.Integer_Text_IO;
-with Ada.Text_IO;           use Ada.Text_IO;
+with Ada.Strings;        use Ada.Strings;
+with Ada.Strings.Fixed;  use Ada.Strings.Fixed;
+with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
@@ -187,16 +188,16 @@ package body AUnit.Reporter.Text is
 
       New_Line (File);
       Put (File, "Total Tests Run:   ");
-      Put (File, Integer (Test_Count (R)), 0);
+      Put (File, Trim (Test_Count (R)'Img, Left));
       New_Line (File);
       Put (File, "Successful Tests:  ");
-      Put (File, S_Count, 0);
+      Put (File, Trim (S_Count'Img, Left));
       New_Line (File);
       Put (File, "Failed Assertions: ");
-      Put (File, F_Count, 0);
+      Put (File, Trim (F_Count'Img, Left));
       New_Line (File);
       Put (File, "Unexpected Errors: ");
-      Put (File, E_Count, 0);
+      Put (File, Trim (E_Count'Img, Left));
       New_Line (File);
 
       if Elapsed (R) /= Time_Measure.Null_Time then
@@ -240,7 +241,7 @@ package body AUnit.Reporter.Text is
          Put (File, "at ");
          Put (File, Test.Failure.Source_Name.all);
          Put (File, ":");
-         Put (File, Test.Failure.Line);
+         Put (File, Trim (Test.Failure.Line'Img, Left));
          New_Line (File);
 
       elsif Test.Error /= null then

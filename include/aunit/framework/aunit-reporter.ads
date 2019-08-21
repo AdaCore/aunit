@@ -29,7 +29,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO;
+with AUnit.IO;
 with AUnit.Options;      use AUnit.Options;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
@@ -39,7 +39,7 @@ package AUnit.Reporter is
 
    procedure Set_File
      (Engine : in out Reporter;
-      Value  : Ada.Text_IO.File_Access);
+      Value  : AUnit.IO.File_Access);
 
    procedure Report
      (Engine  : Reporter;
@@ -52,7 +52,7 @@ private
 
    type Reporter is abstract tagged
       record
-         File : Ada.Text_IO.File_Access := Ada.Text_IO.Standard_Output;
+         File : AUnit.IO.File_Access := AUnit.IO.Standard_Output;
       end record;
 
 end AUnit.Reporter;

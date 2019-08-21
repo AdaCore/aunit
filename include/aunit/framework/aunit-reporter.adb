@@ -33,7 +33,7 @@ package body AUnit.Reporter is
 
    procedure Set_File
      (Engine : in out Reporter;
-      Value  : Ada.Text_IO.File_Access) is
+      Value  : AUnit.IO.File_Access) is
    begin
       Engine.File := Value;
    end Set_File;

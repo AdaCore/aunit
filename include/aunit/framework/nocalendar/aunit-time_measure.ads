@@ -7,7 +7,7 @@
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2014, AdaCore                      --
+--                    Copyright (C) 2006-2019, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -30,6 +30,7 @@
 ------------------------------------------------------------------------------
 
 --  Dummy package when Ada.Calendar is not supported
+with AUnit.IO;
 
 package AUnit.Time_Measure is
 
@@ -49,11 +50,13 @@ package AUnit.Time_Measure is
    --  Get the measure
 
    generic
-   procedure Gen_Put_Measure (Measure : AUnit_Duration);
+   procedure Gen_Put_Measure (File    : AUnit.IO.File_Type;
+                              Measure : AUnit_Duration);
    --  Put the image of the measure
 
    generic
-   procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration);
+   procedure Gen_Put_Measure_In_Seconds (File    : AUnit.IO.File_Type;
+                                         Measure : AUnit_Duration);
    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
    --  9 digits after decimal point.
 
