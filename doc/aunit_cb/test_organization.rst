@@ -101,7 +101,7 @@ possible).
 Using AUnit.Test_Fixtures
 -------------------------
 
-Using type ``Test_Fixture`, we first test ``Parent`` using the
+Using type ``Test_Fixture``, we first test ``Parent`` using the
 following test case:
 
 .. code-block:: ada
