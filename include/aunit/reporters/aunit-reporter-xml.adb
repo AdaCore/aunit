@@ -29,8 +29,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings;        use Ada.Strings;
-with Ada.Strings.Fixed;  use Ada.Strings.Fixed;
+with Ada_Containers;     use Ada_Containers;
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
@@ -94,16 +93,16 @@ package body AUnit.Reporter.XML is
 
       Put_Line (File, "  <Statistics>");
       Put      (File, "    <Tests>");
-      Put (File, Trim (Test_Count (R)'Img, Left));
+      Put (File, Integer (Test_Count (R)));
       Put_Line (File, "</Tests>");
       Put      (File, "    <FailuresTotal>");
-      Put (File, Trim (Count_Type'Image (Failure_Count (R) + Error_Count (R)), Left));
+      Put (File, Integer (Failure_Count (R) + Error_Count (R)));
       Put_Line (File, "</FailuresTotal>");
       Put      (File, "    <Failures>");
-      Put (File, Trim (Failure_Count (R)'Img, Left));
+      Put (File, Integer (Failure_Count (R)));
       Put_Line (File, "</Failures>");
       Put      (File, "    <Errors>");
-      Put (File, Trim (Error_Count (R)'Img, Left));
+      Put (File, Integer (Error_Count (R)));
       Put_Line (File, "</Errors>");
       Put_Line (File, "  </Statistics>");
 
@@ -197,7 +196,7 @@ package body AUnit.Reporter.XML is
             Put      (File, Test.Failure.Source_Name.all);
             Put_Line (File, "</File>");
             Put      (File, "        <Line>");
-            Put      (File, Trim (Test.Failure.Line'Img, Left));
+            Put      (File, Integer (Test.Failure.Line));
             Put_Line (File, "</Line>");
             Put_Line (File, "      </Location>");
 

@@ -29,8 +29,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings;        use Ada.Strings;
-with Ada.Strings.Fixed;  use Ada.Strings.Fixed;
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
@@ -126,13 +124,13 @@ package body  AUnit.Reporter.GNATtest is
          Dump_Result_List (File, E);
       end;
 
-      Put      (File, Trim (Tests_Count'Img, Left));
+      Put      (File, Tests_Count);
       Put      (File, " tests run: ");
-      Put      (File, Trim (Passed_Count'Img, Left));
+      Put      (File, Passed_Count);
       Put      (File, " passed; ");
-      Put      (File, Trim (Failures_Count'Img, Left));
+      Put      (File, Failures_Count);
       Put      (File, " failed; ");
-      Put      (File, Trim (Crashes_Count'Img, Left));
+      Put      (File, Crashes_Count);
       Put_Line (File, " crashed.");
 
    end Report;
@@ -192,7 +190,7 @@ package body  AUnit.Reporter.GNATtest is
                Put      (File, " (");
                Put      (File, Test.Failure.Source_Name.all);
                Put      (File, ":");
-               Put      (File, Trim (Test.Failure.Line'Img, Left));
+               Put      (File, Integer (Test.Failure.Line));
                Put      (File, ")");
             end if;
             if Test.Elapsed /= Time_Measure.Null_Time then

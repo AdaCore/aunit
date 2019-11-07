@@ -29,24 +29,25 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.IO;
-
 package AUnit.IO is
 
-   subtype File_Type is GNAT.IO.File_Type;
+   type File_Type is new Integer;
 
-   type File_Access is access constant GNAT.IO.File_Type;
+   type File_Access is access constant File_Type;
 
    function Standard_Output
      return File_Access;
 
    procedure Put (File : File_Type;
-                  Item : String) renames GNAT.IO.Put;
+                  Item : Integer);
+
+   procedure Put (File : File_Type;
+                  Item : String);
 
    procedure Put_Line (File : File_Type;
-                       Item : String) renames GNAT.IO.Put_Line;
+                       Item : String);
 
    procedure New_Line (File    : File_Type;
-                       Spacing : Positive := 1) renames GNAT.IO.New_Line;
+                       Spacing : Positive := 1);
 
 end AUnit.IO;

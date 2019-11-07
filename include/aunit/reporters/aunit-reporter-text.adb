@@ -29,8 +29,6 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings;        use Ada.Strings;
-with Ada.Strings.Fixed;  use Ada.Strings.Fixed;
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
@@ -188,16 +186,16 @@ package body AUnit.Reporter.Text is
 
       New_Line (File);
       Put (File, "Total Tests Run:   ");
-      Put (File, Trim (Test_Count (R)'Img, Left));
+      Put (File, Integer (Test_Count (R)));
       New_Line (File);
       Put (File, "Successful Tests:  ");
-      Put (File, Trim (S_Count'Img, Left));
+      Put (File, S_Count);
       New_Line (File);
       Put (File, "Failed Assertions: ");
-      Put (File, Trim (F_Count'Img, Left));
+      Put (File, F_Count);
       New_Line (File);
       Put (File, "Unexpected Errors: ");
-      Put (File, Trim (E_Count'Img, Left));
+      Put (File, E_Count);
       New_Line (File);
 
       if Elapsed (R) /= Time_Measure.Null_Time then
@@ -241,7 +239,7 @@ package body AUnit.Reporter.Text is
          Put (File, "at ");
          Put (File, Test.Failure.Source_Name.all);
          Put (File, ":");
-         Put (File, Trim (Test.Failure.Line'Img, Left));
+         Put (File, Integer (Test.Failure.Line));
          New_Line (File);
 
       elsif Test.Error /= null then

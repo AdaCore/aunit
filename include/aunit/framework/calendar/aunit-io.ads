@@ -30,6 +30,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Text_IO;
+with Ada.Integer_Text_IO;
 
 package AUnit.IO is
 
@@ -39,6 +40,12 @@ package AUnit.IO is
 
    function Standard_Output
      return File_Access renames Ada.Text_IO.Standard_Output;
+
+   procedure Put (File  : File_Type;
+                  Item  : Integer;
+                  Width : Ada.Text_IO.Field := Ada.Integer_Text_IO.Default_Width;
+                  Base  : Ada.Text_IO.Number_Base := Ada.Integer_Text_IO.Default_Base)
+                  renames Ada.Integer_Text_IO.Put;
 
    procedure Put (File : File_Type;
                   Item : String) renames Ada.Text_IO.Put;
