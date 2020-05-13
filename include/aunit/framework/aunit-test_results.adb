@@ -106,28 +106,15 @@ package body AUnit.Test_Results is
       E : in out Result_Lists.List)
    is
       C : Result_Lists.Cursor;
-      Prev : Result_Lists.Cursor;
       use Result_Lists;
    begin
       C := First (R.Result_List);
-      Prev := No_Element;
 
       while Has_Element (C) loop
          if Test (C) then
-            Splice (Target   => E,
-                    Before   => No_Element,
-                    Source   => R.Result_List,
-                    Position => C);
-
-            if Prev = No_Element then
-               C := First (R.Result_List);
-            else
-               C := Next (Prev);
-            end if;
-         else
-            Prev := C;
-            Next (C);
+            E.Append (Element (C));
          end if;
+         Next (C);
       end loop;
    end Gen_Extract;
 
