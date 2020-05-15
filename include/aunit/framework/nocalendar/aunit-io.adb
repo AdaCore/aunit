@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                     A U N I T . T I M E _ M E A S U R E                  --
+--                        A U N I T . R E P O R T E R                       --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2019, AdaCore                      --
+--                       Copyright (C) 2019, AdaCore                        --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -29,43 +29,42 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Calendar;
-with AUnit.IO;
+with GNAT.IO; use GNAT.IO;
 
-package AUnit.Time_Measure is
+package body AUnit.IO is
 
-   type Time is record
-      Start : Ada.Calendar.Time;
-      Stop  : Ada.Calendar.Time;
-   end record;
+   Standard_Out : aliased constant File_Type := 1;
 
-   type AUnit_Duration is private;
+   function Standard_Output
+     return File_Access is
+     (Standard_Out'Access);
 
-   Null_Time : constant Time := (Start => Ada.Calendar.Time_Of (1901, 1, 1),
-                                 Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
+   procedure Put (File : File_Type;
+                  Item : Integer) is
+      pragma Unreferenced (File);
+   begin
+      Put (Item);
+   end Put;
 
-   procedure Start_Measure (T : in out Time);
-   --  Start a new measure
+   procedure Put (File : File_Type;
+                  Item : String) is
+      pragma Unreferenced (File);
+   begin
+      Put (Item);
+   end Put;
 
-   procedure Stop_Measure (T : in out Time);
-   --  Stop the measure
+   procedure Put_Line (File : File_Type;
+                       Item : String) is
+      pragma Unreferenced (File);
+   begin
+      Put_Line (Item);
+   end Put_Line;
 
-   function Get_Measure (T : Time) return AUnit_Duration;
-   --  Get the measure
+   procedure New_Line (File    : File_Type;
+                       Spacing : Positive := 1) is
+      pragma Unreferenced (File);
+   begin
+      New_Line (Spacing);
+   end New_Line;
 
-   generic
-      with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
-   procedure Gen_Put_Measure (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
-   --  Put the image of the measure
-
-   generic
-      with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
-   procedure Gen_Put_Measure_In_Seconds (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
-   --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
-   --  9 digits after decimal point.
-
-private
-
-   type AUnit_Duration is new Duration;
-
-end AUnit.Time_Measure;
+end AUnit.IO;

@@ -7,7 +7,7 @@
 --                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2014, AdaCore                      --
+--                    Copyright (C) 2006-2019, AdaCore                      --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -28,6 +28,9 @@
 -- GNAT is maintained by AdaCore (http://www.adacore.com)                   --
 --                                                                          --
 ------------------------------------------------------------------------------
+
+with Ada.Strings;       use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
 package body AUnit.Time_Measure is
 
@@ -63,7 +66,8 @@ package body AUnit.Time_Measure is
    -- Gen_Put_Measure --
    ---------------------
 
-   procedure Gen_Put_Measure (Measure : AUnit_Duration) is
+   procedure Gen_Put_Measure (File    : AUnit.IO.File_Type;
+                              Measure : AUnit_Duration) is
       H, M, S  : Integer := 0;
       T        : Duration := Duration (Measure);
       Force    : Boolean;
@@ -75,13 +79,13 @@ package body AUnit.Time_Measure is
       begin
          for Dig in reverse 1 .. Length - 1 loop
             if N < 10**Dig then
-               Put ("0");
+               Put (File, "0");
             else
                exit;
             end if;
          end loop;
 
-         Put (N);
+         Put (File, Trim (N'Img, Left));
       end Put;
 
    begin
@@ -105,40 +109,41 @@ package body AUnit.Time_Measure is
       Force := False;
 
       if H > 0 then
-         Put (H);
-         Put ("h");
+         Put (File, Trim (H'Img, Left));
+         Put (File, "h");
          Force := True;
       end if;
 
       if M > 0 or else Force then
          if not Force then
-            Put (M);
+            Put (File, Trim (M'Img, Left));
          else
             --  In case some output is already done, then we force a 2 digits
             --  output so that the output is normalized.
             Put (M, 2);
          end if;
 
-         Put ("min. ");
+         Put (File, "min. ");
          Force := True;
       end if;
 
       if not Force then
-         Put (S);
+         Put (File, Trim (S'Img, Left));
       else
          Put (S, 2);
       end if;
 
-      Put (".");
+      Put (File, ".");
       Put (Integer (T * 1_000_000.0), 6);
-      Put (" sec.");
+      Put (File, " sec.");
    end Gen_Put_Measure;
 
    --------------------------------
    -- Gen_Put_Measure_In_Seconds --
    --------------------------------
 
-   procedure Gen_Put_Measure_In_Seconds (Measure : AUnit_Duration) is
+   procedure Gen_Put_Measure_In_Seconds (File    : AUnit.IO.File_Type;
+                                         Measure : AUnit_Duration) is
       S  : Integer := 0;
       T  : Duration := Duration (Measure);
 
@@ -149,13 +154,13 @@ package body AUnit.Time_Measure is
       begin
          for Dig in reverse 1 .. Length - 1 loop
             if N < 10**Dig then
-               Put ("0");
+               Put (File, "0");
             else
                exit;
             end if;
          end loop;
 
-         Put (N);
+         Put (File, Trim (N'Img, Left));
       end Put;
 
    begin
@@ -165,11 +170,11 @@ package body AUnit.Time_Measure is
          T := T - 1.0;
       end loop;
 
-      Put (S);
+      Put (File, Trim (S'Img, Left));
 
-      Put (".");
+      Put (File, ".");
       Put (Integer (T * 1_000_000.0), 9);
-      Put ("s");
+      Put (File, "s");
    end Gen_Put_Measure_In_Seconds;
 
 end AUnit.Time_Measure;
