@@ -186,16 +186,16 @@ package body AUnit.Reporter.Text is
 
       New_Line (File);
       Put (File, "Total Tests Run:   ");
-      Put (File, Integer (Test_Count (R)));
+      Put (File, Integer (Test_Count (R)), 0);
       New_Line (File);
       Put (File, "Successful Tests:  ");
-      Put (File, S_Count);
+      Put (File, S_Count, 0);
       New_Line (File);
       Put (File, "Failed Assertions: ");
-      Put (File, F_Count);
+      Put (File, F_Count, 0);
       New_Line (File);
       Put (File, "Unexpected Errors: ");
-      Put (File, E_Count);
+      Put (File, E_Count, 0);
       New_Line (File);
 
       if Elapsed (R) /= Time_Measure.Null_Time then
