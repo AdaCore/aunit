@@ -21,30 +21,37 @@ project AUnit_Shared is
    type Exception_Type is ("fullexception", "certexception", "zfpexception");
    type Calendar_Type is ("calendar", "nocalendar");
    type Memory_type is ("nativememory", "nodealloc", "staticmemory");
+   type FileIO_Type is ("fileio", "nofileio");
 
    Except : Exception_Type := "fullexception";
    Calend : Calendar_Type := "calendar";
    Memory : Memory_Type := "nativememory";
+   FileIO : FileIO_Type := "fileio";
 
    case Runtime is
       when "zfp" =>
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "nodealloc";
+         FileIO := "nofileio";
       when "zfp-cross" =>
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
+         FileIO := "nofileio";
       when "ravenscar" =>
          Except := "certexception";
          Calend := "nocalendar";
+         FileIO := "nofileio";
       when "ravenscar-cert" =>
          Except := "certexception";
          Calend := "nocalendar";
          Memory := "staticmemory";
+         FileIO := "nofileio";
       when "cert" =>
          Except := "certexception";
          Memory := "staticmemory";
+         FileIO := "nofileio";
       when others =>
    end case;
 

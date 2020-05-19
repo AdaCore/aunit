@@ -12,7 +12,8 @@ project AUnit is
       "../../include/aunit/reporters",
       "../../include/aunit/framework/" & AUnit_Shared.Except,
       "../../include/aunit/framework/" & AUnit_Shared.Calend,
-      "../../include/aunit/framework/" & AUnit_Shared.Memory);
+      "../../include/aunit/framework/" & AUnit_Shared.Memory,
+      "../../include/aunit/framework/" & AUnit_Shared.FileIO);
 
    for Library_Dir use AUnit_Shared.Library_Dir;
 
