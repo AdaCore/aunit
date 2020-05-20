@@ -39,7 +39,9 @@ package AUnit.IO is
      return File_Access;
 
    procedure Put (File : File_Type;
-                  Item : Integer);
+                  Item : Integer;
+                  Width : Integer := 0;
+                  Base  : Integer := 0);
 
    procedure Put (File : File_Type;
                   Item : String);

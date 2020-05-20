@@ -40,8 +40,10 @@ package body AUnit.IO is
      (Standard_Out'Access);
 
    procedure Put (File : File_Type;
-                  Item : Integer) is
-      pragma Unreferenced (File);
+                  Item : Integer;
+                  Width : Integer := 0;
+                  Base  : Integer := 0) is
+      pragma Unreferenced (File, Width, Base);
    begin
       Put (Item);
    end Put;
