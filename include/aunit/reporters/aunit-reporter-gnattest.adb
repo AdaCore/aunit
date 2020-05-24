@@ -190,7 +190,7 @@ package body  AUnit.Reporter.GNATtest is
                Put      (File, " (");
                Put      (File, Test.Failure.Source_Name.all);
                Put      (File, ":");
-               Put      (File, Integer (Test.Failure.Line));
+               Put      (File, Integer (Test.Failure.Line), 0);
                Put      (File, ")");
             end if;
             if Test.Elapsed /= Time_Measure.Null_Time then
