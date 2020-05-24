@@ -239,7 +239,7 @@ package body AUnit.Reporter.Text is
          Put (File, "at ");
          Put (File, Test.Failure.Source_Name.all);
          Put (File, ":");
-         Put (File, Integer (Test.Failure.Line));
+         Put (File, Integer (Test.Failure.Line), 0);
          New_Line (File);
 
       elsif Test.Error /= null then

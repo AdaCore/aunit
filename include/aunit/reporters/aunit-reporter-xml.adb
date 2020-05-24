@@ -196,7 +196,7 @@ package body AUnit.Reporter.XML is
             Put      (File, Test.Failure.Source_Name.all);
             Put_Line (File, "</File>");
             Put      (File, "        <Line>");
-            Put      (File, Integer (Test.Failure.Line));
+            Put      (File, Integer (Test.Failure.Line), 0);
             Put_Line (File, "</Line>");
             Put_Line (File, "      </Location>");
 
