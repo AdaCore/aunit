@@ -36,6 +36,6 @@ package AUnit.Reporter.GNATtest is
    type GNATtest_Reporter is new Reporter with null record;
 
    procedure Report (Engine  : GNATtest_Reporter;
-                     R       : in out Result'Class;
+                     R       : Result'Class;
                      Options : AUnit_Options := Default_Options);
 end AUnit.Reporter.GNATtest;

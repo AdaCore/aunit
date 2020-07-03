@@ -43,7 +43,7 @@ package AUnit.Reporter is
 
    procedure Report
      (Engine  : Reporter;
-      R       : in out Result'Class;
+      R       : Result'Class;
       Options : AUnit_Options := Default_Options) is abstract;
    --  This procedure is called by AUnit.Run to report the result after running
    --  the whole testsuite (or the selected subset of tests).

@@ -59,7 +59,7 @@ package body AUnit.Test_Results is
 
    generic
       with function Test (Position : Result_Lists.Cursor) return Boolean;
-   procedure Gen_Extract (R : in out Result;
+   procedure Gen_Extract (R : Result;
                           E : in out Result_Lists.List);
 
    -------------------
@@ -102,7 +102,7 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Gen_Extract
-     (R : in out Result;
+     (R : Result;
       E : in out Result_Lists.List)
    is
       C : Result_Lists.Cursor;
@@ -233,7 +233,7 @@ package body AUnit.Test_Results is
    -- Errors --
    ------------
 
-   procedure Errors (R : in out Result;
+   procedure Errors (R : Result;
                      E : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
@@ -256,7 +256,7 @@ package body AUnit.Test_Results is
    -- Failures --
    --------------
 
-   procedure Failures (R : in out Result;
+   procedure Failures (R : Result;
                        F : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin
@@ -296,7 +296,7 @@ package body AUnit.Test_Results is
    -- Successes --
    ---------------
 
-   procedure Successes (R : in out Result;
+   procedure Successes (R : Result;
                         S : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Success);
    begin
