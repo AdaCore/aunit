@@ -1,6 +1,6 @@
 project AUnit_Shared is
 
-   Target := external ("PLATFORM", "native");
+   Target := external ("AUNIT_PLATFORM", "native");
 
    type Runtime_Type is
       (
@@ -12,9 +12,9 @@ project AUnit_Shared is
        "cert"            -- used for cert runtimes
       );
 
-   Runtime : Runtime_Type := external ("RUNTIME", "full");
+   Runtime : Runtime_Type := external ("AUNIT_RUNTIME", "full");
 
-   Library_Dir := external ("LIBDIR", "../aunit/" & Target & "-" & Runtime);
+   Library_Dir := external ("AUNIT_LIBDIR", "../aunit/" & Target & "-" & Runtime);
 
    for Source_Dirs use ();
 
