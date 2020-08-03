@@ -4,7 +4,7 @@ with "aunit_shared";
 project AUnit is
 
    type Compilation_Mode_Type is ("Devel", "Install");
-   Mode : Compilation_Mode_Type := external ("MODE", "Install");
+   Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Install");
 
    for Source_Dirs use
      ("../../include/aunit/framework",
@@ -17,7 +17,7 @@ project AUnit is
 
    for Library_Dir use AUnit_Shared.Library_Dir;
 
-   Obj_Dir := external ("OBJDIR", "../aunit-obj/"
+   Obj_Dir := external ("AUNIT_OBJDIR", "../aunit-obj/"
                         & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
    for Object_Dir use Obj_Dir;
 
