@@ -59,7 +59,7 @@ package body AUnit.Test_Results is
 
    generic
       with function Test (Position : Result_Lists.Cursor) return Boolean;
-   procedure Gen_Extract (R : in out Result;
+   procedure Gen_Extract (R : Result;
                           E : in out Result_Lists.List);
 
    -------------------
@@ -102,32 +102,19 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Gen_Extract
-     (R : in out Result;
+     (R : Result;
       E : in out Result_Lists.List)
    is
       C : Result_Lists.Cursor;
-      Prev : Result_Lists.Cursor;
       use Result_Lists;
    begin
       C := First (R.Result_List);
-      Prev := No_Element;
 
       while Has_Element (C) loop
          if Test (C) then
-            Splice (Target   => E,
-                    Before   => No_Element,
-                    Source   => R.Result_List,
-                    Position => C);
-
-            if Prev = No_Element then
-               C := First (R.Result_List);
-            else
-               C := Next (Prev);
-            end if;
-         else
-            Prev := C;
-            Next (C);
+            E.Append (Element (C));
          end if;
+         Next (C);
       end loop;
    end Gen_Extract;
 
@@ -246,7 +233,7 @@ package body AUnit.Test_Results is
    -- Errors --
    ------------
 
-   procedure Errors (R : in out Result;
+   procedure Errors (R : Result;
                      E : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
@@ -269,7 +256,7 @@ package body AUnit.Test_Results is
    -- Failures --
    --------------
 
-   procedure Failures (R : in out Result;
+   procedure Failures (R : Result;
                        F : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin
@@ -309,7 +296,7 @@ package body AUnit.Test_Results is
    -- Successes --
    ---------------
 
-   procedure Successes (R : in out Result;
+   procedure Successes (R : Result;
                         S : in out Result_Lists.List) is
       procedure Extract is new Gen_Extract (Is_Success);
    begin

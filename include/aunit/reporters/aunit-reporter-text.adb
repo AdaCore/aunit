@@ -48,12 +48,12 @@ package body AUnit.Reporter.Text is
    --  Report a single assertion failure or unexpected exception
 
    generic
-      with procedure Get (R : in out Result; L : in out Result_Lists.List);
+      with procedure Get (R : Result; L : in out Result_Lists.List);
       Label : String;
       Color : String;
    procedure Report_Tests
       (Engine : Text_Reporter;
-       R      : in out Result'Class;
+       R      : Result'Class;
        File   : File_Type);
    --  Report a series of tests
 
@@ -113,7 +113,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report_Tests
       (Engine : Text_Reporter;
-       R      : in out Result'Class;
+       R      : Result'Class;
        File   : File_Type)
    is
       S : Result_Lists.List;
@@ -136,7 +136,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report_OK_Tests
       (Engine : Text_Reporter;
-       R      : in out Result'Class)
+       R      : Result'Class)
    is
       procedure Internal is new Report_Tests (Successes, "OK", ANSI_Green);
    begin
@@ -145,7 +145,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report_Fail_Tests
       (Engine : Text_Reporter;
-       R      : in out Result'Class)
+       R      : Result'Class)
    is
       procedure Internal is new Report_Tests (Failures, "FAIL", ANSI_Purple);
    begin
@@ -154,7 +154,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report_Error_Tests
       (Engine : Text_Reporter;
-       R      : in out Result'Class)
+       R      : Result'Class)
    is
       procedure Internal is new Report_Tests (Errors, "ERROR", ANSI_Red);
    begin
@@ -167,7 +167,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report
      (Engine  : Text_Reporter;
-      R       : in out Result'Class;
+      R       : Result'Class;
       Options : AUnit_Options := Default_Options)
    is
       File    : File_Type renames Engine.File.all;

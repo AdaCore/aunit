@@ -33,13 +33,13 @@ with Ada_Containers.AUnit_Lists;
 
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
---  Test reporting.
+--  Test reporting
 --
 package AUnit.Test_Results is
 
    type Result is tagged limited private;
    --  Record result. A result object is associated with the execution of a
-   --  top-level test suite.
+   --  top-level test suite
 
    type Test_Failure is record
       Message     : Message_String;
@@ -102,15 +102,15 @@ package AUnit.Test_Results is
    function Error_Count (R : Result) return Count_Type;
    --  Number of routines with unexpected exceptions
 
-   procedure Errors (R : in out Result;
+   procedure Errors (R : Result;
                      E : in out Result_Lists.List);
-   --  List of routines with unexpected exceptions. This resets the list.
+   --  List of routines with unexpected exceptions
 
    function Failure_Count (R : Result) return Count_Type;
    --  Number of failed routines
 
-   procedure Failures (R : in out Result; F : in out Result_Lists.List);
-   --  List of failed routines. This resets the list.
+   procedure Failures (R : Result; F : in out Result_Lists.List);
+   --  List of failed routines
 
    function Elapsed (R : Result) return Time;
    --  Elapsed time for test execution
@@ -121,8 +121,8 @@ package AUnit.Test_Results is
    function Success_Count (R : Result) return Count_Type;
    --  Number of successful routines
 
-   procedure Successes (R : in out Result; S : in out Result_Lists.List);
-   --  List of successful routines. This resets the list.
+   procedure Successes (R : Result; S : in out Result_Lists.List);
+   --  List of successful routines
 
    function Successful (R : Result) return Boolean;
    --  All routines successful?
