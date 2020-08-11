@@ -5,3 +5,22 @@ from the JUnit/CPPUnit frameworks for Java/C++. Read the AUnit Cookbook,
 available in doc/ in a number of formats, for installation and usage.
 
 AUnit is maintained by AdaCore. Please report problems at report@adacore.com
+
+NOTE FOR CONTRIBUTORS
+---------------------
+
+AUnit is intended to be used on bareboard targets that have a very
+limited runtime library, so many things like containers, finalization,
+exception propagation and so on cannot be used in the main framework
+unconditionally. For full list of restrictions see following parts of
+GNAT User’s Guide Supplement for Cross Platforms:
+
+* [4.2.2. Ada Restrictions in the Zero Footprint Profile](http://docs.adacore.com/live/wave/gnat_ugx/html/gnat_ugx/gnat_ugx/the_predefined_profiles.html#ada-restrictions-in-the-zero-footprint-profile)
+
+* [4.2.3. Predefined Packages in the Zero Footprint Profile](http://docs.adacore.com/live/wave/gnat_ugx/html/gnat_ugx/gnat_ugx/the_predefined_profiles.html#predefined-packages-in-the-zero-footprint-profile)
+
+Other language features and predefined packages may be used in conditional
+way, by either providing the same API across different scenarios or adding
+new units for full runtime scenario only. An example of such conditional usage
+is FileIO variable from lib/gnat/aunit_shared.gpr that selects between
+include/aunit/framework/fileio and include/aunit/framework/nofileio.
