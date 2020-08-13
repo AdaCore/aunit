@@ -2,9 +2,9 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                        A U N I T . R E P O R T E R                       --
+--                              A U N I T . I O                             --
 --                                                                          --
---                                 S p e c                                  --
+--                                 B o d y                                  --
 --                                                                          --
 --                                                                          --
 --                       Copyright (C) 2019, AdaCore                        --
