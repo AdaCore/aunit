@@ -29,42 +29,27 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with GNAT.IO; use GNAT.IO;
+package AUnit.IO is
 
-package body AUnit.IO is
+   type File_Type is new Integer;
 
-   Standard_Out : aliased constant File_Type := 1;
+   type File_Access is access constant File_Type;
 
    function Standard_Output
-     return File_Access is
-     (Standard_Out'Access);
+     return File_Access;
 
    procedure Put (File : File_Type;
-                  Item : Integer) is
-      pragma Unreferenced (File);
-   begin
-      Put (Item);
-   end Put;
+                  Item : Integer;
+                  Width : Integer := 0;
+                  Base  : Integer := 0);
 
    procedure Put (File : File_Type;
-                  Item : String) is
-      pragma Unreferenced (File);
-   begin
-      Put (Item);
-   end Put;
+                  Item : String);
 
    procedure Put_Line (File : File_Type;
-                       Item : String) is
-      pragma Unreferenced (File);
-   begin
-      Put_Line (Item);
-   end Put_Line;
+                       Item : String);
 
    procedure New_Line (File    : File_Type;
-                       Spacing : Positive := 1) is
-      pragma Unreferenced (File);
-   begin
-      New_Line (Spacing);
-   end New_Line;
+                       Spacing : Positive := 1);
 
 end AUnit.IO;

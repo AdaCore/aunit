@@ -71,7 +71,7 @@ package body AUnit.Reporter.XML is
    ------------
 
    procedure Report (Engine  : XML_Reporter;
-                     R       : in out Result'Class;
+                     R       : Result'Class;
                      Options : AUnit_Options := Default_Options)
    is
       T    : AUnit_Duration;
@@ -93,16 +93,16 @@ package body AUnit.Reporter.XML is
 
       Put_Line (File, "  <Statistics>");
       Put      (File, "    <Tests>");
-      Put (File, Integer (Test_Count (R)));
+      Put (File, Integer (Test_Count (R)), 0);
       Put_Line (File, "</Tests>");
       Put      (File, "    <FailuresTotal>");
-      Put (File, Integer (Failure_Count (R) + Error_Count (R)));
+      Put (File, Integer (Failure_Count (R) + Error_Count (R)), 0);
       Put_Line (File, "</FailuresTotal>");
       Put      (File, "    <Failures>");
-      Put (File, Integer (Failure_Count (R)));
+      Put (File, Integer (Failure_Count (R)), 0);
       Put_Line (File, "</Failures>");
       Put      (File, "    <Errors>");
-      Put (File, Integer (Error_Count (R)));
+      Put (File, Integer (Error_Count (R)), 0);
       Put_Line (File, "</Errors>");
       Put_Line (File, "  </Statistics>");
 
@@ -196,7 +196,7 @@ package body AUnit.Reporter.XML is
             Put      (File, Test.Failure.Source_Name.all);
             Put_Line (File, "</File>");
             Put      (File, "        <Line>");
-            Put      (File, Integer (Test.Failure.Line));
+            Put      (File, Integer (Test.Failure.Line), 0);
             Put_Line (File, "</Line>");
             Put_Line (File, "      </Location>");
 

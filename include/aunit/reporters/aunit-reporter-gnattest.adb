@@ -85,7 +85,7 @@ package body  AUnit.Reporter.GNATtest is
    ------------
 
    procedure Report (Engine  : GNATtest_Reporter;
-                     R       : in out Result'Class;
+                     R       : Result'Class;
                      Options : AUnit_Options := Default_Options)
    is
       File : File_Type renames Engine.File.all;
@@ -124,13 +124,13 @@ package body  AUnit.Reporter.GNATtest is
          Dump_Result_List (File, E);
       end;
 
-      Put      (File, Tests_Count);
+      Put      (File, Tests_Count, 0);
       Put      (File, " tests run: ");
-      Put      (File, Passed_Count);
+      Put      (File, Passed_Count, 0);
       Put      (File, " passed; ");
-      Put      (File, Failures_Count);
+      Put      (File, Failures_Count, 0);
       Put      (File, " failed; ");
-      Put      (File, Crashes_Count);
+      Put      (File, Crashes_Count, 0);
       Put_Line (File, " crashed.");
 
    end Report;
@@ -190,7 +190,7 @@ package body  AUnit.Reporter.GNATtest is
                Put      (File, " (");
                Put      (File, Test.Failure.Source_Name.all);
                Put      (File, ":");
-               Put      (File, Integer (Test.Failure.Line));
+               Put      (File, Integer (Test.Failure.Line), 0);
                Put      (File, ")");
             end if;
             if Test.Elapsed /= Time_Measure.Null_Time then
