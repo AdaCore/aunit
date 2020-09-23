@@ -2,9 +2,9 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                          A U N I T . T E S T S                           --
+--                    A U N I T . T E S T _ F I L T E R S                   --
 --                                                                          --
---                                 S p e c                                  --
+--                                 B o d y                                  --
 --                                                                          --
 --                   Copyright (C) 2009-2011, AdaCore                       --
 --                                                                          --
