@@ -67,7 +67,7 @@ package body AUnit.Reporter.JUnit is
          Put (File, "        File: ");
          Put_Line (File, Test.Failure.Source_Name.all);
          Put (File, "        Line: ");
-         Put (File, Integer (Test.Failure.Line));
+         Put (File, Integer (Test.Failure.Line), 0);
          New_Line (File);
          Put_Line (File, "]]>");
          Put_Line (File, "</failure>");
@@ -113,11 +113,11 @@ package body AUnit.Reporter.JUnit is
       Put_Line (File, "<?xml version=""1.0"" encoding=""utf-8""?>");
       Put_Line (File, "<testsuites>");
       Put (File, "<testsuite name=""" & "aunit_testsuite" & """ skipped=""0"" tests=""");
-      Put (File, Integer (Test_Count (R)));
+      Put (File, Integer (Test_Count (R)), 0);
       Put (File, """ failures=""");
-      Put (File, Integer (Failure_Count (R)));
+      Put (File, Integer (Failure_Count (R)), 0);
       Put (File, """ errors=""");
-      Put (File, Integer (Error_Count (R)));
+      Put (File, Integer (Error_Count (R)), 0);
       if T /= Time_Measure.Null_Time then
          Put (File, """ time=""");
          Put_Measure (File, Get_Measure (T));
