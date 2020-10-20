@@ -36,17 +36,17 @@ def get_version():
             line = (vinfo.readline()).strip()
             return line
     except:
-        print 'Error opening or reading version_information file'
+        print ('Error opening or reading version_information file')
         sys.exit(1)
 
 # First retrieve the name of the documentation we are building
 doc_name = os.environ.get('DOC_NAME', None)
 if doc_name is None:
-    print 'DOC_NAME environment variable should be set'
+    print ('DOC_NAME environment variable should be set')
     sys.exit(1)
 
 if doc_name not in DOCS:
-    print '%s is not a valid documentation name' % doc_name
+    print ('%s is not a valid documentation name' % doc_name)
     sys.exit(1)
 
 # Exclude sources that are not part of the current documentation
@@ -54,7 +54,7 @@ exclude_patterns = []
 for d in os.listdir(root_source_dir):
     if d not in ('share', doc_name, doc_name + '.rst'):
         exclude_patterns.append(d)
-        print 'ignoring %s' % d
+        print ('ignoring %s' % d)
 
 extensions = []
 templates_path = ['_templates']
