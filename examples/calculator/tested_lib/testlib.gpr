@@ -13,7 +13,7 @@ project TestLib is
 
    package Compiler is
       for Default_Switches ("ada") use
-        ("-g", "-O0", "-gnat05", "-gnatwae", "-gnaty", "-gnata");
+        ("-g", "-O0", "-gnatwae", "-gnaty", "-gnata");
       case Coverage is
       when "yes" =>
          for Default_Switches ("ada") use Compiler'Default_Switches ("ada") &
