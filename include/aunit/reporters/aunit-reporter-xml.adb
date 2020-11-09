@@ -71,7 +71,7 @@ package body AUnit.Reporter.XML is
    ------------
 
    procedure Report (Engine  : XML_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options)
    is
       T    : AUnit_Duration;
