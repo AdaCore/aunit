@@ -167,7 +167,7 @@ package body AUnit.Reporter.Text is
 
    procedure Report
      (Engine  : Text_Reporter;
-      R       : Result'Class;
+      R       : in out Result'Class;
       Options : AUnit_Options := Default_Options)
    is
       File    : File_Type renames Engine.File.all;
