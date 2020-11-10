@@ -42,7 +42,7 @@ package AUnit.Reporter.Text is
    --  By default, no color is used.
 
    procedure Report (Engine  : Text_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options);
 
    procedure Report_OK_Tests (Engine : Text_Reporter;

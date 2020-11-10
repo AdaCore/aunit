@@ -85,7 +85,7 @@ package body  AUnit.Reporter.GNATtest is
    ------------
 
    procedure Report (Engine  : GNATtest_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options)
    is
       File : File_Type renames Engine.File.all;
