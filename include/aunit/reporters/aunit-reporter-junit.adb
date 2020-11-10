@@ -104,7 +104,7 @@ package body AUnit.Reporter.JUnit is
    end Dump_Result_List;
    
    procedure Report (Engine  : JUnit_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options)
    is     
       File : File_Type renames Engine.File.all;

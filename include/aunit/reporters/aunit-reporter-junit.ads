@@ -35,7 +35,7 @@ package AUnit.Reporter.JUnit is
    type JUnit_Reporter is new Reporter with null record;
       
    procedure Report (Engine  : JUnit_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options);
 
 end AUnit.Reporter.JUnit;
