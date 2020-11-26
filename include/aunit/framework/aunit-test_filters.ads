@@ -51,6 +51,7 @@ package AUnit.Test_Filters is
    procedure Set_Name
      (Filter : in out Name_Filter; Name : String);
    --  Set the name of the test(s) to run.
+   --  If Exact_Match is set to True, only test with given name will be run.
    --  The name can take several forms:
    --     * Either the fully qualified name of the test (including routine).
    --       For instance, if you have an instance of
@@ -61,6 +62,10 @@ package AUnit.Test_Filters is
    --       all routines for instance
    --  If the name is the empty string, all tests will be run
 
+   procedure Set_Exact_Match (Filter      : in out Name_Filter;
+                              Exact_Match : Boolean);
+   --  Enables/disables exact name matching
+
    function Is_Active
      (Filter : Name_Filter;
       T      : AUnit.Tests.Test'Class) return Boolean;
@@ -70,7 +75,8 @@ private
    type Test_Filter is abstract tagged limited null record;
 
    type Name_Filter is new Test_Filter with record
-      Name : Message_String;
+      Name        : Message_String;
+      Exact_Match : Boolean := False;
    end record;
 
 end AUnit.Test_Filters;
