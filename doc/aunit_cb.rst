@@ -26,7 +26,7 @@ in the section entitled :ref:`gnu_fdl`.
    aunit_cb/suite
    aunit_cb/reporting
    aunit_cb/test_organization
-   aunit_cb/using_aunit_with_restricted_run-time_libraries
+   aunit_cb/restricted_runtimes
    aunit_cb/installation_and_use   
    aunit_cb/gps_support   
 
