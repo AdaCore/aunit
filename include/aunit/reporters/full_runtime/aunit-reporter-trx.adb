@@ -155,7 +155,8 @@ package body AUnit.Reporter.TRX is
                Put_Line (File, "Assertion failed on line"
                          & SU.To_String (Test.Line)
                          & " of " & SU.To_String (Test.Failure_Source_Name)
-                         & ": """ & SU.To_String (Test.Failure_Message) & """");
+                         & ": """
+                         & SU.To_String (Test.Failure_Message) & """");
             else
                Put_Line (File, "Raised " & SU.To_String (Test.Exception_Name)
                          & ":");
