@@ -106,7 +106,7 @@ package body AUnit.Reporter.TRX is
    end Get_All_Results;
 
    procedure Report (Engine  : TRX_Reporter;
-                     R       : Result'Class;
+                     R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options)
    is
       pragma Unreferenced (Options);

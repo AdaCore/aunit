@@ -36,7 +36,7 @@ package AUnit.Reporter.TRX is
    overriding
    procedure Report
      (Engine  : TRX_Reporter;
-      R       : Result'Class;
+      R       : in out Result'Class;
       Options : AUnit_Options := Default_Options);
 
 end AUnit.Reporter.TRX;
