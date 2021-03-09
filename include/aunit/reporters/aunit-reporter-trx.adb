@@ -134,7 +134,9 @@ package body AUnit.Reporter.TRX is
       end Report_Test_Name;
 
       -- I found this example trx file
+      pragma Style_Checks ("M200"); -- Allow long lines
       -- https://github.com/x97mdr/pickles/blob/master/src/Pickles/Pickles.Test/results-example-mstest.trx
+      pragma Style_Checks ("M79");
       -- it says UnitTestResult can have StdOut (text) and ErrorInfo 
       -- containing Message and StackTrace
       procedure Report_Test (Test_Cursor : Test_Data_Vecs.Cursor) is
