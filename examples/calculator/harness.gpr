@@ -26,7 +26,7 @@ project Harness is
    package Compiler is
       for Default_Switches ("ada") use
         ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato",
-         "-gnatwa.Xe", "-gnaty", "-gnat05");
+         "-gnatwa.Xe", "-gnaty");
    end Compiler;
 
 end Harness;

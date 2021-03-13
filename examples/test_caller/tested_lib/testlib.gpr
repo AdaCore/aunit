@@ -10,7 +10,7 @@ project TestLib is
 
    package Compiler is
       for Default_Switches ("ada") use
-            ("-g", "-O1", "-gnat05", "-gnatwa.Xe", "-gnaty", "-gnata", "-gnatf");
+            ("-g", "-O1", "-gnatwa.Xe", "-gnaty", "-gnata", "-gnatf");
    end Compiler;
 
 end TestLib;
