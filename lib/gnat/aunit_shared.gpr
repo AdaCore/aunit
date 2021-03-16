@@ -50,6 +50,7 @@ project AUnit_Shared is
          FileIO := "nofileio";
       when "cert" =>
          Except := "zfpexception";
+         Calend := "nocalendar";
          Memory := "staticmemory";
          FileIO := "nofileio";
       when others =>
