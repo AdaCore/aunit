@@ -3,9 +3,6 @@ with "aunit_shared";
 
 project AUnit is
 
-   type Compilation_Mode_Type is ("Devel", "Install");
-   Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Install");
-
    for Source_Dirs use
      ("../../include/aunit/framework",
       "../../include/aunit/containers",
@@ -15,21 +12,35 @@ project AUnit is
       "../../include/aunit/framework/" & AUnit_Shared.Memory,
       "../../include/aunit/framework/" & AUnit_Shared.FileIO);
 
-   for Library_Dir use AUnit_Shared.Library_Dir;
-
-   Obj_Dir := external ("AUNIT_OBJDIR", "../aunit-obj/"
-                        & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
-   for Object_Dir use Obj_Dir;
-
    for Library_Name use "aunit";
-   for Library_Kind use "static";
+
+   case AUnit_Shared.Soversion is
+      when "" =>
+         for Library_Kind use "static";
+      when others =>
+         for Library_Kind use "dynamic";
+         for Library_Version use "lib" & project'Library_name & ".so."
+           & AUnit_Shared.Soversion;
+         --  Put options like --as-needed before the libraries.
+         for Leading_Library_Options use AUnit_Shared.Ldflags;
+   end case;
+
+   for Library_Dir use "../aunit/"
+     & AUnit_Shared.Target & "-"
+     & AUnit_Shared.Runtime & "-"
+     & project'Library_Kind;
+
+   for Object_Dir use "../aunit-obj/"
+     & AUnit_Shared.Target & "-"
+     & AUnit_Shared.Runtime & "-"
+     & project'Library_Kind;
 
    --------------
    -- Compiler --
    --------------
 
    package Compiler is
-      case Mode is
+      case AUnit_Shared.Mode is
          when "Devel" =>
             for Default_Switches ("ada") use
               ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato",
@@ -39,6 +50,9 @@ project AUnit is
             for Default_Switches ("ada") use
               ("-O2", "-gnatp", "-gnatn", "-gnatwa.X");
       end case;
+      --  Allow user flags to override default flags.
+      for Default_Switches ("ada") use Compiler'Default_Switches ("ada")
+        & AUnit_Shared.Adaflags;
 
       for Switches ("aunit.adb") use
         Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");

@@ -1,5 +1,8 @@
 project AUnit_Shared is
 
+   type Compilation_Mode_Type is ("Devel", "Install");
+   Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Install");
+
    Target := external ("AUNIT_PLATFORM", "native");
 
    type Runtime_Type is
@@ -14,7 +17,12 @@ project AUnit_Shared is
 
    Runtime : Runtime_Type := external ("AUNIT_RUNTIME", "full");
 
-   Library_Dir := external ("AUNIT_LIBDIR", "../aunit/" & Target & "-" & Runtime);
+   --  The default is empty, and requires a static build.
+   --  A non-empty soversion requires a shared library.
+   Soversion := External ("aunit_SOVERSION", "");
+
+   Adaflags  := External_As_List ("ADAFLAGS", " ");
+   Ldflags   := External_As_List ("LDFLAGS",  " ");
 
    for Source_Dirs use ();
 

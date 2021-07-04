@@ -24,8 +24,11 @@ MODE = Install
 
 CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
+# User may set this variable to pass more arguments to gpr* tools.
+USER_GPR_ARGS :=
+
 GPROPTS = $(CONF_ARGS) -XAUNIT_BUILD_MODE=$(MODE) -XAUNIT_RUNTIME=$(RTS) \
-		-XAUNIT_PLATFORM=$(TARGET)
+		-XAUNIT_PLATFORM=$(TARGET) $(USER_GPR_ARGS)
 
 .PHONY: all clean targets install_clean install
 
