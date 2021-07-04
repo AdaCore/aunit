@@ -45,7 +45,9 @@ clean:
 	-rm -rf $(BUILDDIR)/*/html \
 		$(BUILDDIR)/*/pdf \
 		$(BUILDDIR)/*/txt \
-		$(BUILDDIR)/*/info
+		$(BUILDDIR)/*/info \
+		$(BUILDDIR)/*/doctrees \
+		share/__pycache__
 
 %.html:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/$*/html

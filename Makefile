@@ -36,7 +36,7 @@ clean-lib:
 	$(RM) -fr lib/aunit lib/aunit-obj
 
 clean: clean-lib
-	-${MAKE} -C docs clean
+	-${MAKE} -C doc clean
 
 install-clean-legacy:
 ifneq (,$(wildcard $(INSTALL)/lib/gnat/manifests/aunit))
