@@ -9,7 +9,8 @@ project AUnit_Shared is
        "zfp-cross",      -- used for zfp runtimes on some cross ports
        "ravenscar",      -- used for full ravenscar runtimes
        "ravenscar-cert", -- used for ravenscar-cert runtimes
-       "cert"            -- used for cert runtimes
+       "cert",           -- used for cert runtimes
+       "ravenscar-sfp"   -- used for ravenscar-sfp for bareboard
       );
 
    Runtime : Runtime_Type := external ("AUNIT_RUNTIME", "full");
@@ -29,7 +30,7 @@ project AUnit_Shared is
    FileIO : FileIO_Type := "fileio";
 
    case Runtime is
-      when "zfp" =>
+      when "zfp" | "ravenscar-sfp" =>
          Except := "zfpexception";
          Calend := "nocalendar";
          Memory := "nodealloc";
