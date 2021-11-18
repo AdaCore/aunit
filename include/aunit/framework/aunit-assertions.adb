@@ -76,7 +76,11 @@ package body AUnit.Assertions is
          Failure_Lists.Append
            (Failures,
             (Failure => (Format (Message), Format (Source), Line),
-             Id      => The_Current_Test.Id));
+             Id      =>
+             --  Allow calling Assert without an AUnit framework
+               (if The_Current_Test = null
+                then Null_Id
+                else The_Current_Test.Id)));
       end if;
 
       return Condition;
