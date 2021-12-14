@@ -1,10 +1,9 @@
 --
---  Copyright (C) 2009-2010, AdaCore
+--  Copyright (C) 2009-2021, AdaCore
 --
 
 with AUnit.Test_Fixtures;
 with AUnit.Test_Results;
-with AUnit.Test_Suites;
 
 package AUnit.Test_Suites.Tests is
 
