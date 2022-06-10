@@ -622,7 +622,6 @@ package body Ada_Containers.AUnit_Lists is
       Count     : Count_Type := 1)
    is
       Position : Cursor;
-      pragma Unreferenced (Position);
    begin
       Insert (Container, Before, New_Item, Position, Count);
    end Insert;
