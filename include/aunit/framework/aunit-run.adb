@@ -82,7 +82,6 @@ package body AUnit.Run is
    is
       Results : Test_Results.Result;
       Outcome : Status;
-      pragma Unreferenced (Outcome);
    begin
       Test_Results.Clear (Results);
       Run (Suite, Results, Options, Reporter, Outcome);
@@ -115,7 +114,6 @@ package body AUnit.Run is
       Options  : AUnit.Options.AUnit_Options := AUnit.Options.Default_Options)
    is
       Outcome : Status;
-      pragma Unreferenced (Outcome);
    begin
       Run (Suite, Results, Options, Reporter, Outcome);
    end Test_Runner_With_Results;
