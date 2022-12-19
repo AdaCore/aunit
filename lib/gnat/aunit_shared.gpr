@@ -45,12 +45,12 @@ project AUnit_Shared is
          FileIO := "nofileio";
       when "ravenscar-cert" =>
          Except := "certexception";
-         Calend := "nocalendar";
+         Calend := "calendar";
          Memory := "staticmemory";
          FileIO := "nofileio";
       when "cert" =>
-         Except := "zfpexception";
-         Calend := "nocalendar";
+         Except := "certexception";
+         Calend := "calendar";
          Memory := "staticmemory";
          FileIO := "nofileio";
       when others =>
