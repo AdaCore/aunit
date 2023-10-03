@@ -71,8 +71,11 @@ release = get_version()
 
 pygments_style = None
 html_theme = 'sphinx_rtd_theme'
-if os.path.isfile('adacore_transparent.png'):
-    html_logo = 'adacore_transparent.png'
+html_theme_options = {
+    "style_nav_header_background": "#12284c",
+}
+if os.path.isfile('adacore-logo-white.png'):
+    html_logo = 'adacore-logo-white.png'
 if os.path.isfile('favicon.ico'):
     html_favicon = 'favicon.ico'
 
