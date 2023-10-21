@@ -58,6 +58,16 @@ package body AUnit.Test_Filters is
       Filter.Name := Format (Name);
    end Set_Name;
 
+   ---------------------
+   -- Set_Exact_Match --
+   ---------------------
+
+   procedure Set_Exact_Match (Filter      : in out Name_Filter;
+                              Exact_Match : Boolean) is
+   begin
+      Filter.Exact_Match := Exact_Match;
+   end Set_Exact_Match;
+
    ---------------
    -- Is_Active --
    ---------------
@@ -80,15 +90,28 @@ package body AUnit.Test_Filters is
       end if;
 
       if Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null then
-         return Starts_With
-           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
-            Filter.Name.all);
+         if Filter.Exact_Match then
+            return Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+               = Filter.Name.all;
+         else
+            return Starts_With
+               (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+                Filter.Name.all);
+         end if;
       else
-         return Starts_With
-           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
-            & " : "
-            & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
-            Filter.Name.all);
+         if Filter.Exact_Match then
+            return Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+                   & " : "
+                   & Routine_Name
+                      (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+                   = Filter.Name.all;
+         else
+            return Starts_With
+              (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+               & " : "
+               & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+               Filter.Name.all);
+         end if;
       end if;
    end Is_Active;
 
