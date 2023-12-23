@@ -18,11 +18,21 @@ project AUnit is
    for Library_Dir use AUnit_Shared.Library_Dir;
 
    Obj_Dir := external ("AUNIT_OBJDIR", "../aunit-obj/"
-                        & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
+                        & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime
+                        & "-" & AUnit_Shared.Library_Kind);
    for Object_Dir use Obj_Dir;
 
    for Library_Name use "aunit";
-   for Library_Kind use "static";
+   for Library_Kind use AUnit_Shared.Library_Kind;
+   for Library_Version use
+     external ("AUNIT_LIBRARY_VERSION", "libaunit.so.0.0");
+
+   case AUnit_Shared.Library_Kind is
+      when "dynamic" | "relocatable" =>
+         --  Put options like --as-needed before the libraries.
+         for Leading_Library_Options use external_As_List ("LDFLAGS", " ");
+      when others =>
+   end case;
 
    --------------
    -- Compiler --
@@ -39,6 +49,10 @@ project AUnit is
             for Default_Switches ("ada") use
               ("-O2", "-gnatp", "-gnatn", "-gnatwa.X");
       end case;
+
+      --  Allow user flags to override default flags.
+      for Default_Switches ("ada") use
+        Compiler'Default_Switches ("ada") & external_As_List ("ADAFLAGS", " ");
 
       for Switches ("aunit.adb") use
         Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");
