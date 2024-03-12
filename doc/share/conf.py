@@ -79,16 +79,17 @@ if os.path.isfile('adacore-logo-white.png'):
 if os.path.isfile('favicon.ico'):
     html_favicon = 'favicon.ico'
 
-html_static_path = ['_static']
-
 latex_elements = {
     'preamble': latex_elements.TOC_DEPTH +
     latex_elements.PAGE_BLANK +
     latex_elements.TOC_CMD +
     latex_elements.LATEX_HYPHEN +
-    latex_elements.doc_settings(DOCS[doc_name]['title'],
-                                get_version()),
-    'tableofcontents': latex_elements.TOC}
+    latex_elements.doc_settings(DOCS[doc_name]['title'], get_version()) +
+    latex_elements.FOOTER,
+    'tableofcontents': latex_elements.TOC
+}
+
+latex_table_style = ["standard", "colorrows"]
 
 latex_documents = [
     (master_doc, '%s.tex' % doc_name, project, u'AdaCore', 'manual')]
@@ -99,5 +100,5 @@ texinfo_documents = [
 
 
 def setup(app):
-    app.add_lexer('ada', ada_pygments.AdaLexer())
-    app.add_lexer('gpr', ada_pygments.GNATProjectLexer())
+    app.add_lexer('ada', ada_pygments.AdaLexer)
+    app.add_lexer('gpr', ada_pygments.GNATProjectLexer)

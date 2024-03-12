@@ -54,7 +54,6 @@ clean:
 
 %.pdf:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/$*/pdf
-	cp $(SOURCEDIR)/share/sphinx.sty $(BUILDDIR)/$*/pdf
 	$(MAKE) -C $(BUILDDIR)/$*/pdf all-pdf LATEXOPTS="-interaction=nonstopmode"
 
 %.txt:

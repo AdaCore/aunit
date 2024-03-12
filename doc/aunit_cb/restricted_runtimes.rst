@@ -72,7 +72,7 @@ Additional restrictions relevant to the default ZFP profile include:
 
 * AUnit requires ``GNAT.IO`` provided in :samp:`g-io.ad{?}` in the full or cert
   profile run-time library sources (or as implemented by the user). Since this
-  is a run-time library unit it must be compiled with the gnatmake :option:`-a`
+  is a run-time library unit it must be compiled with the gnatmake :samp:`-a`
   switch.
 
 .. index:: Secondary stack, memcpy, memset
