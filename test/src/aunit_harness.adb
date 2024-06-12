@@ -14,9 +14,10 @@ procedure AUnit_Harness is
    procedure Harness is new AUnit.Run.Test_Runner (Suite);
    --  The full test harness
 
-   Reporter : AUnit.Reporter.Text.Text_Reporter;
-   Filter   : aliased AUnit.Test_Filters.Name_Filter;
-   Options  : AUnit.Options.AUnit_Options :=
+   Reporter     : AUnit.Reporter.Text.Text_Reporter;
+   Filter       : aliased AUnit.Test_Filters.Name_Filter;
+   Exact_Filter : aliased AUnit.Test_Filters.Name_Filter;
+   Options      : AUnit.Options.AUnit_Options :=
      (Global_Timer     => False,
       Test_Case_Timer  => True,
       Report_Successes => True,
@@ -29,9 +30,14 @@ begin
    --  This filter should be initialized from the command line arguments. In
    --  this example, we don't do it to support limited runtimes with no support
    --  for Ada.Command_Line
-
    Options.Filter := Filter'Unchecked_Access;
-   Set_Name (Filter, "(test_case) Test routines registration");
+   Set_Name (Filter, "(suite)");
+   Harness (Reporter, Options);
+
+   --  Test exact match option of the filter
+   Options.Filter := Exact_Filter'Unchecked_Access;
+   Set_Name (Exact_Filter, "(test_case) Test routines registration");
+   Set_Exact_Match (Exact_Filter, False);
    Harness (Reporter, Options);
 
 end AUnit_Harness;
