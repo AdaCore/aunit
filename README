@@ -4,7 +4,7 @@ This is the Ada unit test framework AUnit, derived
 from the JUnit/CPPUnit frameworks for Java/C++. Read the AUnit Cookbook,
 available in doc/ in a number of formats, for installation and usage.
 
-AUnit is maintained by AdaCore. Please report problems at report@adacore.com
+AUnit is maintained by AdaCore. Please report problems at support@adacore.com
 
 NOTE FOR CONTRIBUTORS
 ---------------------
