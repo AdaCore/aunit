@@ -29,113 +29,13 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings;           use Ada.Strings;
-with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
-with Ada.Strings.Maps;      use Ada.Strings.Maps;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with AUnit.Test_Info;       use AUnit.Test_Info;
-
 package body AUnit.Reporter is
 
-   procedure Set_File (Engine : in out Reporter; Value : AUnit.IO.File_Access)
-   is
+   procedure Set_File
+     (Engine : in out Reporter;
+      Value  : AUnit.IO.File_Access) is
    begin
       Engine.File := Value;
    end Set_File;
-
-   procedure Indent_Line (File : File_Type; Indent : Natural := 0) is
-   begin
-      for J in 1 .. Indent loop
-         Put (File, "    ");
-      end loop;
-   end Indent_Line;
-
-   procedure Put_Line (File : File_Type; Item : String; Indent : Natural) is 
-   begin
-      Indent_Line (File, Indent);
-      AUnit.IO.Put_Line (File, Item);
-   end Put_Line;
-
-   procedure Put (File : File_Type; Item : String; Indent : Natural) is
-   begin
-      Indent_Line (File, Indent);
-      AUnit.IO.Put (File, Item);
-   end Put;
-
-   procedure Print_Location_Suffix (File : File_Type; Test : Test_Result) is
-      procedure Print_Location (File : File_Type; Loc : Tested_Location_Access)
-      is
-      begin
-         if Loc = null then
-            return;
-         end if;
-
-         Put
-           (File,
-            Loc.Tested_File.all
-            & ":"
-            & Trim (Loc.Tested_Line'Image, Left)
-            & ":"
-            & Trim (Loc.Tested_Column'Image, Left)
-            & ":");
-         if Loc.Tested_Name /= null then
-            Put (File, " (" & Loc.Tested_Name.all & ")");
-         end if;
-      end Print_Location;
-   begin
-      Print_Location (File, Test.Location);
-
-      if Test.Suffix /= null then
-         if Test.Suffix.Suffix_Text /= null then
-            Put (File, " " & Test.Suffix.Suffix_Text.all & " ");
-         end if;
-
-         Print_Location (File, Test.Suffix.Suffix_Location);
-
-         if Test.Suffix.Additional_Suffix /= null then
-            if Test.Suffix.Additional_Suffix.Suffix_Text /= null then
-               Put
-                 (File,
-                  " " & Test.Suffix.Additional_Suffix.Suffix_Text.all & " ");
-            end if;
-
-            Print_Location
-              (File, Test.Suffix.Additional_Suffix.Suffix_Location);
-            Put (File, " ");
-         end if;
-      end if;
-   end Print_Location_Suffix;
-
-   procedure Print_Indented_Block
-     (File : File_Type; Block : String; Indent : Natural)
-   is
-      First, Last : Natural;
-      Start       : Positive := Block'First;
-      LF_Set      : constant Character_Set := To_Set (ASCII.LF & ASCII.CR);
-   begin
-      loop
-         Find_Token
-           (Source => To_Unbounded_String (Block (Start .. Block'Last)),
-            Set    => LF_Set,
-            Test   => Outside,
-            First  => First,
-            Last   => Last);
-
-         exit when First = 0;
-
-         --  The linefeed is included in the printed line so no need to
-         --  use Put_Line.
-         Put (File, Block (Start .. Start + Last), Indent);
-
-         Start := Start + Last + 1;
-         while Start <= Block'Last
-           and then (Block (Start) = ASCII.CR or Block (Start) = ASCII.LF)
-         loop
-            Start := Start + 1;
-         end loop;
-         exit when Start > Block'Last;
-      end loop;
-
-   end Print_Indented_Block;
 
 end AUnit.Reporter;

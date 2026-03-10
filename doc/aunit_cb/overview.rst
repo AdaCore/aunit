@@ -32,7 +32,7 @@ something, here is what you do:
   Several test case types are available:
 
   * ``AUnit.Simple_Test_Cases.Test_Case``: the base type for all test
-    cases. Needs overriding of ``Name``, ``Test_File``, ``Suffix``, ``Location``, ``Package_Name`` and ``Run_Test``.
+    cases. Needs overriding of ``Name`` and ``Run_Test``.
   * ``AUnit.Test_Cases.Test_Case``: the traditional AUnit test case type,
     allowing multiple test routines to be registered, where each one is run
     and reported independently.

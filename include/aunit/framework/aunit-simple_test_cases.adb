@@ -37,9 +37,9 @@ package body AUnit.Simple_Test_Cases is
 
    procedure Run_Routine
      (Test    : access Test_Case'Class;
-      Options : AUnit_Options;
+      Options :        AUnit_Options;
       R       : in out Result'Class;
-      Outcome : out Status);
+      Outcome :    out Status);
    --  Run one test routine
 
    -----------------
@@ -48,10 +48,9 @@ package body AUnit.Simple_Test_Cases is
 
    procedure Run_Routine
      (Test    : access Test_Case'Class;
-      Options : AUnit_Options;
+      Options :        AUnit_Options;
       R       : in out Result'Class;
-      Outcome : out Status)
-   is separate;
+      Outcome :    out Status) is separate;
 
    ------------------
    -- Routine_Name --
@@ -89,14 +88,15 @@ package body AUnit.Simple_Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options : AUnit_Options;
+      Options :        AUnit_Options;
       R       : in out Result'Class;
-      Outcome : out Status)
+      Outcome :    out Status)
    is
       Old : constant Test_Access := AUnit.Assertions.Current_Test;
    begin
       Outcome := Success;
-      if Options.Filter = null or else Is_Active (Options.Filter.all, Test.all)
+      if Options.Filter = null
+        or else Is_Active (Options.Filter.all, Test.all)
       then
          AUnit.Assertions.Set_Current_Test (Test_Access (Test));
          Init_Test (Test.all);
@@ -106,7 +106,6 @@ package body AUnit.Simple_Test_Cases is
          Set_Up (Test_Case'Class (Test.all));
          Run_Routine (Test, Options, R, Outcome);
          Tear_Down (Test_Case'Class (Test.all));
-
          AUnit.Assertions.Set_Current_Test (Old);
       end if;
    end Run;
