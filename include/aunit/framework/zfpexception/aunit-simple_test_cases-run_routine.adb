@@ -31,7 +31,6 @@
 
 with AUnit.Last_Chance_Handler; use AUnit.Last_Chance_Handler;
 with AUnit.Time_Measure;
-with AUnit.IO;
 
 separate (AUnit.Simple_Test_Cases)
 
@@ -39,15 +38,14 @@ separate (AUnit.Simple_Test_Cases)
 --  builtin setjmp/longjmp mechanism.
 
 procedure Run_Routine
-  (Test    : access Test_Case'Class;
-   Options : AUnit.Options.AUnit_Options;
-   R       : in out Result'Class;
-   Outcome : out Status)
-is
+  (Test          : access Test_Case'Class;
+   Options       :        AUnit.Options.AUnit_Options;
+   R             : in out Result'Class;
+   Outcome       :    out Status) is
 
    Unexpected_Exception : Boolean := False;
-   Time                 : Time_Measure.Time := Time_Measure.Null_Time;
-   Res                  : Integer;
+   Time : Time_Measure.Time := Time_Measure.Null_Time;
+   Res : Integer;
 
    use Time_Measure;
 
@@ -79,29 +77,20 @@ is
    -----------------------
 
    procedure Internal_Run_Test is
-      Output_File : AUnit.IO.File_Type;
-      Error_File  : AUnit.IO.File_Type;
-      Output_Text : Message_String;
    begin
       if Options.Test_Case_Timer then
          Start_Measure (Time);
       end if;
 
-      AUnit.IO.Redirect_Standard_Streams
-        (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
-
       AUnit.Simple_Test_Cases.Run_Test (Test.all);
-
-      AUnit.IO.Restore_Standard_Streams
-        (Output_File, Error_File, Options.Capture_Standard);
 
       if Options.Test_Case_Timer then
          Stop_Measure (Time);
       end if;
    end Internal_Run_Test;
 
-   function Internal_Setjmp is new
-     AUnit.Last_Chance_Handler.Gen_Setjmp (Internal_Run_Test);
+   function Internal_Setjmp is new AUnit.Last_Chance_Handler.Gen_Setjmp
+     (Internal_Run_Test);
 
 begin
 
@@ -118,27 +107,19 @@ begin
          end if;
 
          declare
-            Src : constant Message_String :=
-              AUnit.Last_Chance_Handler.Get_Exception_Message;
+            Src     : constant Message_String :=
+                        AUnit.Last_Chance_Handler.Get_Exception_Message;
          begin
             if not String_Compare (Src.all, "aunit-assertions.adb:61") then
                Unexpected_Exception := True;
                Add_Error
                  (R,
                   Name (Test.all),
-                  Package_Name (Test.all),
-                  Test_File (Test.all),
                   Routine_Name (Test.all),
-                  AUnit.IO.Read_Output
-                    (Test.Name.all, Options.Capture_Standard),
-                  AUnit.IO.Read_Error
-                    (Test.Name.all, Options.Capture_Standard),
-                  Location (Test.all),
                   Error   =>
                     (Exception_Name    => Get_Exception_Name,
                      Exception_Message => Src,
                      Traceback         => null),
-                  Suffix  => Suffix (Test.all),
                   Elapsed => Time);
             end if;
          end;
@@ -147,18 +128,7 @@ begin
 
    if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
-      Add_Success
-        (R,
-         Name (Test.all),
-         Package_Name (Test.all),
-         Test_File (Test.all),
-         Test_File (Test.all),
-         Routine_Name (Test.all),
-         AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-         AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-         Location (Test.all),
-         Suffix (Test.all),
-         Time);
+      Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
@@ -168,13 +138,8 @@ begin
             Add_Failure
               (R,
                Name (Test.all),
-               Package_Name (Test.all),
                Routine_Name (Test.all),
-               AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-               AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-               Location (Test.all),
                Get_Failure (C),
-               Suffix (Test.all),
                Time);
             Next (C);
          end loop;

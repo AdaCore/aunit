@@ -39,11 +39,10 @@ package AUnit.Time_Measure is
       Stop  : Ada.Calendar.Time;
    end record;
 
-   type AUnit_Duration is new Duration;
+   type AUnit_Duration is private;
 
-   Null_Time : constant Time :=
-     (Start => Ada.Calendar.Time_Of (1901, 1, 1),
-      Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
+   Null_Time : constant Time := (Start => Ada.Calendar.Time_Of (1901, 1, 1),
+                                 Stop  => Ada.Calendar.Time_Of (1901, 1, 1));
 
    procedure Start_Measure (T : in out Time);
    --  Start a new measure
@@ -56,15 +55,17 @@ package AUnit.Time_Measure is
 
    generic
       with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
-   procedure Gen_Put_Measure
-     (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
+   procedure Gen_Put_Measure (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
    --  Put the image of the measure
 
    generic
       with procedure Put (F : AUnit.IO.File_Type; S : String) is <>;
-   procedure Gen_Put_Measure_In_Seconds
-     (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
+   procedure Gen_Put_Measure_In_Seconds (File : AUnit.IO.File_Type; Measure : AUnit_Duration);
    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
    --  9 digits after decimal point.
+
+private
+
+   type AUnit_Duration is new Duration;
 
 end AUnit.Time_Measure;

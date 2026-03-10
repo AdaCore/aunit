@@ -35,8 +35,8 @@ with AUnit.Memory.Utils;
 
 package body AUnit.Test_Caller is
 
-   function New_Fixture is new
-     AUnit.Memory.Utils.Gen_Alloc (Test_Fixture, Fixture_Access);
+   function New_Fixture is new AUnit.Memory.Utils.Gen_Alloc
+     (Test_Fixture, Fixture_Access);
 
    The_Fixture_Object : constant Fixture_Access := New_Fixture;
 
@@ -45,20 +45,13 @@ package body AUnit.Test_Caller is
    ------------
 
    procedure Create
-     (TC           : out Test_Case'Class;
-      Name         : String;
-      Test_Package : String;
-      Test_File    : String;
-      Location     : Tested_Location;
-      Suffix       : Test_Suffix_Access := null;
-      Test         : Test_Method) is
+     (TC   : out Test_Case'Class;
+      Name : String;
+      Test : Test_Method)
+   is
    begin
-      TC.Name := Format (Name);
-      TC.Test_Package := Format (Test_Package);
-      TC.Test_File := Format (Test_File);
-      TC.Method := Test;
-      TC.Location := Location;
-      TC.Suffix := Suffix;
+      TC.Name    := Format (Name);
+      TC.Method  := Test;
       TC.Fixture := The_Fixture_Object;
    end Create;
 
@@ -67,21 +60,17 @@ package body AUnit.Test_Caller is
    ------------
 
    function Create
-     (Name         : String;
-      Test_Package : String;
-      Test_File    : String;
-      Location     : Tested_Location;
-      Suffix       : Test_Suffix_Access := null;
-      Test         : Test_Method) return Test_Case_Access
+     (Name : String;
+      Test : Test_Method) return Test_Case_Access
    is
       type Access_Type is access all Test_Case;
-      function Alloc is new
-        AUnit.Memory.Utils.Gen_Alloc (Test_Case, Access_Type);
-      function Convert is new
-        Ada.Unchecked_Conversion (Access_Type, Test_Case_Access);
+      function Alloc is new AUnit.Memory.Utils.Gen_Alloc
+        (Test_Case, Access_Type);
+      function Convert is new Ada.Unchecked_Conversion
+        (Access_Type, Test_Case_Access);
       Ret : constant Test_Case_Access := Convert (Alloc);
    begin
-      Create (Ret.all, Name, Test_Package, Test_File, Location, Suffix, Test);
+      Create (Ret.all, Name, Test);
       return Ret;
    end Create;
 
@@ -93,42 +82,6 @@ package body AUnit.Test_Caller is
    begin
       return Test.Name;
    end Name;
-
-   ------------------
-   -- Test_Package --
-   ------------------
-
-   function Package_Name (Test : Test_Case) return Message_String is
-   begin
-      return Test.Test_Package;
-   end Package_Name;
-
-   ----------------
-   --  Test_File --
-   ----------------
-   
-   function Test_File (Test : Test_Case) return Message_String  is
-   begin 
-      return Test.Test_File; 
-   end Test_File;
-
-   --------------
-   --  Suffix  --
-   --------------
-
-   function Suffix (Test : Test_Case) return Test_Suffix_Access is
-   begin
-      return Test.Suffix;
-   end Suffix;
-
-   -------------------
-   --   Location   --
-   ------------------
-
-   function Location (Test : Test_Case) return Tested_Location is
-   begin
-      return Test.Location;
-   end Location;
 
    --------------
    -- Run_Test --
