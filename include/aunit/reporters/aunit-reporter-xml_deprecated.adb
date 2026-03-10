@@ -29,17 +29,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada_Containers;     use Ada_Containers;
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
 
-package body AUnit.Reporter.XML is
+package body AUnit.Reporter.XML_DEPRECATED is
 
    procedure Dump_Result_List (File : File_Type; L : Result_Lists.List);
    --  List failed assertions
 
-   procedure Put_Measure is new Gen_Put_Measure_In_Seconds;
+   procedure Put_Measure is new Gen_Put_Measure;
    --  Output elapsed time
 
    procedure Report_Test (File : File_Type; Test : Test_Result);
@@ -71,124 +72,110 @@ package body AUnit.Reporter.XML is
    ------------
 
    procedure Report
-     (Engine  : XML_Reporter;
+     (Engine  : XML_DEPRECATED_Reporter;
       R       : in out Result'Class;
       Options : AUnit_Options := Default_Options)
    is
       T    : AUnit_Duration;
       File : File_Type renames Engine.File.all;
 
-      Total_Tests    : constant Integer := Integer (Test_Count (R));
-      Failures_Count : constant Integer := Integer (Failure_Count (R));
-      Errors_Count   : constant Integer := Integer (Error_Count (R));
-      Total_Failures : constant Integer := Failures_Count + Errors_Count;
-
    begin
       Put_Line (File, "<?xml version='1.0' encoding='utf-8' ?>");
-
       Put (File, "<TestRun");
+
       if Elapsed (R) /= Time_Measure.Null_Time then
          T := Get_Measure (Elapsed (R));
 
          Put (File, " elapsed=""");
          Put_Measure (File, T);
-         Put (File, """");
+         Put_Line (File, """>");
+      else
+         Put_Line (File, ">");
       end if;
-      Put_Line (File, ">");
 
-      Put_Line (File, "<Statistics>", Indent => 1);
-
-      Put (File, "<Tests>", Indent => 2);
-      Put (File, Total_Tests, 0);
+      Put_Line (File, "  <Statistics>");
+      Put (File, "    <Tests>");
+      Put (File, Integer (Test_Count (R)), 0);
       Put_Line (File, "</Tests>");
-
-      Put (File, "<FailuresTotal>", Indent => 2);
-      Put (File, Total_Failures, 0);
+      Put (File, "    <FailuresTotal>");
+      Put (File, Integer (Failure_Count (R) + Error_Count (R)), 0);
       Put_Line (File, "</FailuresTotal>");
-
-      Put (File, "<Failures>", Indent => 2);
-      Put (File, Failures_Count, 0);
+      Put (File, "    <Failures>");
+      Put (File, Integer (Failure_Count (R)), 0);
       Put_Line (File, "</Failures>");
-
-      Put (File, "<Errors>", Indent => 2);
-      Put (File, Errors_Count, 0);
+      Put (File, "    <Errors>");
+      Put (File, Integer (Error_Count (R)), 0);
       Put_Line (File, "</Errors>");
-
-      Put_Line (File, "</Statistics>", Indent => 1);
+      Put_Line (File, "  </Statistics>");
 
       declare
          S : Result_Lists.List;
       begin
-         if Total_Tests /= Total_Failures then
-            Put_Line (File, "<SuccessfulTests>", Indent => 1);
+         Put_Line (File, "  <SuccessfulTests>");
+         if Options.Report_Successes then
             Successes (R, "", S);
             Dump_Result_List (File, S);
-            Put_Line (File, "</SuccessfulTests>", Indent => 1);
          end if;
+         Put_Line (File, "  </SuccessfulTests>");
       end;
 
-      if Total_Failures /= 0 then
-         Put_Line (File, "<FailedTests>", Indent => 1);
-         declare
-            F : Result_Lists.List;
-         begin
-            Failures (R, "", F);
-            Dump_Result_List (File, F);
-         end;
+      Put_Line (File, "  <FailedTests>");
+      declare
+         F : Result_Lists.List;
+      begin
+         Failures (R, "", F);
+         Dump_Result_List (File, F);
+      end;
 
-         declare
-            E : Result_Lists.List;
-         begin
-            Errors (R, "", E);
-            Dump_Result_List (File, E);
-         end;
-         Put_Line (File, "</FailedTests>", Indent => 1);
-      end if;
+      declare
+         E : Result_Lists.List;
+      begin
+         Errors (R, "", E);
+         Dump_Result_List (File, E);
+      end;
+      Put_Line (File, "  </FailedTests>");
 
       Put_Line (File, "</TestRun>");
    end Report;
 
-   -----------------
-   -- Report_Test --
-   -----------------
+   ------------------
+   -- Report_Error --
+   ------------------
 
    procedure Report_Test (File : File_Type; Test : Test_Result) is
       Is_Assert : Boolean;
       T         : AUnit_Duration;
    begin
-      Put (File, "<Test", Indent => 2);
-
-      Put (File, " name=""" & Test.Test_Name.all);
-      if Test.Routine_Name /= null then
-         Put (File, " : ");
-         Put (File, Test.Routine_Name.all);
-      end if;
-      Put (File, """");
-
-      if Test.Location.Tested_Name /= null then
-         Put
-           (File,
-            " tested_function=""" & Test.Location.Tested_Name.all & """");
-      end if;
+      Put (File, "    <Test");
 
       if Test.Elapsed /= Time_Measure.Null_Time then
          T := Get_Measure (Test.Elapsed);
 
          Put (File, " elapsed=""");
          Put_Measure (File, T);
-         Put (File, """");
+         Put_Line (File, """>");
+      else
+         Put_Line (File, ">");
       end if;
 
-      if Test.Failure /= null or else Test.Error /= null then
-         Put_Line (File, ">");
+      Put (File, "      <Name>");
+      Put (File, Test.Test_Name.all);
 
+      if Test.Routine_Name /= null then
+         Put (File, " : ");
+         Put (File, Test.Routine_Name.all);
+      end if;
+
+      Put_Line (File, "</Name>");
+
+      if Test.Failure /= null or else Test.Error /= null then
          if Test.Failure /= null then
             Is_Assert := True;
          else
             Is_Assert := False;
          end if;
 
-         Put (File, "<FailureType>", Indent => 3);
+         Put (File, "      <FailureType>");
 
          if Is_Assert then
             Put (File, "Assertion");
@@ -197,7 +184,7 @@ package body AUnit.Reporter.XML is
          end if;
 
          Put_Line (File, "</FailureType>");
-         Put (File, "<Message>", Indent => 3);
+         Put (File, "      <Message>");
          if Is_Assert then
             Put (File, Test.Failure.Message.all);
          else
@@ -206,46 +193,38 @@ package body AUnit.Reporter.XML is
          Put_Line (File, "</Message>");
 
          if Is_Assert then
-            Put_Line (File, "<Location>", Indent => 3);
-            Put_Line
-              (File,
-               "<File>" & Test.Failure.Source_Name.all & "</File>",
-               Indent => 4);
-            Put (File, "<Line>", Indent => 4);
+            Put_Line (File, "      <Location>");
+            Put (File, "        <File>");
+            Put (File, Test.Failure.Source_Name.all);
+            Put_Line (File, "</File>");
+            Put (File, "        <Line>");
             Put (File, Integer (Test.Failure.Line), 0);
             Put_Line (File, "</Line>");
-            Put_Line (File, "</Location>", Indent => 3);
+            Put_Line (File, "      </Location>");
 
          else
-            Put_Line (File, "<Exception>", Indent => 3);
-            Put_Line
-              (File,
-               "<Message>" & Test.Error.Exception_Message.all & "</Message>",
-               Indent => 4);
+            Put_Line (File, "      <Exception>");
+            Put (File, "      <Message>");
+            Put (File, Test.Error.Exception_Name.all);
+            Put_Line (File, "</Message>");
 
             if Test.Error.Exception_Message /= null then
-               Put_Line
-                 (File,
-                  "<Information>"
-                  & Test.Error.Exception_Message.all
-                  & "</Information>",
-                  Indent => 4);
+               Put (File, "      <Information>");
+               Put (File, Test.Error.Exception_Message.all);
+               Put_Line (File, "</Information>");
             end if;
 
             if Test.Error.Traceback /= null then
-               Put_Line (File, "<Traceback>", Indent => 4);
-               Print_Indented_Block
-                 (File, Test.Error.Traceback.all, Indent => 5);
-               Put_Line (File, "</Traceback>", Indent => 4);
+               Put (File, "      <Traceback>");
+               Put (File, Test.Error.Traceback.all);
+               Put_Line (File, "</Traceback>");
             end if;
 
-            Put_Line (File, "</Exception>", Indent => 3);
+            Put_Line (File, "      </Exception>");
          end if;
-         Put_Line (File, "</Test>", Indent => 2);
-      else
-         Put_Line (File, "/>");
       end if;
 
+      Put_Line (File, "    </Test>");
    end Report_Test;
 
-end AUnit.Reporter.XML;
+end AUnit.Reporter.XML_DEPRECATED;

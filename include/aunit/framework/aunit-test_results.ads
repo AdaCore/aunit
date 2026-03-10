@@ -29,12 +29,15 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Ordered_Sets;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada_Containers.AUnit_Lists;
-
-with AUnit.Time_Measure; use AUnit.Time_Measure;
+with AUnit.Test_Info;       use AUnit.Test_Info;
+with AUnit.Time_Measure;    use AUnit.Time_Measure;
 
 --  Test reporting
 --
+
 package AUnit.Test_Results is
 
    type Result is tagged limited private;
@@ -59,57 +62,86 @@ package AUnit.Test_Results is
    pragma No_Strict_Aliasing (Test_Error_Access);
    --  Description of unexpected exceptions
 
+   pragma No_Strict_Aliasing (Test_Error_Access);
+   --  Description of the test location
+
    type Test_Result is record
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Failure      : Test_Failure_Access;
-      Error        : Test_Error_Access;
-      Elapsed      : Time := Null_Time;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String := null;
+      Standard_Error  : Message_String := null;
+      Location        : Tested_Location_Access;
+      Suffix          : Test_Suffix_Access;
+      Failure         : Test_Failure_Access;
+      Error           : Test_Error_Access;
+      Elapsed         : Time := Null_Time;
    end record;
    --  Decription of a test routine result
 
    use Ada_Containers;
 
    package Result_Lists is new Ada_Containers.AUnit_Lists (Test_Result);
+
    --  Containers for all test results
 
    procedure Add_Error
-     (R            : in out Result;
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Error        : Test_Error;
-      Elapsed      : Time);
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Error           : Test_Error;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time);
    --  Record an unexpected exception
 
    procedure Add_Failure
-     (R            : in out Result;
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Failure      : Test_Failure;
-      Elapsed      : Time);
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Failure         : Test_Failure;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time);
    --  Record a test routine failure
 
    procedure Add_Success
-     (R            : in out Result;
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Elapsed      : Time);
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time);
    --  Record a test routine success
 
    procedure Set_Elapsed (R : in out Result; T : Time);
    --  Set Elapsed time for reporter
 
-   function Error_Count (R : Result) return Count_Type;
+   function Error_Count (R : Result; N : String := "") return Count_Type;
    --  Number of routines with unexpected exceptions
 
-   procedure Errors (R : Result;
-                     E : in out Result_Lists.List);
+   procedure Errors
+     (R : Result; N : String := ""; E : in out Result_Lists.List);
    --  List of routines with unexpected exceptions
 
-   function Failure_Count (R : Result) return Count_Type;
+   function Failure_Count (R : Result; N : String := "") return Count_Type;
    --  Number of failed routines
 
-   procedure Failures (R : Result; F : in out Result_Lists.List);
+   procedure Failures
+     (R : Result; N : String := ""; F : in out Result_Lists.List);
    --  List of failed routines
 
    function Elapsed (R : Result) return Time;
@@ -118,21 +150,29 @@ package AUnit.Test_Results is
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
    --  Set count for a test run
 
-   function Success_Count (R : Result) return Count_Type;
+   function Success_Count (R : Result; N : String := "") return Count_Type;
    --  Number of successful routines
 
-   procedure Successes (R : Result; S : in out Result_Lists.List);
+   procedure Successes
+     (R : Result; N : String := ""; S : in out Result_Lists.List);
    --  List of successful routines
 
    function Successful (R : Result) return Boolean;
    --  All routines successful?
 
-   function Test_Count (R : Result) return Ada_Containers.Count_Type;
+   function Test_Count (R : Result) return Count_Type;
    --  Number of routines run
+
+   function Total_Count (R : Result; Name : String := "") return Count_Type;
+   --  Number of routines run for a specific package
 
    procedure Clear (R : in out Result);
    --  Clear the results
 
+   package Message_Sets is new Ada.Containers.Ordered_Sets (Unbounded_String);
+
+   function Get_Packages (R : Result) return Message_Sets.Set;
+   --  Return a list of all the test packages (unique)
 private
 
    pragma Inline (Errors, Failures, Successes);

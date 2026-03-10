@@ -39,36 +39,64 @@ package body AUnit.Test_Results is
    -- Local Subprograms --
    -----------------------
 
-   function Alloc_Failure is new AUnit.Memory.Utils.Gen_Alloc
-     (Test_Failure, Test_Failure_Access);
+   function Alloc_Failure is new
+     AUnit.Memory.Utils.Gen_Alloc (Test_Failure, Test_Failure_Access);
 
-   function Alloc_Error is new AUnit.Memory.Utils.Gen_Alloc
-     (Test_Error, Test_Error_Access);
+   function Alloc_Error is new
+     AUnit.Memory.Utils.Gen_Alloc (Test_Error, Test_Error_Access);
 
-   E_Count : Count_Type;
-   F_Count : Count_Type;
-   S_Count : Count_Type;
+   function Alloc_Location is new
+     AUnit.Memory.Utils.Gen_Alloc (Tested_Location, Tested_Location_Access);
 
-   procedure Iterate_Error (Position : Result_Lists.Cursor);
-   procedure Iterate_Failure (Position : Result_Lists.Cursor);
-   procedure Iterate_Success (Position : Result_Lists.Cursor);
+   E_Count     : Count_Type;
+   F_Count     : Count_Type;
+   S_Count     : Count_Type;
+   Package_Set : Message_Sets.Set;
 
-   function Is_Error (Position : Result_Lists.Cursor) return Boolean;
-   function Is_Failure (Position : Result_Lists.Cursor) return Boolean;
-   function Is_Success (Position : Result_Lists.Cursor) return Boolean;
+   procedure Iterate_Error
+     (Position : Result_Lists.Cursor; Name : String := "");
+   --  Find all the test that ended in an error.
+   --  A name arg can be added to filter to only tests from a specific package.
+   procedure Iterate_Failure
+     (Position : Result_Lists.Cursor; Name : String := "");
+   --  Find all the test that ended in an failure.
+   --  A name arg can be added to filter to only tests from a specific package.
+   procedure Iterate_Success
+     (Position : Result_Lists.Cursor; Name : String := "");
+   --  Find all the test that ended succesfully.
+   --  A name arg can be added to filter to only tests from a specific package.
+   procedure Iterate_Name
+     (Position : Result_Lists.Cursor; Name : String := "");
+   --  Get all the tests from a given package name
+   procedure Iterate_Package_Name
+     (Position : Result_Lists.Cursor; Name : String);
+   --  Get a set of all the tests package
+
+   function Is_Error
+     (Position : Result_Lists.Cursor; Name : String) return Boolean;
+   function Is_Failure
+     (Position : Result_Lists.Cursor; Name : String) return Boolean;
+   function Is_Success
+     (Position : Result_Lists.Cursor; Name : String) return Boolean;
 
    generic
-      with function Test (Position : Result_Lists.Cursor) return Boolean;
-   procedure Gen_Extract (R : Result;
-                          E : in out Result_Lists.List);
+      with
+        function Test
+          (Position : Result_Lists.Cursor; Name : String) return Boolean;
+   procedure Gen_Extract
+     (R : Result; N : String := ""; E : in out Result_Lists.List);
 
    -------------------
    -- Iterate_Error --
    -------------------
 
-   procedure Iterate_Error (Position : Result_Lists.Cursor) is
+   procedure Iterate_Error
+     (Position : Result_Lists.Cursor; Name : String := "") is
    begin
-      if Result_Lists.Element (Position).Error /= null then
+      if (Name'Length = 0
+          or else Result_Lists.Element (Position).Package_Name.all = Name)
+        and then Result_Lists.Element (Position).Error /= null
+      then
          E_Count := E_Count + 1;
       end if;
    end Iterate_Error;
@@ -77,9 +105,13 @@ package body AUnit.Test_Results is
    -- Iterate_Failure --
    ---------------------
 
-   procedure Iterate_Failure (Position : Result_Lists.Cursor) is
+   procedure Iterate_Failure
+     (Position : Result_Lists.Cursor; Name : String := "") is
    begin
-      if Result_Lists.Element (Position).Failure /= null then
+      if (Name'Length = 0
+          or else Result_Lists.Element (Position).Package_Name.all = Name)
+        and then Result_Lists.Element (Position).Failure /= null
+      then
          F_Count := F_Count + 1;
       end if;
    end Iterate_Failure;
@@ -88,22 +120,57 @@ package body AUnit.Test_Results is
    -- Iterate_Success --
    ---------------------
 
-   procedure Iterate_Success (Position : Result_Lists.Cursor) is
+   procedure Iterate_Success
+     (Position : Result_Lists.Cursor; Name : String := "") is
    begin
-      if Result_Lists.Element (Position).Error = null
+      if (Name'Length = 0
+          or else Result_Lists.Element (Position).Package_Name.all = Name)
+        and then Result_Lists.Element (Position).Error = null
         and then Result_Lists.Element (Position).Failure = null
       then
          S_Count := S_Count + 1;
       end if;
    end Iterate_Success;
 
+   ------------------
+   -- Iterate_Name --
+   ------------------
+
+   procedure Iterate_Name (Position : Result_Lists.Cursor; Name : String := "")
+   is
+   begin
+      if Name'Length = 0
+        or else Result_Lists.Element (Position).Package_Name.all = Name
+      then
+         S_Count := S_Count + 1;
+      end if;
+   end Iterate_Name;
+
+   --------------------------
+   -- Iterate_Package_Name --
+   --------------------------
+
+   procedure Iterate_Package_Name
+     (Position : Result_Lists.Cursor; Name : String)
+   is
+      Package_Name : constant Message_String :=
+        Result_Lists.Element (Position).Package_Name;
+      pragma Unreferenced (Name);
+   begin
+      if Package_Name /= null
+        and then not Package_Set.Contains
+                       (To_Unbounded_String (Package_Name.all))
+      then
+         Package_Set.Insert (To_Unbounded_String (Package_Name.all));
+      end if;
+   end Iterate_Package_Name;
+
    -----------------
    -- Gen_Extract --
    -----------------
 
    procedure Gen_Extract
-     (R : Result;
-      E : in out Result_Lists.List)
+     (R : Result; N : String := ""; E : in out Result_Lists.List)
    is
       C : Result_Lists.Cursor;
       use Result_Lists;
@@ -111,7 +178,7 @@ package body AUnit.Test_Results is
       C := First (R.Result_List);
 
       while Has_Element (C) loop
-         if Test (C) then
+         if Test (C, N) then
             E.Append (Element (C));
          end if;
          Next (C);
@@ -122,8 +189,14 @@ package body AUnit.Test_Results is
    -- Is_Error --
    --------------
 
-   function Is_Error (Position : Result_Lists.Cursor) return Boolean is
+   function Is_Error
+     (Position : Result_Lists.Cursor; Name : String) return Boolean is
    begin
+      if Name'Length /= 0
+        and then Result_Lists.Element (Position).Package_Name.all /= Name
+      then
+         return False;
+      end if;
       return Result_Lists.Element (Position).Error /= null;
    end Is_Error;
 
@@ -131,8 +204,14 @@ package body AUnit.Test_Results is
    -- Is_Failure --
    ----------------
 
-   function Is_Failure (Position : Result_Lists.Cursor) return Boolean is
+   function Is_Failure
+     (Position : Result_Lists.Cursor; Name : String) return Boolean is
    begin
+      if Name'Length /= 0
+        and then Result_Lists.Element (Position).Package_Name.all /= Name
+      then
+         return False;
+      end if;
       return Result_Lists.Element (Position).Failure /= null;
    end Is_Failure;
 
@@ -140,9 +219,16 @@ package body AUnit.Test_Results is
    -- Is_Success --
    ----------------
 
-   function Is_Success (Position : Result_Lists.Cursor) return Boolean is
+   function Is_Success
+     (Position : Result_Lists.Cursor; Name : String) return Boolean is
    begin
-      return not Is_Error (Position) and then not Is_Failure (Position);
+      if Name'Length /= 0
+        and then Result_Lists.Element (Position).Package_Name.all /= Name
+      then
+         return False;
+      end if;
+      return
+        not Is_Error (Position, Name) and then not Is_Failure (Position, Name);
    end Is_Success;
 
    ---------------
@@ -150,19 +236,33 @@ package body AUnit.Test_Results is
    ---------------
 
    procedure Add_Error
-     (R            : in out Result;
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Error        : Test_Error;
-      Elapsed      : Time)
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Error           : Test_Error;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time)
    is
-      Val : constant Test_Result := (Test_Name, Routine_Name,
-                                     Failure => null,
-                                     Error   => Alloc_Error,
-                                     Elapsed => Elapsed);
+      Val : constant Test_Result :=
+        (Test_Name,
+         Package_Name,
+         Test_File,
+         Routine_Name,
+         Standard_Output,
+         Standard_Error,
+         Alloc_Location,
+         Suffix,
+         null,
+         Alloc_Error,
+         Elapsed);
       use Result_Lists;
    begin
-
+      Val.Location.all := Location;
       Val.Error.all := Error;
       Append (R.Result_List, Val);
    end Add_Error;
@@ -172,19 +272,35 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Add_Failure
-     (R            : in out Result;
-      Test_Name    : Message_String;
-      Routine_Name : Message_String;
-      Failure      : Test_Failure;
-      Elapsed      : Time) is
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Failure         : Test_Failure;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time)
+   is
 
-      Val : constant Test_Result := (Test_Name, Routine_Name,
-                                     Failure => Alloc_Failure,
-                                     Error   => null,
-                                     Elapsed => Elapsed);
+      Val : constant Test_Result :=
+        (Test_Name,
+         Package_Name,
+         Test_File,
+         Routine_Name,
+         Standard_Output,
+         Standard_Error,
+         Alloc_Location,
+         Suffix,
+         Alloc_Failure,
+         null,
+         Elapsed);
       use Result_Lists;
    begin
 
+      Val.Location.all := Location;
       Val.Failure.all := Failure;
       Append (R.Result_List, Val);
    end Add_Failure;
@@ -194,25 +310,43 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Add_Success
-     (R                       : in out Result;
-      Test_Name               : Message_String;
-      Routine_Name            : Message_String;
-      Elapsed                 : Time) is
+     (R               : in out Result;
+      Test_Name       : Message_String;
+      Package_Name    : Message_String;
+      Test_File       : Message_String;
+      Routine_Name    : Message_String;
+      Standard_Output : Message_String;
+      Standard_Error  : Message_String;
+      Location        : Tested_Location;
+      Suffix          : Test_Suffix_Access;
+      Elapsed         : Time)
+   is
 
       Val : constant Test_Result :=
-              (Test_Name, Routine_Name, null, null, Elapsed);
+        (Test_Name,
+         Package_Name,
+         Test_File,
+         Routine_Name,
+         Standard_Output,
+         Standard_Error,
+         Alloc_Location,
+         Suffix,
+         null,
+         null,
+         Elapsed);
       use Result_Lists;
 
    begin
+      Val.Location.all := Location;
       Append (R.Result_List, Val);
+
    end Add_Success;
 
    -----------------
    -- Set_Elapsed --
    -----------------
 
-   procedure Set_Elapsed (R : in out Result;
-                          T : Time_Measure.Time) is
+   procedure Set_Elapsed (R : in out Result; T : Time_Measure.Time) is
    begin
       R.Elapsed_Time := T;
    end Set_Elapsed;
@@ -221,11 +355,11 @@ package body AUnit.Test_Results is
    -- Error_Count --
    -----------------
 
-   function Error_Count (R : Result) return Count_Type is
+   function Error_Count (R : Result; N : String := "") return Count_Type is
       use Result_Lists;
    begin
       E_Count := 0;
-      Iterate (R.Result_List, Iterate_Error'Access);
+      Iterate (R.Result_List, Iterate_Error'Access, N);
       return E_Count;
    end Error_Count;
 
@@ -233,22 +367,23 @@ package body AUnit.Test_Results is
    -- Errors --
    ------------
 
-   procedure Errors (R : Result;
-                     E : in out Result_Lists.List) is
+   procedure Errors
+     (R : Result; N : String := ""; E : in out Result_Lists.List)
+   is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
-      Extract (R, E);
+      Extract (R, N, E);
    end Errors;
 
    -------------------
    -- Failure_Count --
    -------------------
 
-   function Failure_Count (R : Result) return Count_Type is
+   function Failure_Count (R : Result; N : String := "") return Count_Type is
       use Result_Lists;
    begin
       F_Count := 0;
-      Iterate (R.Result_List, Iterate_Failure'Access);
+      Iterate (R.Result_List, Iterate_Failure'Access, N);
       return F_Count;
    end Failure_Count;
 
@@ -256,11 +391,12 @@ package body AUnit.Test_Results is
    -- Failures --
    --------------
 
-   procedure Failures (R : Result;
-                       F : in out Result_Lists.List) is
+   procedure Failures
+     (R : Result; N : String := ""; F : in out Result_Lists.List)
+   is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin
-      Extract (R, F);
+      Extract (R, N, F);
    end Failures;
 
    -------------
@@ -285,10 +421,10 @@ package body AUnit.Test_Results is
    -- Success_Count --
    -------------------
 
-   function Success_Count (R : Result)  return Count_Type is
+   function Success_Count (R : Result; N : String := "") return Count_Type is
    begin
       S_Count := 0;
-      Result_Lists.Iterate (R.Result_List, Iterate_Success'Access);
+      Result_Lists.Iterate (R.Result_List, Iterate_Success'Access, N);
       return S_Count;
    end Success_Count;
 
@@ -296,11 +432,12 @@ package body AUnit.Test_Results is
    -- Successes --
    ---------------
 
-   procedure Successes (R : Result;
-                        S : in out Result_Lists.List) is
+   procedure Successes
+     (R : Result; N : String := ""; S : in out Result_Lists.List)
+   is
       procedure Extract is new Gen_Extract (Is_Success);
    begin
-      Extract (R, S);
+      Extract (R, N, S);
    end Successes;
 
    ----------------
@@ -321,15 +458,37 @@ package body AUnit.Test_Results is
       return R.Tests_Run;
    end Test_Count;
 
+   -----------------
+   -- Total_Count --
+   -----------------
+
+   function Total_Count (R : Result; Name : String := "") return Count_Type is
+   begin
+      S_Count := 0;
+      Result_Lists.Iterate (R.Result_List, Iterate_Name'Access, Name);
+      return S_Count;
+   end Total_Count;
+
    -----------
    -- Clear --
    -----------
 
    procedure Clear (R : in out Result) is
    begin
-      R.Tests_Run    := 0;
+      R.Tests_Run := 0;
       R.Elapsed_Time := Time_Measure.Null_Time;
       Result_Lists.Clear (R.Result_List);
    end Clear;
+
+   ------------------
+   -- Get_Packages --
+   ------------------
+
+   function Get_Packages (R : Result) return Message_Sets.Set is
+   begin
+      Package_Set.Clear;
+      Result_Lists.Iterate (R.Result_List, Iterate_Package_Name'Access);
+      return Package_Set;
+   end Get_Packages;
 
 end AUnit.Test_Results;
