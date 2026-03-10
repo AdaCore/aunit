@@ -29,71 +29,160 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Strings;           use Ada.Strings;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with AUnit.IO;              use AUnit.IO;
 with AUnit.Time_Measure;    use AUnit.Time_Measure;
 
 package body AUnit.Reporter.JUnit is
-   
-   procedure Put_Special_Chars (File : File_Type; S : String) is
+   procedure Put_Special_Chars (File : AUnit.IO.File_Type; S : String);
+   procedure Print_System_Out
+     (File : AUnit.IO.File_Type; Output : Message_String; Indent : Natural);
+   function Get_Combined_Time
+     (S : Result_Lists.List; E : Result_Lists.List; F : Result_Lists.List)
+      return AUnit_Duration;
+
+   procedure Put_Special_Chars (File : AUnit.IO.File_Type; S : String) is
    begin
       for C of S loop
          case C is
-            when '"' => Put (File, "&quot;");
-            when '<' => Put (File, "&lt;");
-            when '>' => Put (File, "&gt;");
-            when '&' => Put (File, "&amp;");
-            when others => Put (File, (1 => C));
+            when '"'    =>
+               Put (File, "&quot;");
+
+            when '<'    =>
+               Put (File, "&lt;");
+
+            when '>'    =>
+               Put (File, "&gt;");
+
+            when '&'    =>
+               Put (File, "&amp;");
+
+            when others =>
+               Put (File, (1 => C));
          end case;
       end loop;
    end Put_Special_Chars;
-   
-   procedure Put_Measure is
-     new Gen_Put_Measure_In_Seconds;
-   
-   procedure Report_Test (File : File_Type; Test : Test_Result) is
+
+   procedure Print_System_Out
+     (File : AUnit.IO.File_Type; Output : Message_String; Indent : Natural) is
    begin
-      Put (File, "<testcase name=""");
-      Put_Special_Chars (File, Test.Test_Name.all &
-           (if Test.Routine_Name = null then ""
-              else " : " & Test.Routine_Name.all));
-      Put (File, """ time=""");
+      if Output /= null then
+         Put (File, "<system-out>", Indent);
+         Put (File, "<![CDATA[");
+         Put (File, Output.all);
+         Put (File, "]]>");
+         Put_Line (File, "</system-out>");
+      end if;
+   end Print_System_Out;
+
+   procedure Print_System_Err
+     (File : AUnit.IO.File_Type; Error : Message_String; Indent : Natural) is
+   begin
+      if Error /= null then
+         Put (File, "<system-err>", Indent);
+         Put (File, "<![CDATA[");
+         Put (File, Error.all);
+         Put (File, "]]>");
+         Put_Line (File, "</system-err>");
+      end if;
+   end Print_System_Err;
+   procedure Put_Measure is new Gen_Put_Measure_In_Seconds;
+
+   function Get_Combined_Time
+     (S : Result_Lists.List; E : Result_Lists.List; F : Result_Lists.List)
+      return AUnit_Duration
+   is
+      Duration_Sum : AUnit_Duration := 0.0;
+
+      use Result_Lists;
+
+      procedure Get_Time (R : Result_Lists.List) is
+         C : Cursor := First (R);
+      begin
+         while Has_Element (C) loop
+            Duration_Sum :=
+              Duration_Sum + Get_Measure (Result_Lists.Element (C).Elapsed);
+            Next (C);
+         end loop;
+      end Get_Time;
+   begin
+
+      Get_Time (S);
+      Get_Time (E);
+      Get_Time (F);
+      return Duration_Sum;
+   end Get_Combined_Time;
+
+   procedure Report_Test (File : AUnit.IO.File_Type; Test : Test_Result) is
+   begin
+      Put (File, "<testcase name=""", Indent => 2);
+      Put_Special_Chars
+        (File,
+         Test.Test_Name.all
+         & (if Test.Routine_Name = null
+            then ""
+            else " : " & Test.Routine_Name.all));
+      Put (File, """ classname=""");
+      Put_Special_Chars (File, Test.Package_Name.all);
+      Put (File, """ file=""" & Test.Test_File.all & """ ");
+      Put (File, "time=""");
       Put_Measure (File, Get_Measure (Test.Elapsed));
+
       if Test.Failure /= null then
-         Put_Line (File, """>"); 
-         Put_Line (File, "<failure>");
-         Put_Line (File, "<![CDATA[");
-         Put (File, "        Assertion: ");
-         Put_Line (File, Test.Failure.Message.all);
-         Put (File, "        File: ");
-         Put_Line (File, Test.Failure.Source_Name.all);
-         Put (File, "        Line: ");
+         Put_Line (File, """>");
+         Put (File, "<failure>", Indent => 3);
+         Put (File, "<![CDATA[");
+         Put
+           (File,
+            "Assertion failed: """
+            & Test.Failure.Message.all
+            & """ at "
+            & Test.Failure.Source_Name.all
+            & ":");
          Put (File, Integer (Test.Failure.Line), 0);
-         New_Line (File);
-         Put_Line (File, "]]>");
+         Put (File, "]]>");
          Put_Line (File, "</failure>");
-         Put_Line (File, "</testcase>");
+         Print_System_Out (File, Test.Standard_Output, Indent => 3);
+         Print_System_Err (File, Test.Standard_Error, Indent => 3);
+         Put_Line (File, "</testcase>", Indent => 2);
+
       elsif Test.Error /= null then
-         Put_Line (File, """>"); 
-         Put_Line (File, "<error>");
-         Put_Line (File, "<![CDATA[");
-         Put (File, "      Exception: ");
-         Put_Line (File, Test.Error.Exception_Name.all);
+         Put_Line (File, """>");
+         Put_Line (File, "<error>", Indent => 3);
+         Put (File, "<![CDATA[");
+         Put (File, Test.Error.Exception_Name.all);
+
          if Test.Error.Exception_Message /= null then
-            Put_Line (File, Test.Error.Exception_Message.all);
+            Put_Line
+              (File, ": " & Test.Error.Exception_Message.all);
          end if;
+         New_Line (File);
+
+
          if Test.Error.Traceback /= null then
-            Put      (File, "      Traceback: ");
-            Put_Line (File, Test.Error.Traceback.all);
+            Put_Line (File, "Traceback:");
+            Put (File, Test.Error.Traceback.all);
          end if;
          Put_Line (File, "]]>");
-         Put_Line (File, "</error>");
-         Put_Line (File, "</testcase>");
+         Print_System_Out (File, Test.Standard_Output, Indent => 3);
+         Print_System_Err (File, Test.Standard_Error, Indent => 3);
+         Put_Line (File, "</error>", Indent => 3);
+         Put_Line (File, "</testcase>", Indent => 2);
+
+      elsif Test.Standard_Output /= null or else Test.Standard_Error /= null
+      then
+         Print_System_Out (File, Test.Standard_Output, Indent => 3);
+         Print_System_Err (File, Test.Standard_Error, Indent => 3);
+         Put_Line (File, "</testcase>", Indent => 2);
       else
-         Put_Line (File, """ />");
-      end if;      
+         Put_Line (File, """/>");
+      end if;
    end Report_Test;
-   
-   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List) is
+
+   procedure Dump_Result_List
+     (File : AUnit.IO.File_Type; L : Result_Lists.List)
+   is
       use Result_Lists;
       C : Cursor := First (L);
    begin
@@ -102,17 +191,19 @@ package body AUnit.Reporter.JUnit is
          Next (C);
       end loop;
    end Dump_Result_List;
-   
-   procedure Report (Engine  : JUnit_Reporter;
-                     R       : in out Result'Class;
-                     Options : AUnit_Options := Default_Options)
-   is     
-      File : File_Type renames Engine.File.all;
-      T    : constant Time := Elapsed (R);
+
+   procedure Report
+     (Engine  : JUnit_Reporter;
+      R       : in out Result'Class;
+      Options : AUnit_Options := Default_Options)
+   is
+      File     : AUnit.IO.File_Type renames Engine.File.all;
+      T        : constant Time := Elapsed (R);
+      Packages : constant Message_Sets.Set := Get_Packages (R);
    begin
       Put_Line (File, "<?xml version=""1.0"" encoding=""utf-8""?>");
-      Put_Line (File, "<testsuites>");
-      Put (File, "<testsuite name=""" & "aunit_testsuite" & """ skipped=""0"" tests=""");
+
+      Put (File, "<testsuites skipped=""0"" tests=""");
       Put (File, Integer (Test_Count (R)), 0);
       Put (File, """ failures=""");
       Put (File, Integer (Failure_Count (R)), 0);
@@ -122,28 +213,42 @@ package body AUnit.Reporter.JUnit is
          Put (File, """ time=""");
          Put_Measure (File, Get_Measure (T));
       end if;
-      Put_Line (File, """>");      
-      if Options.Report_Successes then
+      Put_Line (File, """>");
+
+      for Package_Name of Packages loop
+         Put
+           (File,
+            "<testsuite name="""
+            & To_String (Package_Name)
+            & """ skipped=""0"" tests=""",
+            Indent => 1);
+         Put (File, Integer (Total_Count (R, To_String (Package_Name))), 0);
+         Put (File, """ failures=""");
+         Put (File, Integer (Failure_Count (R, To_String (Package_Name))), 0);
+         Put (File, """ errors=""");
+         Put (File, Integer (Error_Count (R, To_String (Package_Name))), 0);
+
          declare
             S : Result_Lists.List;
+            F : Result_Lists.List;
+            E : Result_Lists.List;
          begin
-            Successes (R, S);
+            Successes (R, To_String (Package_Name), S);
+            Failures (R, To_String (Package_Name), F);
+            Errors (R, To_String (Package_Name), E);
+
+            if T /= Time_Measure.Null_Time then
+               Put (File, """ time=""");
+               Put_Measure (File, Get_Combined_Time (S, E, F));
+            end if;
+            Put_Line (File, """>");
+
             Dump_Result_List (File, S);
+            Dump_Result_List (File, F);
+            Dump_Result_List (File, E);
          end;
-      end if;      
-      declare
-         F : Result_Lists.List;
-      begin
-         Failures (R, F);
-         Dump_Result_List (File, F);
-      end;
-      declare
-         E : Result_Lists.List;
-      begin
-         Errors (R, E);
-         Dump_Result_List (File, E);
-      end;      
-      Put_Line (File, "</testsuite>");
+         Put_Line (File, "</testsuite>", Indent => 1);
+      end loop;
       Put_Line (File, "</testsuites>");
    end Report;
 

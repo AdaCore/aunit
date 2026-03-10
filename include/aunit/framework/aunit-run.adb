@@ -53,7 +53,7 @@ package body AUnit.Run is
       Reporter : AUnit.Reporter.Reporter'Class;
       Outcome  : out Status)
    is
-      Time    : Time_Measure.Time;
+      Time : Time_Measure.Time;
 
    begin
       if Options.Global_Timer then

@@ -38,22 +38,41 @@ package AUnit.IO is
 
    subtype File_Access is Ada.Text_IO.File_Access;
 
-   function Standard_Output
-     return File_Access renames Ada.Text_IO.Standard_Output;
+   function Standard_Output return File_Access
+   renames Ada.Text_IO.Standard_Output;
 
-   procedure Put (File  : File_Type;
-                  Item  : Integer;
-                  Width : Ada.Text_IO.Field := Ada.Integer_Text_IO.Default_Width;
-                  Base  : Ada.Text_IO.Number_Base := Ada.Integer_Text_IO.Default_Base)
-                  renames Ada.Integer_Text_IO.Put;
+   procedure Put
+     (File  : File_Type;
+      Item  : Integer;
+      Width : Ada.Text_IO.Field := Ada.Integer_Text_IO.Default_Width;
+      Base  : Ada.Text_IO.Number_Base := Ada.Integer_Text_IO.Default_Base)
+   renames Ada.Integer_Text_IO.Put;
 
-   procedure Put (File : File_Type;
-                  Item : String) renames Ada.Text_IO.Put;
+   procedure Put (File : File_Type; Item : String) renames Ada.Text_IO.Put;
 
-   procedure Put_Line (File : File_Type;
-                       Item : String) renames Ada.Text_IO.Put_Line;
+   procedure Put_Line (File : File_Type; Item : String)
+   renames Ada.Text_IO.Put_Line;
 
-   procedure New_Line (File    : File_Type;
-                       Spacing : Ada.Text_IO.Positive_Count := 1) renames Ada.Text_IO.New_Line;
+   procedure New_Line
+     (File : File_Type; Spacing : Ada.Text_IO.Positive_Count := 1)
+   renames Ada.Text_IO.New_Line;
+
+   procedure Redirect_Standard_Streams
+     (Name             : String;
+      Output_File      : in out File_Type;
+      Error_File       : in out File_Type;
+      Capture_Standard : Boolean);
+
+   procedure Restore_Standard_Streams
+     (Output_File      : in out File_Type;
+      Error_File       : in out File_Type;
+      Capture_Standard : Boolean);
+
+   function Read_File
+     (Name : String) return Message_String;
+   function Read_Output
+     (Name : String; Capture_Standard : Boolean) return Message_String;
+   function Read_Error
+     (Name : String; Capture_Standard : Boolean) return Message_String;
 
 end AUnit.IO;
