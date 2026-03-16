@@ -30,9 +30,9 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
-with AUnit.Options;              use AUnit.Options;
-with AUnit.Test_Filters;         use AUnit.Test_Filters;
-with AUnit.Time_Measure;
+with AUnit.Options;      use AUnit.Options;
+with AUnit.Test_Filters; use AUnit.Test_Filters;
+with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 package body AUnit.Test_Cases is
 
@@ -61,7 +61,8 @@ package body AUnit.Test_Cases is
    ----------------------
 
    function Call_Set_Up_Case
-     (Test : in out Test_Case'Class) return Test_Error_Access is separate;
+     (Test : in out Test_Case'Class) return Test_Error_Access
+   is separate;
 
    ---------
    -- Run --
@@ -69,13 +70,13 @@ package body AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit.Options.AUnit_Options;
+      Options : AUnit.Options.AUnit_Options;
       R       : in out Result'Class;
-      Outcome :    out Status)
+      Outcome : out Status)
    is
       use Routine_Lists;
-      Result : Status;
-      C      : Cursor;
+      Result             : Status;
+      C                  : Cursor;
       Set_Up_Case_Called : Boolean := False;
       Error              : Test_Error_Access := null;
    begin
@@ -98,16 +99,27 @@ package body AUnit.Test_Cases is
             if Error = null then
                AUnit.Simple_Test_Cases.Run
                  (AUnit.Simple_Test_Cases.Test_Case (Test.all)'Access,
-                  Options, R, Result);
+                  Options,
+                  R,
+                  Result);
 
                if Result = Failure then
                   Outcome := Failure;
                end if;
             else
                Outcome := Failure;
-               Add_Error (R, Name (Test_Case'Class (Test.all)),
-                          Routine_Name (Test.all), Error.all,
-                          Time_Measure.Null_Time);
+               Add_Error
+                 (R,
+                  Name (Test_Case'Class (Test.all)),
+                  Package_Name (Test_Case'Class (Test.all)),
+                  Test_File (Test_Case'Class (Test.all)),
+                  Routine_Name (Test.all),
+                  null,
+                  null,
+                  Location (Test_Case'Class (Test.all)),
+                  Error.all,
+                  Suffix (Test_Case'Class(Test.all)),
+                  Time_Measure.Null_Time);
             end if;
          end if;
 
@@ -160,13 +172,11 @@ package body AUnit.Test_Cases is
          Routine : Specific_Test_Routine;
          Name    : String)
       is
-         function Conv is
-            new Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
+         function Conv is new
+           Ada.Unchecked_Conversion (Specific_Test_Routine, Test_Routine);
       begin
          Registration.Register_Routine
-           (Test_Case'Class (Test),
-            Conv (Routine),
-            Name);
+           (Test_Case'Class (Test), Conv (Routine), Name);
       end Register_Wrapper;
 
    end Specific_Test_Case_Registration;

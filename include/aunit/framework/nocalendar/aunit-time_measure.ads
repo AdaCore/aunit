@@ -36,7 +36,7 @@ package AUnit.Time_Measure is
 
    type Time is null record;
 
-   type AUnit_Duration is private;
+   type AUnit_Duration is new Integer;
 
    Null_Time : Time;
 
@@ -59,9 +59,5 @@ package AUnit.Time_Measure is
                                          Measure : AUnit_Duration);
    --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
    --  9 digits after decimal point.
-
-private
-
-   type AUnit_Duration is new Integer;
 
 end AUnit.Time_Measure;

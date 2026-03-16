@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                        A U N I T . R E P O R T E R                       --
+--                   A U N I T . R E P O R T E R . X M L                    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                       Copyright (C) 2008-2019, AdaCore                   --
+--                       Copyright (C) 2000-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -29,45 +29,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.IO;           use AUnit.IO;
-with AUnit.Options;      use AUnit.Options;
-with AUnit.Test_Results; use AUnit.Test_Results;
+--  Very simple reporter to console
+package AUnit.Reporter.XML_DEPRECATED is
 
-package AUnit.Reporter is
+   type XML_DEPRECATED_Reporter is new Reporter with null record;
 
-   Indent_Level : Natural := 0;
-   --  Indicate how many indentation the reporter must currently print.
+   procedure Report (Engine  : XML_DEPRECATED_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options);
+end AUnit.Reporter.XML_DEPRECATED;
 
-   type Reporter is abstract tagged private;
 
-   procedure Set_File (Engine : in out Reporter; Value : AUnit.IO.File_Access);
-
-   procedure Report
-     (Engine  : Reporter;
-      R       : in out Result'Class;
-      Options : AUnit_Options := Default_Options)
-   is abstract;
-   --  This procedure is called by AUnit.Run to report the result after running
-   --  the whole testsuite (or the selected subset of tests).
-
-   procedure Indent_Line (File : File_Type; Indent : Natural := 0);
-   --  Print spaces matching the current indentation level.
-
-   procedure Put_Line (File : File_Type; Item : String; Indent : Natural);
-   --  Print the indentation, the string and a linefeed.
-
-   procedure Put (File : File_Type; Item : String; Indent : Natural);
-   --  Print the indentation and the string.
-
-   procedure Print_Indented_Block
-     (File : File_Type; Block : String; Indent : Natural);
-   -- Print a block of text by splitting and indentating individual lines.
-private
-
-   procedure Print_Location_Suffix (File : File_Type; Test : Test_Result);
-
-   type Reporter is abstract tagged record
-      File : AUnit.IO.File_Access := AUnit.IO.Standard_Output;
-   end record;
-
-end AUnit.Reporter;

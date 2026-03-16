@@ -67,6 +67,18 @@ create a fixture. The package spec is now:
       function Name (T : Money_Test) return Test_String;
       -- Provide name identifying the test case
 
+      function Test_File (T: Money_Test) returnn Message_String;
+      -- Provide the path to the test file
+
+      function Suffix (T: Money_Test) return Test_Suffix_Access;
+      -- Provide additional information about the test
+
+      function Location (T: Money_Test) return Tested_Location;  
+      -- Provide the location of the test
+
+      function Package_Name (T: Money_Test) return Message_String;
+      -- Provide the name of the test de package
+      
       procedure Set_Up (T : in out Money_Test);
       --  Set up performed before each test routine
 
@@ -114,6 +126,30 @@ The body becomes:
       begin
          return Format ("Money Tests");
       end Name;
+
+      function Test_File (T: Money_Test) returnn Message_String is 
+      begin 
+         return Format("/home/..../money_test_suite.ads");
+      end Test_File;
+
+      function Suffix (T : Money_Test) return Test_Suffix_Access is
+      begin
+         return null;
+      end Suffix;
+
+      function Location (T : Money_Test) return Tested_Location is
+      begin
+         return
+           (Tested_File   => Format ("money_tests-suite.adb"),
+            Tested_Line   => 16,
+            Tested_Column => 4,
+            Tested_Name => null);
+      end Location;
+
+      function Package_Name (T : Money_Test) return Message_String is
+      begin
+         return Format ("Money_Tests.Money_Test_Test_Data.Money_Test_Tests");
+      end Package_Name;
 
    end Money_Tests;
 

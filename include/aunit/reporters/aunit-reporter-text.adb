@@ -33,28 +33,28 @@ with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
+
 package body AUnit.Reporter.Text is
 
-   procedure Indent (File : File_Type; N : Natural);
-   --  Print N indentations to output
-
-   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String);
+   procedure Dump_Result_List
+     (File : File_Type; L : Result_Lists.List; Prefix : String);
    --  Dump a result list
 
    procedure Put_Measure is new Gen_Put_Measure;
    --  Output elapsed time
 
-   procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String);
+   procedure Report_Test
+     (File : File_Type; Test : Test_Result; Prefix : String);
    --  Report a single assertion failure or unexpected exception
 
    generic
-      with procedure Get (R : Result; L : in out Result_Lists.List);
+      with
+        procedure Get
+          (R : Result; N : String := ""; L : in out Result_Lists.List);
       Label : String;
       Color : String;
    procedure Report_Tests
-      (Engine : Text_Reporter;
-       R      : Result'Class;
-       File   : File_Type);
+     (Engine : Text_Reporter; R : Result'Class; File : File_Type);
    --  Report a series of tests
 
    ANSI_Def    : constant String := ASCII.ESC & "[0m";
@@ -67,28 +67,18 @@ package body AUnit.Reporter.Text is
    -------------------------
 
    procedure Set_Use_ANSI_Colors
-     (Engine : in out Text_Reporter;
-      Value  : Boolean) is
+     (Engine : in out Text_Reporter; Value : Boolean) is
    begin
       Engine.Use_ANSI := Value;
    end Set_Use_ANSI_Colors;
-
-   ------------
-   -- Indent --
-   ------------
-
-   procedure Indent (File : File_Type; N : Natural) is
-   begin
-      for J in 1 .. N loop
-         Put (File, "    ");
-      end loop;
-   end Indent;
 
    ----------------------
    -- Dump_Result_List --
    ----------------------
 
-   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String) is
+   procedure Dump_Result_List
+     (File : File_Type; L : Result_Lists.List; Prefix : String)
+   is
 
       use Result_Lists;
 
@@ -112,13 +102,11 @@ package body AUnit.Reporter.Text is
    ---------
 
    procedure Report_Tests
-      (Engine : Text_Reporter;
-       R      : Result'Class;
-       File   : File_Type)
+     (Engine : Text_Reporter; R : Result'Class; File : File_Type)
    is
       S : Result_Lists.List;
    begin
-      Get (Result (R), S);
+      Get (Result (R), "", S);
       if Engine.Use_ANSI then
          Put (File, Color);
       end if;
@@ -134,28 +122,19 @@ package body AUnit.Reporter.Text is
    -- Report_OK_Tests --
    ---------------------
 
-   procedure Report_OK_Tests
-      (Engine : Text_Reporter;
-       R      : Result'Class)
-   is
+   procedure Report_OK_Tests (Engine : Text_Reporter; R : Result'Class) is
       procedure Internal is new Report_Tests (Successes, "OK", ANSI_Green);
    begin
       Internal (Engine, R, Engine.File.all);
    end Report_OK_Tests;
 
-   procedure Report_Fail_Tests
-      (Engine : Text_Reporter;
-       R      : Result'Class)
-   is
+   procedure Report_Fail_Tests (Engine : Text_Reporter; R : Result'Class) is
       procedure Internal is new Report_Tests (Failures, "FAIL", ANSI_Purple);
    begin
       Internal (Engine, R, Engine.File.all);
    end Report_Fail_Tests;
 
-   procedure Report_Error_Tests
-      (Engine : Text_Reporter;
-       R      : Result'Class)
-   is
+   procedure Report_Error_Tests (Engine : Text_Reporter; R : Result'Class) is
       procedure Internal is new Report_Tests (Errors, "ERROR", ANSI_Red);
    begin
       Internal (Engine, R, Engine.File.all);
@@ -174,14 +153,14 @@ package body AUnit.Reporter.Text is
       S_Count : constant Integer := Integer (Success_Count (R));
       F_Count : constant Integer := Integer (Failure_Count (R));
       E_Count : constant Integer := Integer (Error_Count (R));
-      T : AUnit_Duration;
+      T       : AUnit_Duration;
    begin
 
       if Options.Report_Successes then
-         Report_OK_Tests    (Text_Reporter'Class (Engine), R);
+         Report_OK_Tests (Text_Reporter'Class (Engine), R);
       end if;
 
-      Report_Fail_Tests  (Text_Reporter'Class (Engine), R);
+      Report_Fail_Tests (Text_Reporter'Class (Engine), R);
       Report_Error_Tests (Text_Reporter'Class (Engine), R);
 
       New_Line (File);
@@ -203,7 +182,7 @@ package body AUnit.Reporter.Text is
 
          Put (File, "Cumulative Time: ");
          Put_Measure (File, T);
-         Put_Line (File, " seconds");
+         Put_Line (File, "");
       end if;
    end Report;
 
@@ -211,16 +190,18 @@ package body AUnit.Reporter.Text is
    -- Report_Test --
    -----------------
 
-   procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String) is
+   procedure Report_Test
+     (File : File_Type; Test : Test_Result; Prefix : String)
+   is
       T : AUnit_Duration;
    begin
       Put (File, Prefix);
       Put (File, " ");
-      Put (File, Test.Test_Name.all);
+
+      Print_Location_Suffix (File, Test);
 
       if Test.Routine_Name /= null then
-         Put (File, " : ");
-         Put (File, Test.Routine_Name.all);
+         Put (File, " : " & Test.Routine_Name.all);
       end if;
 
       if Test.Elapsed /= Time_Measure.Null_Time then
@@ -233,45 +214,22 @@ package body AUnit.Reporter.Text is
       New_Line (File);
 
       if Test.Failure /= null then
-         Indent (File, 1);
-         Put_Line (File, Test.Failure.Message.all);
-         Indent (File, 1);
-         Put (File, "at ");
-         Put (File, Test.Failure.Source_Name.all);
-         Put (File, ":");
+         Put_Line (File, Test.Failure.Message.all, Indent => 1);
+         Put (FIle, "at " & Test.Failure.Source_Name.all & ":", Indent => 1);
          Put (File, Integer (Test.Failure.Line), 0);
          New_Line (File);
 
       elsif Test.Error /= null then
-         Indent (File, 1);
-         Put_Line (File, Test.Error.Exception_Name.all);
+         Put_Line (File, Test.Error.Exception_Name.all, Indent => 1);
 
          if Test.Error.Exception_Message /= null then
-            Indent (File, 1);
-            Put      (File, "Exception Message: ");
-            Put_Line (File, Test.Error.Exception_Message.all);
+            Put_Line (File, "Exception Message: " & Test.Error.Exception_Message.all, Indent => 1);
          end if;
 
          if Test.Error.Traceback /= null then
-            Indent (File, 1);
-            Put_Line (File, "Traceback:");
+            Put_Line (File, "Traceback:", Indent => 1);
 
-            declare
-               From, To : Natural := Test.Error.Traceback'First;
-            begin
-               while From <= Test.Error.Traceback'Last loop
-                  To := From;
-                  while To <= Test.Error.Traceback'Last
-                    and then Test.Error.Traceback (To) /= ASCII.LF
-                  loop
-                     To := To + 1;
-                  end loop;
-
-                  Indent (File, 2);
-                  Put_Line (File, Test.Error.Traceback (From .. To - 1));
-                  From := To + 1;
-               end loop;
-            end;
+            Print_Indented_Block (File, Test.Error.Traceback.all, Indent => 2);
          end if;
 
          New_Line (File);

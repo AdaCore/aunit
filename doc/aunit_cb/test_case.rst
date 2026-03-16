@@ -21,6 +21,76 @@ that is the sum of the two values:
 The following sections will show how to use this test method using the
 different test case types available in AUnit.
 
+
+.. index:: AUnit.Options
+
+AUnit.Options
+=============
+
+``Options`` is a small package containing only a record ``AUnit.Options``.
+
+The record definition is at follow: 
+
+.. code-block:: ada
+
+   type AUnit_Options is record
+      Global_Timer     : Boolean := False;
+      Test_Case_Timer  : Boolean := False;
+      Report_Successes : Boolean := True;
+      Capture_Standard : Boolean := False;
+      Filter           : AUnit.Test_Filters.Test_Filter_Access := null;
+   end record;
+
+- ``Global_Timer`` : If ``True``, mesure the time taken to run all the test of the session.
+- ``Test_Case_Timer`` : If ``True``, mesure the individual time taken to each test of the session.
+- ``Report_Successes`` : If ``True``, report the successful test. Only used for non-XML reporters.
+- ``Capture_Standard`` : If ``True``, redirect stdout and stderr to include them in the report. Only available for 
+the ``Junit`` reporter.
+- ``Filter`` : Used to filter which test to report, see the package ``AUnit.Test_Filters`` for an 
+  example of such a filter.
+
+
+.. index:: AUnit.Test_Info
+
+AUnit.Test_Info
+===============
+
+``Test_Info`` is a package defining two records : ``Tested_Location`` and ``Test_Suffix``.
+
+``Tested_Location`` is a record describing the location of a the function tested by a specific test
+and is defined as follows : 
+
+.. code-block:: ada
+
+   type Tested_Location is record
+      Tested_File   : Message_String;
+      Tested_Line   : Natural;
+      Tested_Column : Natural;
+      Tested_Name : Message_String;
+   end record;
+   type Tested_Location_Access is access all Tested_Location;
+
+- ``Tested_File``: The name of the file the tested function is located in.
+- ``Tested_Line``: The line number of the file the tested function is located in.
+- ``Tested_Column``: The column number of the file the tested function is located in.
+- ``Tested_Name``: The name of the tested function.
+
+``Test_Suffix`` is a record handling the case where the tested function deepened on another 
+(instance/inheritance/overridden/...). It is defined as follows : 
+
+.. code-block:: ada 
+
+   type Test_Suffix_Access is access Test_Suffix;
+   type Test_Suffix is record
+      Suffix_Text       : Message_String;
+      Suffix_Location   : Tested_Location_Access;
+      Additional_Suffix : Test_Suffix_Access;
+   end record;
+
+- ``Suffix_Text`` : The type of relation between the tested function and the function it dependes on. (can be `instance at`, `inherited at`, `overriden at`,...).
+- ``Suffix_Location`` : The location of the other function.
+- ``Additional_Suffix`` : In case the other function also depending on another function.
+
 .. index:: AUnit.Simple_Test_Cases.Test_Case type
 
 .. _AUnit-Simple_Test_Cases:
@@ -48,6 +118,60 @@ overridden.
      begin
        return Format ("Money Tests");
      end Name;
+
+.. index:: Package_Name abstract function
+
+* ``function Package_Name (T : Test_Case) return Message_String is abstract``:
+
+  This function returns the package name of the Test. For example:
+
+  .. code-block:: ada
+
+     function Package_Name (T : Money_Test) return Message_String is
+     begin
+       return Format ("Money_Tests.Suite");
+     end Name;
+
+.. index:: Location abstract function
+
+* ``function Location (T : Test_Case) return Tested_Location is abstract``:
+
+  This function returns information about the location of the Test. For example:
+
+  .. code-block:: ada
+
+     function Location (T : Money_Test) return Tested_Location is
+     begin
+       return
+        (Tested_File   => Format ("money_tests-suite.adb"),
+         Tested_Line   => 16,
+         Tested_Column => 4,
+         Tested_Name => null);
+     end Name;
+
+
+.. index:: Suffix abstract function
+
+* ``function Suffix (T : Test_Case) return Test_Suffix is abstract``:
+
+  This function returns additional information about the location of the Test. For example:
+
+  .. code-block:: ada
+
+     function Suffix (T : Money_Test) return Test_Suffix_Access is
+     begin
+       return new Test_Suffix'(
+         Suffix_Text => "instance at"
+         Suffix_Location => new Tested_Location'(
+            Tested_File => Format ("money_test-suite.adb"),
+            Tested_Line => 4, 
+            Tested_Column => 4, 
+            Tested_Name => null
+         ),
+         Additional_Suffix => null
+       );
+     end Name;
+
 
 .. index:: Run_Test abstract function
 
@@ -90,13 +214,18 @@ AUnit.Test_Cases
 It allows a very flexible composition of Test routines inside a single
 test case, each being reported independently.
 
-The following subprograms must be considered for inheritance, overriding or
+The following subprograms must be considered for inheritance, overriding, or
 completion:
 
 .. index:: Name abstract function (for AUnit.Test_Cases.Test_Case)
+.. index:: Package_Name abstract function (for AUnit.Test_Cases.Test_Case)
+.. index:: Location abstract function (for AUnit.Test_Cases.Test_Case)
+.. index:: Suffix abstract function (for AUnit.Test_Cases.Test_Case)
 
-* ``function Name (T : Test_Case) return Message_String is abstract;``
-
+* | ``function Name (T : Test_Case) return Message_String is abstract;``
+  | ``function Package Name (T : Test_Case) return Message_String is abstract;``
+  | ``function Location (T : Test_Case) return Tested_Location is abstract;``
+  | ``function Suffix (T : Test_Case) return Test_Suffix_Access is abstract;``
   Inherited. See :ref:`AUnit.Simple_Test_Cases<AUnit-Simple_Test_Cases>`.
 
 .. index:: Set_Up procedure (for AUnit.Test_Cases.Test_Case)
@@ -167,6 +296,16 @@ Using this type to test our money addition, the package spec is:
      function Name (T: Money_Test) return Message_String;
      -- Provide name identifying the test case
 
+     function Location (T: Money_Test) return Tested_Location;  
+     -- Provide the location of the tested function.
+
+     function Suffix (T: Money_Test) return Test_Suffix_Access;
+     -- Provide additional information about the location of the tested
+     -- function
+
+     function Package_Name (T: Money_Test) return Message_String;
+     -- Provide the name of the package the test is located in.
+
      -- Test Routines:
      procedure Test_Simple_Add (T : in out Test_Cases.Test_Case'Class);
    end Money_Tests
@@ -200,6 +339,25 @@ The package body is:
       begin
          return Format ("Money Tests");
       end Name;
+
+      function Location (T : Money_Test) return Tested_Location is
+      begin
+         return
+           (Tested_File   => Format ("money_tests-suite.adb"),
+            Tested_Line   => 16,
+            Tested_Column => 4,
+            Tested_Name => null);
+      end Location;
+
+      function Suffix (T : Money_Test) return Test_Suffix_Access is
+      begin
+         return null;
+      end Suffix;
+
+      function Package_Name (T : Money_Test) return Message_String is
+      begin
+         return Format ("Money_Tests.Money_Test_Test_Data.Money_Test_Tests");
+      end Package_Name;
 
    end Money_Tests;
 
@@ -261,8 +419,17 @@ Here is the corresponding body:
       begin
          Ret.Add_Test
             (Money_Caller.Create
-               ("Money Test : Test Addition",
-                 Money_Tests.Test_Simple_Add'Access));
+               (Name         => "Money Test : Test Addition",
+                Package_Name => "Money_Test.Suite",
+                Test_File    => "money_test_suite.ads",
+                Location     => (
+                    Tested_File   => new String'("money_test.adb"),
+                    Tested_Line   => 22,
+                    Tested_Column => 4,
+                    Tested_Name =>  new String'("Test Addition")
+                ),
+                Suffix       => null,
+                Test         => Money_Tests.Test_Simple_Add'Access));
          return Ret;
       end Suite;
 
@@ -277,4 +444,3 @@ You can find a compilable example of
 ``AUnit.Test_Caller`` usage in the AUnit installation
 directory: :samp:`{<aunit-root>}/share/examples/aunit/test_caller/` or from the
 source distribution :samp:`aunit-{<version>}-src/examples/test_caller/`.
-
