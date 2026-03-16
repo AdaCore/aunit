@@ -70,12 +70,14 @@
 
 with AUnit.Simple_Test_Cases;
 with AUnit.Test_Fixtures;
+with AUnit.Test_Info; use AUnit.Test_Info;
 
 generic
 
    type Test_Fixture is new AUnit.Test_Fixtures.Test_Fixture with private;
 
-package AUnit.Test_Caller is
+package AUnit.Test_Caller
+is
 
    type Test_Case is new AUnit.Simple_Test_Cases.Test_Case with private;
    type Test_Case_Access is access all Test_Case'Class;
@@ -83,20 +85,40 @@ package AUnit.Test_Caller is
    type Test_Method is access procedure (Test : in out Test_Fixture);
 
    function Create
-     (Name : String;
-      Test : Test_Method) return Test_Case_Access;
+     (Name         : String;
+      Test_Package : String;
+      Test_File    : String;
+      Location     : Tested_Location;
+      Suffix       : Test_Suffix_Access := null;
+      Test         : Test_Method) return Test_Case_Access;
    --  Return a test case from a test fixture method, reporting the result
    --  of the test using the Name parameter.
 
    procedure Create
-     (TC   : out Test_Case'Class;
-      Name : String;
-      Test : Test_Method);
+     (TC           : out Test_Case'Class;
+      Name         : String;
+      Test_Package : String;
+      Test_File    : String;
+      Location     : Tested_Location;
+      Suffix       : Test_Suffix_Access := null;
+      Test         : Test_Method);
    --  Initialize a test case from a test fixture method, reporting the result
    --  of the test using the Name parameter.
 
    function Name (Test : Test_Case) return Message_String;
    --  Test case name
+
+   function Package_Name (Test : Test_Case) return Message_String;
+   --  Test case package name
+   
+   function Test_File (Test : Test_Case) return Message_String;
+   --  Test case file path.
+
+   function Suffix (Test : Test_Case) return Test_Suffix_Access;
+   --  Additional information about the test sloc.
+
+   function Location (Test : Test_Case) return Tested_Location;
+   --  The text case location.
 
    procedure Run_Test (Test : in out Test_Case);
    --  Perform the test.
@@ -113,9 +135,13 @@ private
    pragma No_Strict_Aliasing (Fixture_Access);
 
    type Test_Case is new AUnit.Simple_Test_Cases.Test_Case with record
-      Fixture : Fixture_Access;
-      Name    : Message_String;
-      Method  : Test_Method;
+      Fixture      : Fixture_Access;
+      Name         : Message_String;
+      Test_Package : Message_String;
+      Test_File    : Message_String;
+      Location     : Tested_Location;
+      Suffix       : Test_Suffix_Access := null;
+      Method       : Test_Method;
    end record;
 
 end AUnit.Test_Caller;

@@ -38,6 +38,7 @@
 with AUnit.Assertions;
 with AUnit.Options;
 with AUnit.Test_Results; use AUnit.Test_Results;
+with AUnit.Test_Info; use AUnit.Test_Info;
 
 package AUnit.Simple_Test_Cases is
 
@@ -47,11 +48,22 @@ package AUnit.Simple_Test_Cases is
    function Name (Test : Test_Case) return Message_String is abstract;
    --  Test case name
 
+   function Package_Name (Test : Test_Case) return Message_String is abstract;
+   --  Test case package name
+
+   function Test_File (Test : Test_Case) return Message_String is abstract;
+   --  Test case file path.
+   
+   function Suffix (Test : Test_Case) return Test_Suffix_Access is abstract;
+   --  Additional information about the test sloc.
+
    function Routine_Name (Test : Test_Case) return Message_String;
    --  Routine name. By default return a null Message_String
 
-   procedure Run_Test
-     (Test          : in out Test_Case) is abstract;
+   function Location (Test : Test_Case) return Tested_Location is abstract;
+   --  Test case location.
+
+   procedure Run_Test (Test : in out Test_Case) is abstract;
    --  Perform the test.
 
    procedure Set_Up (Test : in out Test_Case);
@@ -64,10 +76,11 @@ package AUnit.Simple_Test_Cases is
    --  Below are internal routines. Do not use --
    ----------------------------------------------
 
-   procedure Run (Test    : access Test_Case;
-                  Options :        AUnit.Options.AUnit_Options;
-                  R       : in out Result'Class;
-                  Outcome :    out Status);
+   procedure Run
+     (Test    : access Test_Case;
+      Options : AUnit.Options.AUnit_Options;
+      R       : in out Result'Class;
+      Outcome : out Status);
    --  Run test case. Do not override
 
 private

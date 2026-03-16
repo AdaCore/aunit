@@ -22,7 +22,7 @@ This offers a more 'white box' approach to examining the state of the unit
 under test than would, for instance, accessor functions defined in a separate
 fixture that is a child of the unit under test. Making the test case a child of
 the unit under test also provides a way to make the test case share certain
-characteristics of the unit under test.  For instance, if the unit under test
+characteristics of the unit under test. For instance, if the unit under test
 is generic, then any child package (here the test case) must be also generic:
 any instantiation of the parent package will require an instantiation of the
 test case in order to accomplish its aims.
@@ -148,7 +148,7 @@ following test case:
       procedure Test_P1 (P : in out Parent_Test) is ...;
       procedure Test_P2 (P : in out Parent_Test) is ...;
 
-end Root.Tests;
+    end Root.Tests;
 
 The associated test suite will be:
 
@@ -158,15 +158,37 @@ The associated test suite will be:
    with Root.Tests;
 
    package body Root_Suite is
-      package Caller is new AUnit.Test_Caller with (Root.Tests.Parent_Test);
+      package Caller is new AUnit.Test_Caller (Root.Tests.Parent_Test);
 
       function Suite return AUnit.Test_Suites.Access_Test_Suite is
-         Ret : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
+      Ret : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
       begin
          AUnit.Test_Suites.Add_Test
-            (Ret, Caller.Create ("Test Parent : P1", Root.Tests.Test_P1'Access));
+           (Ret,
+            Caller.Create
+              (Name         => "Test Parent : P1",
+               Package_Name => new String'("Root.Tests"),
+               Test_File    => new String'("root_tests.ads")
+               Location     =>
+                 (Tested_File = new String'("root.ads"),
+                  Tested_Line = 4,
+                  Tested_Column = 4,
+                  Tested_Name = new String'("P1")),
+               Suffix       => null
+               Test         => Root.Tests.Test_P1'Access));
          AUnit.Test_Suites.Add_Test
-            (Ret, Caller.Create ("Test Parent : P2", Root.Tests.Test_P2'Access));
+           (Ret,
+            Caller.Create
+              (Name         => "Test Parent : P2",
+               Package_Name => new String'("Root.Tests"),
+               Test_File    => new String'("root_tests.ads")
+               Location     =>
+                 (Tested_File = new String'("root.ads"),
+                  Tested_Line = 5,
+                  Tested_Column = 4,
+                  Tested_Name = new String'("P2")),
+               Suffix       => null,
+               Test         => Root.Tests.Test_P2'Access));
          return Ret;
       end Suite;
    end Root_Suite;
@@ -231,6 +253,7 @@ The suite for Branch.Tests will now be:
       --  In this suite, we use Ada 2005 distinguished receiver notation to
       --  simplify the code.
 
+     
       function Suite return Access_Test_Suite is
          Ret : Access_Test_Suite := AUnit.Test_Suites.New_Suite;
       begin
@@ -238,13 +261,50 @@ The suite for Branch.Tests will now be:
          --  Branch.Tests.Set_Up that will be called, and so Test_P1 will be run
          --  against an object of type Child
          Ret.Add_Test
-            (Caller.Create ("Test Child : P1", Branch.Tests.Test_P1'Access));
+           (Caller.Create
+              (Name         => "Test Child : P1",
+               Package_Name => new String'("Root.Tests"),
+               Test_File    => new String'("root_tests.ads")
+               Location     =>
+                 (Tested_File = new String'("root.ads"),
+                  Tested_Line = 4,
+                  Tested_Column = 4,
+                  Tested_Name = new String'("P1")),
+               Suffix       => null,
+               Test         => Branch.Tests.Test_P1'Access));
          --  We use the overridden Test_P2
          Ret.Add_Test
-            (Caller.Create ("Test Child : P2", Branch.Tests.Test_P2'Access));
+           (Caller.Create
+              (Name         => "Test Child : P2",
+               Package_Name => new String'("Branch.Tests"),
+               Test_File    => new String'("branch_tests.ads")
+               Location     =>
+                 (Tested_File   => new String'("root.ads"),
+                  Tested_Line   => 5,
+                  Tested_Column => 4,
+                  Tested_Name = new String'("P2")),
+               Suffix       =>
+                 new Test_Suffix'
+                   (Suffix_Text       => new String'("overridden at"),
+                    Suffix_Location   =>
+                      (Tested_File   => new String'("branch.ads"),
+                       Tested_Line   => 6,
+                       Tested_Column => 4,
+                       Tested_Name => null),
+                    Additional_Suffix => null),
+               Test         => Branch.Tests.Test_P2'Access));
          --  We use the new Test_P2
          Ret.Add_Test
-            (Caller.Create ("Test Child : P3", Branch.Tests.Test_P3'Access));
+           (Caller.Create
+              (Name         => "Test Child : P3",
+               Package_Name => new String'("Branch.Tests"),
+               Test_File    => new String'("branch_tests.ads")
+               Location     =>
+                 (Tested_File   => new String'("branch.ads"),
+                  Tested_Line   => 7,
+                  Tested_Column => 4,
+                  Tested_Name = new String'("P3")),
+               Branch.Tests.Test_P3'Access));
          return Ret;
       end Suite;
    end Branch_Suite;
@@ -270,6 +330,10 @@ following code for testing ``Parent``:
       end record;
 
       function Name (P : Parent_Test) return Message_String;
+      function Test_File (P : Parent_Test) return Message_String;
+      function Package_Name (P : Parent_Test) return Message_String;
+      function Location (P : Parent_Test) return Tested_Location;
+      function Suffix (P : Parent_Test) return Test_Suffix_Access;
       procedure Register_Tests (P : in out Parent_Test);
 
       procedure Set_Up_Case (P : in out Parent_Test);
@@ -306,6 +370,10 @@ parameter being the parent test case type.
       procedure Test_P2_Wrapper (P : in out Parent_Test'Class);
 
       function Name (P : Parent_Test) return Message_String is ...;
+      function Test_File (P : Parent_Test) return Message_String is ...;
+      function Package_Name (P : Parent_Test) return Message_String is ...;
+      function Location (P : Parent_Test) return Tested_Location is ...;
+      function Suffix (P : Parent_Test) return Test_Suffix_Access is ...;
 
       --  Set the fixture in P
       Fixture : aliased Parent;
@@ -354,6 +422,10 @@ The code for testing the `Child` type will now be:
       type Child_Test is new Parent_Test with private;
 
       function Name (C : Child_Test) return Message_String;
+      function Test_File (P : Parent_Test) return Message_String;
+      function Package_Name (P : Parent_Test) return Message_String;
+      function Location (P : Parent_Test) return Tested_Location;
+      function Suffix (P : Parent_Test) return Test_Suffix_Access;
       procedure Register_Tests (C : in out Child_Test);
 
       --  Override Set_Up_Case so that the fixture changes.
@@ -376,6 +448,10 @@ The code for testing the `Child` type will now be:
       procedure Test_P3_Wrapper (C : in out Child_Test'Class);
 
       function Name (C : Child_Test) return Test_String is ...;
+      function Test_File (P : Parent_Test) return Message_String is ...;
+      function Package_Name (P : Parent_Test) return Message_String is ...;
+      function Location (P : Parent_Test) return Tested_Location is ...;
+      function Suffix (P : Parent_Test) return Test_Suffix_Access is ...;
 
       procedure Register_Tests (C : in out Child_Test) is
          package Register_Specific is
