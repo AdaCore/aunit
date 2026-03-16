@@ -32,7 +32,7 @@
 --  Dummy implementation.
 
 with System.Storage_Elements;
-with Unchecked_Conversion;
+with Ada.Unchecked_Conversion;
 
 package body AUnit.Memory is
 
@@ -49,7 +49,7 @@ package body AUnit.Memory is
 
    Top : Mark_Id := Mem'First;
 
-   function To_Mark_Id is new Unchecked_Conversion
+   function To_Mark_Id is new Ada.Unchecked_Conversion
      (size_t, Mark_Id);
 
    -----------

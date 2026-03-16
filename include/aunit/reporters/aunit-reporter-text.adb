@@ -38,13 +38,19 @@ package body AUnit.Reporter.Text is
    procedure Indent (File : File_Type; N : Natural);
    --  Print N indentations to output
 
-   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String);
+   procedure Dump_Result_List
+      (File   : File_Type;
+       L      : Result_Lists.List;
+       Prefix : String);
    --  Dump a result list
 
    procedure Put_Measure is new Gen_Put_Measure;
    --  Output elapsed time
 
-   procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String);
+   procedure Report_Test
+      (File   : File_Type;
+       Test   : Test_Result;
+       Prefix : String);
    --  Report a single assertion failure or unexpected exception
 
    generic
@@ -88,8 +94,11 @@ package body AUnit.Reporter.Text is
    -- Dump_Result_List --
    ----------------------
 
-   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List; Prefix : String) is
-
+   procedure Dump_Result_List
+      (File   : File_Type;
+       L      : Result_Lists.List;
+       Prefix : String)
+   is
       use Result_Lists;
 
       C : Cursor := First (L);
@@ -211,7 +220,11 @@ package body AUnit.Reporter.Text is
    -- Report_Test --
    -----------------
 
-   procedure Report_Test (File : File_Type; Test : Test_Result; Prefix : String) is
+   procedure Report_Test
+      (File   : File_Type;
+       Test   : Test_Result;
+       Prefix : String)
+   is
       T : AUnit_Duration;
    begin
       Put (File, Prefix);

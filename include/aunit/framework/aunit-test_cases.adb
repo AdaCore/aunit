@@ -61,6 +61,9 @@ package body AUnit.Test_Cases is
    ----------------------
 
    function Call_Set_Up_Case
+     (Test : in out Test_Case'Class) return Test_Error_Access;
+
+   function Call_Set_Up_Case
      (Test : in out Test_Case'Class) return Test_Error_Access is separate;
 
    ---------

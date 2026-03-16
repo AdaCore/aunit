@@ -33,7 +33,11 @@ with AUnit.IO;              use AUnit.IO;
 with AUnit.Time_Measure;    use AUnit.Time_Measure;
 
 package body AUnit.Reporter.JUnit is
-   
+
+   procedure Put_Special_Chars (File : File_Type; S : String);
+   procedure Report_Test (File : File_Type; Test : Test_Result);
+   procedure Dump_Result_List (File : File_Type; L : Result_Lists.List);
+
    procedure Put_Special_Chars (File : File_Type; S : String) is
    begin
       for C of S loop
@@ -46,10 +50,10 @@ package body AUnit.Reporter.JUnit is
          end case;
       end loop;
    end Put_Special_Chars;
-   
+
    procedure Put_Measure is
      new Gen_Put_Measure_In_Seconds;
-   
+
    procedure Report_Test (File : File_Type; Test : Test_Result) is
    begin
       Put (File, "<testcase name=""");
@@ -59,7 +63,7 @@ package body AUnit.Reporter.JUnit is
       Put (File, """ time=""");
       Put_Measure (File, Get_Measure (Test.Elapsed));
       if Test.Failure /= null then
-         Put_Line (File, """>"); 
+         Put_Line (File, """>");
          Put_Line (File, "<failure>");
          Put_Line (File, "<![CDATA[");
          Put (File, "        Assertion: ");
@@ -73,7 +77,7 @@ package body AUnit.Reporter.JUnit is
          Put_Line (File, "</failure>");
          Put_Line (File, "</testcase>");
       elsif Test.Error /= null then
-         Put_Line (File, """>"); 
+         Put_Line (File, """>");
          Put_Line (File, "<error>");
          Put_Line (File, "<![CDATA[");
          Put (File, "      Exception: ");
@@ -90,9 +94,9 @@ package body AUnit.Reporter.JUnit is
          Put_Line (File, "</testcase>");
       else
          Put_Line (File, """ />");
-      end if;      
+      end if;
    end Report_Test;
-   
+
    procedure Dump_Result_List (File : File_Type; L : Result_Lists.List) is
       use Result_Lists;
       C : Cursor := First (L);
@@ -102,17 +106,19 @@ package body AUnit.Reporter.JUnit is
          Next (C);
       end loop;
    end Dump_Result_List;
-   
+
    procedure Report (Engine  : JUnit_Reporter;
                      R       : in out Result'Class;
                      Options : AUnit_Options := Default_Options)
-   is     
+   is
       File : File_Type renames Engine.File.all;
       T    : constant Time := Elapsed (R);
    begin
       Put_Line (File, "<?xml version=""1.0"" encoding=""utf-8""?>");
       Put_Line (File, "<testsuites>");
-      Put (File, "<testsuite name=""" & "aunit_testsuite" & """ skipped=""0"" tests=""");
+      Put (File, "<testsuite name=""" &
+                 "aunit_testsuite" &
+                 """ skipped=""0"" tests=""");
       Put (File, Integer (Test_Count (R)), 0);
       Put (File, """ failures=""");
       Put (File, Integer (Failure_Count (R)), 0);
@@ -122,7 +128,7 @@ package body AUnit.Reporter.JUnit is
          Put (File, """ time=""");
          Put_Measure (File, Get_Measure (T));
       end if;
-      Put_Line (File, """>");      
+      Put_Line (File, """>");
       if Options.Report_Successes then
          declare
             S : Result_Lists.List;
@@ -130,7 +136,7 @@ package body AUnit.Reporter.JUnit is
             Successes (R, S);
             Dump_Result_List (File, S);
          end;
-      end if;      
+      end if;
       declare
          F : Result_Lists.List;
       begin
@@ -142,7 +148,7 @@ package body AUnit.Reporter.JUnit is
       begin
          Errors (R, E);
          Dump_Result_List (File, E);
-      end;      
+      end;
       Put_Line (File, "</testsuite>");
       Put_Line (File, "</testsuites>");
    end Report;
