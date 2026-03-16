@@ -29,9 +29,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions; use Ada.Exceptions;
+with Ada.Exceptions;          use Ada.Exceptions;
 
-with AUnit.IO;
 with GNAT.Traceback.Symbolic; use GNAT.Traceback.Symbolic;
 
 with AUnit.Time_Measure;
@@ -41,14 +40,12 @@ separate (AUnit.Simple_Test_Cases)
 --  Version for run-time libraries that support exception handling
 procedure Run_Routine
   (Test    : access Test_Case'Class;
-   Options : AUnit.Options.AUnit_Options;
+   Options :        AUnit.Options.AUnit_Options;
    R       : in out Result'Class;
-   Outcome : out Status)
+   Outcome :    out Status)
 is
    Unexpected_Exception : Boolean := False;
-   Time                 : Time_Measure.Time := Time_Measure.Null_Time;
-   Output_File          : AUnit.IO.File_Type;
-   Error_File           : AUnit.IO.File_Type;
+   Time : Time_Measure.Time := Time_Measure.Null_Time;
 
    use Time_Measure;
 
@@ -63,28 +60,19 @@ begin
          Start_Measure (Time);
       end if;
 
-      AUnit.IO.Redirect_Standard_Streams
-        (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
-
       Run_Test (Test.all);
 
-      AUnit.IO.Restore_Standard_Streams
-        (Output_File, Error_File, Options.Capture_Standard);
       if Options.Test_Case_Timer then
          Stop_Measure (Time);
       end if;
 
    exception
       when Assertion_Error =>
-         AUnit.IO.Restore_Standard_Streams
-           (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
       when E : others =>
-         AUnit.IO.Restore_Standard_Streams
-           (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
@@ -93,51 +81,27 @@ begin
          Add_Error
            (R,
             Name (Test.all),
-            Package_Name (Test.all),
-            Test_File (Test.all),
             Routine_Name (Test.all),
-            AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-            AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-            Location (Test.all),
-            Error   =>
-              (Exception_Name    => Format (Exception_Name (E)),
-               Exception_Message => Format (Exception_Message (E)),
-               Traceback         => Format (Symbolic_Traceback (E))),
-            Suffix  => Suffix (Test.all),
+            Error => (Exception_Name    => Format (Exception_Name (E)),
+                      Exception_Message => Format (Exception_Message (E)),
+                      Traceback         => Format (Symbolic_Traceback (E))),
             Elapsed => Time);
    end;
 
    if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
-      Add_Success
-        (R,
-         Name (Test.all),
-         Package_Name (Test.all),
-         Test_File (Test.all),
-         Routine_Name (Test.all),
-         AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-         AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-         Location (Test.all),
-         Suffix (Test.all),
-         Time);
+      Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
    else
       Outcome := Failure;
       declare
          C : Failure_Iter := First_Failure (Test.all);
       begin
          while Has_Failure (C) loop
-            Add_Failure
-              (R,
-               Name (Test.all),
-               Package_Name (Test.all),
-               Test_File (Test.all),
-               Routine_Name (Test.all),
-               AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-               AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-               Location (Test.all),
-               Get_Failure (C),
-               Suffix (Test.all),
-               Time);
+            Add_Failure (R,
+                         Name (Test.all),
+                         Routine_Name (Test.all),
+                         Get_Failure (C),
+                         Time);
             Next (C);
          end loop;
       end;

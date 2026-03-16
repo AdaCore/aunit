@@ -31,7 +31,7 @@
 
 package body AUnit.Assertions is
 
-   Failures : Failure_Lists.List;
+   Failures         : Failure_Lists.List;
    --  ??? Calls to Failures should be protected, so that we can use
    --  multitasking
 
@@ -72,13 +72,12 @@ package body AUnit.Assertions is
       Source    : String := GNAT.Source_Info.File;
       Line      : Natural := GNAT.Source_Info.Line) return Boolean is
    begin
-
       if not Condition then
          Failure_Lists.Append
            (Failures,
             (Failure => (Format (Message), Format (Source), Line),
              Id      =>
-               --  Allow calling Assert without an AUnit framework
+             --  Allow calling Assert without an AUnit framework
                (if The_Current_Test = null
                 then Null_Id
                 else The_Current_Test.Id)));
@@ -95,19 +94,18 @@ package body AUnit.Assertions is
      (Proc    : Throwing_Exception_Proc;
       Message : String;
       Source  : String := GNAT.Source_Info.File;
-      Line    : Natural := GNAT.Source_Info.Line)
-   is separate;
+      Line    : Natural := GNAT.Source_Info.Line) is separate;
 
    ------------
    -- Assert --
    ------------
 
    procedure Assert
-     (Actual   : String;
-      Expected : String;
-      Message  : String;
-      Source   : String := GNAT.Source_Info.File;
-      Line     : Natural := GNAT.Source_Info.Line) is
+     (Actual    : String;
+      Expected  : String;
+      Message   : String;
+      Source    : String  := GNAT.Source_Info.File;
+      Line      : Natural := GNAT.Source_Info.Line) is
    begin
       if Actual /= Expected then
          Assert
@@ -154,7 +152,6 @@ package body AUnit.Assertions is
    function First_Failure (T : Test) return Failure_Iter is
       C : Failure_Lists.Cursor;
    begin
-
       C := Failure_Lists.First (Failures);
 
       while Failure_Lists.Has_Element (C) loop

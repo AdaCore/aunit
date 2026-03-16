@@ -30,8 +30,7 @@
 
 pragma Ada_2005;
 
-with System;
-use type System.Address;
+with System;  use type System.Address;
 
 with AUnit.Memory;       use AUnit.Memory;
 with AUnit.Memory.Utils; use AUnit.Memory.Utils;
@@ -42,15 +41,19 @@ package body Ada_Containers.AUnit_Lists is
    -- Local Subprograms --
    -----------------------
 
-   function New_Node_Type is new
-     AUnit.Memory.Utils.Gen_Alloc (Node_Type, Node_Access);
+   function New_Node_Type is new AUnit.Memory.Utils.Gen_Alloc
+     (Node_Type, Node_Access);
 
    function New_Node_Type
-     (Element : Element_Type; Next : Node_Access; Prev : Node_Access)
+     (Element : Element_Type;
+      Next    : Node_Access;
+      Prev    : Node_Access)
       return Node_Access;
 
    procedure Insert_Internal
-     (Container : in out List; Before : Node_Access; New_Node : Node_Access);
+     (Container : in out List;
+      Before    : Node_Access;
+      New_Node  : Node_Access);
 
    function Vet (Position : Cursor) return Boolean;
 
@@ -59,14 +62,15 @@ package body Ada_Containers.AUnit_Lists is
    --------------
 
    function New_Node_Type
-     (Element : Element_Type; Next : Node_Access; Prev : Node_Access)
-      return Node_Access
+     (Element : Element_Type;
+      Next    : Node_Access;
+      Prev    : Node_Access) return Node_Access
    is
       Res : constant Node_Access := New_Node_Type;
    begin
       Res.Element := Element;
-      Res.Next := Next;
-      Res.Prev := Prev;
+      Res.Next    := Next;
+      Res.Prev    := Prev;
       return Res;
    end New_Node_Type;
 
@@ -106,7 +110,8 @@ package body Ada_Containers.AUnit_Lists is
    procedure Append
      (Container : in out List;
       New_Item  : Element_Type;
-      Count     : Count_Type := 1) is
+      Count     : Count_Type := 1)
+   is
    begin
       Insert (Container, No_Element, New_Item, Count);
    end Append;
@@ -160,7 +165,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Contains --
    --------------
 
-   function Contains (Container : List; Item : Element_Type) return Boolean is
+   function Contains
+     (Container : List;
+      Item      : Element_Type) return Boolean
+   is
    begin
       return Find (Container, Item) /= No_Element;
    end Contains;
@@ -231,7 +239,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Delete_First --
    ------------------
 
-   procedure Delete_First (Container : in out List; Count : Count_Type := 1) is
+   procedure Delete_First
+     (Container : in out List;
+      Count     : Count_Type := 1)
+   is
       X : Node_Access;
 
    begin
@@ -265,7 +276,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Delete_Last --
    -----------------
 
-   procedure Delete_Last (Container : in out List; Count : Count_Type := 1) is
+   procedure Delete_Last
+     (Container : in out List;
+      Count     : Count_Type := 1)
+   is
       X : Node_Access;
 
    begin
@@ -315,8 +329,9 @@ package body Ada_Containers.AUnit_Lists is
    ----------
 
    function Find
-     (Container : List; Item : Element_Type; Position : Cursor := No_Element)
-      return Cursor
+     (Container : List;
+      Item      : Element_Type;
+      Position  : Cursor := No_Element) return Cursor
    is
       Node : Node_Access := Position.Node;
 
@@ -398,7 +413,10 @@ package body Ada_Containers.AUnit_Lists is
       -- Merge --
       -----------
 
-      procedure Merge (Target : in out List; Source : in out List) is
+      procedure Merge
+        (Target : in out List;
+         Source : in out List)
+      is
          LI, RI : Cursor;
 
       begin
@@ -417,20 +435,18 @@ package body Ada_Containers.AUnit_Lists is
          LI := First (Target);
          RI := First (Source);
          while RI.Node /= null loop
-            pragma
-              Assert
-                (RI.Node.Next = null
-                   or else not (RI.Node.Next.Element < RI.Node.Element));
+            pragma Assert (RI.Node.Next = null
+                             or else not (RI.Node.Next.Element <
+                                          RI.Node.Element));
 
             if LI.Node = null then
                Splice (Target, No_Element, Source);
                return;
             end if;
 
-            pragma
-              Assert
-                (LI.Node.Next = null
-                   or else not (LI.Node.Next.Element < LI.Node.Element));
+            pragma Assert (LI.Node.Next = null
+                             or else not (LI.Node.Next.Element <
+                                          LI.Node.Element));
 
             if RI.Node.Element < LI.Node.Element then
                declare
@@ -521,7 +537,7 @@ package body Ada_Containers.AUnit_Lists is
             end if;
          end Sort;
 
-         --  Start of processing for Sort
+      --  Start of processing for Sort
 
       begin
          if Container.Length <= 1 then
@@ -656,7 +672,10 @@ package body Ada_Containers.AUnit_Lists is
    ---------------------
 
    procedure Insert_Internal
-     (Container : in out List; Before : Node_Access; New_Node : Node_Access) is
+     (Container : in out List;
+      Before    : Node_Access;
+      New_Node  : Node_Access)
+   is
    begin
       if Container.Length = 0 then
          pragma Assert (Before = null);
@@ -710,7 +729,8 @@ package body Ada_Containers.AUnit_Lists is
    -------------
 
    procedure Iterate
-     (Container : List; Process : Iterator; Name : String := "")
+     (Container : List;
+      Process   : Iterator)
    is
       C : List renames Container'Unrestricted_Access.all;
       B : Natural renames C.Busy;
@@ -722,7 +742,7 @@ package body Ada_Containers.AUnit_Lists is
 
       begin
          while Node /= null loop
-            Process (Cursor'(Container'Unchecked_Access, Node), Name);
+            Process (Cursor'(Container'Unchecked_Access, Node));
             Node := Node.Next;
          end loop;
       end;
@@ -769,7 +789,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Move --
    ----------
 
-   procedure Move (Target : in out List; Source : in out List) is
+   procedure Move
+     (Target : in out List;
+      Source : in out List)
+   is
    begin
       if Target'Address = Source'Address then
          return;
@@ -826,7 +849,8 @@ package body Ada_Containers.AUnit_Lists is
    procedure Prepend
      (Container : in out List;
       New_Item  : Element_Type;
-      Count     : Count_Type := 1) is
+      Count     : Count_Type := 1)
+   is
    begin
       Insert (Container, First (Container), New_Item, Count);
    end Prepend;
@@ -864,7 +888,10 @@ package body Ada_Containers.AUnit_Lists is
    ---------------------
 
    procedure Replace_Element
-     (Container : in out List; Position : Cursor; New_Item : Element_Type) is
+     (Container : in out List;
+      Position  : Cursor;
+      New_Item  : Element_Type)
+   is
    begin
       if Position.Container = null then
          raise Constraint_Error;
@@ -931,7 +958,7 @@ package body Ada_Containers.AUnit_Lists is
          end if;
       end Swap;
 
-      --  Start of processing for Reverse_Elements
+   --  Start of processing for Reverse_Elements
 
    begin
       if Container.Length <= 1 then
@@ -974,8 +1001,9 @@ package body Ada_Containers.AUnit_Lists is
    ------------------
 
    function Reverse_Find
-     (Container : List; Item : Element_Type; Position : Cursor := No_Element)
-      return Cursor
+     (Container : List;
+      Item      : Element_Type;
+      Position  : Cursor := No_Element) return Cursor
    is
       Node : Node_Access := Position.Node;
 
@@ -1007,7 +1035,10 @@ package body Ada_Containers.AUnit_Lists is
    ------------
 
    procedure Splice
-     (Target : in out List; Before : Cursor; Source : in out List) is
+     (Target : in out List;
+      Before : Cursor;
+      Source : in out List)
+   is
    begin
       if Before.Container /= null then
          if Before.Container /= Target'Unrestricted_Access then
@@ -1017,7 +1048,9 @@ package body Ada_Containers.AUnit_Lists is
          pragma Assert (Vet (Before), "bad cursor in Splice");
       end if;
 
-      if Target'Address = Source'Address or else Source.Length = 0 then
+      if Target'Address = Source'Address
+        or else Source.Length = 0
+      then
          return;
       end if;
 
@@ -1078,7 +1111,10 @@ package body Ada_Containers.AUnit_Lists is
    end Splice;
 
    procedure Splice
-     (Container : in out List; Before : Cursor; Position : Cursor) is
+     (Container : in out List;
+      Before    : Cursor;
+      Position  : Cursor)
+   is
    begin
       if Before.Container /= null then
          if Before.Container /= Container'Unchecked_Access then
@@ -1098,7 +1134,8 @@ package body Ada_Containers.AUnit_Lists is
 
       pragma Assert (Vet (Position), "bad Position cursor in Splice");
 
-      if Position.Node = Before.Node or else Position.Node.Next = Before.Node
+      if Position.Node = Before.Node
+        or else Position.Node.Next = Before.Node
       then
          return;
       end if;
@@ -1176,7 +1213,8 @@ package body Ada_Containers.AUnit_Lists is
      (Target   : in out List;
       Before   : Cursor;
       Source   : in out List;
-      Position : in out Cursor) is
+      Position : in out Cursor)
+   is
    begin
       if Target'Address = Source'Address then
          Splice (Target, Before, Position);
@@ -1282,7 +1320,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Swap --
    ----------
 
-   procedure Swap (Container : in out List; I, J : Cursor) is
+   procedure Swap
+     (Container : in out List;
+      I, J      : Cursor)
+   is
    begin
       if I.Node = null then
          raise Constraint_Error;
@@ -1327,7 +1368,10 @@ package body Ada_Containers.AUnit_Lists is
    -- Swap_Links --
    ----------------
 
-   procedure Swap_Links (Container : in out List; I, J : Cursor) is
+   procedure Swap_Links
+     (Container : in out List;
+      I, J      : Cursor)
+   is
    begin
       if I.Node = null then
          raise Constraint_Error;
@@ -1427,11 +1471,15 @@ package body Ada_Containers.AUnit_Lists is
             return False;
          end if;
 
-         if Position.Node.Prev = null and then Position.Node /= L.First then
+         if Position.Node.Prev = null
+           and then Position.Node /= L.First
+         then
             return False;
          end if;
 
-         if Position.Node.Next = null and then Position.Node /= L.Last then
+         if Position.Node.Next = null
+           and then Position.Node /= L.Last
+         then
             return False;
          end if;
 

@@ -1,7 +1,7 @@
 --
 --  Copyright (C) 2008, AdaCore
 --
-with Math.Test; use Math.Test;
+with Math.Test;         use Math.Test;
 with AUnit.Test_Caller;
 
 package body Math_Suite is
@@ -12,56 +12,17 @@ package body Math_Suite is
       Ret : constant Access_Test_Suite := new Test_Suite;
    begin
       Ret.Add_Test
-        (Caller.Create
-           (Name         => "Test addition",
-            Test_Package => "Math.Test",
-            Test_File    => "../tests/math-test.ads",
-            Location     =>
-              (Tested_File   => new String'("math.ads"),
-               Tested_Line   => 8,
-               Tested_Column => 4,
-               Tested_Name => new String'("""+""")),
-            Suffix       => null,
-            Test         => Test_Addition'Access));
-
+        (Caller.Create ("Test addition", Test_Addition'Access));
+      Ret.Add_Test
+        (Caller.Create ("Test subtraction", Test_Subtraction'Access));
       Ret.Add_Test
         (Caller.Create
-           (Name         => "Test subtraction",
-            Test_Package => "Math.Test",
-            Test_File    => "../tests/math-test.ads",
-            Location     =>
-              (Tested_File   => new String'("math.ads"),
-               Tested_Line   => 10,
-               Tested_Column => 4,
-               Tested_Name => new String'("""-""")),
-            Suffix       => null,
-            Test         => Test_Subtraction'Access));
-
+           ("Test addition (failure expected)",
+            Test_Addition_Failure'Access));
       Ret.Add_Test
         (Caller.Create
-           (Name         => "Test addition (failure expected)",
-            Test_Package => "Math.Test",
-            Test_File    => "../tests/math-test.ads",
-            Location     =>
-              (Tested_File   => new String'("math.ads"),
-               Tested_Line   => 8,
-               Tested_Column => 4,
-               Tested_Name => new String'("""+""")),
-            Suffix       => null,
-            Test         => Test_Addition_Failure'Access));
-
-      Ret.Add_Test
-        (Caller.Create
-           (Name         => "Test addition (error expected)",
-            Test_Package => "Math.Test",
-            Test_File    => "../tests/math-test.ads",
-            Location     =>
-              (Tested_File   => new String'("math.ads"),
-               Tested_Line   => 8,
-               Tested_Column => 4,
-               Tested_Name => new String'("""+""")),
-            Suffix       => null,
-            Test         => Test_Addition_Error'Access));
+           ("Test addition (error expected)",
+            Test_Addition_Error'Access));
       return Ret;
    end Suite;
 

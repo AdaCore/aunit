@@ -66,12 +66,11 @@ package body AUnit.Time_Measure is
    -- Gen_Put_Measure --
    ---------------------
 
-   procedure Gen_Put_Measure
-     (File : AUnit.IO.File_Type; Measure : AUnit_Duration)
-   is
-      H, M, S : Integer := 0;
-      T       : Duration := Duration (Measure);
-      Force   : Boolean;
+   procedure Gen_Put_Measure (File    : AUnit.IO.File_Type;
+                              Measure : AUnit_Duration) is
+      H, M, S  : Integer := 0;
+      T        : Duration := Duration (Measure);
+      Force    : Boolean;
 
       procedure Put (N : Integer; Length : Integer);
       --  Put N using at least Length digits.
@@ -143,11 +142,10 @@ package body AUnit.Time_Measure is
    -- Gen_Put_Measure_In_Seconds --
    --------------------------------
 
-   procedure Gen_Put_Measure_In_Seconds
-     (File : AUnit.IO.File_Type; Measure : AUnit_Duration)
-   is
-      S : Integer := 0;
-      T : Duration := Duration (Measure);
+   procedure Gen_Put_Measure_In_Seconds (File    : AUnit.IO.File_Type;
+                                         Measure : AUnit_Duration) is
+      S  : Integer := 0;
+      T  : Duration := Duration (Measure);
 
       procedure Put (N : Integer; Length : Integer);
       --  Put N using at least Length digits.
@@ -176,6 +174,7 @@ package body AUnit.Time_Measure is
 
       Put (File, ".");
       Put (Integer (T * 1_000_000.0), 9);
+      Put (File, "s");
    end Gen_Put_Measure_In_Seconds;
 
 end AUnit.Time_Measure;

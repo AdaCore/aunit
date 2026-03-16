@@ -43,16 +43,16 @@
 generic
    type Element_Type is private;
 
-   with function "=" (Left, Right : Element_Type) return Boolean is <>;
+   with function "=" (Left, Right : Element_Type)
+      return Boolean is <>;
 
-package Ada_Containers.AUnit_Lists
-is
+package Ada_Containers.AUnit_Lists is
 
    type List is tagged limited private;
 
    type Cursor is private;
 
-   --    Empty_List : constant List;
+--    Empty_List : constant List;
 
    No_Element : constant Cursor;
 
@@ -67,18 +67,22 @@ is
    function Element (Position : Cursor) return Element_Type;
 
    procedure Replace_Element
-     (Container : in out List; Position : Cursor; New_Item : Element_Type);
+     (Container : in out List;
+      Position  : Cursor;
+      New_Item  : Element_Type);
 
-   --     procedure Query_Element
-   --       (Position : Cursor;
-   --        Process  : not null access procedure (Element : Element_Type));
+--     procedure Query_Element
+--       (Position : Cursor;
+--        Process  : not null access procedure (Element : Element_Type));
 
-   --     procedure Update_Element
-   --       (Container : in out List;
-   --        Position  : Cursor;
-   --      Process   : not null access procedure (Element : in out Element_Type));
+--     procedure Update_Element
+--       (Container : in out List;
+--        Position  : Cursor;
+--      Process   : not null access procedure (Element : in out Element_Type));
 
-   procedure Move (Target : in out List; Source : in out List);
+   procedure Move
+     (Target : in out List;
+      Source : in out List);
 
    procedure Insert
      (Container : in out List;
@@ -114,18 +118,28 @@ is
       Position  : in out Cursor;
       Count     : Count_Type := 1);
 
-   procedure Delete_First (Container : in out List; Count : Count_Type := 1);
+   procedure Delete_First
+     (Container : in out List;
+      Count     : Count_Type := 1);
 
-   procedure Delete_Last (Container : in out List; Count : Count_Type := 1);
+   procedure Delete_Last
+     (Container : in out List;
+      Count     : Count_Type := 1);
 
    procedure Reverse_Elements (Container : in out List);
 
-   procedure Swap (Container : in out List; I, J : Cursor);
+   procedure Swap
+     (Container : in out List;
+      I, J      : Cursor);
 
-   procedure Swap_Links (Container : in out List; I, J : Cursor);
+   procedure Swap_Links
+     (Container : in out List;
+      I, J      : Cursor);
 
    procedure Splice
-     (Target : in out List; Before : Cursor; Source : in out List);
+     (Target : in out List;
+      Before : Cursor;
+      Source : in out List);
 
    procedure Splice
      (Target   : in out List;
@@ -134,7 +148,9 @@ is
       Position : in out Cursor);
 
    procedure Splice
-     (Container : in out List; Before : Cursor; Position : Cursor);
+     (Container : in out List;
+      Before    : Cursor;
+      Position  : Cursor);
 
    function First (Container : List) return Cursor;
 
@@ -153,25 +169,30 @@ is
    procedure Previous (Position : in out Cursor);
 
    function Find
-     (Container : List; Item : Element_Type; Position : Cursor := No_Element)
-      return Cursor;
+     (Container : List;
+      Item      : Element_Type;
+      Position  : Cursor := No_Element) return Cursor;
 
    function Reverse_Find
-     (Container : List; Item : Element_Type; Position : Cursor := No_Element)
-      return Cursor;
+     (Container : List;
+      Item      : Element_Type;
+      Position  : Cursor := No_Element) return Cursor;
 
-   function Contains (Container : List; Item : Element_Type) return Boolean;
+   function Contains
+     (Container : List;
+      Item      : Element_Type) return Boolean;
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   type Iterator is access procedure (Position : Cursor; Name : String);
+   type Iterator is access procedure (Position : Cursor);
 
    procedure Iterate
-     (Container : List; Process : Iterator; Name : String := "");
+     (Container : List;
+      Process   : Iterator);
 
-   --     procedure Reverse_Iterate
-   --       (Container : List;
-   --        Process   : not null access procedure (Position : Cursor));
+--     procedure Reverse_Iterate
+--       (Container : List;
+--        Process   : not null access procedure (Position : Cursor));
 
    generic
       with function "<" (Left, Right : Element_Type) return Boolean is <>;
