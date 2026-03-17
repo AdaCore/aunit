@@ -29,30 +29,42 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.IO;
+with AUnit.IO;           use AUnit.IO;
 with AUnit.Options;      use AUnit.Options;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 package AUnit.Reporter is
 
+   Indent_Level : Natural := 0;
+   --  Indicate how many indentation the reporter must currently print.
+
    type Reporter is abstract tagged private;
 
-   procedure Set_File
-     (Engine : in out Reporter;
-      Value  : AUnit.IO.File_Access);
+   procedure Set_File (Engine : in out Reporter; Value : AUnit.IO.File_Access);
 
    procedure Report
      (Engine  : Reporter;
       R       : in out Result'Class;
-      Options : AUnit_Options := Default_Options) is abstract;
+      Options : AUnit_Options := Default_Options)
+   is abstract;
    --  This procedure is called by AUnit.Run to report the result after running
    --  the whole testsuite (or the selected subset of tests).
 
+   procedure Indent_Line (File : File_Type; Indent : Natural := 0);
+   --  Print spaces matching the current indentation level.
+
+   procedure Put_Line (File : File_Type; Item : String; Indent : Natural);
+   --  Print the indentation, the string and a linefeed.
+
+   procedure Put (File : File_Type; Item : String; Indent : Natural);
+   --  Print the indentation and the string.
+
 private
 
-   type Reporter is abstract tagged
-      record
-         File : AUnit.IO.File_Access := AUnit.IO.Standard_Output;
-      end record;
+   procedure Print_Location_Suffix (File : File_Type; Test : Test_Result);
+
+   type Reporter is abstract tagged record
+      File : AUnit.IO.File_Access := AUnit.IO.Standard_Output;
+   end record;
 
 end AUnit.Reporter;
