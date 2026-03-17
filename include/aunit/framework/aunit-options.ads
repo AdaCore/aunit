@@ -37,6 +37,7 @@ package AUnit.Options is
       Global_Timer     : Boolean := False;
       Test_Case_Timer  : Boolean := False;
       Report_Successes : Boolean := True;
+      Capture_Standard : Boolean := False;
       Filter           : AUnit.Test_Filters.Test_Filter_Access := null;
    end record;
    --  Options used to determine how a test should be run.
@@ -45,6 +46,7 @@ package AUnit.Options is
      (Global_Timer     => False,
       Test_Case_Timer  => False,
       Report_Successes => True,
+      Capture_Standard => False,
       Filter           => null);
 
 end AUnit.Options;

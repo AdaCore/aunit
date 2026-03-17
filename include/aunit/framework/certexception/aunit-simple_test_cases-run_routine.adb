@@ -29,20 +29,23 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Exceptions;          use Ada.Exceptions;
+with Ada.Exceptions; use Ada.Exceptions;
 with AUnit.Time_Measure;
+with AUnit.IO;
 
 separate (AUnit.Simple_Test_Cases)
 
 --  Version for cert run-time libraries
 procedure Run_Routine
   (Test    : access Test_Case'Class;
-   Options :        AUnit.Options.AUnit_Options;
+   Options : AUnit.Options.AUnit_Options;
    R       : in out Result'Class;
-   Outcome :    out Status)
+   Outcome : out Status)
 is
    Unexpected_Exception : Boolean := False;
-   Time : Time_Measure.Time := Time_Measure.Null_Time;
+   Time                 : Time_Measure.Time := Time_Measure.Null_Time;
+   Output_File          : AUnit.IO.File_Type := AUnit.IO.Standard_Output.all;
+   Error_File           : AUnit.IO.File_Type := AUnit.IO.Standard_Error.all;
 
    use Time_Measure;
 
@@ -57,7 +60,11 @@ begin
          Start_Measure (Time);
       end if;
 
+      AUnit.IO.Redirect_Standard_Streams (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
+
       Run_Test (Test.all);
+
+      AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
 
       if Options.Test_Case_Timer then
          Stop_Measure (Time);
@@ -65,11 +72,13 @@ begin
 
    exception
       when Assertion_Error =>
+         AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
       when E : others =>
+         AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
@@ -78,27 +87,51 @@ begin
          Add_Error
            (R,
             Name (Test.all),
+            Package_Name (Test.all),
+            Test_File (Test.all),
             Routine_Name (Test.all),
-            Error   => (Exception_Name    => Format (Exception_Name (E)),
-                        Exception_Message => null,
-                        Traceback         => null),
+            AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+            AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+            Location (Test.all),
+            Error   =>
+              (Exception_Name    => Format (Exception_Name (E)),
+               Exception_Message => null,
+               Traceback         => null),
+            Suffix  => Suffix (Test.all),
             Elapsed => Time);
    end;
 
    if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
-      Add_Success (R, Name (Test.all), Routine_Name (Test.all), Time);
+      Add_Success
+        (R,
+         Name (Test.all),
+         Package_Name (Test.all),
+         Test_File (Test.all),
+         Routine_Name (Test.all),
+         AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+         AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+         Location (Test.all),
+         Suffix (Test.all),
+         Time);
    else
       Outcome := Failure;
       declare
          C : Failure_Iter := First_Failure (Test.all);
       begin
          while Has_Failure (C) loop
-            Add_Failure (R,
-                         Name (Test.all),
-                         Routine_Name (Test.all),
-                         Get_Failure (C),
-                         Time);
+            Add_Failure
+              (R,
+               Name (Test.all),
+               Package_Name (Test.all),
+               Test_File (Test.all),
+               Routine_Name (Test.all),
+               AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+               AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+               Location (Test.all),
+               Get_Failure (C),
+               Suffix (Test.all),
+               Time);
             Next (C);
          end loop;
       end;

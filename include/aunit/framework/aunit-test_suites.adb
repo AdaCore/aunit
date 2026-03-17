@@ -39,39 +39,34 @@ package body AUnit.Test_Suites is
    --------------
 
    procedure Add_Test
-     (S : access Test_Suite'Class;
-      T : access Test_Suite'Class)
-   is
+     (S : access Test_Suite'Class; T : access Test_Suite'Class) is
    begin
       Append
         (S.Tests,
-         (Kind => TS_Elt,
-          TS   => Access_Test_Suite'(T.all'Unchecked_Access)));
+         (Kind => TS_Elt, TS => Access_Test_Suite'(T.all'Unchecked_Access)));
    end Add_Test;
 
    --------------
    -- Add_Test --
    --------------
 
-   procedure Add_Test
-     (S : access Test_Suite'Class;
-      T : access Test_Case'Class)
+   procedure Add_Test (S : access Test_Suite'Class; T : access Test_Case'Class)
    is
    begin
       Append
         (S.Tests,
-         (Kind => TC_Elt,
-          TC   => Test_Case_Access'(T.all'Unchecked_Access)));
+         (Kind => TC_Elt, TC => Test_Case_Access'(T.all'Unchecked_Access)));
    end Add_Test;
 
    ---------
    -- Run --
    ---------
 
-   procedure Run (Suite   : access Test_Suite;
-                  Options :        AUnit_Options;
-                  R       : in out Result'Class;
-                  Outcome :    out Status)
+   procedure Run
+     (Suite   : access Test_Suite;
+      Options : AUnit_Options;
+      R       : in out Result'Class;
+      Outcome : out Status)
    is
       C      : Cursor := First (Suite.Tests);
       Result : Status := Success;
@@ -82,6 +77,7 @@ package body AUnit.Test_Suites is
          case Element (C).Kind is
             when TC_Elt =>
                Run (Element (C).TC, Options, R, Result);
+
             when TS_Elt =>
                Run (Element (C).TS, Options, R, Result);
          end case;
@@ -101,10 +97,10 @@ package body AUnit.Test_Suites is
    function New_Suite return Access_Test_Suite is
       type Access_Type is access all Test_Suite;
       pragma No_Strict_Aliasing (Access_Type);
-      function Alloc is new AUnit.Memory.Utils.Gen_Alloc
-        (Test_Suite, Access_Type);
-      function Convert is new Ada.Unchecked_Conversion
-        (Access_Type, Access_Test_Suite);
+      function Alloc is new
+        AUnit.Memory.Utils.Gen_Alloc (Test_Suite, Access_Type);
+      function Convert is new
+        Ada.Unchecked_Conversion (Access_Type, Access_Test_Suite);
       Ret : constant Access_Type := Alloc;
       Obj : Test_Suite;
       for Obj'Address use Ret.all'Address;

@@ -34,39 +34,73 @@ with GNAT.IO; use GNAT.IO;
 package body AUnit.IO is
 
    Standard_Out : aliased constant File_Type := 1;
+   Standard_Err : aliased constant File_Type := 2;
 
-   function Standard_Output
-     return File_Access is
-     (Standard_Out'Access);
+   function Standard_Output return File_Access
+   is (Standard_Out'Access);
 
-   procedure Put (File : File_Type;
-                  Item : Integer;
-                  Width : Integer := 0;
-                  Base  : Integer := 0) is
+   function Standard_Error return File_Access
+   is (Standard_Err'Access);
+
+   procedure Put
+     (File  : File_Type;
+      Item  : Integer;
+      Width : Integer := 0;
+      Base  : Integer := 0)
+   is
       pragma Unreferenced (File, Width, Base);
    begin
       Put (Item);
    end Put;
 
-   procedure Put (File : File_Type;
-                  Item : String) is
+   procedure Put (File : File_Type; Item : String) is
       pragma Unreferenced (File);
    begin
       Put (Item);
    end Put;
 
-   procedure Put_Line (File : File_Type;
-                       Item : String) is
+   procedure Put_Line (File : File_Type; Item : String) is
       pragma Unreferenced (File);
    begin
       Put_Line (Item);
    end Put_Line;
 
-   procedure New_Line (File    : File_Type;
-                       Spacing : Positive := 1) is
+   procedure New_Line (File : File_Type; Spacing : Positive := 1) is
       pragma Unreferenced (File);
    begin
       New_Line (Spacing);
    end New_Line;
 
+   procedure Redirect_Standard_Streams
+     (Name             : String;
+      Output_File      : in out File_Type;
+      Error_File       : in out File_Type;
+      Capture_Standard : Boolean) is
+      pragma Unreferenced (Name, Output_File, Error_File, Capture_Standard);
+   begin
+      null;
+   end Redirect_Standard_Streams;
+
+   procedure Restore_Standard_Streams
+     (Output_File      : in out File_Type;
+      Error_File       : in out File_Type;
+      Capture_Standard : Boolean) is
+      pragma Unreferenced (Output_File, Error_File, Capture_Standard);
+   begin
+      null;
+   end Restore_Standard_Streams;
+
+   function Read_Error
+     (Name : String; Capture_Standard : Boolean) return Message_String is
+     pragma Unreferenced (Name, Capture_Standard);
+   begin
+      return null;
+   end Read_Error;
+
+   function Read_Output
+     (Name : String; Capture_Standard : Boolean) return Message_String is
+     pragma Unreferenced (Name, Capture_Standard);
+   begin
+      return null;
+   end Read_Output;
 end AUnit.IO;

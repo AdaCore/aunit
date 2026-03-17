@@ -2,12 +2,12 @@
 --                                                                          --
 --                         GNAT COMPILER COMPONENTS                         --
 --                                                                          --
---                    A U N I T . T I M E _ M E A S U R E                   --
+--                   A U N I T . R E P O R T E R . X M L                    --
 --                                                                          --
 --                                 S p e c                                  --
 --                                                                          --
 --                                                                          --
---                    Copyright (C) 2006-2019, AdaCore                      --
+--                       Copyright (C) 2000-2013, AdaCore                   --
 --                                                                          --
 -- GNAT is free software;  you can  redistribute it  and/or modify it under --
 -- terms of the  GNU General Public License as published  by the Free Soft- --
@@ -29,35 +29,14 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
---  Dummy package when Ada.Calendar is not supported
-with AUnit.IO;
+--  Very simple reporter to console
+package AUnit.Reporter.XML_DEPRECATED is
 
-package AUnit.Time_Measure is
+   type XML_DEPRECATED_Reporter is new Reporter with null record;
 
-   type Time is null record;
+   procedure Report (Engine  : XML_DEPRECATED_Reporter;
+                     R       : in out Result'Class;
+                     Options : AUnit_Options := Default_Options);
+end AUnit.Reporter.XML_DEPRECATED;
 
-   type AUnit_Duration is new Integer;
 
-   Null_Time : Time;
-
-   procedure Start_Measure (T : in out Time);
-   --  Start a new measure
-
-   procedure Stop_Measure (T : in out Time);
-   --  Stop the measure
-
-   function Get_Measure (T : Time) return AUnit_Duration;
-   --  Get the measure
-
-   generic
-   procedure Gen_Put_Measure (File    : AUnit.IO.File_Type;
-                              Measure : AUnit_Duration);
-   --  Put the image of the measure
-
-   generic
-   procedure Gen_Put_Measure_In_Seconds (File    : AUnit.IO.File_Type;
-                                         Measure : AUnit_Duration);
-   --  Unlike Gen_Put_Measure, puts the measure in seconds only, also puts
-   --  9 digits after decimal point.
-
-end AUnit.Time_Measure;
