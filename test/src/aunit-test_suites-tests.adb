@@ -159,7 +159,7 @@ package body AUnit.Test_Suites.Tests is
          List : Result_Lists.List;
          Elem : Test_Result;
       begin
-         Successes (T.Res, List);
+         Successes (T.Res, "", List);
          Assert (Result_Lists.Length (List) = 1,
                  "Unexpected number of successful results");
          Elem := Result_Lists.First_Element (List);
@@ -181,7 +181,7 @@ package body AUnit.Test_Suites.Tests is
                  "Unexpected elapsed value with run option set to No_Time");
          Result_Lists.Clear (List);
 
-         Failures (T.Res, List);
+         Failures (T.Res, "", List);
          Assert (Result_Lists.Length (List) = 2,
                  "Unexpected number of failure results");
          Elem := Result_Lists.First_Element (List);
@@ -203,7 +203,7 @@ package body AUnit.Test_Suites.Tests is
                  "Incorrect filename reported in Failure");
          Result_Lists.Clear (List);
 
-         Errors (T.Res, List);
+         Errors (T.Res, "", List);
          Assert (Result_Lists.Length (List) = 1,
                  "Unexpected number of error results");
          Elem := Result_Lists.First_Element (List);

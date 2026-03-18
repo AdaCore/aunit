@@ -19,6 +19,7 @@ procedure AUnit_Harness is
    Options  : AUnit.Options.AUnit_Options :=
      (Global_Timer     => False,
       Test_Case_Timer  => True,
+      Capture_Standard => False,
       Report_Successes => True,
       Filter           => null);
 begin
@@ -31,7 +32,7 @@ begin
    --  for Ada.Command_Line
 
    Options.Filter := Filter'Unchecked_Access;
-   Set_Name (Filter, "(test_case) Test routines registration");
+   Set_Name (Filter, "Test Routines");
    Harness (Reporter, Options);
 
 end AUnit_Harness;

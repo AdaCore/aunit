@@ -85,25 +85,19 @@ package body AUnit.Test_Cases.Tests_Fixtures is
    --------------------
 
    procedure Register_Tests (T : in out The_Test_Case) is
-      package Register_Specific is
-        new AUnit.Test_Cases.Specific_Test_Case_Registration
-          (The_Test_Case);
+      package Register_Specific is new
+        AUnit.Test_Cases.Specific_Test_Case_Registration (The_Test_Case);
       use Register_Specific;
    begin
 
-      Register_Routine
-        (T, Succeed'Access, "Success Test");
+      Register_Routine (T, Succeed'Access, "Success Test");
 
-      Register_Routine
-        (T, Fail'Access, "Failure Test");
+      Register_Routine (T, Fail'Access, "Failure Test");
 
       Register_Wrapper
-        (T,
-         Double_Failure_Wrapper'Access,
-         "Multiple assertion failures");
+        (T, Double_Failure_Wrapper'Access, "Multiple assertion failures");
 
-      Register_Routine
-        (T, Except'Access, "Exception Test");
+      Register_Routine (T, Except'Access, "Exception Test");
    end Register_Tests;
 
    ----------
@@ -115,6 +109,46 @@ package body AUnit.Test_Cases.Tests_Fixtures is
    begin
       return Format ("Dummy Test Case");
    end Name;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (T : The_Test_Case) return Test_String is
+      pragma Unreferenced (T);
+   begin
+      return Format ("Dummy.Tests");
+   end Package_Name;
+
+   ----------
+   -- Test_File --
+   ----------
+
+   function Test_File (T : The_Test_Case) return Test_String is
+      pragma Unreferenced (T);
+   begin
+      return Format ("dummy_test.ads");
+   end Test_File;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (T : The_Test_Case) return Tested_Location is
+      pragma Unreferenced (T);
+   begin
+      return (Format ("dummy_file.ads"), 8, 3, Format ("DummyTest"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (T : The_Test_Case) return Test_Suffix_Access is
+      pragma Unreferenced (T);
+   begin
+      return null;
+   end Suffix;
 
    ---------------
    -- Is_Set_Up --
