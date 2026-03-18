@@ -21,11 +21,29 @@ package AUnit.Test_Fixtures.Tests_Fixtures is
    package Caller is new AUnit.Test_Caller (Fix);
 
    TC_Success : constant Caller.Test_Case_Access :=
-                  Caller.Create ("Test Success", Test_Success'Access);
+     Caller.Create
+       ("Test Success",
+        "AUnit.Test_Fixtures.Test_Fixtures",
+        "src/aunit-test_fixtures-test_fixutres.ads",
+        (new String'("dummy"), 0, 0, null),
+        null,
+        Test_Success'Access);
    TC_Failure : constant Caller.Test_Case_Access :=
-                  Caller.Create ("Test Failure", Test_Failure'Access);
+     Caller.Create
+       ("Test Failure",
+        "AUnit.Test_Fixtures.Test_Fixtures",
+        "src/aunit-test_fixtures-test_fixutres.ads",
+        (new String'("dummy"), 0, 0, null),
+        null,
+        Test_Failure'Access);
    TC_Error   : constant Caller.Test_Case_Access :=
-                  Caller.Create ("Test Error", Test_Error'Access);
+     Caller.Create
+       ("Test Error",
+        "AUnit.Test_Fixtures.Test_Fixtures",
+        "src/aunit-test_fixtures-test_fixutres.ads",
+        (new String'("dummy"), 0, 0, null),
+        null,
+        Test_Error'Access);
 
    function Get_Nb_Set_Up_Called return Natural;
    function Get_Nb_Tear_Down_Called return Natural;

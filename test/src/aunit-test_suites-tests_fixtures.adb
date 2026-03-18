@@ -17,6 +17,46 @@ package body AUnit.Test_Suites.Tests_Fixtures is
       return AUnit.Format ("Simple test case");
    end Name;
 
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : Simple_Test_Case) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("simple_test.ads");
+   end Test_File;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : Simple_Test_Case) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("Simple.Test");
+   end Package_Name;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : Simple_Test_Case) return Tested_Location is
+      pragma Unreferenced (Test);
+   begin
+      return (AUnit.Format ("simple.ads"), 4, 4, AUnit.Format ("simple"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (Test : Simple_Test_Case) return Test_Suffix_Access is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Suffix;
+
    --------------
    -- Run_Test --
    --------------
@@ -27,11 +67,55 @@ package body AUnit.Test_Suites.Tests_Fixtures is
       null;
    end Run_Test;
 
+   ----------
+   -- Name --
+   ----------
+
    function Name (Test : TC_With_Failure) return Message_String is
       pragma Unreferenced (Test);
    begin
       return AUnit.Format ("Test case with failure");
    end Name;
+
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : TC_With_Failure) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("simple_test.ads");
+   end Test_File;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : TC_With_Failure) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("Simple.Test");
+   end Package_Name;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : TC_With_Failure) return Tested_Location is
+      pragma Unreferenced (Test);
+   begin
+      return (AUnit.Format ("simple.ads"), 4, 4, AUnit.Format ("simple"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (Test : TC_With_Failure) return Test_Suffix_Access is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Suffix;
 
    --------------
    -- Run_Test --
@@ -52,6 +136,46 @@ package body AUnit.Test_Suites.Tests_Fixtures is
    begin
       return AUnit.Format ("Test case with 2 failures");
    end Name;
+
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : TC_With_Two_Failures) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("simple_test.ads");
+   end Test_File;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : TC_With_Two_Failures) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("Simple.Test");
+   end Package_Name;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : TC_With_Two_Failures) return Tested_Location is
+      pragma Unreferenced (Test);
+   begin
+      return (AUnit.Format ("simple.ads"), 4, 4, AUnit.Format ("simple"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (Test : TC_With_Two_Failures) return Test_Suffix_Access is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Suffix;
 
    --------------
    -- Run_Test --
@@ -76,6 +200,46 @@ package body AUnit.Test_Suites.Tests_Fixtures is
       return AUnit.Format ("Test case with exception");
    end Name;
 
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : TC_With_Exception) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("simple_test.ads");
+   end Test_File;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : TC_With_Exception) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("Simple.Test");
+   end Package_Name;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : TC_With_Exception) return Tested_Location is
+      pragma Unreferenced (Test);
+   begin
+      return (AUnit.Format ("simple.ads"), 4, 4, AUnit.Format ("simple"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (Test : TC_With_Exception) return Test_Suffix_Access is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Suffix;
+
    --------------
    -- Run_Test --
    --------------
@@ -83,8 +247,7 @@ package body AUnit.Test_Suites.Tests_Fixtures is
    procedure Run_Test (Test : in out TC_With_Exception) is
       pragma Unreferenced (Test);
    begin
-      Ada.Exceptions.Raise_Exception
-        (My_Exception'Identity, "A message");
+      Ada.Exceptions.Raise_Exception (My_Exception'Identity, "A message");
    end Run_Test;
 
    ----------
@@ -96,6 +259,47 @@ package body AUnit.Test_Suites.Tests_Fixtures is
    begin
       return AUnit.Format ("Test case with set_up/tear_down defined)");
    end Name;
+
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : TC_With_Setup) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("simple_test.ads");
+   end Test_File;
+
+   ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : TC_With_Setup) return Message_String is
+      pragma Unreferenced (Test);
+   begin
+      return AUnit.Format ("Simple.Test");
+   end Package_Name;
+
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : TC_With_Setup) return Tested_Location is
+      pragma Unreferenced (Test);
+   begin
+      return (AUnit.Format ("simple.ads"), 4, 4, AUnit.Format ("simple"));
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+
+   function Suffix (Test : TC_With_Setup) return Test_Suffix_Access is
+      pragma Unreferenced (Test);
+   begin
+      return null;
+   end Suffix;
+
 
    ------------
    -- Set_Up --
