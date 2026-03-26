@@ -3,7 +3,7 @@ with "aunit";
 project Aunit_Tests is
 
    for Languages use ("Ada");
-   for Main use ("aunit_harness.adb");
+   for Main use ("aunit_harness_cases.adb", "aunit_harness_suites.adb", "aunit_harness_fixtures.adb");
    for Source_Dirs use ("src");
    for Exec_Dir use "exe";
    for Object_Dir use "obj";
@@ -18,7 +18,7 @@ project Aunit_Tests is
 
    package Compiler is
       for Default_Switches ("ada") use
-        ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
+        ("-g","-gnatQ", "-O1", "-gnatf", "-gnato", "-gnatwa.Xe", "-gnaty");
    end Compiler;
 
 end Aunit_Tests;

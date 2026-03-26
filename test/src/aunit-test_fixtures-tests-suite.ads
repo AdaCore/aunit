@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2009-2010, AdaCore
+--  Copyright (C) 2009-2026, AdaCore
 --
 
 with AUnit.Test_Suites;

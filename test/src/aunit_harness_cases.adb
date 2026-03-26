@@ -1,17 +1,17 @@
 --
---  Copyright (C) 2009-2013, AdaCore
+--  Copyright (C) 2009-2026, AdaCore
 --
 
 with AUnit.Options;
 with AUnit.Reporter.Text;
 with AUnit.Run;
-with AUnit.Test_Filters;   use AUnit.Test_Filters;
+with AUnit.Test_Filters; use AUnit.Test_Filters;
 
 with AUnit_Suite; use AUnit_Suite;
 
-procedure AUnit_Harness is
+procedure AUnit_Harness_Cases is
 
-   procedure Harness is new AUnit.Run.Test_Runner (Suite);
+   procedure Harness is new AUnit.Run.Test_Runner (Suite_Cases);
    --  The full test harness
 
    Reporter : AUnit.Reporter.Text.Text_Reporter;
@@ -35,4 +35,4 @@ begin
    Set_Name (Filter, "Test Routines");
    Harness (Reporter, Options);
 
-end AUnit_Harness;
+end AUnit_Harness_Cases;
