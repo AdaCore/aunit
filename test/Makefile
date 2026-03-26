@@ -47,7 +47,9 @@ run: build
 	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)
 
 test: build
-	-$(RUN) ./exe/aunit_harness$(exeext) > test.out.full 2>&1
+	-$(RUN) ./exe/aunit_harness_suites$(exeext) > test.out.full 2>&1
+	-$(RUN) ./exe/aunit_harness_cases$(exeext) >> test.out.full 2>&1
+	-$(RUN) ./exe/aunit_harness_fixtures$(exeext) >> test.out.full 2>&1
 	egrep "^Total|^Success|^Fail|^Unexp" test.out.full > test.out
 	diff -b test.out expected.out
 	@echo
