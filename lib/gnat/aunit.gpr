@@ -6,14 +6,23 @@ project AUnit is
    type Compilation_Mode_Type is ("Devel", "Install");
    Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Install");
 
+   Reporters := ("../../include/aunit/reporters");
+
+   case AUnit_Shared.Runtime is
+      when "full" =>
+         Reporters := Reporters & ("../../include/aunit/reporters/full_runtime");
+      when others =>
+         null;
+   end case;
+
    for Source_Dirs use
      ("../../include/aunit/framework",
       "../../include/aunit/containers",
-      "../../include/aunit/reporters",
       "../../include/aunit/framework/" & AUnit_Shared.Except,
       "../../include/aunit/framework/" & AUnit_Shared.Calend,
       "../../include/aunit/framework/" & AUnit_Shared.Memory,
-      "../../include/aunit/framework/" & AUnit_Shared.FileIO);
+      "../../include/aunit/framework/" & AUnit_Shared.FileIO)
+      & Reporters;
 
    for Library_Dir use AUnit_Shared.Library_Dir;
 
