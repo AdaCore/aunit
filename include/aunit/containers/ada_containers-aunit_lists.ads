@@ -164,10 +164,14 @@ is
 
    function Has_Element (Position : Cursor) return Boolean;
 
-   type Iterator is access procedure (Position : Cursor; Name : String);
+   type IteratorNamed is access procedure (Position : Cursor; Name : String);
+   type Iterator is access procedure (Position : Cursor);
 
    procedure Iterate
-     (Container : List; Process : Iterator; Name : String := "");
+     (Container : List; Process : IteratorNamed; Name : String := "");
+
+   procedure Iterate
+     (Container : List; Process : Iterator); 
 
    --     procedure Reverse_Iterate
    --       (Container : List;

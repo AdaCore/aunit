@@ -420,7 +420,7 @@ package body Ada_Containers.AUnit_Lists is
             pragma
               Assert
                 (RI.Node.Next = null
-                   or else not (RI.Node.Next.Element < RI.Node.Element));
+                 or else not (RI.Node.Next.Element < RI.Node.Element));
 
             if LI.Node = null then
                Splice (Target, No_Element, Source);
@@ -430,7 +430,7 @@ package body Ada_Containers.AUnit_Lists is
             pragma
               Assert
                 (LI.Node.Next = null
-                   or else not (LI.Node.Next.Element < LI.Node.Element));
+                 or else not (LI.Node.Next.Element < LI.Node.Element));
 
             if RI.Node.Element < LI.Node.Element then
                declare
@@ -710,7 +710,7 @@ package body Ada_Containers.AUnit_Lists is
    -------------
 
    procedure Iterate
-     (Container : List; Process : Iterator; Name : String := "")
+     (Container : List; Process : IteratorNamed; Name : String := "")
    is
       C : List renames Container'Unrestricted_Access.all;
       B : Natural renames C.Busy;
@@ -729,6 +729,28 @@ package body Ada_Containers.AUnit_Lists is
 
       B := B - 1;
    end Iterate;
+
+   procedure Iterate
+     (Container : List; Process : Iterator)
+   is
+      C : List renames Container'Unrestricted_Access.all;
+      B : Natural renames C.Busy;
+
+      Node : Node_Access := Container.First;
+
+   begin
+      B := B + 1;
+
+      begin
+         while Node /= null loop
+            Process (Cursor'(Container'Unchecked_Access, Node));
+            Node := Node.Next;
+         end loop;
+      end;
+
+      B := B - 1;
+   end Iterate;
+
 
    ----------
    -- Last --

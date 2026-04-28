@@ -29,8 +29,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.IO;              use AUnit.IO;
-with AUnit.Time_Measure;    use AUnit.Time_Measure;
+with AUnit.IO;           use AUnit.IO;
+with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 package body AUnit.Reporter.JUnit is
    procedure Put_Special_Chars (File : AUnit.IO.File_Type; S : String);
@@ -127,9 +127,13 @@ package body AUnit.Reporter.JUnit is
          & (if Test.Routine_Name = null
             then ""
             else " : " & Test.Routine_Name.all));
-      Put (File, """ classname=""");
-      Put_Special_Chars (File, Test.Package_Name.all);
-      Put (File, """ file=""" & Test.Test_File.all & """ ");
+      if Test.Package_Name /= null then
+         Put (File, """ classname=""");
+         Put_Special_Chars (File, Test.Package_Name.all);
+      end if;
+      if Test.Test_File /= null then
+         Put (File, """ file=""" & Test.Test_File.all & """ ");
+      end if;
       Put (File, "time=""");
       Put_Measure (File, Get_Measure (Test.Elapsed));
 
@@ -219,7 +223,7 @@ package body AUnit.Reporter.JUnit is
 
       declare
          use Message_List;
-         C : Cursor := First (Packages.all);
+         C            : Cursor := First (Packages.all);
          Package_Name : Message_String;
       begin
          while Has_Element (C) loop
@@ -232,8 +236,7 @@ package body AUnit.Reporter.JUnit is
                Indent => 1);
             Put (File, Integer (Total_Count (R, Package_Name.all)), 0);
             Put (File, """ failures=""");
-            Put
-              (File, Integer (Failure_Count (R, Package_Name.all)), 0);
+            Put (File, Integer (Failure_Count (R, Package_Name.all)), 0);
             Put (File, """ errors=""");
             Put (File, Integer (Error_Count (R, Package_Name.all)), 0);
 
@@ -242,9 +245,9 @@ package body AUnit.Reporter.JUnit is
                F : Result_Lists.List;
                E : Result_Lists.List;
             begin
-               Successes (R, Package_Name.all, S);
-               Failures (R, Package_Name.all, F);
-               Errors (R, Package_Name.all, E);
+               Successes (R, S, Package_Name.all);
+               Failures (R, F, Package_Name.all);
+               Errors (R, E, Package_Name.all);
 
                if T /= Time_Measure.Null_Time then
                   Put (File, """ time=""");

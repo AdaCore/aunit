@@ -105,12 +105,21 @@ is
    --  Initialize a test case from a test fixture method, reporting the result
    --  of the test using the Name parameter.
 
+   function Create (Name : String; Test : Test_Method) return Test_Case_Access;
+   --  Return a test case from a test fixture method, reporting the result
+   --  of the test using the Name parameter.
+
+   procedure Create
+     (TC : out Test_Case'Class; Name : String; Test : Test_Method);
+   --  Initialize a test case from a test fixture method, reporting the result
+   --  of the test using the Name parameter.
+
    function Name (Test : Test_Case) return Message_String;
    --  Test case name
 
    function Package_Name (Test : Test_Case) return Message_String;
    --  Test case package name
-   
+
    function Test_File (Test : Test_Case) return Message_String;
    --  Test case file path.
 
@@ -137,9 +146,9 @@ private
    type Test_Case is new AUnit.Simple_Test_Cases.Test_Case with record
       Fixture      : Fixture_Access;
       Name         : Message_String;
-      Test_Package : Message_String;
-      Test_File    : Message_String;
-      Location     : Tested_Location;
+      Test_Package : Message_String := null;
+      Test_File    : Message_String := null;
+      Location     : Tested_Location := (null, -1, -1, null);
       Suffix       : Test_Suffix_Access := null;
       Method       : Test_Method;
    end record;

@@ -65,13 +65,13 @@ package AUnit.Test_Results is
 
    type Test_Result is record
       Test_Name       : Message_String;
-      Package_Name    : Message_String;
-      Test_File       : Message_String;
+      Package_Name    : Message_String := null;
+      Test_File       : Message_String := null;
       Routine_Name    : Message_String;
       Standard_Output : Message_String := null;
       Standard_Error  : Message_String := null;
-      Location        : Tested_Location_Access;
-      Suffix          : Test_Suffix_Access;
+      Location        : Tested_Location_Access := null;
+      Suffix          : Test_Suffix_Access := null;
       Failure         : Test_Failure_Access;
       Error           : Test_Error_Access;
       Elapsed         : Time := Null_Time;
@@ -132,14 +132,14 @@ package AUnit.Test_Results is
    --  Number of routines with unexpected exceptions
 
    procedure Errors
-     (R : Result; N : String := ""; E : in out Result_Lists.List);
+     (R : Result; E : in out Result_Lists.List; N : String := "");
    --  List of routines with unexpected exceptions
 
    function Failure_Count (R : Result; N : String := "") return Count_Type;
    --  Number of failed routines
 
    procedure Failures
-     (R : Result; N : String := ""; F : in out Result_Lists.List);
+     (R : Result; F : in out Result_Lists.List; N : String := "");
    --  List of failed routines
 
    function Elapsed (R : Result) return Time;
@@ -152,7 +152,7 @@ package AUnit.Test_Results is
    --  Number of successful routines
 
    procedure Successes
-     (R : Result; N : String := ""; S : in out Result_Lists.List);
+     (R : Result; S : in out Result_Lists.List; N : String := "");
    --  List of successful routines
 
    function Successful (R : Result) return Boolean;

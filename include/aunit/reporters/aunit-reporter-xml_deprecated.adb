@@ -113,7 +113,7 @@ package body AUnit.Reporter.XML_DEPRECATED is
       begin
          Put_Line (File, "  <SuccessfulTests>");
          if Options.Report_Successes then
-            Successes (R, "", S);
+            Successes (R, S);
             Dump_Result_List (File, S);
          end if;
          Put_Line (File, "  </SuccessfulTests>");
@@ -123,14 +123,14 @@ package body AUnit.Reporter.XML_DEPRECATED is
       declare
          F : Result_Lists.List;
       begin
-         Failures (R, "", F);
+         Failures (R, F);
          Dump_Result_List (File, F);
       end;
 
       declare
          E : Result_Lists.List;
       begin
-         Errors (R, "", E);
+         Errors (R, E);
          Dump_Result_List (File, E);
       end;
       Put_Line (File, "  </FailedTests>");

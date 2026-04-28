@@ -54,6 +54,42 @@ package body AUnit.Simple_Test_Cases is
    is separate;
 
    ------------------
+   -- Package_Name --
+   ------------------
+
+   function Package_Name (Test : Test_Case) return Message_String is 
+   begin 
+      return null;
+   end Package_Name;
+
+   ---------------
+   -- Test_File --
+   ---------------
+
+   function Test_File (Test : Test_Case) return Message_String is 
+   begin 
+      return null;
+   end Test_File;
+   
+   --------------
+   -- Location --
+   --------------
+
+   function Location (Test : Test_Case) return Tested_Location is 
+   begin 
+      return (null, 0,0, null);
+   end Location;
+
+   ------------
+   -- Suffix --
+   ------------
+   
+   function Suffix (Test : Test_Case) return Test_Suffix_Access is 
+   begin 
+      return null;
+   end Suffix;
+
+   ------------------
    -- Routine_Name --
    ------------------
 

@@ -31,6 +31,7 @@
 
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
+with AUnit.Test_Info; use AUnit.Test_Info;
 
 --  Very simple reporter to console
 
@@ -121,7 +122,7 @@ package body AUnit.Reporter.XML is
       begin
          if Total_Tests /= Total_Failures then
             Put_Line (File, "<SuccessfulTests>", Indent => 1);
-            Successes (R, "", S);
+            Successes (R, S);
             Dump_Result_List (File, S);
             Put_Line (File, "</SuccessfulTests>", Indent => 1);
          end if;
@@ -132,14 +133,14 @@ package body AUnit.Reporter.XML is
          declare
             F : Result_Lists.List;
          begin
-            Failures (R, "", F);
+            Failures (R, F);
             Dump_Result_List (File, F);
          end;
 
          declare
             E : Result_Lists.List;
          begin
-            Errors (R, "", E);
+            Errors (R, E);
             Dump_Result_List (File, E);
          end;
          Put_Line (File, "</FailedTests>", Indent => 1);
@@ -165,7 +166,8 @@ package body AUnit.Reporter.XML is
       end if;
       Put (File, """");
 
-      if Test.Location.Tested_Name /= null then
+
+      if Test.Location /= null and then Test.Location.Tested_Name /= null then
          Put
            (File,
             " tested_function=""" & Test.Location.Tested_Name.all & """");

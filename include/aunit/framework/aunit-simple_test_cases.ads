@@ -48,19 +48,19 @@ package AUnit.Simple_Test_Cases is
    function Name (Test : Test_Case) return Message_String is abstract;
    --  Test case name
 
-   function Package_Name (Test : Test_Case) return Message_String is abstract;
+   function Package_Name (Test : Test_Case) return Message_String;
    --  Test case package name
 
-   function Test_File (Test : Test_Case) return Message_String is abstract;
+   function Test_File (Test : Test_Case) return Message_String;
    --  Test case file path.
    
-   function Suffix (Test : Test_Case) return Test_Suffix_Access is abstract;
+   function Suffix (Test : Test_Case) return Test_Suffix_Access;
    --  Additional information about the test sloc.
 
    function Routine_Name (Test : Test_Case) return Message_String;
    --  Routine name. By default return a null Message_String
 
-   function Location (Test : Test_Case) return Tested_Location is abstract;
+   function Location (Test : Test_Case) return Tested_Location;
    --  Test case location.
 
    procedure Run_Test (Test : in out Test_Case) is abstract;
