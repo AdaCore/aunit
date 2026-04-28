@@ -29,6 +29,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Latin_1;
+
 package body AUnit.Assertions is
 
    Failures : Failure_Lists.List;
@@ -70,22 +72,51 @@ package body AUnit.Assertions is
      (Condition : Boolean;
       Message   : String;
       Source    : String := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line) return Boolean is
+      Line      : Natural := GNAT.Source_Info.Line) return Boolean
+   is
+      Id : Test_Id;
    begin
-
+      if The_Current_Test = null then
+         Id := Null_Id;
+      else
+         Id := The_Current_Test.Id;
+      end if;
       if not Condition then
          Failure_Lists.Append
            (Failures,
-            (Failure => (Format (Message), Format (Source), Line),
-             Id      =>
-               --  Allow calling Assert without an AUnit framework
-               (if The_Current_Test = null
-                then Null_Id
-                else The_Current_Test.Id)));
+            (Failure => (Format (Message), Format (Source), Line), Id => Id));
       end if;
 
       return Condition;
    end Assert;
+
+   --------------------
+   -- Assert_Generic --
+   --------------------
+
+   procedure Assert_Generic
+     (Actual   : T;
+      Expected : T;
+      Message  : String;
+      Source   : String := GNAT.Source_Info.File;
+      Line     : Natural := GNAT.Source_Info.Line) is
+   begin
+      if Actual /= Expected then
+         Assert
+           (False,
+            Message
+            & Ada.Characters.Latin_1.LF
+            & "got        - '"
+            & Image (Actual)
+            & "'"
+            & Ada.Characters.Latin_1.LF
+            & "'expecting - '"
+            & Image (Expected)
+            & "'",
+            Source,
+            Line);
+      end if;
+   end Assert_Generic;
 
    ----------------------
    -- Assert_Exception --
@@ -98,25 +129,18 @@ package body AUnit.Assertions is
       Line    : Natural := GNAT.Source_Info.Line)
    is separate;
 
-   ------------
-   -- Assert --
-   ------------
+   function Img (E : String) return String
+   is (E);
+
+   procedure Assert_String is new Assert_Generic (T => String, Image => Img);
 
    procedure Assert
      (Actual   : String;
       Expected : String;
       Message  : String;
       Source   : String := GNAT.Source_Info.File;
-      Line     : Natural := GNAT.Source_Info.Line) is
-   begin
-      if Actual /= Expected then
-         Assert
-           (False,
-            Message & " - got '" & Actual & "', expecting '" & Expected & "'",
-            Source,
-            Line);
-      end if;
-   end Assert;
+      Line     : Natural := GNAT.Source_Info.Line)
+   renames Assert_String;
 
    --------------------
    -- Clear_Failures --

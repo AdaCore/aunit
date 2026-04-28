@@ -62,6 +62,18 @@ package AUnit.Assertions is
    --  Functional version to allow the calling routine to decide whether to
    --  continue or abandon the execution.
 
+   generic
+      type T (<>) is limited private;
+      with function "=" (L, R : T) return Boolean is <>;
+      with function Image (E : T) return String;
+   procedure Assert_Generic
+     (Actual   : T;
+      Expected : T;
+      Message  : String;
+      Source   : String := GNAT.Source_Info.File;
+      Line     : Natural := GNAT.Source_Info.Line);
+   --  Generic assert version
+
    -----------------------
    -- Simple assertions --
    -----------------------
