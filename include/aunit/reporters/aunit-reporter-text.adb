@@ -30,6 +30,7 @@
 ------------------------------------------------------------------------------
 
 with AUnit.IO;           use AUnit.IO;
+with AUnit.Test_Info; use AUnit.Test_Info;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
@@ -50,7 +51,7 @@ package body AUnit.Reporter.Text is
    generic
       with
         procedure Get
-          (R : Result; N : String := ""; L : in out Result_Lists.List);
+          (R : Result; L : in out Result_Lists.List; N : String := "");
       Label : String;
       Color : String;
    procedure Report_Tests
@@ -106,7 +107,7 @@ package body AUnit.Reporter.Text is
    is
       S : Result_Lists.List;
    begin
-      Get (Result (R), "", S);
+      Get (Result (R), S);
       if Engine.Use_ANSI then
          Put (File, Color);
       end if;
@@ -198,7 +199,14 @@ package body AUnit.Reporter.Text is
       Put (File, Prefix);
       Put (File, " ");
 
-      Print_Location_Suffix (File, Test);
+      if (Test.Location = null and then Test.Suffix = null) then 
+         --  If both location and suffix are null, it means that 
+         --  it uses the old aunit interface where only the test name is 
+         --  given.
+         Put (File, Test.Test_Name.all);
+      else 
+         Print_Location_Suffix (File, Test);
+      end if;
 
       if Test.Routine_Name /= null then
          Put (File, " : " & Test.Routine_Name.all);

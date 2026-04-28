@@ -14,72 +14,32 @@ package body AUnit.Test_Suites.Tests.Suite is
    begin
       AUnit.Test_Suites.Add_Test
         (S,
-         Caller.Create
-           ("Test Add test case",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"),
-             48,
-             4,
-             new String'("Add_Test")),
-            null,
-            Test_Add_Test_Case'Access));
-
+         Caller.Create ("(suite) Add test case", Test_Add_Test_Case'Access));
+      AUnit.Test_Suites.Add_Test
+        (S, Caller.Create ("(suite) Run empty suite", Test_Run_Empty'Access));
       AUnit.Test_Suites.Add_Test
         (S,
          Caller.Create
-           ("Test Empty suite",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
-            Test_Run_Empty'Access));
-
-      AUnit.Test_Suites.Add_Test
-        (S,
-         Caller.Create
-           ("Test Run with successful test",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
+           ("(suite) Run suite with a successful test",
             Test_Run_With_Success'Access));
-
       AUnit.Test_Suites.Add_Test
         (S,
          Caller.Create
-           ("Test Run with a failing test",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
+           ("(suite) Run suite with a failing test",
             Test_Run_With_Failure'Access));
       AUnit.Test_Suites.Add_Test
         (S,
          Caller.Create
-           ("Test Run with a test raising an exception",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
+           ("(suite) Run suite with a test raising an exception",
             Test_Run_With_Exception'Access));
       AUnit.Test_Suites.Add_Test
         (S,
          Caller.Create
-           ("Test Run with various tests",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
-            Test_Run_With_All'Access));
+           ("(suite) Run suite with various tests", Test_Run_With_All'Access));
       AUnit.Test_Suites.Add_Test
         (S,
          Caller.Create
-           ("Test that Set_Up/Tear_Down are called",
-            "AUnit.Test_Suites.Tests",
-            "src/aunit-test_suites-tests.ads",
-            (new String'("aunit-test_suites.ads"), 52, 4, new String'("Run")),
-            null,
+           ("(suite) Verify Set_Up/Tear_Down are called",
             Test_Run_With_Setup'Access));
       return S;
    end Test_Suite;

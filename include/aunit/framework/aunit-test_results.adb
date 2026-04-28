@@ -84,7 +84,7 @@ package body AUnit.Test_Results is
         function Test
           (Position : Result_Lists.Cursor; Name : String) return Boolean;
    procedure Gen_Extract
-     (R : Result; N : String := ""; E : in out Result_Lists.List);
+     (R : Result; E : in out Result_Lists.List; N : String := "");
 
    -------------------
    -- Iterate_Error --
@@ -178,7 +178,7 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Gen_Extract
-     (R : Result; N : String := ""; E : in out Result_Lists.List)
+     (R : Result; E : in out Result_Lists.List; N : String := "")
    is
       C : Result_Lists.Cursor;
       use Result_Lists;
@@ -263,14 +263,16 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         Alloc_Location,
+         (if Location.Tested_Line = -1 then null else Alloc_Location),
          Suffix,
          null,
          Alloc_Error,
          Elapsed);
       use Result_Lists;
    begin
-      Val.Location.all := Location;
+      if Location.Tested_Line /= -1 then
+         Val.Location.all := Location;
+      end if;
       Val.Error.all := Error;
       Append (R.Result_List, Val);
    end Add_Error;
@@ -300,15 +302,16 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         Alloc_Location,
+         (if Location.Tested_Line = -1 then null else Alloc_Location),
          Suffix,
          Alloc_Failure,
          null,
          Elapsed);
       use Result_Lists;
    begin
-
-      Val.Location.all := Location;
+      if Location.Tested_Line /= -1 then
+         Val.Location.all := Location;
+      end if;
       Val.Failure.all := Failure;
       Append (R.Result_List, Val);
    end Add_Failure;
@@ -327,7 +330,8 @@ package body AUnit.Test_Results is
       Standard_Error  : Message_String;
       Location        : Tested_Location;
       Suffix          : Test_Suffix_Access;
-      Elapsed         : Time)
+      Elapsed         : Time
+      )
    is
 
       Val : constant Test_Result :=
@@ -337,7 +341,7 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         Alloc_Location,
+         (if Location.Tested_Line = -1 then null else Alloc_Location),
          Suffix,
          null,
          null,
@@ -345,7 +349,9 @@ package body AUnit.Test_Results is
       use Result_Lists;
 
    begin
-      Val.Location.all := Location;
+      if Location.Tested_Line /= -1 then
+         Val.Location.all := Location;
+      end if;
       Append (R.Result_List, Val);
 
    end Add_Success;
@@ -376,11 +382,11 @@ package body AUnit.Test_Results is
    ------------
 
    procedure Errors
-     (R : Result; N : String := ""; E : in out Result_Lists.List)
+     (R : Result; E : in out Result_Lists.List;  N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
-      Extract (R, N, E);
+      Extract (R, E, N);
    end Errors;
 
    -------------------
@@ -400,11 +406,11 @@ package body AUnit.Test_Results is
    --------------
 
    procedure Failures
-     (R : Result; N : String := ""; F : in out Result_Lists.List)
+     (R : Result;F : in out Result_Lists.List; N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin
-      Extract (R, N, F);
+      Extract (R, F, N);
    end Failures;
 
    -------------
@@ -441,11 +447,11 @@ package body AUnit.Test_Results is
    ---------------
 
    procedure Successes
-     (R : Result; N : String := ""; S : in out Result_Lists.List)
+     (R : Result; S : in out Result_Lists.List; N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Success);
    begin
-      Extract (R, N, S);
+      Extract (R, S, N);
    end Successes;
 
    ----------------
