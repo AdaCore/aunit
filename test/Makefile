@@ -49,6 +49,7 @@ run: build
 test: build
 	-$(RUN) ./exe/aunit_harness_suites$(exeext) > xunit-suite.xml 2>&1
 	-$(RUN) ./exe/aunit_harness_cases$(exeext) > xunit-cases.xml 2>&1
+	-$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml 2>&1
 	-$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml 2>&1
 
 clean:
