@@ -22,6 +22,8 @@ endif
 
 MODE = Install
 
+LIBRARY_TYPES = static static-pic relocatable
+
 CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 
 GPROPTS = $(CONF_ARGS) -XAUNIT_BUILD_MODE=$(MODE) -XAUNIT_RUNTIME=$(RTS) \
@@ -39,10 +41,13 @@ GPROPTS_EXTRA+=-cargs -mcmodel=large -largs -mcmodel=large
 endif
 endif
 
-.PHONY: all clean targets install_clean install
+.PHONY: all clean install install-clean install-artifacts install-doc distrib
 
-all:
-	$(GPRBUILD) -p $(GPROPTS) lib/gnat/aunit.gpr ${GPROPTS_EXTRA}
+all: $(LIBRARY_TYPES:%=build-lib-%)
+
+build-lib-%:
+	$(GPRBUILD) -p $(GPROPTS) -XAUNIT_LIBRARY_TYPE=$* \
+		lib/gnat/aunit.gpr $(GPROPTS_EXTRA)
 
 clean-lib:
 	$(RM) -fr lib/aunit lib/aunit-obj
@@ -56,14 +61,33 @@ ifneq (,$(wildcard $(INSTALL)/lib/gnat/manifests/aunit))
 		--project-subdir=lib/gnat aunit
 endif
 
-install-clean: install-clean-legacy
-ifneq (,$(wildcard $(INSTALL)/share/gpr/manifests/aunit))
-	-$(GPRINSTALL) $(GPROPTS) --uninstall --prefix=$(INSTALL) aunit
-endif
+install-clean: install-clean-legacy $(LIBRARY_TYPES:%=uninstall-lib-%)
 
-install: install-clean
+uninstall-lib-%:
+	-$(GPRINSTALL) $(GPROPTS) --uninstall --prefix=$(INSTALL) aunit
+
+install: install-clean $(LIBRARY_TYPES:%=install-lib-%)
+
+install-lib-%:
 	$(GPRINSTALL) $(GPROPTS) -p -f --prefix=$(INSTALL) \
-		--no-build-var lib/gnat/aunit.gpr
+		-XAUNIT_LIBRARY_TYPE=$* --build-name=$* \
+		--build-var=LIBRARY_TYPE --build-var=AUNIT_LIBRARY_TYPE \
+		lib/gnat/aunit.gpr
+
+distrib: doc install install-artifacts install-doc
+
+install-artifacts:
+	$(RM) -fr $(INSTALL)/share/examples/aunit
+	$(RM) -f  $(INSTALL)/share/gps/plug-ins/aunit.xml
+	mkdir -p $(INSTALL)/share/gps/plug-ins \
+	         $(INSTALL)/share/examples/aunit
+	cp support/aunit.xml $(INSTALL)/share/gps/plug-ins/
+	cp -r examples/.     $(INSTALL)/share/examples/aunit/
+
+install-doc:
+	$(RM) -fr $(INSTALL)/share/doc/aunit
+	mkdir -p $(INSTALL)/share/doc/aunit
+	cp -r doc/pdf doc/txt doc/info doc/html $(INSTALL)/share/doc/aunit/
 
 .PHONY: doc
 doc:

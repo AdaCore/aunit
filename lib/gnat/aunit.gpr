@@ -15,14 +15,15 @@ project AUnit is
       "../../include/aunit/framework/" & AUnit_Shared.Memory,
       "../../include/aunit/framework/" & AUnit_Shared.FileIO);
 
-   for Library_Dir use AUnit_Shared.Library_Dir;
+   for Library_Dir use
+     AUnit_Shared.Library_Dir & "/" & AUnit_Shared.Library_Type;
 
    Obj_Dir := external ("AUNIT_OBJDIR", "../aunit-obj/"
                         & AUnit_Shared.Target & "-" & AUnit_Shared.Runtime);
-   for Object_Dir use Obj_Dir;
+   for Object_Dir use Obj_Dir & "/" & AUnit_Shared.Library_Type;
 
    for Library_Name use "aunit";
-   for Library_Kind use "static";
+   for Library_Kind use AUnit_Shared.Library_Type;
 
    --------------
    -- Compiler --
@@ -43,23 +44,5 @@ project AUnit is
       for Switches ("aunit.adb") use
         Compiler'Default_Switches ("ada") & ("-fno-strict-aliasing");
    end Compiler;
-
-   -------------
-   -- Install --
-   -------------
-
-   package Install is
-      for Artifacts ("share/doc/aunit/pdf")
-        use ("../../doc/pdf/**");
-      for Artifacts ("share/doc/aunit/txt")
-        use ("../../doc/txt/**");
-      for Artifacts ("share/doc/aunit/info")
-        use ("../../doc/info/**");
-      for Artifacts ("share/doc/aunit/html")
-        use ("../../doc/html/**");
-
-      for Artifacts ("share/gps/plug-ins") use ("../../support/aunit.xml");
-      for Artifacts ("share/examples/aunit") use ("../../examples/*");
-   end Install;
 
 end AUnit;
