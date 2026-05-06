@@ -134,7 +134,7 @@ package body AUnit.Simple_Test_Cases is
       Outcome := Success;
       if Options.Filter = null or else Is_Active (Options.Filter.all, Test.all)
       then
-         AUnit.Assertions.Set_Current_Test (Test_Access (Test));
+         AUnit.Assertions.Set_Current_Test (Test.all'Unchecked_Access);
          Init_Test (Test.all);
          Start_Test (R, 1);
 
