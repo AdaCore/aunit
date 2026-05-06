@@ -101,6 +101,9 @@ package AUnit.Test_Cases is
    function Routine_Name (Test : Test_Case) return Message_String;
    --  Routine name. Returns the routine under test. Do not override.
 
+   function Call_Set_Up_Case
+     (Test : in out Test_Case'Class) return Test_Error_Access;
+
 private
 
    type Routine_Access is access all Routine_Spec;

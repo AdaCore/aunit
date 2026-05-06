@@ -58,10 +58,10 @@ package body AUnit.IO is
    function Read_File (Name : String) return Message_String is
       File_Size : constant Natural := Natural (Size (Name));
    begin
-      --  On some targets, Unbounded_String is unusable, so to avoid this 
-      --  problem, we first get the size of the file to read and then 
-      --  read it line by line. 
-      --  StreamIO could be used to read the whole file at once but 
+      --  On some targets, Unbounded_String is unusable, so to avoid this
+      --  problem, we first get the size of the file to read and then
+      --  read it line by line.
+      --  StreamIO could be used to read the whole file at once but
       --  it was preferable to avoid having others dependencies.
       if File_Size = 0 then
          return null;
@@ -78,12 +78,12 @@ package body AUnit.IO is
             declare
                Line : constant String := Get_Line (File);
             begin
-               -- Check if adding this line + LF exceeds our buffer
+               --  Check if adding this line + LF exceeds our buffer
                if Last + Line'Length + 1 <= Buffer'Last then
                   Buffer (Last + 1 .. Last + Line'Length) := Line;
                   Last := Last + Line'Length;
 
-                  -- Manually re-insert the Line Feed that Get_Line stripped
+                  --  Manually re-insert the Line Feed that Get_Line stripped
                   Last := Last + 1;
                   Buffer (Last) := ASCII.LF;
                end if;

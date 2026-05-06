@@ -53,7 +53,7 @@ package AUnit.Simple_Test_Cases is
 
    function Test_File (Test : Test_Case) return Message_String;
    --  Test case file path.
-   
+
    function Suffix (Test : Test_Case) return Test_Suffix_Access;
    --  Additional information about the test sloc.
 

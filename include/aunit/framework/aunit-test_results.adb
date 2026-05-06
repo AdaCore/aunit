@@ -407,7 +407,7 @@ package body AUnit.Test_Results is
    --------------
 
    procedure Failures
-     (R : Result;F : in out Result_Lists.List; N : String := "")
+     (R : Result; F : in out Result_Lists.List; N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin

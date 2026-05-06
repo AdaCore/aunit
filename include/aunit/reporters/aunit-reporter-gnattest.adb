@@ -130,12 +130,13 @@ package body AUnit.Reporter.GNATtest is
       N : Integer;
    begin
 
-      if (Test.Location = null and then Test.Suffix = null) then 
-         --  If both location and suffix are null, it means that 
-         --  it uses the old aunit interface where only the test name is 
-         --  given.
+      if (Test.Location = null and then Test.Suffix = null) then
+
+         --  If both location and suffix are null, it means that it uses the
+         --  old aunit interface where only the test name is given.
+
          Put (File, Test.Test_Name.all);
-      else 
+      else
          Print_Location_Suffix (File, Test);
       end if;
 

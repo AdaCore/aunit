@@ -69,15 +69,6 @@ is
    procedure Replace_Element
      (Container : in out List; Position : Cursor; New_Item : Element_Type);
 
-   --     procedure Query_Element
-   --       (Position : Cursor;
-   --        Process  : not null access procedure (Element : Element_Type));
-
-   --     procedure Update_Element
-   --       (Container : in out List;
-   --        Position  : Cursor;
-   --      Process   : not null access procedure (Element : in out Element_Type));
-
    procedure Move (Target : in out List; Source : in out List);
 
    procedure Insert
@@ -171,11 +162,7 @@ is
      (Container : List; Process : IteratorNamed; Name : String := "");
 
    procedure Iterate
-     (Container : List; Process : Iterator); 
-
-   --     procedure Reverse_Iterate
-   --       (Container : List;
-   --        Process   : not null access procedure (Position : Cursor));
+     (Container : List; Process : Iterator);
 
    generic
       with function "<" (Left, Right : Element_Type) return Boolean is <>;

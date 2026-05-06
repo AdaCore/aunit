@@ -48,7 +48,7 @@ package body AUnit.Reporter is
       end loop;
    end Indent_Line;
 
-   procedure Put_Line (File : File_Type; Item : String; Indent : Natural) is 
+   procedure Put_Line (File : File_Type; Item : String; Indent : Natural) is
    begin
       Indent_Line (File, Indent);
       AUnit.IO.Put_Line (File, Item);
@@ -61,6 +61,9 @@ package body AUnit.Reporter is
    end Put;
 
    procedure Print_Location_Suffix (File : File_Type; Test : Test_Result) is
+      procedure Print_Location
+        (File : File_Type; Loc : Tested_Location_Access);
+
       procedure Print_Location (File : File_Type; Loc : Tested_Location_Access)
       is
       begin
