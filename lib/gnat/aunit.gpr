@@ -4,7 +4,7 @@ with "aunit_shared";
 project AUnit is
 
    type Compilation_Mode_Type is ("Devel", "Install");
-   Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Install");
+   Mode : Compilation_Mode_Type := external ("AUNIT_BUILD_MODE", "Devel");
 
    for Source_Dirs use
      ("../../include/aunit/framework",
