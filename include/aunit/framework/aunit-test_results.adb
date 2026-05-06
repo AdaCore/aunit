@@ -154,22 +154,23 @@ package body AUnit.Test_Results is
      (Position : Result_Lists.Cursor; Name : String)
    is
       use Message_List;
+      Elem         : constant Test_Result := Result_Lists.Element (Position);
       Package_Name : constant Message_String :=
-        Result_Lists.Element (Position).Package_Name;
+        (if Elem.Package_Name = null
+         then Message_String'(new String'(""))
+         else Elem.Package_Name);
       Present      : Boolean := False;
       C            : Cursor := First (Package_List.all);
       pragma Unreferenced (Name);
    begin
-      if Package_Name /= null then
-         while Has_Element (C) loop
-            if Element (C).all = Package_Name.all then
-               Present := True;
-            end if;
-            C := Next (C);
-         end loop;
-         if not Present then
-            Package_List.all.Append (Package_Name);
+      while Has_Element (C) and not Present loop
+         if Element (C).all = Package_Name.all then
+            Present := True;
          end if;
+         C := Next (C);
+      end loop;
+      if not Present then
+         Package_List.all.Append (Package_Name);
       end if;
    end Iterate_Package_Name;
 
