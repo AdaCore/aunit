@@ -127,14 +127,16 @@ package body AUnit.Reporter.JUnit is
          & (if Test.Routine_Name = null
             then ""
             else " : " & Test.Routine_Name.all));
+      Put (File, """");
       if Test.Package_Name /= null then
-         Put (File, """ classname=""");
+         Put (File, " classname=""");
          Put_Special_Chars (File, Test.Package_Name.all);
+         Put (File, """");
       end if;
       if Test.Test_File /= null then
-         Put (File, """ file=""" & Test.Test_File.all & """ ");
+         Put (File, " file=""" & Test.Test_File.all & """");
       end if;
-      Put (File, "time=""");
+      Put (File, " time=""");
       Put_Measure (File, Get_Measure (Test.Elapsed));
 
       if Test.Failure /= null then
