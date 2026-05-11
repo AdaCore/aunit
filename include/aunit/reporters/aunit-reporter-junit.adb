@@ -47,8 +47,7 @@ package body AUnit.Reporter.JUnit is
    procedure Report_Test (File : AUnit.IO.File_Type; Test : Test_Result);
    --  Report a test case
 
-   procedure Report_Tests
-     (File : AUnit.IO.File_Type; L : Result_Lists.List);
+   procedure Report_Tests (File : AUnit.IO.File_Type; L : Result_Lists.List);
    --  Report all test cases
 
    -----------------------
@@ -225,9 +224,7 @@ package body AUnit.Reporter.JUnit is
    -- Report_Tests --
    ------------------
 
-   procedure Report_Tests
-     (File : AUnit.IO.File_Type; L : Result_Lists.List)
-   is
+   procedure Report_Tests (File : AUnit.IO.File_Type; L : Result_Lists.List) is
       use Result_Lists;
       C : Cursor := First (L);
    begin

@@ -38,7 +38,7 @@
 with AUnit.Assertions;
 with AUnit.Options;
 with AUnit.Test_Results; use AUnit.Test_Results;
-with AUnit.Test_Info; use AUnit.Test_Info;
+with AUnit.Test_Info;    use AUnit.Test_Info;
 
 package AUnit.Simple_Test_Cases is
 

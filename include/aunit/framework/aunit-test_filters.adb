@@ -28,7 +28,7 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with AUnit.Simple_Test_Cases;  use AUnit.Simple_Test_Cases;
+with AUnit.Simple_Test_Cases; use AUnit.Simple_Test_Cases;
 
 package body AUnit.Test_Filters is
 
@@ -63,12 +63,9 @@ package body AUnit.Test_Filters is
    ---------------
 
    function Is_Active
-     (Filter : Name_Filter;
-      T      : AUnit.Tests.Test'Class) return Boolean is
+     (Filter : Name_Filter; T : AUnit.Tests.Test'Class) return Boolean is
    begin
-      if Filter.Name = null
-        or else Filter.Name.all = ""
-      then
+      if Filter.Name = null or else Filter.Name.all = "" then
          return True;
       end if;
 
@@ -80,15 +77,17 @@ package body AUnit.Test_Filters is
       end if;
 
       if Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)) = null then
-         return Starts_With
-           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
-            Filter.Name.all);
+         return
+           Starts_With
+             (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+              Filter.Name.all);
       else
-         return Starts_With
-           (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
-            & " : "
-            & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
-            Filter.Name.all);
+         return
+           Starts_With
+             (Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all
+              & " : "
+              & Routine_Name (AUnit.Simple_Test_Cases.Test_Case'Class (T)).all,
+              Filter.Name.all);
       end if;
    end Is_Active;
 

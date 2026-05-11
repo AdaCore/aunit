@@ -70,11 +70,11 @@ package AUnit.Assertions is
    --  contain both the expected and actual values.
 
    procedure Assert
-     (Actual    : String;
-      Expected  : String;
-      Message   : String;
-      Source    : String  := GNAT.Source_Info.File;
-      Line      : Natural := GNAT.Source_Info.Line);
+     (Actual   : String;
+      Expected : String;
+      Message  : String;
+      Source   : String := GNAT.Source_Info.File;
+      Line     : Natural := GNAT.Source_Info.Line);
    --  Specialized versions of Assert, they call the general version that
    --  takes a Condition as a parameter
 
@@ -142,8 +142,7 @@ private
       Id      : Test_Id := Null_Id;
    end record;
 
-   package Failure_Lists is
-     new Ada_Containers.AUnit_Lists (Failure_Elt);
+   package Failure_Lists is new Ada_Containers.AUnit_Lists (Failure_Elt);
    --  Container for failed assertion messages per routine
 
    type Failure_Iter is new Failure_Lists.Cursor;

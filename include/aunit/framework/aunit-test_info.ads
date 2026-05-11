@@ -4,7 +4,7 @@ package AUnit.Test_Info is
       Tested_File   : Message_String;
       Tested_Line   : Integer;
       Tested_Column : Integer;
-      Tested_Name : Message_String;
+      Tested_Name   : Message_String;
    end record;
    --  Description of the sloc of a test.
 

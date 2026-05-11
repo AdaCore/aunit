@@ -29,17 +29,18 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada_Containers; use Ada_Containers;
+with Ada_Containers;     use Ada_Containers;
 with Ada_Containers.AUnit_Lists;
 with AUnit.Options;
 with AUnit.Simple_Test_Cases;
 with AUnit.Test_Results; use AUnit.Test_Results;
 
 --  Test case: a collection of test routines
+
 package AUnit.Test_Cases is
 
-   type Test_Case is abstract new AUnit.Simple_Test_Cases.Test_Case with
-     private;
+   type Test_Case is abstract
+     new AUnit.Simple_Test_Cases.Test_Case with private;
    type Test_Case_Access is access all Test_Case'Class;
 
    type Test_Routine is access procedure (Test : in out Test_Case'Class);
@@ -63,9 +64,7 @@ package AUnit.Test_Cases is
    package Registration is
 
       procedure Register_Routine
-        (Test    : in out Test_Case'Class;
-         Routine : Test_Routine;
-         Name    : String);
+        (Test : in out Test_Case'Class; Routine : Test_Routine; Name : String);
       --  Add test routine to test case
 
       function Routine_Count (Test : Test_Case'Class) return Count_Type;
@@ -78,8 +77,8 @@ package AUnit.Test_Cases is
    package Specific_Test_Case_Registration is
       --  Specific Test Case registration
 
-      type Specific_Test_Routine is access procedure
-        (Test : in out Specific_Test_Case'Class);
+      type Specific_Test_Routine is
+        access procedure (Test : in out Specific_Test_Case'Class);
 
       procedure Register_Wrapper
         (Test    : in out Specific_Test_Case'Class;
@@ -90,9 +89,9 @@ package AUnit.Test_Cases is
 
    procedure Run
      (Test    : access Test_Case;
-      Options :        AUnit.Options.AUnit_Options;
+      Options : AUnit.Options.AUnit_Options;
       R       : in out Result'Class;
-      Outcome :    out Status);
+      Outcome : out Status);
    --  Run test case. Do not override.
 
    procedure Run_Test (Test : in out Test_Case);
@@ -112,8 +111,7 @@ private
    package Routine_Lists is new Ada_Containers.AUnit_Lists (Routine_Spec);
    --  Container for test routines
 
-   package Failure_Lists is
-     new Ada_Containers.AUnit_Lists (Message_String);
+   package Failure_Lists is new Ada_Containers.AUnit_Lists (Message_String);
    --  Container for failed assertion messages per routine
 
    type Test_Case is abstract new AUnit.Simple_Test_Cases.Test_Case with record

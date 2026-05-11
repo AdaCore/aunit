@@ -30,7 +30,7 @@
 ------------------------------------------------------------------------------
 
 with AUnit.IO;           use AUnit.IO;
-with AUnit.Test_Info; use AUnit.Test_Info;
+with AUnit.Test_Info;    use AUnit.Test_Info;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console

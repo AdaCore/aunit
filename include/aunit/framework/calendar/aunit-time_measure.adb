@@ -79,7 +79,7 @@ package body AUnit.Time_Measure is
       procedure Put (N : Integer; Length : Integer) is
       begin
          for Dig in reverse 1 .. Length - 1 loop
-            if N < 10**Dig then
+            if N < 10 ** Dig then
                Put (File, "0");
             else
                exit;
@@ -155,7 +155,7 @@ package body AUnit.Time_Measure is
       procedure Put (N : Integer; Length : Integer) is
       begin
          for Dig in reverse 1 .. Length - 1 loop
-            if N < 10**Dig then
+            if N < 10 ** Dig then
                Put (File, "0");
             else
                exit;

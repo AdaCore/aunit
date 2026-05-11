@@ -29,9 +29,9 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
-with Ada.Strings;           use Ada.Strings;
-with Ada.Strings.Fixed;     use Ada.Strings.Fixed;
-with AUnit.Test_Info;       use AUnit.Test_Info;
+with Ada.Strings;       use Ada.Strings;
+with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with AUnit.Test_Info;   use AUnit.Test_Info;
 
 package body AUnit.Reporter is
 

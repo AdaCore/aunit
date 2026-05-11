@@ -30,12 +30,14 @@
 ------------------------------------------------------------------------------
 
 --  jenkins-junit.xsd compatible reporter to file.
+
 package AUnit.Reporter.JUnit is
 
    type JUnit_Reporter is new Reporter with null record;
 
-   procedure Report (Engine  : JUnit_Reporter;
-                     R       : in out Result'Class;
-                     Options : AUnit_Options := Default_Options);
+   procedure Report
+     (Engine  : JUnit_Reporter;
+      R       : in out Result'Class;
+      Options : AUnit_Options := Default_Options);
 
 end AUnit.Reporter.JUnit;

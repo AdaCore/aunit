@@ -40,16 +40,15 @@ package AUnit.Test_Filters is
    type Test_Filter is abstract tagged limited private;
    type Test_Filter_Access is access all Test_Filter'Class;
    function Is_Active
-     (Filter : Test_Filter;
-      T      : AUnit.Tests.Test'Class) return Boolean is abstract;
+     (Filter : Test_Filter; T : AUnit.Tests.Test'Class) return Boolean
+   is abstract;
    --  Whether we should run the given test. If this function returns False,
    --  the test is not run.
 
    type Name_Filter is new Test_Filter with private;
    --  A filter based on the name of the test and/or routine.
 
-   procedure Set_Name
-     (Filter : in out Name_Filter; Name : String);
+   procedure Set_Name (Filter : in out Name_Filter; Name : String);
    --  Set the name of the test(s) to run.
    --  The name can take several forms:
    --     * Either the fully qualified name of the test (including routine).
@@ -62,8 +61,7 @@ package AUnit.Test_Filters is
    --  If the name is the empty string, all tests will be run
 
    function Is_Active
-     (Filter : Name_Filter;
-      T      : AUnit.Tests.Test'Class) return Boolean;
+     (Filter : Name_Filter; T : AUnit.Tests.Test'Class) return Boolean;
    --  See inherited documentation
 
 private

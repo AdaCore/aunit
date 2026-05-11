@@ -161,8 +161,7 @@ is
    procedure Iterate
      (Container : List; Process : IteratorNamed; Name : String := "");
 
-   procedure Iterate
-     (Container : List; Process : Iterator);
+   procedure Iterate (Container : List; Process : Iterator);
 
    generic
       with function "<" (Left, Right : Element_Type) return Boolean is <>;

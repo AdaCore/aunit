@@ -39,15 +39,14 @@ package body Registration is
    ----------------------
 
    procedure Register_Routine
-     (Test    : in out Test_Case'Class;
-      Routine : Test_Routine;
-      Name    : String) is
+     (Test : in out Test_Case'Class; Routine : Test_Routine; Name : String)
+   is
 
       Formatted_Name : constant Message_String := Format (Name);
-      Val : Routine_Spec;
+      Val            : Routine_Spec;
 
    begin
-      Val  := (Routine, Formatted_Name);
+      Val := (Routine, Formatted_Name);
       Add_Routine (Test, Val);
    end Register_Routine;
 
