@@ -30,7 +30,7 @@
 ------------------------------------------------------------------------------
 
 with AUnit.IO;           use AUnit.IO;
-with AUnit.Test_Info; use AUnit.Test_Info;
+with AUnit.Test_Info;    use AUnit.Test_Info;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 --  Very simple reporter to console
@@ -199,12 +199,13 @@ package body AUnit.Reporter.Text is
       Put (File, Prefix);
       Put (File, " ");
 
-      if (Test.Location = null and then Test.Suffix = null) then 
-         --  If both location and suffix are null, it means that 
-         --  it uses the old aunit interface where only the test name is 
-         --  given.
+      if (Test.Location = null and then Test.Suffix = null) then
+
+         --  If both location and suffix are null, it means that it uses the
+         --  old aunit interface where only the test name is given.
+
          Put (File, Test.Test_Name.all);
-      else 
+      else
          Print_Location_Suffix (File, Test);
       end if;
 
@@ -223,7 +224,7 @@ package body AUnit.Reporter.Text is
 
       if Test.Failure /= null then
          Put_Line (File, Test.Failure.Message.all, Indent => 1);
-         Put (FIle, "at " & Test.Failure.Source_Name.all & ":", Indent => 1);
+         Put (File, "at " & Test.Failure.Source_Name.all & ":", Indent => 1);
          Put (File, Integer (Test.Failure.Line), 0);
          New_Line (File);
 

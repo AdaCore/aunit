@@ -30,8 +30,8 @@
 ------------------------------------------------------------------------------
 
 with Ada.Unchecked_Conversion;
-with System.Storage_Elements;  use System.Storage_Elements;
-with AUnit.Memory;             use AUnit.Memory;
+with System.Storage_Elements; use System.Storage_Elements;
+with AUnit.Memory;            use AUnit.Memory;
 with System;
 
 package body AUnit is
@@ -46,8 +46,9 @@ package body AUnit is
       First : Natural;
       Last  : Natural;
    end record
-   with Bit_Order => System.Default_Bit_Order,
-        Scalar_Storage_Order => System.Default_Bit_Order;
+   with
+     Bit_Order            => System.Default_Bit_Order,
+     Scalar_Storage_Order => System.Default_Bit_Order;
 
    type Bounds_Access is access all Bounds;
 
@@ -55,8 +56,9 @@ package body AUnit is
       Address       : System.Address;
       Bound_Address : Bounds_Access;
    end record
-   with Bit_Order => System.Default_Bit_Order,
-        Scalar_Storage_Order => System.Default_Bit_Order;
+   with
+     Bit_Order            => System.Default_Bit_Order,
+     Scalar_Storage_Order => System.Default_Bit_Order;
 
    pragma Warnings (On, "scalar storage order");
 
@@ -65,17 +67,18 @@ package body AUnit is
    -------------------
 
    function Message_Alloc (Length : Natural) return Message_String is
-      function To_Message is new Ada.Unchecked_Conversion
-        (Fat_Pointer, Message_String);
-      function To_Bounds_Access is new Ada.Unchecked_Conversion
-        (System.Address, Bounds_Access);
-      function To_Address is new Ada.Unchecked_Conversion
-        (Bounds_Access, System.Address);
+      function To_Message is new
+        Ada.Unchecked_Conversion (Fat_Pointer, Message_String);
+      function To_Bounds_Access is new
+        Ada.Unchecked_Conversion (System.Address, Bounds_Access);
+      function To_Address is new
+        Ada.Unchecked_Conversion (Bounds_Access, System.Address);
       Ret : Fat_Pointer;
    begin
-      Ret.Bound_Address := To_Bounds_Access
-        (AUnit.Memory.AUnit_Alloc
-           (size_t (Length + (Bounds'Object_Size / 8))));
+      Ret.Bound_Address :=
+        To_Bounds_Access
+          (AUnit.Memory.AUnit_Alloc
+             (size_t (Length + (Bounds'Object_Size / 8))));
       Ret.Bound_Address.First := 1;
       Ret.Bound_Address.Last := Length;
       Ret.Address := To_Address (Ret.Bound_Address) + (Bounds'Size / 8);

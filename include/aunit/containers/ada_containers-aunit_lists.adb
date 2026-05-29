@@ -730,9 +730,7 @@ package body Ada_Containers.AUnit_Lists is
       B := B - 1;
    end Iterate;
 
-   procedure Iterate
-     (Container : List; Process : Iterator)
-   is
+   procedure Iterate (Container : List; Process : Iterator) is
       C : List renames Container'Unrestricted_Access.all;
       B : Natural renames C.Busy;
 
@@ -750,7 +748,6 @@ package body Ada_Containers.AUnit_Lists is
 
       B := B - 1;
    end Iterate;
-
 
    ----------
    -- Last --

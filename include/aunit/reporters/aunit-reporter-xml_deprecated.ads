@@ -30,13 +30,13 @@
 ------------------------------------------------------------------------------
 
 --  Very simple reporter to console
+
 package AUnit.Reporter.XML_DEPRECATED is
 
    type XML_DEPRECATED_Reporter is new Reporter with null record;
 
-   procedure Report (Engine  : XML_DEPRECATED_Reporter;
-                     R       : in out Result'Class;
-                     Options : AUnit_Options := Default_Options);
+   procedure Report
+     (Engine  : XML_DEPRECATED_Reporter;
+      R       : in out Result'Class;
+      Options : AUnit_Options := Default_Options);
 end AUnit.Reporter.XML_DEPRECATED;
-
-

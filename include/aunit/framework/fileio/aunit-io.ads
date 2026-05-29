@@ -71,8 +71,7 @@ package AUnit.IO is
       Error_File       : in out File_Type;
       Capture_Standard : Boolean);
 
-   function Read_File
-     (Name : String) return Message_String;
+   function Read_File (Name : String) return Message_String;
    function Read_Output
      (Name : String; Capture_Standard : Boolean) return Message_String;
    function Read_Error

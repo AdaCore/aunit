@@ -36,8 +36,7 @@ procedure Assert_Exception
   (Proc    : Throwing_Exception_Proc;
    Message : String;
    Source  : String := GNAT.Source_Info.File;
-   Line    : Natural := GNAT.Source_Info.Line)
-is
+   Line    : Natural := GNAT.Source_Info.Line) is
 begin
    begin
       Proc.all;

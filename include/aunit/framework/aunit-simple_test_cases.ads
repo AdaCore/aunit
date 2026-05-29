@@ -38,7 +38,7 @@
 with AUnit.Assertions;
 with AUnit.Options;
 with AUnit.Test_Results; use AUnit.Test_Results;
-with AUnit.Test_Info; use AUnit.Test_Info;
+with AUnit.Test_Info;    use AUnit.Test_Info;
 
 package AUnit.Simple_Test_Cases is
 
@@ -53,7 +53,7 @@ package AUnit.Simple_Test_Cases is
 
    function Test_File (Test : Test_Case) return Message_String;
    --  Test case file path.
-   
+
    function Suffix (Test : Test_Case) return Test_Suffix_Access;
    --  Additional information about the test sloc.
 

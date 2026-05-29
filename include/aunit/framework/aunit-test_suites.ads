@@ -43,16 +43,17 @@ package AUnit.Test_Suites is
    type Test_Suite is new AUnit.Tests.Test with private;
    type Access_Test_Suite is access all Test_Suite'Class;
 
-   procedure Add_Test (S : access Test_Suite'Class;
-                       T : access Test_Suite'Class);
-   procedure Add_Test (S : access Test_Suite'Class;
-                       T : access Test_Case'Class);
+   procedure Add_Test
+     (S : access Test_Suite'Class; T : access Test_Suite'Class);
+   procedure Add_Test
+     (S : access Test_Suite'Class; T : access Test_Case'Class);
    --  Add a test case or suite to this suite
 
-   procedure Run (Suite   : access Test_Suite;
-                  Options :        AUnit_Options;
-                  R       : in out Result'Class;
-                  Outcome :    out Status);
+   procedure Run
+     (Suite   : access Test_Suite;
+      Options : AUnit_Options;
+      R       : in out Result'Class;
+      Outcome : out Status);
    --  Run all tests collected into this suite
 
    function New_Suite return Access_Test_Suite;
@@ -60,14 +61,13 @@ package AUnit.Test_Suites is
 
 private
 
-   type Test_Suite_Elt_Kind is
-     (TC_Elt,
-      TS_Elt);
+   type Test_Suite_Elt_Kind is (TC_Elt, TS_Elt);
 
    type Test_Suite_Element (Kind : Test_Suite_Elt_Kind := TC_Elt) is record
       case Kind is
          when TC_Elt =>
             TC : Test_Case_Access;
+
          when TS_Elt =>
             TS : Access_Test_Suite;
       end case;

@@ -30,27 +30,25 @@
 ------------------------------------------------------------------------------
 
 --  Very simple reporter to console
+
 package AUnit.Reporter.Text is
 
    type Text_Reporter is new Reporter with private;
 
    procedure Set_Use_ANSI_Colors
-     (Engine : in out Text_Reporter;
-      Value  : Boolean);
+     (Engine : in out Text_Reporter; Value : Boolean);
    --  Setting this value will enable colors output on an ANSI compatible
    --  terminal.
    --  By default, no color is used.
 
-   procedure Report (Engine  : Text_Reporter;
-                     R       : in out Result'Class;
-                     Options : AUnit_Options := Default_Options);
+   procedure Report
+     (Engine  : Text_Reporter;
+      R       : in out Result'Class;
+      Options : AUnit_Options := Default_Options);
 
-   procedure Report_OK_Tests (Engine : Text_Reporter;
-                              R      : Result'Class);
-   procedure Report_Fail_Tests (Engine : Text_Reporter;
-                                R      : Result'Class);
-   procedure Report_Error_Tests (Engine : Text_Reporter;
-                                 R      : Result'Class);
+   procedure Report_OK_Tests (Engine : Text_Reporter; R : Result'Class);
+   procedure Report_Fail_Tests (Engine : Text_Reporter; R : Result'Class);
+   procedure Report_Error_Tests (Engine : Text_Reporter; R : Result'Class);
    --  These subprograms implement the various parts of the Report. You
    --  can therefore chose in which order to report the various categories,
    --  and whether or not to report them.

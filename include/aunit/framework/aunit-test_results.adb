@@ -331,8 +331,7 @@ package body AUnit.Test_Results is
       Standard_Error  : Message_String;
       Location        : Tested_Location;
       Suffix          : Test_Suffix_Access;
-      Elapsed         : Time
-      )
+      Elapsed         : Time)
    is
 
       Val : constant Test_Result :=
@@ -383,7 +382,7 @@ package body AUnit.Test_Results is
    ------------
 
    procedure Errors
-     (R : Result; E : in out Result_Lists.List;  N : String := "")
+     (R : Result; E : in out Result_Lists.List; N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
@@ -407,7 +406,7 @@ package body AUnit.Test_Results is
    --------------
 
    procedure Failures
-     (R : Result;F : in out Result_Lists.List; N : String := "")
+     (R : Result; F : in out Result_Lists.List; N : String := "")
    is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin

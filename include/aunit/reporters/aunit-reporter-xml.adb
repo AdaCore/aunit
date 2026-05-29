@@ -31,7 +31,7 @@
 
 with AUnit.IO;           use AUnit.IO;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
-with AUnit.Test_Info; use AUnit.Test_Info;
+with AUnit.Test_Info;    use AUnit.Test_Info;
 
 --  Very simple reporter to console
 
@@ -165,7 +165,6 @@ package body AUnit.Reporter.XML is
          Put (File, Test.Routine_Name.all);
       end if;
       Put (File, """");
-
 
       if Test.Location /= null and then Test.Location.Tested_Name /= null then
          Put

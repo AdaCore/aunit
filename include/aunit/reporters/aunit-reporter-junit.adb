@@ -40,6 +40,20 @@ package body AUnit.Reporter.JUnit is
      (S : Result_Lists.List; E : Result_Lists.List; F : Result_Lists.List)
       return AUnit_Duration;
 
+   procedure Print_System_Err
+     (File : AUnit.IO.File_Type; Error : Message_String; Indent : Natural);
+   --  Print the Error message to File, with the given Indent
+
+   procedure Report_Test (File : AUnit.IO.File_Type; Test : Test_Result);
+   --  Report a test case
+
+   procedure Report_Tests (File : AUnit.IO.File_Type; L : Result_Lists.List);
+   --  Report all test cases
+
+   -----------------------
+   -- Put_Special_Chars --
+   -----------------------
+
    procedure Put_Special_Chars (File : AUnit.IO.File_Type; S : String) is
    begin
       for C of S loop
@@ -74,6 +88,10 @@ package body AUnit.Reporter.JUnit is
       end if;
    end Print_System_Out;
 
+   ----------------------
+   -- Print_System_Err --
+   ----------------------
+
    procedure Print_System_Err
      (File : AUnit.IO.File_Type; Error : Message_String; Indent : Natural) is
    begin
@@ -85,7 +103,12 @@ package body AUnit.Reporter.JUnit is
          Put_Line (File, "</system-err>");
       end if;
    end Print_System_Err;
+
    procedure Put_Measure is new Gen_Put_Measure_In_Seconds;
+
+   -----------------------
+   -- Get_Combined_Time --
+   -----------------------
 
    function Get_Combined_Time
      (S : Result_Lists.List; E : Result_Lists.List; F : Result_Lists.List)
@@ -94,6 +117,12 @@ package body AUnit.Reporter.JUnit is
       Duration_Sum : AUnit_Duration;
 
       use Result_Lists;
+
+      procedure Get_Time (R : Result_Lists.List);
+
+      --------------
+      -- Get_Time --
+      --------------
 
       procedure Get_Time (R : Result_Lists.List) is
          C : Cursor := First (R);
@@ -111,12 +140,15 @@ package body AUnit.Reporter.JUnit is
          end loop;
       end Get_Time;
    begin
-
       Get_Time (S);
       Get_Time (E);
       Get_Time (F);
       return Duration_Sum;
    end Get_Combined_Time;
+
+   -----------------
+   -- Report_Test --
+   -----------------
 
    procedure Report_Test (File : AUnit.IO.File_Type; Test : Test_Result) is
    begin
@@ -188,9 +220,11 @@ package body AUnit.Reporter.JUnit is
       end if;
    end Report_Test;
 
-   procedure Dump_Result_List
-     (File : AUnit.IO.File_Type; L : Result_Lists.List)
-   is
+   ------------------
+   -- Report_Tests --
+   ------------------
+
+   procedure Report_Tests (File : AUnit.IO.File_Type; L : Result_Lists.List) is
       use Result_Lists;
       C : Cursor := First (L);
    begin
@@ -198,7 +232,11 @@ package body AUnit.Reporter.JUnit is
          Report_Test (File, Element (C));
          Next (C);
       end loop;
-   end Dump_Result_List;
+   end Report_Tests;
+
+   ------------
+   -- Report --
+   ------------
 
    procedure Report
      (Engine  : JUnit_Reporter;
@@ -257,9 +295,9 @@ package body AUnit.Reporter.JUnit is
                end if;
                Put_Line (File, """>");
 
-               Dump_Result_List (File, S);
-               Dump_Result_List (File, F);
-               Dump_Result_List (File, E);
+               Report_Tests (File, S);
+               Report_Tests (File, F);
+               Report_Tests (File, E);
             end;
             Put_Line (File, "</testsuite>", Indent => 1);
             C := Next (C);

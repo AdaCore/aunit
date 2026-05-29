@@ -3,7 +3,7 @@
 --
 
 with AUnit.Options;
-with AUnit.Reporter.Text;
+with AUnit.Reporter.JUnit;
 with AUnit.Run;
 
 with AUnit_Suite; use AUnit_Suite;
@@ -13,7 +13,7 @@ procedure AUnit_Harness_Fixtures is
    procedure Harness is new AUnit.Run.Test_Runner (Suite_Fixtures);
    --  The full test harness
 
-   Reporter : AUnit.Reporter.Text.Text_Reporter;
+   Reporter : AUnit.Reporter.JUnit.JUnit_Reporter;
    Options  : constant AUnit.Options.AUnit_Options :=
      (Global_Timer     => False,
       Test_Case_Timer  => True,
@@ -21,6 +21,5 @@ procedure AUnit_Harness_Fixtures is
       Report_Successes => True,
       Filter           => null);
 begin
-   AUnit.Reporter.Text.Set_Use_ANSI_Colors (Reporter, True);
    Harness (Reporter, Options);
 end AUnit_Harness_Fixtures;

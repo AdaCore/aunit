@@ -118,7 +118,7 @@ package body AUnit.Test_Cases is
                   null,
                   Location (Test_Case'Class (Test.all)),
                   Error.all,
-                  Suffix (Test_Case'Class(Test.all)),
+                  Suffix (Test_Case'Class (Test.all)),
                   Time_Measure.Null_Time);
             end if;
          end if;
