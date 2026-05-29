@@ -14,6 +14,10 @@ project AUnit_Shared is
 
    Runtime : Runtime_Type := external ("AUNIT_RUNTIME", "full");
 
+   type Library_Kind is ("static", "static-pic", "relocatable");
+   Library_Type : Library_Kind :=
+     external ("AUNIT_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
+
    Library_Dir := external ("AUNIT_LIBDIR", "../aunit/" & Target & "-" & Runtime);
 
    for Source_Dirs use ();
