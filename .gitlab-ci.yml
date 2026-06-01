@@ -24,9 +24,17 @@ include:
   # Build
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
-      stage: build
       job-name: build
       anod-args: build aunit
+      cpus: 16
+      image: pe-base
+      save-component: true
+
+  # Cross build
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
+    inputs:
+      job-name: build-cross
+      anod-args: build aunit --target aarch64-elf
       cpus: 16
       image: pe-base
       save-component: true
@@ -36,16 +44,30 @@ include:
     inputs:
       needs: ["build:linux"]
       job-name: aunit
-      anod-args: test aunit
+      anod-args: test aunit --minimal
+      image: pe-base
+      cpus: 16
+      disk: 80
+
+  # Cross testing
+  - component: $CI_SERVER_FQDN/eng/gitlab-templates/test@~latest
+    inputs:
+      needs: ["build-cross:linux"]
+      job-name: aunit-cross
+      anod-args: test aunit --minimal --target aarch64-elf,,qemu-zynqmp -Qrts=light-zynqmp
       image: pe-base
       cpus: 16
       disk: 80
 
 aunit:linux:
-  after_script:
-    - cat /tmp/ci_env.sh
-    - . /tmp/ci_env.sh
-    - TEST_BSN=$(anod eval --primitive=test aunit build_space_name --sandbox-dir=$ANOD_DEFAULT_SANDBOX_DIR)
+  artifacts:
+    paths:
+      - xunit-*.xml
+
+    reports:
+      junit: xunit-*.xml
+
+aunit-cross:linux:
   artifacts:
     paths:
       - xunit-*.xml
