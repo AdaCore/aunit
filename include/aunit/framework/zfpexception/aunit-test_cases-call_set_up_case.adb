@@ -37,6 +37,8 @@ function Call_Set_Up_Case
   (Test : in out Test_Case'Class) return Test_Error_Access is
    function Alloc_Error is new Gen_Alloc (Test_Error, Test_Error_Access);
 
+   procedure Internal_Set_Up_Case;
+
    procedure Internal_Set_Up_Case is
    begin
       Set_Up_Case (Test);

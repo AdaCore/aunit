@@ -38,6 +38,9 @@ package body AUnit.Test_Cases is
 
    package body Registration is separate;
 
+   function Call_Set_Up_Case
+     (Test : in out Test_Case'Class) return Test_Error_Access;
+
    -----------------
    -- Add_Routine --
    -----------------
