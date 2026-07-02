@@ -169,7 +169,7 @@ package body AUnit.Test_Caller is
       --  the test Ids correspond so that a failure reported via Fixture is
       --  correctly understood as being part of Test.
       AUnit.Assertions.Copy_Id (Test, Test.Fixture.all);
-      Test.Method (Test_Fixture (Test.Fixture.all));
+      Test.Method (Test.Fixture.all);
    end Run_Test;
 
    ------------
