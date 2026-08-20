@@ -212,6 +212,9 @@ package body AUnit.Reporter.JUnit is
 
       elsif Test.Standard_Output /= null or else Test.Standard_Error /= null
       then
+         --  Passing test with captured output: close the opening tag before
+         --  emitting the <system-out>/<system-err> children.
+         Put_Line (File, """>");
          Print_System_Out (File, Test.Standard_Output, Indent => 3);
          Print_System_Err (File, Test.Standard_Error, Indent => 3);
          Put_Line (File, "</testcase>", Indent => 2);

@@ -91,7 +91,10 @@ package body AUnit.IO is
          end loop;
          Delete (File);
 
-         return Format (Buffer.all);
+         --  Only the first Last characters were filled in; the trailing
+         --  padding is uninitialized (and would leak NUL bytes into the
+         --  reporter output, which is illegal in XML).
+         return Format (Buffer (1 .. Last));
       end;
    end Read_File;
 
