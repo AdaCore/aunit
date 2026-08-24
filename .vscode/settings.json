@@ -1,0 +1,15 @@
+{
+  // The library project. Its source dirs are include/aunit/**, so the
+  // reporters and framework resolve; test/src does not (see note below).
+  "ada.projectFile": "lib/gnat/aunit.gpr",
+
+  // aunit_shared.gpr derives Except/Calend/Memory/FileIO from AUNIT_RUNTIME,
+  // which selects which framework/<profile> dir is a source dir. Change
+  // AUNIT_RUNTIME here to have the ALS follow a restricted profile instead.
+  "ada.scenarioVariables": {
+    "AUNIT_PLATFORM": "native",
+    "AUNIT_RUNTIME": "full",
+    "LIBRARY_TYPE": "static",
+    "AUNIT_BUILD_MODE": "Devel"
+  }
+}
