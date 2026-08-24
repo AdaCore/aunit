@@ -5,4 +5,4 @@ repos:
         name: Run gnatformat
         entry: gnatformat
         language: system
-        files: "^src/.*.ad(b|s)"
+        files: '\.ad[bs]$'
