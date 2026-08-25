@@ -36,9 +36,6 @@ ifeq ($(findstring vxworks,$(TARGET)),vxworks)
 endif
 
 RUN=
-ifeq ($(TARGET),powerpc-elf)
-   RUN=./support/run-ppc-elf
-endif
 
 build:
 	$(PROJECT_PATH_ARG) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) $(LARGS)
