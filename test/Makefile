@@ -36,24 +36,19 @@ ifeq ($(findstring vxworks,$(TARGET)),vxworks)
 endif
 
 RUN=
-ifeq ($(TARGET),powerpc-elf)
-   RUN=./support/run-ppc-elf
-endif
 
 build:
 	$(PROJECT_PATH_ARG) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) $(LARGS)
 
-run: build
-	-$(RUN) ./exe/$(TARGET)-$(RTS)/aunit_harness$(exeext)
-
 test: build
-	-$(RUN) ./exe/aunit_harness_suites$(exeext) > xunit-suite.xml 2>&1
-	-$(RUN) ./exe/aunit_harness_cases$(exeext) > xunit-cases.xml 2>&1
-	-$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml 2>&1
-	-$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml 2>&1
+	$(RUN) ./exe/aunit_harness_suites$(exeext) > xunit-suite.xml
+	$(RUN) ./exe/aunit_harness_cases$(exeext) > xunit-cases.xml
+	$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml
+	$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml
 
 clean:
-	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out
+	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out \
+		  xunit-*.xml
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
