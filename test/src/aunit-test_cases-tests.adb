@@ -3,6 +3,7 @@
 --
 
 with AUnit.Assertions; use AUnit.Assertions;
+with AUnit.Test_Info;
 
 package body AUnit.Test_Cases.Tests is
 
@@ -76,5 +77,37 @@ package body AUnit.Test_Cases.Tests is
       Assert (Error_Count (R) = 1, "Wrong errors count");
       Assert (Outcome = Failure, "Result flag incorrect");
    end Test_Run;
+
+   ---------------------------
+   -- Test_Default_Location --
+   ---------------------------
+
+   procedure Test_Default_Location (T : in out Fixture) is
+      pragma Unreferenced (T);
+      TC      : aliased Default_Location_Test_Case;
+      Outcome : AUnit.Status;
+      R       : Result;
+      Results : Result_Lists.List;
+      Pos     : Result_Lists.Cursor;
+      use type AUnit.Test_Info.Tested_Location_Access;
+   begin
+      Run (TC'Access, AUnit.Options.Default_Options, R, Outcome);
+
+      Successes (R, Results);
+      Failures (R, Results);
+      Errors (R, Results);
+      Assert
+        (Result_Lists.Length (Results) = 3, "Not all outcomes were recorded");
+
+      --  A non-null Location makes the text reporter print its file, which
+      --  is null here.
+      Pos := Result_Lists.First (Results);
+      while Result_Lists.Has_Element (Pos) loop
+         Assert
+           (Result_Lists.Element (Pos).Location = null,
+            "Location recorded for a test case that has none");
+         Result_Lists.Next (Pos);
+      end loop;
+   end Test_Default_Location;
 
 end AUnit.Test_Cases.Tests;

@@ -15,5 +15,6 @@ package AUnit.Test_Cases.Tests is
    procedure Test_Set_Up (T : in out Fixture);
    procedure Test_Torn_Down (T : in out Fixture);
    procedure Test_Run (T : in out Fixture);
+   procedure Test_Default_Location (T : in out Fixture);
 
 end AUnit.Test_Cases.Tests;

@@ -148,7 +148,7 @@ private
       Name         : Message_String;
       Test_Package : Message_String := null;
       Test_File    : Message_String := null;
-      Location     : Tested_Location := (null, -1, -1, null);
+      Location     : Tested_Location := No_Location;
       Suffix       : Test_Suffix_Access := null;
       Method       : Test_Method;
    end record;

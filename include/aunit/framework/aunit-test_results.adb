@@ -264,14 +264,14 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         (if Location.Tested_Line = -1 then null else Alloc_Location),
+         (if Location = No_Location then null else Alloc_Location),
          Suffix,
          null,
          Alloc_Error,
          Elapsed);
       use Result_Lists;
    begin
-      if Location.Tested_Line /= -1 then
+      if Location /= No_Location then
          Val.Location.all := Location;
       end if;
       Val.Error.all := Error;
@@ -303,14 +303,14 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         (if Location.Tested_Line = -1 then null else Alloc_Location),
+         (if Location = No_Location then null else Alloc_Location),
          Suffix,
          Alloc_Failure,
          null,
          Elapsed);
       use Result_Lists;
    begin
-      if Location.Tested_Line /= -1 then
+      if Location /= No_Location then
          Val.Location.all := Location;
       end if;
       Val.Failure.all := Failure;
@@ -341,7 +341,7 @@ package body AUnit.Test_Results is
          Routine_Name,
          Standard_Output,
          Standard_Error,
-         (if Location.Tested_Line = -1 then null else Alloc_Location),
+         (if Location = No_Location then null else Alloc_Location),
          Suffix,
          null,
          null,
@@ -349,7 +349,7 @@ package body AUnit.Test_Results is
       use Result_Lists;
 
    begin
-      if Location.Tested_Line /= -1 then
+      if Location /= No_Location then
          Val.Location.all := Location;
       end if;
       Append (R.Result_List, Val);

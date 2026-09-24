@@ -1,5 +1,5 @@
 --
---  Copyright (C) 2009-2010, AdaCore
+--  Copyright (C) 2009-2026, AdaCore
 --
 with AUnit.Test_Info; use AUnit.Test_Info;
 
@@ -39,6 +39,16 @@ package AUnit.Test_Cases.Tests_Fixtures is
 
    function Is_Torn_Down (T : The_Test_Case) return Boolean;
    --  Torn down?
+
+   type Default_Location_Test_Case is new Test_Cases.Test_Case
+   with null record;
+   --  Inherits Location and Suffix, like test cases written before they
+   --  existed.
+
+   procedure Register_Tests (T : in out Default_Location_Test_Case);
+   --  Register one routine per outcome
+
+   function Name (T : Default_Location_Test_Case) return Test_String;
 
    --------------------
    --  Test Routines --

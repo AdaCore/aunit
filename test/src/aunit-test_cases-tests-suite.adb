@@ -60,6 +60,18 @@ package body AUnit.Test_Cases.Tests.Suite is
               new String'("Run")),
              null,
              Test_Run'Access)));
+      AUnit.Test_Suites.Add_Test
+        (S,
+         (Caller.Create
+            ("Test Default Location",
+             "AUnit.Test_Cases.Tests",
+             "src/aunit-test_cases-tests.ads",
+             (new String'("aunit-simple_test_cases.ads"),
+              63,
+              13,
+              new String'("Location")),
+             null,
+             Test_Default_Location'Access)));
 
       return S;
    end Test_Suite;
