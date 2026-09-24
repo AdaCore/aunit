@@ -168,4 +168,25 @@ package body AUnit.Test_Cases.Tests_Fixtures is
       return T.Is_Torn_Down;
    end Is_Torn_Down;
 
+   --------------------
+   -- Register_Tests --
+   --------------------
+
+   procedure Register_Tests (T : in out Default_Location_Test_Case) is
+   begin
+      Register_Routine (T, Succeed'Access, "Success Test");
+      Register_Routine (T, Fail'Access, "Failure Test");
+      Register_Routine (T, Except'Access, "Exception Test");
+   end Register_Tests;
+
+   ----------
+   -- Name --
+   ----------
+
+   function Name (T : Default_Location_Test_Case) return Test_String is
+      pragma Unreferenced (T);
+   begin
+      return Format ("Default Location Test Case");
+   end Name;
+
 end AUnit.Test_Cases.Tests_Fixtures;

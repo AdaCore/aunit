@@ -8,6 +8,10 @@ package AUnit.Test_Info is
    end record;
    --  Description of the sloc of a test.
 
+   No_Location : constant Tested_Location := (null, -1, -1, null);
+   --  Results only record a location that differs from this one. Reporters
+   --  print Tested_File for any recorded location, so it must then be set.
+
    type Tested_Location_Access is access all Tested_Location;
 
    type Test_Suffix;
