@@ -35,25 +35,21 @@ package AUnit.IO is
 
    type File_Access is access constant File_Type;
 
-   function Standard_Output
-     return File_Access;
+   function Standard_Output return File_Access;
 
-   function Standard_Error 
-     return File_Access;
+   function Standard_Error return File_Access;
 
-   procedure Put (File : File_Type;
-                  Item : Integer;
-                  Width : Integer := 0;
-                  Base  : Integer := 0);
+   procedure Put
+     (File  : File_Type;
+      Item  : Integer;
+      Width : Integer := 0;
+      Base  : Integer := 0);
 
-   procedure Put (File : File_Type;
-                  Item : String);
+   procedure Put (File : File_Type; Item : String);
 
-   procedure Put_Line (File : File_Type;
-                       Item : String);
+   procedure Put_Line (File : File_Type; Item : String);
 
-   procedure New_Line (File    : File_Type;
-                       Spacing : Positive := 1);
+   procedure New_Line (File : File_Type; Spacing : Positive := 1);
 
    procedure Redirect_Standard_Streams
      (Name             : String;
@@ -74,7 +70,5 @@ package AUnit.IO is
    function Read_Error
      (Name : String; Capture_Standard : Boolean) return Message_String;
    --  When no fileio is present don't try to read error.
-
-
 
 end AUnit.IO;
