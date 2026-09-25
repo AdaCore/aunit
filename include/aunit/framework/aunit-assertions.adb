@@ -129,8 +129,12 @@ package body AUnit.Assertions is
       Line    : Natural := GNAT.Source_Info.Line)
    is separate;
 
-   function Img (E : String) return String
-   is (E);
+   function Img (E : String) return String;
+
+   function Img (E : String) return String is
+   begin
+      return E;
+   end Img;
 
    procedure Assert_String is new Generic_Assert (T => String, Image => Img);
 

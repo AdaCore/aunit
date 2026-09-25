@@ -1,5 +1,5 @@
-with Ada.Directories; use Ada.Directories;
-with Ada.Text_IO;     use Ada.Text_IO;
+with Ada.Streams.Stream_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body AUnit.IO is
 
@@ -55,8 +55,26 @@ package body AUnit.IO is
       return Read_File (".tmp_stdout_" & Name);
    end Read_Output;
 
+   function File_Size (Name : String) return Natural;
+   --  Size of file Name. Text_IO cannot tell it, Stream_IO can.
+
+   ---------------
+   -- File_Size --
+   ---------------
+
+   function File_Size (Name : String) return Natural is
+      use Ada.Streams.Stream_IO;
+      File   : Ada.Streams.Stream_IO.File_Type;
+      Result : Natural;
+   begin
+      Open (File, In_File, Name);
+      Result := Natural (Size (File));
+      Close (File);
+      return Result;
+   end File_Size;
+
    function Read_File (Name : String) return Message_String is
-      File_Size : constant Natural := Natural (Size (Name));
+      File_Size : constant Natural := IO.File_Size (Name);
    begin
       --  On some targets, Unbounded_String is unusable, so to avoid this
       --  problem, we first get the size of the file to read and then
@@ -74,20 +92,16 @@ package body AUnit.IO is
          Last   : Natural := 0;
       begin
          Open (File, In_File, Name);
-         while not End_Of_File (File) loop
-            declare
-               Line : constant String := Get_Line (File);
-            begin
-               --  Check if adding this line + LF exceeds our buffer
-               if Last + Line'Length + 1 <= Buffer'Last then
-                  Buffer (Last + 1 .. Last + Line'Length) := Line;
-                  Last := Last + Line'Length;
+         --  Get_Line returns at once on an empty slice. Stop when the buffer
+         --  is full, or the loop never ends.
+         while not End_Of_File (File) and then Last < Buffer'Last loop
+            Get_Line (File, Buffer (Last + 1 .. Buffer'Last), Last);
 
-                  --  Manually re-insert the Line Feed that Get_Line stripped
-                  Last := Last + 1;
-                  Buffer (Last) := ASCII.LF;
-               end if;
-            end;
+            --  Manually re-insert the Line Feed that Get_Line stripped
+            if Last < Buffer'Last then
+               Last := Last + 1;
+               Buffer (Last) := ASCII.LF;
+            end if;
          end loop;
          Delete (File);
 

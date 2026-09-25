@@ -36,11 +36,15 @@ package body AUnit.IO is
    Standard_Out : aliased constant File_Type := 1;
    Standard_Err : aliased constant File_Type := 2;
 
-   function Standard_Output return File_Access
-   is (Standard_Out'Access);
+   function Standard_Output return File_Access is
+   begin
+      return Standard_Out'Access;
+   end Standard_Output;
 
-   function Standard_Error return File_Access
-   is (Standard_Err'Access);
+   function Standard_Error return File_Access is
+   begin
+      return Standard_Err'Access;
+   end Standard_Error;
 
    procedure Put
      (File  : File_Type;

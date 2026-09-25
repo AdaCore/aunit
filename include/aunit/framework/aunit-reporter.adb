@@ -75,9 +75,9 @@ package body AUnit.Reporter is
            (File,
             Loc.Tested_File.all
             & ":"
-            & Trim (Loc.Tested_Line'Image, Left)
+            & Trim (Integer'Image (Loc.Tested_Line), Left)
             & ":"
-            & Trim (Loc.Tested_Column'Image, Left)
+            & Trim (Integer'Image (Loc.Tested_Column), Left)
             & ":");
          if Loc.Tested_Name /= null then
             Put (File, " (" & Loc.Tested_Name.all & ")");
