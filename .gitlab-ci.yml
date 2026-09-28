@@ -58,6 +58,9 @@ include:
       image: pe-base
       cpus: 16
       disk: 80
+  - component: $CI_SERVER_FQDN/it/gitlab-templates/gitleaks@~latest
+    inputs:
+      stage: check
 
 aunit:linux:
   artifacts:
