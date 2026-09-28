@@ -22,5 +22,6 @@ package AUnit.Test_Suites.Tests is
    procedure Test_Run_With_Exception (T : in out Fixture);
    procedure Test_Run_With_All (T : in out Fixture);
    procedure Test_Run_With_Setup (T : in out Fixture);
+   procedure Test_Generic_Assertions (T : in out Fixture);
 
 end AUnit.Test_Suites.Tests;

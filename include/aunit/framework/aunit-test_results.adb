@@ -155,14 +155,16 @@ package body AUnit.Test_Results is
    is
       use Message_List;
       Elem         : constant Test_Result := Result_Lists.Element (Position);
-      Package_Name : constant Message_String :=
-        (if Elem.Package_Name = null
-         then Message_String'(new String'(""))
-         else Elem.Package_Name);
+      Package_Name : Message_String;
       Present      : Boolean := False;
       C            : Cursor := First (Package_List.all);
       pragma Unreferenced (Name);
    begin
+      if Elem.Package_Name = null then
+         Package_Name := new String'("");
+      else
+         Package_Name := Elem.Package_Name;
+      end if;
       while Has_Element (C) and not Present loop
          if Element (C).all = Package_Name.all then
             Present := True;
