@@ -32,7 +32,14 @@ ifeq ($(OS),Windows_NT)
 endif
 
 ifeq ($(findstring vxworks,$(TARGET)),vxworks)
-   exeext=.out
+  ifeq ($(findstring rtp,$(RTS)),rtp)
+    exeext=.vxe
+  else ifeq ($(findstring rtp,$(RTS_CONF)),rtp)
+    # For light-tasking-rtp
+    exeext=.vxe
+  else
+    exeext=.out
+  endif
 endif
 
 RUN=
