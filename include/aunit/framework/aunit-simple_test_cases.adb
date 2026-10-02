@@ -77,7 +77,7 @@ package body AUnit.Simple_Test_Cases is
 
    function Location (Test : Test_Case) return Tested_Location is
    begin
-      return (null, 0, 0, null);
+      return No_Location;
    end Location;
 
    ------------
