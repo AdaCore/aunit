@@ -91,10 +91,10 @@ package body AUnit.Assertions is
    end Assert;
 
    --------------------
-   -- Assert_Generic --
+   -- Generic_Assert --
    --------------------
 
-   procedure Assert_Generic
+   procedure Generic_Assert
      (Actual   : T;
       Expected : T;
       Message  : String;
@@ -116,7 +116,7 @@ package body AUnit.Assertions is
             Source,
             Line);
       end if;
-   end Assert_Generic;
+   end Generic_Assert;
 
    ----------------------
    -- Assert_Exception --
@@ -132,7 +132,7 @@ package body AUnit.Assertions is
    function Img (E : String) return String
    is (E);
 
-   procedure Assert_String is new Assert_Generic (T => String, Image => Img);
+   procedure Assert_String is new Generic_Assert (T => String, Image => Img);
 
    procedure Assert
      (Actual   : String;

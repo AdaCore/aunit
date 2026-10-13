@@ -64,9 +64,9 @@ package AUnit.Assertions is
 
    generic
       type T (<>) is limited private;
-      with function "=" (L, R : T) return Boolean is <>;
       with function Image (E : T) return String;
-   procedure Assert_Generic
+      with function "=" (L, R : T) return Boolean is <>;
+   procedure Generic_Assert
      (Actual   : T;
       Expected : T;
       Message  : String;

@@ -274,7 +274,7 @@ package body AUnit.Test_Suites.Tests is
 
    procedure Test_Generic_Assertions (T : in out Fixture) is
       procedure Assert_Int is new
-        AUnit.Assertions.Assert_Generic (T => Integer, Image => Integer'Image);
+        AUnit.Assertions.Generic_Assert (T => Integer, Image => Integer'Image);
 
       --  String'Image goes through Put_Image, which light runtimes lack
 
@@ -282,7 +282,7 @@ package body AUnit.Test_Suites.Tests is
       is ('"' & S & '"');
 
       procedure Assert_String is new
-        AUnit.Assertions.Assert_Generic (T => String, Image => Image);
+        AUnit.Assertions.Generic_Assert (T => String, Image => Image);
    begin
       Assert_Int (1, 1, "dummy");
       Assert_String ("foo", "foo", "dummy");
