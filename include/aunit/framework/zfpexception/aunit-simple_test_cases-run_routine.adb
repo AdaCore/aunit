@@ -33,10 +33,11 @@ with AUnit.Last_Chance_Handler; use AUnit.Last_Chance_Handler;
 with AUnit.Time_Measure;
 with AUnit.IO;
 
-separate (AUnit.Simple_Test_Cases)
+separate
+  (AUnit.Simple_Test_Cases)
 
---  Version for run-time libraries that support exception handling via gcc
---  builtin setjmp/longjmp mechanism.
+   --  Version for run-time libraries that support exception handling via gcc
+   --  builtin setjmp/longjmp mechanism.
 
 procedure Run_Routine
   (Test    : access Test_Case'Class;
@@ -123,22 +124,24 @@ begin
             if not String_Compare (Src.all, "aunit-assertions.adb:63") then
                Unexpected_Exception := True;
                Add_Error
-                 (R,
-                  Name (Test.all),
-                  Package_Name (Test.all),
-                  Test_File (Test.all),
-                  Routine_Name (Test.all),
-                  AUnit.IO.Read_Output
-                    (Test.Name.all, Options.Capture_Standard),
-                  AUnit.IO.Read_Error
-                    (Test.Name.all, Options.Capture_Standard),
-                  Location (Test.all),
-                  Error   =>
+                 (R               => R,
+                  Test_Name       => Name (Test.all),
+                  Routine_Name    => Routine_Name (Test.all),
+                  Error           =>
                     (Exception_Name    => Get_Exception_Name,
                      Exception_Message => Src,
                      Traceback         => null),
-                  Suffix  => Suffix (Test.all),
-                  Elapsed => Time);
+                  Elapsed         => Time,
+                  Package_Name    => Package_Name (Test.all),
+                  Test_File       => Test_File (Test.all),
+                  Standard_Output =>
+                    AUnit.IO.Read_Output
+                      (Test.Name.all, Options.Capture_Standard),
+                  Standard_Error  =>
+                    AUnit.IO.Read_Error
+                      (Test.Name.all, Options.Capture_Standard),
+                  Location        => Location (Test.all),
+                  Suffix          => Suffix (Test.all));
             end if;
          end;
       end if;
@@ -147,16 +150,18 @@ begin
    if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
       Add_Success
-        (R,
-         Name (Test.all),
-         Package_Name (Test.all),
-         Test_File (Test.all),
-         Routine_Name (Test.all),
-         AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-         AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-         Location (Test.all),
-         Suffix (Test.all),
-         Time);
+        (R               => R,
+         Test_Name       => Name (Test.all),
+         Routine_Name    => Routine_Name (Test.all),
+         Elapsed         => Time,
+         Package_Name    => Package_Name (Test.all),
+         Test_File       => Test_File (Test.all),
+         Standard_Output =>
+           AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+         Standard_Error  =>
+           AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+         Location        => Location (Test.all),
+         Suffix          => Suffix (Test.all));
    else
       Outcome := Failure;
       declare
@@ -164,17 +169,20 @@ begin
       begin
          while Has_Failure (C) loop
             Add_Failure
-              (R,
-               Name (Test.all),
-               Package_Name (Test.all),
-               Test_File (Test.all),
-               Routine_Name (Test.all),
-               AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-               AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-               Location (Test.all),
-               Get_Failure (C),
-               Suffix (Test.all),
-               Time);
+              (R               => R,
+               Test_Name       => Name (Test.all),
+               Routine_Name    => Routine_Name (Test.all),
+               Failure         => Get_Failure (C),
+               Elapsed         => Time,
+               Package_Name    => Package_Name (Test.all),
+               Test_File       => Test_File (Test.all),
+               Standard_Output =>
+                 AUnit.IO.Read_Output
+                   (Test.Name.all, Options.Capture_Standard),
+               Standard_Error  =>
+                 AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+               Location        => Location (Test.all),
+               Suffix          => Suffix (Test.all));
             Next (C);
          end loop;
       end;

@@ -65,16 +65,16 @@ package AUnit.Test_Results is
 
    type Test_Result is record
       Test_Name       : Message_String;
+      Routine_Name    : Message_String;
+      Failure         : Test_Failure_Access;
+      Error           : Test_Error_Access;
+      Elapsed         : Time := Null_Time;
       Package_Name    : Message_String := null;
       Test_File       : Message_String := null;
-      Routine_Name    : Message_String;
       Standard_Output : Message_String := null;
       Standard_Error  : Message_String := null;
       Location        : Tested_Location_Access := null;
       Suffix          : Test_Suffix_Access := null;
-      Failure         : Test_Failure_Access;
-      Error           : Test_Error_Access;
-      Elapsed         : Time := Null_Time;
    end record;
    --  Decription of a test routine result
 
@@ -87,42 +87,42 @@ package AUnit.Test_Results is
    procedure Add_Error
      (R               : in out Result;
       Test_Name       : Message_String;
-      Package_Name    : Message_String;
-      Test_File       : Message_String;
       Routine_Name    : Message_String;
-      Standard_Output : Message_String;
-      Standard_Error  : Message_String;
-      Location        : Tested_Location;
       Error           : Test_Error;
-      Suffix          : Test_Suffix_Access;
-      Elapsed         : Time);
+      Elapsed         : Time;
+      Package_Name    : Message_String := null;
+      Test_File       : Message_String := null;
+      Standard_Output : Message_String := null;
+      Standard_Error  : Message_String := null;
+      Location        : Tested_Location := No_Location;
+      Suffix          : Test_Suffix_Access := null);
    --  Record an unexpected exception
 
    procedure Add_Failure
      (R               : in out Result;
       Test_Name       : Message_String;
-      Package_Name    : Message_String;
-      Test_File       : Message_String;
       Routine_Name    : Message_String;
-      Standard_Output : Message_String;
-      Standard_Error  : Message_String;
-      Location        : Tested_Location;
       Failure         : Test_Failure;
-      Suffix          : Test_Suffix_Access;
-      Elapsed         : Time);
+      Elapsed         : Time;
+      Package_Name    : Message_String := null;
+      Test_File       : Message_String := null;
+      Standard_Output : Message_String := null;
+      Standard_Error  : Message_String := null;
+      Location        : Tested_Location := No_Location;
+      Suffix          : Test_Suffix_Access := null);
    --  Record a test routine failure
 
    procedure Add_Success
      (R               : in out Result;
       Test_Name       : Message_String;
-      Package_Name    : Message_String;
-      Test_File       : Message_String;
       Routine_Name    : Message_String;
-      Standard_Output : Message_String;
-      Standard_Error  : Message_String;
-      Location        : Tested_Location;
-      Suffix          : Test_Suffix_Access;
-      Elapsed         : Time);
+      Elapsed         : Time;
+      Package_Name    : Message_String := null;
+      Test_File       : Message_String := null;
+      Standard_Output : Message_String := null;
+      Standard_Error  : Message_String := null;
+      Location        : Tested_Location := No_Location;
+      Suffix          : Test_Suffix_Access := null);
    --  Record a test routine success
 
    procedure Set_Elapsed (R : in out Result; T : Time);
