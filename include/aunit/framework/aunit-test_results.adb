@@ -48,114 +48,72 @@ package body AUnit.Test_Results is
    function Alloc_Location is new
      AUnit.Memory.Utils.Gen_Alloc (Tested_Location, Tested_Location_Access);
 
-   E_Count      : Count_Type;
-   F_Count      : Count_Type;
-   S_Count      : Count_Type;
    Package_List : Message_List_Access;
 
-   procedure Iterate_Error
-     (Position : Result_Lists.Cursor; Name : String := "");
-   --  Find all the test that ended in an error.
-   --  A name arg can be added to filter to only tests from a specific package.
-   procedure Iterate_Failure
-     (Position : Result_Lists.Cursor; Name : String := "");
-   --  Find all the test that ended in an failure.
-   --  A name arg can be added to filter to only tests from a specific package.
-   procedure Iterate_Success
-     (Position : Result_Lists.Cursor; Name : String := "");
-   --  Find all the test that ended succesfully.
-   --  A name arg can be added to filter to only tests from a specific package.
-   procedure Iterate_Name
-     (Position : Result_Lists.Cursor; Name : String := "");
-   --  Get all the tests from a given package name
+   function Matches_Package
+     (Package_Name, Name : Message_String) return Boolean;
+
    procedure Iterate_Package_Name
      (Position : Result_Lists.Cursor; Name : String);
    --  Get a set of all the tests package
 
    function Is_Error
-     (Position : Result_Lists.Cursor; Name : String) return Boolean;
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean;
    function Is_Failure
-     (Position : Result_Lists.Cursor; Name : String) return Boolean;
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean;
    function Is_Success
-     (Position : Result_Lists.Cursor; Name : String) return Boolean;
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean;
 
    generic
       with
         function Test
-          (Position : Result_Lists.Cursor; Name : String) return Boolean;
+          (Position : Result_Lists.Cursor; Name : Message_String)
+           return Boolean;
    procedure Gen_Extract
-     (R : Result; E : in out Result_Lists.List; N : String := "");
+     (R : Result;
+      E : in out Result_Lists.List;
+      N : Message_String := All_Packages);
 
-   -------------------
-   -- Iterate_Error --
-   -------------------
-
-   procedure Iterate_Error
-     (Position : Result_Lists.Cursor; Name : String := "")
-   is
-      Elem : Test_Result := Result_Lists.Element (Position);
-   begin
-      if (Name'Length = 0
-          or else
-            (Elem.Package_Name /= null and then Elem.Package_Name.all = Name))
-        and then Elem.Error /= null
-      then
-         E_Count := E_Count + 1;
-      end if;
-   end Iterate_Error;
+   generic
+      with
+        function Test
+          (Position : Result_Lists.Cursor; Name : Message_String)
+           return Boolean;
+   function Gen_Count (R : Result; Name : Message_String) return Count_Type;
 
    ---------------------
-   -- Iterate_Failure --
+   -- Matches_Package --
    ---------------------
 
-   procedure Iterate_Failure
-     (Position : Result_Lists.Cursor; Name : String := "")
-   is
-      Elem : Test_Result := Result_Lists.Element (Position);
+   function Matches_Package
+     (Package_Name, Name : Message_String) return Boolean is
    begin
-      if (Name'Length = 0
-          or else
-            (Elem.Package_Name /= null and then Elem.Package_Name.all = Name))
-        and then Elem.Failure /= null
-      then
-         F_Count := F_Count + 1;
+      if Name = null then
+         return Package_Name = null or else Package_Name.all'Length = 0;
+      else
+         return
+           Name.all'Length = 0
+           or else (Package_Name /= null and then Package_Name.all = Name.all);
       end if;
-   end Iterate_Failure;
+   end Matches_Package;
 
-   ---------------------
-   -- Iterate_Success --
-   ---------------------
+   ---------------
+   -- Gen_Count --
+   ---------------
 
-   procedure Iterate_Success
-     (Position : Result_Lists.Cursor; Name : String := "")
-   is
-      Elem : Test_Result := Result_Lists.Element (Position);
+   function Gen_Count (R : Result; Name : Message_String) return Count_Type is
+      use Result_Lists;
+      C     : Cursor := First (R.Result_List);
+      Count : Count_Type := 0;
    begin
-      if (Name'Length = 0
-          or else
-            (Elem.Package_Name /= null and then Elem.Package_Name.all = Name))
-        and then Elem.Error = null
-        and then Elem.Failure = null
-      then
-         S_Count := S_Count + 1;
-      end if;
-   end Iterate_Success;
-
-   ------------------
-   -- Iterate_Name --
-   ------------------
-
-   procedure Iterate_Name (Position : Result_Lists.Cursor; Name : String := "")
-   is
-      Elem : Test_Result := Result_Lists.Element (Position);
-   begin
-      if Name'Length = 0
-        or else
-          (Elem.Package_Name /= null and then Elem.Package_Name.all = Name)
-      then
-         S_Count := S_Count + 1;
-      end if;
-   end Iterate_Name;
+      while Has_Element (C) loop
+         if Test (C, Name) then
+            Count := Count + 1;
+         end if;
+         Next (C);
+      end loop;
+      return Count;
+   end Gen_Count;
 
    --------------------------
    -- Iterate_Package_Name --
@@ -166,18 +124,23 @@ package body AUnit.Test_Results is
    is
       use Message_List;
       Elem         : constant Test_Result := Result_Lists.Element (Position);
-      Package_Name : Message_String;
+      --  Empty and null package names share the unnamed suite. Use null
+      --  here because the empty-string filter selects every package.
+      Package_Name : constant Message_String :=
+        (if Elem.Package_Name = null or else Elem.Package_Name.all'Length = 0
+         then null
+         else Elem.Package_Name);
       Present      : Boolean := False;
       C            : Cursor := First (Package_List.all);
       pragma Unreferenced (Name);
    begin
-      if Elem.Package_Name = null then
-         Package_Name := new String'("");
-      else
-         Package_Name := Elem.Package_Name;
-      end if;
       while Has_Element (C) and not Present loop
-         if Element (C).all = Package_Name.all then
+         if (Element (C) = null and then Package_Name = null)
+           or else
+             (Element (C) /= null
+              and then Package_Name /= null
+              and then Element (C).all = Package_Name.all)
+         then
             Present := True;
          end if;
          C := Next (C);
@@ -192,7 +155,9 @@ package body AUnit.Test_Results is
    -----------------
 
    procedure Gen_Extract
-     (R : Result; E : in out Result_Lists.List; N : String := "")
+     (R : Result;
+      E : in out Result_Lists.List;
+      N : Message_String := All_Packages)
    is
       C : Result_Lists.Cursor;
       use Result_Lists;
@@ -212,15 +177,12 @@ package body AUnit.Test_Results is
    --------------
 
    function Is_Error
-     (Position : Result_Lists.Cursor; Name : String) return Boolean
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean
    is
 
-      Elem : Test_Result := Result_Lists.Element (Position);
+      Elem : constant Test_Result := Result_Lists.Element (Position);
    begin
-      if Name'Length /= 0
-        and then
-          (Elem.Package_Name = null or else Elem.Package_Name.all /= Name)
-      then
+      if not Matches_Package (Elem.Package_Name, Name) then
          return False;
       end if;
       return Elem.Error /= null;
@@ -231,14 +193,11 @@ package body AUnit.Test_Results is
    ----------------
 
    function Is_Failure
-     (Position : Result_Lists.Cursor; Name : String) return Boolean
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean
    is
-      Elem : Test_Result := Result_Lists.Element (Position);
+      Elem : constant Test_Result := Result_Lists.Element (Position);
    begin
-      if Name'Length /= 0
-        and then
-          (Elem.Package_Name = null or else Elem.Package_Name.all /= Name)
-      then
+      if not Matches_Package (Elem.Package_Name, Name) then
          return False;
       end if;
       return Elem.Failure /= null;
@@ -249,14 +208,11 @@ package body AUnit.Test_Results is
    ----------------
 
    function Is_Success
-     (Position : Result_Lists.Cursor; Name : String) return Boolean
+     (Position : Result_Lists.Cursor; Name : Message_String) return Boolean
    is
-      Elem : Test_Result := Result_Lists.Element (Position);
+      Elem : constant Test_Result := Result_Lists.Element (Position);
    begin
-      if Name'Length /= 0
-        and then
-          (Elem.Package_Name = null or else Elem.Package_Name.all /= Name)
-      then
+      if not Matches_Package (Elem.Package_Name, Name) then
          return False;
       end if;
       return
@@ -395,12 +351,12 @@ package body AUnit.Test_Results is
    -- Error_Count --
    -----------------
 
-   function Error_Count (R : Result; N : String := "") return Count_Type is
-      use Result_Lists;
+   function Error_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type
+   is
+      function Count is new Gen_Count (Is_Error);
    begin
-      E_Count := 0;
-      Iterate (R.Result_List, Iterate_Error'Access, N);
-      return E_Count;
+      return Count (R, N);
    end Error_Count;
 
    ------------
@@ -408,7 +364,9 @@ package body AUnit.Test_Results is
    ------------
 
    procedure Errors
-     (R : Result; E : in out Result_Lists.List; N : String := "")
+     (R : Result;
+      E : in out Result_Lists.List;
+      N : Message_String := All_Packages)
    is
       procedure Extract is new Gen_Extract (Is_Error);
    begin
@@ -419,12 +377,12 @@ package body AUnit.Test_Results is
    -- Failure_Count --
    -------------------
 
-   function Failure_Count (R : Result; N : String := "") return Count_Type is
-      use Result_Lists;
+   function Failure_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type
+   is
+      function Count is new Gen_Count (Is_Failure);
    begin
-      F_Count := 0;
-      Iterate (R.Result_List, Iterate_Failure'Access, N);
-      return F_Count;
+      return Count (R, N);
    end Failure_Count;
 
    --------------
@@ -432,7 +390,9 @@ package body AUnit.Test_Results is
    --------------
 
    procedure Failures
-     (R : Result; F : in out Result_Lists.List; N : String := "")
+     (R : Result;
+      F : in out Result_Lists.List;
+      N : Message_String := All_Packages)
    is
       procedure Extract is new Gen_Extract (Is_Failure);
    begin
@@ -461,11 +421,12 @@ package body AUnit.Test_Results is
    -- Success_Count --
    -------------------
 
-   function Success_Count (R : Result; N : String := "") return Count_Type is
+   function Success_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type
+   is
+      function Count is new Gen_Count (Is_Success);
    begin
-      S_Count := 0;
-      Result_Lists.Iterate (R.Result_List, Iterate_Success'Access, N);
-      return S_Count;
+      return Count (R, N);
    end Success_Count;
 
    ---------------
@@ -473,7 +434,9 @@ package body AUnit.Test_Results is
    ---------------
 
    procedure Successes
-     (R : Result; S : in out Result_Lists.List; N : String := "")
+     (R : Result;
+      S : in out Result_Lists.List;
+      N : Message_String := All_Packages)
    is
       procedure Extract is new Gen_Extract (Is_Success);
    begin
@@ -502,11 +465,20 @@ package body AUnit.Test_Results is
    -- Total_Count --
    -----------------
 
-   function Total_Count (R : Result; Name : String := "") return Count_Type is
+   function Total_Count
+     (R : Result; Name : Message_String := All_Packages) return Count_Type
+   is
+      use Result_Lists;
+      C     : Cursor := First (R.Result_List);
+      Count : Count_Type := 0;
    begin
-      S_Count := 0;
-      Result_Lists.Iterate (R.Result_List, Iterate_Name'Access, Name);
-      return S_Count;
+      while Has_Element (C) loop
+         if Matches_Package (Element (C).Package_Name, Name) then
+            Count := Count + 1;
+         end if;
+         Next (C);
+      end loop;
+      return Count;
    end Total_Count;
 
    -----------

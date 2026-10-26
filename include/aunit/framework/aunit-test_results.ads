@@ -128,18 +128,28 @@ package AUnit.Test_Results is
    procedure Set_Elapsed (R : in out Result; T : Time);
    --  Set Elapsed time for reporter
 
-   function Error_Count (R : Result; N : String := "") return Count_Type;
+   All_Packages : constant Message_String := Format ("");
+   --  Package filters use an empty string for all tests, null for tests
+   --  without a package name, and a nonempty string for an exact match.
+
+   function Error_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type;
    --  Number of routines with unexpected exceptions
 
    procedure Errors
-     (R : Result; E : in out Result_Lists.List; N : String := "");
+     (R : Result;
+      E : in out Result_Lists.List;
+      N : Message_String := All_Packages);
    --  List of routines with unexpected exceptions
 
-   function Failure_Count (R : Result; N : String := "") return Count_Type;
+   function Failure_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type;
    --  Number of failed routines
 
    procedure Failures
-     (R : Result; F : in out Result_Lists.List; N : String := "");
+     (R : Result;
+      F : in out Result_Lists.List;
+      N : Message_String := All_Packages);
    --  List of failed routines
 
    function Elapsed (R : Result) return Time;
@@ -148,11 +158,14 @@ package AUnit.Test_Results is
    procedure Start_Test (R : in out Result; Subtest_Count : Count_Type);
    --  Set count for a test run
 
-   function Success_Count (R : Result; N : String := "") return Count_Type;
+   function Success_Count
+     (R : Result; N : Message_String := All_Packages) return Count_Type;
    --  Number of successful routines
 
    procedure Successes
-     (R : Result; S : in out Result_Lists.List; N : String := "");
+     (R : Result;
+      S : in out Result_Lists.List;
+      N : Message_String := All_Packages);
    --  List of successful routines
 
    function Successful (R : Result) return Boolean;
@@ -161,7 +174,8 @@ package AUnit.Test_Results is
    function Test_Count (R : Result) return Count_Type;
    --  Number of routines run
 
-   function Total_Count (R : Result; Name : String := "") return Count_Type;
+   function Total_Count
+     (R : Result; Name : Message_String := All_Packages) return Count_Type;
    --  Number of routines run for a specific package
 
    procedure Clear (R : in out Result);
