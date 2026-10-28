@@ -23,7 +23,12 @@ else
    TARGET_CONF = --target=$(TARGET)
 endif
 
-CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
+# Full runtimes support file-based XML checks. Other runtimes use the
+# portable result checks; override TEST_FILEIO for a custom full runtime.
+TEST_FILEIO ?= $(if $(filter full,$(RTS)),fileio,nofileio)
+
+CONF_ARGS = $(TARGET_CONF) $(RTS_CONF) \
+            -XAUNIT_TEST_FILEIO=$(TEST_FILEIO)
 
 ifeq ($(OS),Windows_NT)
  ifeq ($(TARGET),native)
@@ -52,6 +57,8 @@ test: build
 	$(RUN) ./exe/aunit_harness_cases$(exeext) > xunit-cases.xml
 	$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml
 	$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml
+	$(RUN) ./exe/aunit_harness_results$(exeext) > xunit-results.xml
+	$(RUN) ./exe/aunit_harness_package_filters$(exeext) > xunit-package-filter.xml
 
 clean:
 	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out \
