@@ -58,7 +58,8 @@ test: build
 	$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml
 	$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml
 	$(RUN) ./exe/aunit_harness_results$(exeext) > xunit-results.xml
-	$(RUN) ./exe/aunit_harness_package_filters$(exeext) > xunit-package-filter.xml
+	$(RUN) ./exe/aunit_harness_package_filters_named_first$(exeext)
+	$(RUN) ./exe/aunit_harness_package_filters_unnamed_first$(exeext)
 
 clean:
 	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out \
