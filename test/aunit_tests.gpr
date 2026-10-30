@@ -12,7 +12,8 @@ project Aunit_Tests is
      ("aunit_harness_cases.adb", "aunit_harness_suites.adb",
       "aunit_harness_fixtures.adb", "aunit_harness_cases_filter.adb",
       "aunit_harness_results.adb",
-      "aunit_harness_package_filters.adb");
+      "aunit_harness_package_filters_named_first.adb",
+      "aunit_harness_package_filters_unnamed_first.adb");
    for Source_Dirs use ("src", "src/" & FileIO);
    for Exec_Dir use "exe";
    for Object_Dir use "obj";
