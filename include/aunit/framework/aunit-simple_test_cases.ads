@@ -61,7 +61,7 @@ package AUnit.Simple_Test_Cases is
    --  Routine name. By default return a null Message_String
 
    function Location (Test : Test_Case) return Tested_Location;
-   --  Test case location.
+   --  Test case location. By default No_Location.
 
    procedure Run_Test (Test : in out Test_Case) is abstract;
    --  Perform the test.
