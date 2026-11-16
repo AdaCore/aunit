@@ -3,6 +3,9 @@ TARGET =
 GPRBUILD  = gprbuild
 GPRCLEAN = gprclean
 GPRINSTALL = gprinstall
+GNATCOV = gnatcov
+GNATCOV_LEVEL ?= stmt
+GNATCOV_DUMP_CHANNEL ?= bin-file
 
 INSTALL:=$(shell exec=`which gprbuild`;if [ ! -x "$$exec" ]; then unset exec;fi;echo $$exec | sed -e 's/\/bin\/$(GPRBUILD).*//')
 
@@ -29,6 +32,11 @@ CONF_ARGS = $(TARGET_CONF) $(RTS_CONF)
 GPROPTS = $(CONF_ARGS) -XAUNIT_BUILD_MODE=$(MODE) -XAUNIT_RUNTIME=$(RTS) \
 		-XAUNIT_PLATFORM=$(TARGET)
 
+ifdef INSTRUMENTED
+GPROPTS += --src-subdirs=gnatcov-instr --implicit-with=gnatcov_rts
+COVERAGE_LIBRARY = -XGNATCOV_RTS_LIBRARY_TYPE=$*
+endif
+
 # For the 64 bits architectures, the large code model has to be used.
 # with rtp-large, gprconfig ensures that -mcmodel=large is used,
 # but it is managed here for the default (kernel).
@@ -45,9 +53,18 @@ endif
 
 all: $(LIBRARY_TYPES:%=build-lib-%)
 
-build-lib-%:
-	$(GPRBUILD) -p $(GPROPTS) -XAUNIT_LIBRARY_TYPE=$* \
-		lib/gnat/aunit.gpr $(GPROPTS_EXTRA)
+build-lib-%: $(if $(INSTRUMENTED),instrument-lib-%)
+	$(GPRBUILD) -p $(GPROPTS) $(COVERAGE_LIBRARY) \
+		-XAUNIT_LIBRARY_TYPE=$* lib/gnat/aunit.gpr $(GPROPTS_EXTRA)
+
+instrument-lib-%:
+ifdef INSTRUMENTED
+	$(GNATCOV) instrument -P lib/gnat/aunit.gpr $(CONF_ARGS) \
+		-XAUNIT_BUILD_MODE=$(MODE) -XAUNIT_RUNTIME=$(RTS) \
+		-XAUNIT_PLATFORM=$(TARGET) -XAUNIT_LIBRARY_TYPE=$* \
+		--level=$(GNATCOV_LEVEL) --dump-filename-env-var=GNATCOV_TRACE_DIR \
+		--dump-channel=$(GNATCOV_DUMP_CHANNEL)
+endif
 
 clean-lib:
 	$(RM) -fr lib/aunit lib/aunit-obj
@@ -68,8 +85,9 @@ uninstall-lib-%:
 
 install: install-clean $(LIBRARY_TYPES:%=install-lib-%)
 
-install-lib-%:
-	$(GPRINSTALL) $(GPROPTS) -p -f --prefix=$(INSTALL) \
+install-lib-%: build-lib-%
+	$(GPRINSTALL) $(GPROPTS) $(COVERAGE_LIBRARY) \
+		-p -f --prefix=$(INSTALL) \
 		-XAUNIT_LIBRARY_TYPE=$* --build-name=$* \
 		--build-var=LIBRARY_TYPE --build-var=AUNIT_LIBRARY_TYPE \
 		lib/gnat/aunit.gpr

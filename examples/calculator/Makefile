@@ -1,8 +1,10 @@
-all:
-	gprbuild -p -f -Pharness
+BUILD_FLAGS = -f
+CUSTOM_CLEAN = 1
+
+include ../common.mk
 
 coverage:
-	gprbuild -p -f -Pharness -XCOVERAGE=yes
+	$(GPRBUILD) $(GPROPTS) -p $(BUILD_FLAGS) -P$(PROJECT) -XCOVERAGE=yes
 	./test_calculator
 	cd obj;	gcov ../../tested_lib/obj/*.gcda
 
