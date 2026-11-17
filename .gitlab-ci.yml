@@ -25,7 +25,7 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       job-name: build
-      anod-args: build aunit
+      anod-args: build aunit -Qcoverage
       cpus: 16
       image: pe-base
       save-component: true
@@ -34,7 +34,7 @@ include:
   - component: $CI_SERVER_FQDN/eng/gitlab-templates/build@~latest
     inputs:
       job-name: build-cross
-      anod-args: build aunit --target aarch64-elf
+      anod-args: build aunit --target aarch64-elf -Qcoverage
       cpus: 16
       image: pe-base
       save-component: true
@@ -44,7 +44,7 @@ include:
     inputs:
       needs: ["build:linux"]
       job-name: aunit
-      anod-args: test aunit --minimal
+      anod-args: test aunit -Qcoverage --minimal
       image: pe-base
       cpus: 16
       disk: 80
@@ -54,7 +54,7 @@ include:
     inputs:
       needs: ["build-cross:linux"]
       job-name: aunit-cross
-      anod-args: test aunit --minimal --target aarch64-elf,,qemu-zynqmp -Qrts=light-zynqmp
+      anod-args: test aunit --minimal --target aarch64-elf,,qemu-zynqmp -Qcoverage,rts=light-zynqmp
       image: pe-base
       cpus: 16
       disk: 80
@@ -63,17 +63,35 @@ include:
       stage: check
 
 aunit:linux:
+  after_script:
+    - . /tmp/ci_env.sh
+    - test_dir=$(anod info test aunit -Qcoverage --show working_dir)
+    - mkdir -p coverage
+    - cp "$test_dir/test/coverage/cobertura.xml" coverage/
   artifacts:
     paths:
       - xunit-*.xml
+      - coverage/cobertura.xml
 
     reports:
       junit: xunit-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura.xml
 
 aunit-cross:linux:
+  after_script:
+    - . /tmp/ci_env.sh
+    - test_dir=$(anod info test aunit --target aarch64-elf,,qemu-zynqmp -Qcoverage,rts=light-zynqmp --show working_dir)
+    - mkdir -p coverage
+    - cp "$test_dir/test/coverage/cobertura.xml" coverage/
   artifacts:
     paths:
       - xunit-*.xml
+      - coverage/cobertura.xml
 
     reports:
       junit: xunit-*.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura.xml

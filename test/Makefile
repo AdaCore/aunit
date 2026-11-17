@@ -1,5 +1,8 @@
 GPRBUILD  = gprbuild
 GPRCLEAN  = gprclean
+GNATCOV = gnatcov
+GNATCOV_LEVEL ?= stmt
+GNATCOV_DUMP_CHANNEL ?= bin-file
 
 .PHONY: all test force
 
@@ -49,8 +52,21 @@ endif
 
 RUN=
 
-build:
-	$(PROJECT_PATH_ARG) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) $(LARGS)
+ifdef INSTRUMENTED
+COVERAGE_BUILD = --src-subdirs=gnatcov-instr --implicit-with=gnatcov_rts
+endif
+
+build: instrument
+	$(PROJECT_PATH_ARG) $(GPRBUILD) -p -Paunit_tests $(CONF_ARGS) $(COVERAGE_BUILD) $(LARGS)
+
+.PHONY: instrument
+instrument:
+ifdef INSTRUMENTED
+	$(PROJECT_PATH_ARG) $(GNATCOV) instrument -P aunit_tests.gpr $(CONF_ARGS) \
+		--level=$(GNATCOV_LEVEL) --projects=aunit --externally-built-projects \
+		--dump-filename-env-var=GNATCOV_TRACE_DIR \
+		--dump-channel=$(GNATCOV_DUMP_CHANNEL)
+endif
 
 test: build
 	$(RUN) ./exe/aunit_harness_suites$(exeext) > xunit-suite.xml
@@ -58,12 +74,12 @@ test: build
 	$(RUN) ./exe/aunit_harness_cases_filter$(exeext) > xunit-cases-filter.xml
 	$(RUN) ./exe/aunit_harness_fixtures$(exeext) > xunit-fixtures.xml
 	$(RUN) ./exe/aunit_harness_results$(exeext) > xunit-results.xml
-	$(RUN) ./exe/aunit_harness_package_filters_named_first$(exeext)
-	$(RUN) ./exe/aunit_harness_package_filters_unnamed_first$(exeext)
+	$(RUN) ./exe/aunit_harness_package_filters_named_first$(exeext) $(if $(filter base64-stdout,$(GNATCOV_DUMP_CHANNEL)),> coverage-package-filters-named-first.out)
+	$(RUN) ./exe/aunit_harness_package_filters_unnamed_first$(exeext) $(if $(filter base64-stdout,$(GNATCOV_DUMP_CHANNEL)),> coverage-package-filters-unnamed-first.out)
 
 clean:
 	$(RM) -rf obj exe support/obj support/lib *.cgpr test.out \
-		  xunit-*.xml
+		  xunit-*.xml coverage-*.out
 
 RMDIR	= rmdir
 MKDIR	= mkdir -p
