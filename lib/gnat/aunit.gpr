@@ -34,11 +34,11 @@ project AUnit is
          when "Devel" =>
             for Default_Switches ("ada") use
               ("-g", "-gnatQ", "-O1", "-gnatf", "-gnato",
-               "-gnatwa.Xe", "-gnaty");
+               "-gnatwa.Xe", "-gnaty", "-gnat95");
 
          when "Install" =>
             for Default_Switches ("ada") use
-              ("-O2", "-gnatp", "-gnatn", "-gnatwa.X");
+              ("-O2", "-gnatp", "-gnatn", "-gnatwa.X", "-gnat95");
       end case;
 
       for Switches ("aunit.adb") use

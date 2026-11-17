@@ -63,7 +63,7 @@ ifdef INSTRUMENTED
 		-XAUNIT_BUILD_MODE=$(MODE) -XAUNIT_RUNTIME=$(RTS) \
 		-XAUNIT_PLATFORM=$(TARGET) -XAUNIT_LIBRARY_TYPE=$* \
 		--level=$(GNATCOV_LEVEL) --dump-filename-env-var=GNATCOV_TRACE_DIR \
-		--dump-channel=$(GNATCOV_DUMP_CHANNEL)
+		--dump-channel=$(GNATCOV_DUMP_CHANNEL) --ada 95
 endif
 
 clean-lib:

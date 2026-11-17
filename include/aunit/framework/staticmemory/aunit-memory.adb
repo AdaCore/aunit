@@ -32,7 +32,7 @@
 --  Dummy implementation.
 
 with System.Storage_Elements;
-with Unchecked_Conversion;
+with Ada.Unchecked_Conversion;
 
 package body AUnit.Memory is
 
@@ -49,19 +49,17 @@ package body AUnit.Memory is
 
    Top : Mark_Id := Mem'First;
 
-   function To_Mark_Id is new Unchecked_Conversion
-     (size_t, Mark_Id);
+   function To_Mark_Id is new Ada.Unchecked_Conversion (size_t, Mark_Id);
 
    -----------
    -- Alloc --
    -----------
 
    function AUnit_Alloc (Size : size_t) return System.Address is
-      Max_Align    : constant Mark_Id := Mark_Id (Standard'Maximum_Alignment);
-      Max_Size     : Mark_Id :=
-                       ((To_Mark_Id (Size) + Max_Align - 1) / Max_Align)
-                       * Max_Align;
-      Location     : constant Mark_Id := Top;
+      Max_Align : constant Mark_Id := Mark_Id (Standard'Maximum_Alignment);
+      Max_Size  : Mark_Id :=
+        ((To_Mark_Id (Size) + Max_Align - 1) / Max_Align) * Max_Align;
+      Location  : constant Mark_Id := Top;
    begin
       if Max_Size = 0 then
          Max_Size := Max_Align;

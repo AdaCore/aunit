@@ -48,6 +48,10 @@ package body AUnit.Test_Results is
    function Alloc_Location is new
      AUnit.Memory.Utils.Gen_Alloc (Tested_Location, Tested_Location_Access);
 
+   function Copy_Location
+     (Location : Tested_Location) return Tested_Location_Access;
+   --  Preserve the missing-location sentinel when copying to the heap.
+
    Package_List : Message_List_Access;
 
    function Matches_Package
@@ -124,16 +128,18 @@ package body AUnit.Test_Results is
    is
       use Message_List;
       Elem         : constant Test_Result := Result_Lists.Element (Position);
-      --  Empty and null package names share the unnamed suite. Use null
-      --  here because the empty-string filter selects every package.
-      Package_Name : constant Message_String :=
-        (if Elem.Package_Name = null or else Elem.Package_Name.all'Length = 0
-         then null
-         else Elem.Package_Name);
+      Package_Name : Message_String;
       Present      : Boolean := False;
       C            : Cursor := First (Package_List.all);
       pragma Unreferenced (Name);
    begin
+      --  Empty and null package names share the unnamed suite. Use null
+      --  here because the empty-string filter selects every package.
+      if Elem.Package_Name = null or else Elem.Package_Name.all'Length = 0 then
+         Package_Name := null;
+      else
+         Package_Name := Elem.Package_Name;
+      end if;
       while Has_Element (C) and not Present loop
          if (Element (C) = null and then Package_Name = null)
            or else
@@ -146,7 +152,7 @@ package body AUnit.Test_Results is
          C := Next (C);
       end loop;
       if not Present then
-         Package_List.all.Append (Package_Name);
+         Append (Package_List.all, Package_Name);
       end if;
    end Iterate_Package_Name;
 
@@ -166,7 +172,7 @@ package body AUnit.Test_Results is
 
       while Has_Element (C) loop
          if Test (C, N) then
-            E.Append (Element (C));
+            Append (E, Element (C));
          end if;
          Next (C);
       end loop;
@@ -219,6 +225,22 @@ package body AUnit.Test_Results is
         not Is_Error (Position, Name) and then not Is_Failure (Position, Name);
    end Is_Success;
 
+   -------------------
+   -- Copy_Location --
+   -------------------
+
+   function Copy_Location
+     (Location : Tested_Location) return Tested_Location_Access
+   is
+      Result : Tested_Location_Access := null;
+   begin
+      if Location /= No_Location then
+         Result := Alloc_Location;
+         Result.all := Location;
+      end if;
+      return Result;
+   end Copy_Location;
+
    ---------------
    -- Add_Error --
    ---------------
@@ -246,14 +268,10 @@ package body AUnit.Test_Results is
          Test_File       => Test_File,
          Standard_Output => Standard_Output,
          Standard_Error  => Standard_Error,
-         Location        =>
-           (if Location = No_Location then null else Alloc_Location),
+         Location        => Copy_Location (Location),
          Suffix          => Suffix);
       use Result_Lists;
    begin
-      if Location /= No_Location then
-         Val.Location.all := Location;
-      end if;
       Val.Error.all := Error;
       Append (R.Result_List, Val);
    end Add_Error;
@@ -286,14 +304,10 @@ package body AUnit.Test_Results is
          Test_File       => Test_File,
          Standard_Output => Standard_Output,
          Standard_Error  => Standard_Error,
-         Location        =>
-           (if Location = No_Location then null else Alloc_Location),
+         Location        => Copy_Location (Location),
          Suffix          => Suffix);
       use Result_Lists;
    begin
-      if Location /= No_Location then
-         Val.Location.all := Location;
-      end if;
       Val.Failure.all := Failure;
       Append (R.Result_List, Val);
    end Add_Failure;
@@ -325,15 +339,11 @@ package body AUnit.Test_Results is
          Test_File       => Test_File,
          Standard_Output => Standard_Output,
          Standard_Error  => Standard_Error,
-         Location        =>
-           (if Location = No_Location then null else Alloc_Location),
+         Location        => Copy_Location (Location),
          Suffix          => Suffix);
       use Result_Lists;
 
    begin
-      if Location /= No_Location then
-         Val.Location.all := Location;
-      end if;
       Append (R.Result_List, Val);
 
    end Add_Success;

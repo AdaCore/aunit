@@ -56,8 +56,8 @@ package body AUnit.Reporter.JUnit is
 
    procedure Put_Special_Chars (File : AUnit.IO.File_Type; S : String) is
    begin
-      for C of S loop
-         case C is
+      for I in S'Range loop
+         case S (I) is
             when '"'    =>
                Put (File, "&quot;");
 
@@ -71,7 +71,7 @@ package body AUnit.Reporter.JUnit is
                Put (File, "&amp;");
 
             when others =>
-               Put (File, (1 => C));
+               Put (File, (1 => S (I)));
          end case;
       end loop;
    end Put_Special_Chars;
@@ -153,12 +153,10 @@ package body AUnit.Reporter.JUnit is
    procedure Report_Test (File : AUnit.IO.File_Type; Test : Test_Result) is
    begin
       Put (File, "<testcase name=""", Indent => 2);
-      Put_Special_Chars
-        (File,
-         Test.Test_Name.all
-         & (if Test.Routine_Name = null
-            then ""
-            else " : " & Test.Routine_Name.all));
+      Put_Special_Chars (File, Test.Test_Name.all);
+      if Test.Routine_Name /= null then
+         Put_Special_Chars (File, " : " & Test.Routine_Name.all);
+      end if;
       Put (File, """");
       if Test.Package_Name /= null then
          Put (File, " classname=""");
@@ -271,14 +269,13 @@ package body AUnit.Reporter.JUnit is
       begin
          while Has_Element (C) loop
             Package_Name := Element (C);
-            Put
-              (File,
-               "<testsuite name="""
-               & (if Package_Name = null
-                  then "unnamed-testsuite"
-                  else Package_Name.all)
-               & """ skipped=""0"" tests=""",
-               Indent => 1);
+            Put (File, "<testsuite name=""", Indent => 1);
+            if Package_Name = null then
+               Put (File, "unnamed-testsuite");
+            else
+               Put (File, Package_Name.all);
+            end if;
+            Put (File, """ skipped=""0"" tests=""");
             Put (File, Integer (Total_Count (R, Package_Name)), 0);
             Put (File, """ failures=""");
             Put (File, Integer (Failure_Count (R, Package_Name)), 0);

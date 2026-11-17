@@ -45,20 +45,18 @@ package body AUnit is
    type Bounds is record
       First : Natural;
       Last  : Natural;
-   end record
-   with
-     Bit_Order            => System.Default_Bit_Order,
-     Scalar_Storage_Order => System.Default_Bit_Order;
+   end record;
+   for Bounds'Bit_Order use System.Default_Bit_Order;
+   for Bounds'Scalar_Storage_Order use System.Default_Bit_Order;
 
    type Bounds_Access is access all Bounds;
 
    type Fat_Pointer is record
       Address       : System.Address;
       Bound_Address : Bounds_Access;
-   end record
-   with
-     Bit_Order            => System.Default_Bit_Order,
-     Scalar_Storage_Order => System.Default_Bit_Order;
+   end record;
+   for Fat_Pointer'Bit_Order use System.Default_Bit_Order;
+   for Fat_Pointer'Scalar_Storage_Order use System.Default_Bit_Order;
 
    pragma Warnings (On, "scalar storage order");
 

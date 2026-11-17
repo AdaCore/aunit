@@ -33,10 +33,9 @@ with Ada.Exceptions; use Ada.Exceptions;
 with AUnit.Time_Measure;
 with AUnit.IO;
 
-separate
-  (AUnit.Simple_Test_Cases)
+separate (AUnit.Simple_Test_Cases)
 
-   --  Version for cert run-time libraries
+--  Version for cert run-time libraries
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    Options : AUnit.Options.AUnit_Options;
@@ -62,7 +61,10 @@ begin
       end if;
 
       AUnit.IO.Redirect_Standard_Streams
-        (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
+        (Name (Test.all).all,
+         Output_File,
+         Error_File,
+         Options.Capture_Standard);
 
       Run_Test (Test.all);
 
@@ -101,9 +103,11 @@ begin
             Package_Name    => Package_Name (Test.all),
             Test_File       => Test_File (Test.all),
             Standard_Output =>
-              AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+              AUnit.IO.Read_Output
+                (Name (Test.all).all, Options.Capture_Standard),
             Standard_Error  =>
-              AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+              AUnit.IO.Read_Error
+                (Name (Test.all).all, Options.Capture_Standard),
             Location        => Location (Test.all),
             Suffix          => Suffix (Test.all));
    end;
@@ -118,9 +122,10 @@ begin
          Package_Name    => Package_Name (Test.all),
          Test_File       => Test_File (Test.all),
          Standard_Output =>
-           AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+           AUnit.IO.Read_Output
+             (Name (Test.all).all, Options.Capture_Standard),
          Standard_Error  =>
-           AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+           AUnit.IO.Read_Error (Name (Test.all).all, Options.Capture_Standard),
          Location        => Location (Test.all),
          Suffix          => Suffix (Test.all));
    else
@@ -139,9 +144,10 @@ begin
                Test_File       => Test_File (Test.all),
                Standard_Output =>
                  AUnit.IO.Read_Output
-                   (Test.Name.all, Options.Capture_Standard),
+                   (Name (Test.all).all, Options.Capture_Standard),
                Standard_Error  =>
-                 AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+                 AUnit.IO.Read_Error
+                   (Name (Test.all).all, Options.Capture_Standard),
                Location        => Location (Test.all),
                Suffix          => Suffix (Test.all));
             Next (C);

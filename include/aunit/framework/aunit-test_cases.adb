@@ -38,8 +38,9 @@ package body AUnit.Test_Cases is
 
    package body Registration is separate;
 
-   function Call_Set_Up_Case
-     (Test : in out Test_Case'Class) return Test_Error_Access;
+   procedure Call_Set_Up_Case
+     (Test : in out Test_Case'Class; Error : out Test_Error_Access);
+   --  Error is null on success, else describes what Set_Up_Case raised
 
    -----------------
    -- Add_Routine --
@@ -63,8 +64,8 @@ package body AUnit.Test_Cases is
    -- Call_Set_Up_Case --
    ----------------------
 
-   function Call_Set_Up_Case
-     (Test : in out Test_Case'Class) return Test_Error_Access
+   procedure Call_Set_Up_Case
+     (Test : in out Test_Case'Class; Error : out Test_Error_Access)
    is separate;
 
    ---------
@@ -96,7 +97,7 @@ package body AUnit.Test_Cases is
          then
             if not Set_Up_Case_Called then
                Set_Up_Case_Called := True;
-               Error := Call_Set_Up_Case (Test_Case'Class (Test.all));
+               Call_Set_Up_Case (Test_Case'Class (Test.all), Error);
             end if;
 
             if Error = null then

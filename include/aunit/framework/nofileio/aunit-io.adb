@@ -36,11 +36,15 @@ package body AUnit.IO is
    Standard_Out : aliased constant File_Type := 1;
    Standard_Err : aliased constant File_Type := 2;
 
-   function Standard_Output return File_Access
-   is (Standard_Out'Access);
+   function Standard_Output return File_Access is
+   begin
+      return Standard_Out'Access;
+   end Standard_Output;
 
-   function Standard_Error return File_Access
-   is (Standard_Err'Access);
+   function Standard_Error return File_Access is
+   begin
+      return Standard_Err'Access;
+   end Standard_Error;
 
    procedure Put
      (File  : File_Type;
@@ -75,7 +79,8 @@ package body AUnit.IO is
      (Name             : String;
       Output_File      : in out File_Type;
       Error_File       : in out File_Type;
-      Capture_Standard : Boolean) is
+      Capture_Standard : Boolean)
+   is
       pragma Unreferenced (Name, Output_File, Error_File, Capture_Standard);
    begin
       null;
@@ -84,22 +89,25 @@ package body AUnit.IO is
    procedure Restore_Standard_Streams
      (Output_File      : in out File_Type;
       Error_File       : in out File_Type;
-      Capture_Standard : Boolean) is
+      Capture_Standard : Boolean)
+   is
       pragma Unreferenced (Output_File, Error_File, Capture_Standard);
    begin
       null;
    end Restore_Standard_Streams;
 
    function Read_Error
-     (Name : String; Capture_Standard : Boolean) return Message_String is
-     pragma Unreferenced (Name, Capture_Standard);
+     (Name : String; Capture_Standard : Boolean) return Message_String
+   is
+      pragma Unreferenced (Name, Capture_Standard);
    begin
       return null;
    end Read_Error;
 
    function Read_Output
-     (Name : String; Capture_Standard : Boolean) return Message_String is
-     pragma Unreferenced (Name, Capture_Standard);
+     (Name : String; Capture_Standard : Boolean) return Message_String
+   is
+      pragma Unreferenced (Name, Capture_Standard);
    begin
       return null;
    end Read_Output;
