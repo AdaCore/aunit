@@ -18,7 +18,8 @@ project AUnit_Shared is
    Library_Type : Library_Kind :=
      external ("AUNIT_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
 
-   Library_Dir := external ("AUNIT_LIBDIR", "../aunit/" & Target & "-" & Runtime);
+   Library_Dir := external ("AUNIT_LIBDIR", "../aunit/" & Target & "-" & Runtime
+                            & "-" & Library_Kind);
 
    for Source_Dirs use ();
 
