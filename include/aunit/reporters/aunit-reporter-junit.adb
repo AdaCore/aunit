@@ -274,23 +274,25 @@ package body AUnit.Reporter.JUnit is
             Put
               (File,
                "<testsuite name="""
-               & Package_Name.all
+               & (if Package_Name = null
+                  then "unnamed-testsuite"
+                  else Package_Name.all)
                & """ skipped=""0"" tests=""",
                Indent => 1);
-            Put (File, Integer (Total_Count (R, Package_Name.all)), 0);
+            Put (File, Integer (Total_Count (R, Package_Name)), 0);
             Put (File, """ failures=""");
-            Put (File, Integer (Failure_Count (R, Package_Name.all)), 0);
+            Put (File, Integer (Failure_Count (R, Package_Name)), 0);
             Put (File, """ errors=""");
-            Put (File, Integer (Error_Count (R, Package_Name.all)), 0);
+            Put (File, Integer (Error_Count (R, Package_Name)), 0);
 
             declare
                S : Result_Lists.List;
                F : Result_Lists.List;
                E : Result_Lists.List;
             begin
-               Successes (R, S, Package_Name.all);
-               Failures (R, F, Package_Name.all);
-               Errors (R, E, Package_Name.all);
+               Successes (R, S, Package_Name);
+               Failures (R, F, Package_Name);
+               Errors (R, E, Package_Name);
 
                if T /= Time_Measure.Null_Time then
                   Put (File, """ time=""");

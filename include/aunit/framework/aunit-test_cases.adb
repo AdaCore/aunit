@@ -112,17 +112,17 @@ package body AUnit.Test_Cases is
             else
                Outcome := Failure;
                Add_Error
-                 (R,
-                  Name (Test_Case'Class (Test.all)),
-                  Package_Name (Test_Case'Class (Test.all)),
-                  Test_File (Test_Case'Class (Test.all)),
-                  Routine_Name (Test.all),
-                  null,
-                  null,
-                  Location (Test_Case'Class (Test.all)),
-                  Error.all,
-                  Suffix (Test_Case'Class (Test.all)),
-                  Time_Measure.Null_Time);
+                 (R               => R,
+                  Test_Name       => Name (Test_Case'Class (Test.all)),
+                  Routine_Name    => Routine_Name (Test.all),
+                  Error           => Error.all,
+                  Elapsed         => Time_Measure.Null_Time,
+                  Package_Name    => Package_Name (Test_Case'Class (Test.all)),
+                  Test_File       => Test_File (Test_Case'Class (Test.all)),
+                  Standard_Output => null,
+                  Standard_Error  => null,
+                  Location        => Location (Test_Case'Class (Test.all)),
+                  Suffix          => Suffix (Test_Case'Class (Test.all)));
             end if;
          end if;
 

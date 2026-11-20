@@ -51,7 +51,9 @@ package body AUnit.Reporter.Text is
    generic
       with
         procedure Get
-          (R : Result; L : in out Result_Lists.List; N : String := "");
+          (R : Result;
+           L : in out Result_Lists.List;
+           N : Message_String := All_Packages);
       Label : String;
       Color : String;
    procedure Report_Tests
