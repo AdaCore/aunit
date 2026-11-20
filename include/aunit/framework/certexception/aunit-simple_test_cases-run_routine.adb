@@ -33,9 +33,10 @@ with Ada.Exceptions; use Ada.Exceptions;
 with AUnit.Time_Measure;
 with AUnit.IO;
 
-separate (AUnit.Simple_Test_Cases)
+separate
+  (AUnit.Simple_Test_Cases)
 
---  Version for cert run-time libraries
+   --  Version for cert run-time libraries
 procedure Run_Routine
   (Test    : access Test_Case'Class;
    Options : AUnit.Options.AUnit_Options;
@@ -60,11 +61,13 @@ begin
          Start_Measure (Time);
       end if;
 
-      AUnit.IO.Redirect_Standard_Streams (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
+      AUnit.IO.Redirect_Standard_Streams
+        (Test.Name.all, Output_File, Error_File, Options.Capture_Standard);
 
       Run_Test (Test.all);
 
-      AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
+      AUnit.IO.Restore_Standard_Streams
+        (Output_File, Error_File, Options.Capture_Standard);
 
       if Options.Test_Case_Timer then
          Stop_Measure (Time);
@@ -72,48 +75,54 @@ begin
 
    exception
       when Assertion_Error =>
-         AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
+         AUnit.IO.Restore_Standard_Streams
+           (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
       when E : others =>
-         AUnit.IO.Restore_Standard_Streams (Output_File, Error_File, Options.Capture_Standard);
+         AUnit.IO.Restore_Standard_Streams
+           (Output_File, Error_File, Options.Capture_Standard);
          if Options.Test_Case_Timer then
             Stop_Measure (Time);
          end if;
 
          Unexpected_Exception := True;
          Add_Error
-           (R,
-            Name (Test.all),
-            Package_Name (Test.all),
-            Test_File (Test.all),
-            Routine_Name (Test.all),
-            AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-            AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-            Location (Test.all),
-            Error   =>
+           (R               => R,
+            Test_Name       => Name (Test.all),
+            Routine_Name    => Routine_Name (Test.all),
+            Error           =>
               (Exception_Name    => Format (Exception_Name (E)),
                Exception_Message => null,
                Traceback         => null),
-            Suffix  => Suffix (Test.all),
-            Elapsed => Time);
+            Elapsed         => Time,
+            Package_Name    => Package_Name (Test.all),
+            Test_File       => Test_File (Test.all),
+            Standard_Output =>
+              AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+            Standard_Error  =>
+              AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+            Location        => Location (Test.all),
+            Suffix          => Suffix (Test.all));
    end;
 
    if not Unexpected_Exception and then not Has_Failures (Test.all) then
       Outcome := Success;
       Add_Success
-        (R,
-         Name (Test.all),
-         Package_Name (Test.all),
-         Test_File (Test.all),
-         Routine_Name (Test.all),
-         AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-         AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-         Location (Test.all),
-         Suffix (Test.all),
-         Time);
+        (R               => R,
+         Test_Name       => Name (Test.all),
+         Routine_Name    => Routine_Name (Test.all),
+         Elapsed         => Time,
+         Package_Name    => Package_Name (Test.all),
+         Test_File       => Test_File (Test.all),
+         Standard_Output =>
+           AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
+         Standard_Error  =>
+           AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+         Location        => Location (Test.all),
+         Suffix          => Suffix (Test.all));
    else
       Outcome := Failure;
       declare
@@ -121,17 +130,20 @@ begin
       begin
          while Has_Failure (C) loop
             Add_Failure
-              (R,
-               Name (Test.all),
-               Package_Name (Test.all),
-               Test_File (Test.all),
-               Routine_Name (Test.all),
-               AUnit.IO.Read_Output (Test.Name.all, Options.Capture_Standard),
-               AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
-               Location (Test.all),
-               Get_Failure (C),
-               Suffix (Test.all),
-               Time);
+              (R               => R,
+               Test_Name       => Name (Test.all),
+               Routine_Name    => Routine_Name (Test.all),
+               Failure         => Get_Failure (C),
+               Elapsed         => Time,
+               Package_Name    => Package_Name (Test.all),
+               Test_File       => Test_File (Test.all),
+               Standard_Output =>
+                 AUnit.IO.Read_Output
+                   (Test.Name.all, Options.Capture_Standard),
+               Standard_Error  =>
+                 AUnit.IO.Read_Error (Test.Name.all, Options.Capture_Standard),
+               Location        => Location (Test.all),
+               Suffix          => Suffix (Test.all));
             Next (C);
          end loop;
       end;
