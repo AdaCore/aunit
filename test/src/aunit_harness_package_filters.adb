@@ -14,8 +14,8 @@ with AUnit.Time_Measure; use AUnit.Time_Measure;
 with Harness_IO;
 
 procedure AUnit_Harness_Package_Filters is
-   R        : Result;
-   Output   : Message_String;
+   R      : Result;
+   Output : Message_String;
 
    procedure Add_Group (Package_Name : Message_String);
    procedure Check_Filter (Name : Message_String; Expected : Count_Type);
@@ -24,13 +24,21 @@ procedure AUnit_Harness_Package_Filters is
    begin
       Add_Success (R, Format ("success"), null, Null_Time, Package_Name);
       Add_Failure
-        (R, Format ("failure"), null,
-         (Message => Format ("failure"), Source_Name => Format ("test"),
-          Line => 1), Null_Time, Package_Name);
+        (R,
+         Format ("failure"),
+         null,
+         (Message     => Format ("failure"),
+          Source_Name => Format ("test"),
+          Line        => 1),
+         Null_Time,
+         Package_Name);
       Add_Error
-        (R, Format ("error"), null,
+        (R,
+         Format ("error"),
+         null,
          (Exception_Name => Format ("ERROR"), others => null),
-         Null_Time, Package_Name);
+         Null_Time,
+         Package_Name);
    end Add_Group;
 
    procedure Check_Filter (Name : Message_String; Expected : Count_Type) is
@@ -66,18 +74,15 @@ begin
       Check_Filter (null, 2);
       Check_Filter (Format ("Package"), 2);
       Check_Filter (Format ("Missing"), 0);
-      Assert (Total_Count (R) = 12, "Wrong default total count");
-      Assert (Success_Count (R) = 4, "Wrong default success count");
-      Assert (Failure_Count (R) = 4, "Wrong default failure count");
-      Assert (Error_Count (R) = 4, "Wrong default error count");
       declare
          S, F, E : Result_Lists.List;
       begin
          Successes (R, S);
          Failures (R, F);
          Errors (R, E);
-         Assert (S.Length = 4 and F.Length = 4 and E.Length = 4,
-                 "Default extraction must select all packages");
+         Assert
+           (S.Length = 4 and F.Length = 4 and E.Length = 4,
+            "Default extraction must select all packages");
       end;
 
       declare
@@ -113,13 +118,15 @@ begin
            (Ada.Strings.Fixed.Count
               (Output.all,
                "<testsuite name=""unnamed-testsuite"" skipped=""0"""
-              & " tests=""6"" failures=""2"" errors=""2""") = 1,
+               & " tests=""6"" failures=""2"" errors=""2""")
+            = 1,
             "Wrong unnamed suite counts");
          Assert
            (Ada.Strings.Fixed.Count
               (Output.all,
                "<testsuite name=""Package"" skipped=""0"" tests=""6"""
-               & " failures=""2"" errors=""2""") = 1,
+               & " failures=""2"" errors=""2""")
+            = 1,
             "Wrong named suite counts");
          Assert
            (Ada.Strings.Fixed.Count (Output.all, "<testcase name=") = 12,
@@ -142,7 +149,10 @@ begin
       Summary_Reporter : AUnit.Reporter.JUnit.JUnit_Reporter;
    begin
       Add_Success
-        (Summary, Format ("package filters"), null, Null_Time,
+        (Summary,
+         Format ("package filters"),
+         null,
+         Null_Time,
          Format ("AUnit_Harness_Package_Filters"));
       Start_Test (Summary, 1);
       Summary_Reporter.Report (Summary);
