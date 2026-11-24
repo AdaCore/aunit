@@ -7,13 +7,12 @@ with Ada_Containers; use Ada_Containers;
 
 with AUnit;              use AUnit;
 with AUnit.Assertions;   use AUnit.Assertions;
-with AUnit.Reporter.JUnit;
 with AUnit.Test_Results; use AUnit.Test_Results;
 with AUnit.Time_Measure; use AUnit.Time_Measure;
 
 with Harness_IO;
 
-procedure AUnit_Harness_Package_Filters is
+procedure AUnit_Harness_Package_Filters (Named_First : Boolean) is
    R      : Result;
    Output : Message_String;
 
@@ -56,105 +55,87 @@ procedure AUnit_Harness_Package_Filters is
       Assert (E.Length = Expected, "Wrong error list");
    end Check_Filter;
 begin
-   --  Both orders must safely compare null and nonnull package names.
-   for Named_First in Boolean loop
-      Clear (R);
-      if Named_First then
-         Add_Group (Format ("Package"));
-      end if;
-      Add_Group (null);
-      Add_Group (null);
-      if not Named_First then
-         Add_Group (Format ("Package"));
-      end if;
+   --  Safely compare null and nonnull package names in the selected order.
+   Clear (R);
+   if Named_First then
       Add_Group (Format ("Package"));
-      Start_Test (R, 12);
+   end if;
+   Add_Group (null);
+   Add_Group (null);
+   if not Named_First then
+      Add_Group (Format ("Package"));
+   end if;
+   Add_Group (Format ("Package"));
+   Start_Test (R, 12);
 
-      Check_Filter (Format (""), 4);
-      Check_Filter (null, 2);
-      Check_Filter (Format ("Package"), 2);
-      Check_Filter (Format ("Missing"), 0);
-      declare
-         S, F, E : Result_Lists.List;
-      begin
-         Successes (R, S);
-         Failures (R, F);
-         Errors (R, E);
-         Assert
-           (S.Length = 4 and F.Length = 4 and E.Length = 4,
-            "Default extraction must select all packages");
-      end;
-
-      declare
-         Packages : constant Message_List_Access := Get_Packages (R);
-         C        : Message_List.Cursor := Packages.First;
-         Unnamed  : Boolean := False;
-         Named    : Boolean := False;
-      begin
-         Assert (Packages.Length = 2, "Expected two packages");
-         while Message_List.Has_Element (C) loop
-            declare
-               Name : constant Message_String := Message_List.Element (C);
-            begin
-               if Name = null then
-                  Unnamed := True;
-               elsif Name.all = "Package" then
-                  Named := True;
-               else
-                  Assert (False, "Unexpected package name");
-               end if;
-            end;
-            C := Message_List.Next (C);
-         end loop;
-         Assert (Unnamed and Named, "Missing unnamed or named package");
-      end;
-
-      Output := Harness_IO.Capture_Report (R);
-      if Output /= null then
-         Assert
-           (Ada.Strings.Fixed.Count (Output.all, "<testsuite name=") = 2,
-            "Expected one named and one unnamed suite");
-         Assert
-           (Ada.Strings.Fixed.Count
-              (Output.all,
-               "<testsuite name=""unnamed-testsuite"" skipped=""0"""
-               & " tests=""6"" failures=""2"" errors=""2""")
-            = 1,
-            "Wrong unnamed suite counts");
-         Assert
-           (Ada.Strings.Fixed.Count
-              (Output.all,
-               "<testsuite name=""Package"" skipped=""0"" tests=""6"""
-               & " failures=""2"" errors=""2""")
-            = 1,
-            "Wrong named suite counts");
-         Assert
-           (Ada.Strings.Fixed.Count (Output.all, "<testcase name=") = 12,
-            "JUnit duplicated or omitted tests");
-         Assert
-           (Ada.Strings.Fixed.Count (Output.all, "classname=""Package""") = 6,
-            "Named tests appeared in the unnamed suite");
-      end if;
-
-      --  Empty and null package names share the unnamed suite.
-      Add_Group (Format (""));
-      Check_Filter (null, 3);
-      Check_Filter (Format (""), 5);
-   end loop;
-
-   --  Publish the harness outcome after every assertion has passed. The
-   --  fixture results above contain intentional failures and errors.
+   Check_Filter (Format (""), 4);
+   Check_Filter (null, 2);
+   Check_Filter (Format ("Package"), 2);
+   Check_Filter (Format ("Missing"), 0);
    declare
-      Summary          : Result;
-      Summary_Reporter : AUnit.Reporter.JUnit.JUnit_Reporter;
+      S, F, E : Result_Lists.List;
    begin
-      Add_Success
-        (Summary,
-         Format ("package filters"),
-         null,
-         Null_Time,
-         Format ("AUnit_Harness_Package_Filters"));
-      Start_Test (Summary, 1);
-      Summary_Reporter.Report (Summary);
+      Successes (R, S);
+      Failures (R, F);
+      Errors (R, E);
+      Assert
+        (S.Length = 4 and F.Length = 4 and E.Length = 4,
+         "Default extraction must select all packages");
    end;
+
+   declare
+      Packages : constant Message_List_Access := Get_Packages (R);
+      C        : Message_List.Cursor := Packages.First;
+      Unnamed  : Boolean := False;
+      Named    : Boolean := False;
+   begin
+      Assert (Packages.Length = 2, "Expected two packages");
+      while Message_List.Has_Element (C) loop
+         declare
+            Name : constant Message_String := Message_List.Element (C);
+         begin
+            if Name = null then
+               Unnamed := True;
+            elsif Name.all = "Package" then
+               Named := True;
+            else
+               Assert (False, "Unexpected package name");
+            end if;
+         end;
+         C := Message_List.Next (C);
+      end loop;
+      Assert (Unnamed and Named, "Missing unnamed or named package");
+   end;
+
+   Output := Harness_IO.Capture_Report (R);
+   if Output /= null then
+      Assert
+        (Ada.Strings.Fixed.Count (Output.all, "<testsuite name=") = 2,
+         "Expected one named and one unnamed suite");
+      Assert
+        (Ada.Strings.Fixed.Count
+           (Output.all,
+            "<testsuite name=""unnamed-testsuite"" skipped=""0"""
+            & " tests=""6"" failures=""2"" errors=""2""")
+         = 1,
+         "Wrong unnamed suite counts");
+      Assert
+        (Ada.Strings.Fixed.Count
+           (Output.all,
+            "<testsuite name=""Package"" skipped=""0"" tests=""6"""
+            & " failures=""2"" errors=""2""")
+         = 1,
+         "Wrong named suite counts");
+      Assert
+        (Ada.Strings.Fixed.Count (Output.all, "<testcase name=") = 12,
+         "JUnit duplicated or omitted tests");
+      Assert
+        (Ada.Strings.Fixed.Count (Output.all, "classname=""Package""") = 6,
+         "Named tests appeared in the unnamed suite");
+   end if;
+
+   --  Empty and null package names share the unnamed suite.
+   Add_Group (Format (""));
+   Check_Filter (null, 3);
+   Check_Filter (Format (""), 5);
 end AUnit_Harness_Package_Filters;
